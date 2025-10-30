@@ -1,292 +1,205 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Settings, History, Loader2, Sparkles, Camera as CameraIcon } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Camera, Scale, TrendingUp, Sparkles, Star, Clock, Package } from "lucide-react";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
-  const navigate = useNavigate();
-  const [cameraReady, setCameraReady] = useState(false);
-  const [scanning, setScanning] = useState(false);
-  const [file, setFile] = useState(null);
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const [isMobile] = useState(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+  const [userName, setUserName] = useState("");
+
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: async () => {
+      try {
+        return await base44.auth.me();
+      } catch {
+        return null;
+      }
+    }
+  });
+
+  const { data: captures, isLoading } = useQuery({
+    queryKey: ['recentCaptures'],
+    queryFn: () => base44.entities.Capture.list('-created_date', 10),
+    initialData: [],
+  });
 
   useEffect(() => {
-    startCamera();
-    return () => stopCamera();
-  }, []);
-
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: isMobile ? 'environment' : 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false 
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-      setCameraReady(true);
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setCameraReady(false);
+    if (user) {
+      const firstName = user.full_name?.split(' ')[0] || 'there';
+      setUserName(firstName);
     }
-  };
+  }, [user]);
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-  };
-
-  const capturePhoto = async () => {
-    if (!videoRef.current || !cameraReady) return;
-
-    setScanning(true);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(videoRef.current, 0, 0);
-
-    canvas.toBlob(async (blob) => {
-      const capturedFile = new File([blob], `snap-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      
-      try {
-        // Upload and process
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
-
-        // Extract data using AI
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this image/document and identify what it is. Provide:
-          1. A descriptive title/name of the object or document
-          2. Content type (homework, notes, diagram, idea, reminder, project, product, or other)
-          3. A detailed description and key insights (2-3 sentences)
-          4. 3-5 relevant keywords or tags
-          5. Any due dates or important dates mentioned (format: YYYY-MM-DD)
-          6. Extract any visible text
-          7. Smart tips or recommendations based on what you see
-          
-          Be thorough and provide actionable insights.`,
-          file_urls: file_url,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              title: { type: "string" },
-              content_type: { 
-                type: "string",
-                enum: ["homework", "notes", "diagram", "idea", "reminder", "project", "product", "other"]
-              },
-              description: { type: "string" },
-              smart_tips: { type: "string" },
-              keywords: { type: "array", items: { type: "string" } },
-              due_date: { type: "string" },
-              extracted_text: { type: "string" },
-              brand: { type: "string" },
-              model: { type: "string" }
-            }
-          }
-        });
-
-        // Save to database
-        const capture = await base44.entities.Capture.create({
-          title: result.title || "Untitled Scan",
-          content_type: result.content_type || "other",
-          file_url,
-          file_type: 'image',
-          ai_summary: result.description || result.smart_tips || "",
-          extracted_text: result.extracted_text || "",
-          keywords: result.keywords || [],
-          has_due_date: !!result.due_date,
-          due_date: result.due_date || null,
-          is_favorite: false
-        });
-
-        // Navigate to results
-        navigate(`${createPageUrl("Preview")}?id=${capture.id}&new=true`);
-      } catch (error) {
-        console.error("Error processing scan:", error);
-        alert("Failed to process image. Please try again.");
-      }
-      
-      setScanning(false);
-    }, 'image/jpeg', 0.9);
-  };
-
-  const handleFileUpload = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileSelect = async (e) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
-
-    setScanning(true);
-
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
-
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this image/document and identify what it is. Provide:
-        1. A descriptive title/name of the object or document
-        2. Content type (homework, notes, diagram, idea, reminder, project, product, or other)
-        3. A detailed description and key insights (2-3 sentences)
-        4. 3-5 relevant keywords or tags
-        5. Any due dates or important dates mentioned (format: YYYY-MM-DD)
-        6. Extract any visible text
-        7. Smart tips or recommendations based on what you see`,
-        file_urls: file_url,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            title: { type: "string" },
-            content_type: { 
-              type: "string",
-              enum: ["homework", "notes", "diagram", "idea", "reminder", "project", "product", "other"]
-            },
-            description: { type: "string" },
-            smart_tips: { type: "string" },
-            keywords: { type: "array", items: { type: "string" } },
-            due_date: { type: "string" },
-            extracted_text: { type: "string" }
-          }
-        }
-      });
-
-      const capture = await base44.entities.Capture.create({
-        title: result.title || "Untitled Scan",
-        content_type: result.content_type || "other",
-        file_url,
-        file_type: selectedFile.type.startsWith('image/') ? 'image' : 'pdf',
-        ai_summary: result.description || result.smart_tips || "",
-        extracted_text: result.extracted_text || "",
-        keywords: result.keywords || [],
-        has_due_date: !!result.due_date,
-        due_date: result.due_date || null,
-        is_favorite: false
-      });
-
-      navigate(`${createPageUrl("Preview")}?id=${capture.id}&new=true`);
-    } catch (error) {
-      console.error("Error processing file:", error);
-      alert("Failed to process file. Please try again.");
-    }
-    
-    setScanning(false);
-  };
+  const recentScans = captures.slice(0, 3);
+  const trendingProducts = captures.filter(c => c.content_type === 'product').slice(0, 3);
+  const aiSuggestions = captures.slice(3, 6);
 
   return (
-    <div className="relative h-screen w-screen bg-black overflow-hidden">
-      {/* Camera Video Feed */}
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted
-        className="absolute inset-0 w-full h-full object-cover"
-      />
-
-      {/* Overlay Text (top center) */}
-      {!scanning && (
-        <div className="absolute top-8 left-0 right-0 text-center z-10 px-6">
-          <p className="text-white text-sm font-medium drop-shadow-lg">
-            Point your camera at an object or document
-          </p>
-        </div>
-      )}
-
-      {/* Top Navigation */}
-      <div className="absolute top-0 left-0 right-0 z-20 pt-12 px-6 flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(createPageUrl("Library"))}
-          className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
-        >
-          <History className="w-5 h-5 text-white" />
-        </Button>
-        
-        <div className="flex items-center gap-2 bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/20">
-          <Sparkles className="w-4 h-4 text-[#00FF88]" />
-          <span className="text-white text-sm font-semibold">SnapSmart</span>
-        </div>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate(createPageUrl("AIAssistant"))}
-          className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
-        >
-          <Settings className="w-5 h-5 text-white" />
-        </Button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Header */}
+      <div className="px-6 pt-12 pb-6">
+        <h1 className="text-3xl font-bold text-[var(--smart-gray)] mb-2">
+          Welcome back, {userName || 'there'} 👋
+        </h1>
+        <p className="text-[var(--secondary-gray)] text-sm">
+          Discover and explore with SnapSmart
+        </p>
       </div>
 
-      {/* Scanning Overlay */}
-      {scanning && (
-        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
-          <div className="relative">
-            {/* Pulsing radar animation */}
-            <div className="w-32 h-32 rounded-full border-4 border-[#00FF88] animate-ping absolute inset-0" />
-            <div className="w-32 h-32 rounded-full border-4 border-[#00FF88] flex items-center justify-center relative">
-              <Loader2 className="w-16 h-16 text-[#00FF88] animate-spin" />
+      {/* Quick Access Buttons */}
+      <div className="px-6 mb-8">
+        <div className="grid grid-cols-2 gap-4">
+          <Link to={createPageUrl("Snap")}>
+            <div className="bg-gradient-to-br from-[var(--electric-blue)] to-[var(--teal-accent)] rounded-3xl p-6 text-white card-shadow smooth-transition hover:scale-105 active:scale-95">
+              <div className="flex items-center justify-between mb-3">
+                <Camera className="w-8 h-8" strokeWidth={2.5} />
+                <Sparkles className="w-6 h-6 opacity-80" />
+              </div>
+              <h3 className="text-xl font-bold mb-1">Snap Now</h3>
+              <p className="text-sm text-white/80">Identify anything</p>
             </div>
-          </div>
-          <p className="text-white text-lg font-semibold mt-8 animate-pulse">Scanning...</p>
-          <p className="text-white/70 text-sm mt-2">Analyzing your photo with AI</p>
+          </Link>
+
+          <Link to={createPageUrl("Compare")}>
+            <div className="bg-white rounded-3xl p-6 border-2 border-[var(--electric-blue)] card-shadow smooth-transition hover:scale-105 active:scale-95">
+              <div className="flex items-center justify-between mb-3">
+                <Scale className="w-8 h-8 text-[var(--electric-blue)]" strokeWidth={2.5} />
+                <Sparkles className="w-6 h-6 text-[var(--teal-accent)]" />
+              </div>
+              <h3 className="text-xl font-bold text-[var(--smart-gray)] mb-1">Compare</h3>
+              <p className="text-sm text-[var(--secondary-gray)]">2 items side-by-side</p>
+            </div>
+          </Link>
         </div>
-      )}
+      </div>
 
-      {/* Bottom Controls */}
-      {!scanning && (
-        <div className="absolute bottom-0 left-0 right-0 pb-12 px-6 z-20">
-          <div className="flex items-center justify-center gap-8">
-            {/* Upload from gallery button */}
-            <input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={handleFileSelect}
-              ref={fileInputRef}
-              className="hidden"
-            />
-            <button
-              onClick={handleFileUpload}
-              className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
-            >
-              <CameraIcon className="w-6 h-6 text-white" />
-            </button>
-
-            {/* Main Snap Button - BIG circular button */}
-            <button
-              onClick={capturePhoto}
-              disabled={!cameraReady}
-              className="w-24 h-24 rounded-full bg-gradient-to-r from-[#00FF88] to-[#00D9FF] shadow-2xl shadow-cyan-500/50 flex flex-col items-center justify-center smooth-transition hover:scale-110 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-            >
-              <Sparkles className="w-8 h-8 text-white mb-1" strokeWidth={2.5} />
-              <span className="text-white text-xs font-bold">SNAP</span>
-            </button>
-
-            {/* AI Assistant quick access */}
-            <button
-              onClick={() => navigate(createPageUrl("AIAssistant"))}
-              className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
-            >
-              <Sparkles className="w-6 h-6 text-[#00FF88]" />
-            </button>
+      {/* Scroll Feed */}
+      <div className="px-6 pb-8 space-y-8">
+        {/* Recently Scanned Items */}
+        <div className="slide-up">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[var(--electric-blue)]" />
+              <h2 className="text-lg font-bold text-[var(--smart-gray)]">Recently Scanned</h2>
+            </div>
+            <Link to={createPageUrl("Library")}>
+              <Button variant="ghost" size="sm" className="text-[var(--electric-blue)] font-semibold">
+                View All
+              </Button>
+            </Link>
           </div>
 
-          {!cameraReady && (
-            <p className="text-white text-sm text-center mt-4">
-              Requesting camera access...
-            </p>
+          {isLoading ? (
+            <div className="grid grid-cols-3 gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="aspect-square rounded-2xl shimmer" />
+              ))}
+            </div>
+          ) : recentScans.length === 0 ? (
+            <div className="bg-white rounded-3xl p-8 text-center border border-[var(--border-gray)] soft-shadow">
+              <Camera className="w-12 h-12 text-[var(--secondary-gray)] mx-auto mb-3" />
+              <p className="text-[var(--secondary-gray)] text-sm">No scans yet. Start snapping!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-3">
+              {recentScans.map((scan) => (
+                <Link key={scan.id} to={`${createPageUrl("Preview")}?id=${scan.id}`}>
+                  <div className="aspect-square rounded-2xl overflow-hidden bg-white border border-[var(--border-gray)] soft-shadow smooth-transition hover:scale-105">
+                    <img 
+                      src={scan.file_url} 
+                      alt={scan.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
-      )}
+
+        {/* Trending Products */}
+        {trendingProducts.length > 0 && (
+          <div className="slide-up">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-[var(--purple-accent)]" />
+              <h2 className="text-lg font-bold text-[var(--smart-gray)]">Trending Products</h2>
+            </div>
+            <div className="space-y-3">
+              {trendingProducts.map((product) => (
+                <Link key={product.id} to={`${createPageUrl("Preview")}?id=${product.id}`}>
+                  <div className="bg-white rounded-2xl p-4 border border-[var(--border-gray)] soft-shadow smooth-transition hover:shadow-lg flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img 
+                        src={product.file_url} 
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-[var(--smart-gray)] text-sm line-clamp-1 mb-1">
+                        {product.title}
+                      </h3>
+                      <p className="text-xs text-[var(--secondary-gray)] line-clamp-2 mb-2">
+                        {product.ai_summary}
+                      </p>
+                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 text-xs">
+                        Trending
+                      </Badge>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AI Suggestions */}
+        {aiSuggestions.length > 0 && (
+          <div className="slide-up">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-5 h-5 text-[var(--teal-accent)]" />
+              <h2 className="text-lg font-bold text-[var(--smart-gray)]">AI Suggestions for You</h2>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {aiSuggestions.map((suggestion) => (
+                <Link key={suggestion.id} to={`${createPageUrl("Preview")}?id=${suggestion.id}`}>
+                  <div className="bg-white rounded-2xl overflow-hidden border border-[var(--border-gray)] soft-shadow smooth-transition hover:scale-105">
+                    <div className="aspect-square bg-gray-100">
+                      <img 
+                        src={suggestion.file_url} 
+                        alt={suggestion.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-bold text-[var(--smart-gray)] text-sm line-clamp-1 mb-1">
+                        {suggestion.title}
+                      </h3>
+                      <p className="text-xs text-[var(--secondary-gray)] line-clamp-2">
+                        {suggestion.ai_summary}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Motivational Tagline */}
+      <div className="px-6 pb-8">
+        <div className="text-center">
+          <p className="text-[var(--secondary-gray)] text-sm font-medium italic">
+            "Learn more with every snap."
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

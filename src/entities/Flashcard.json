@@ -1,0 +1,45 @@
+{
+  "name": "Flashcard",
+  "type": "object",
+  "properties": {
+    "capture_id": {
+      "type": "string",
+      "description": "ID of the capture this flashcard was generated from"
+    },
+    "question": {
+      "type": "string",
+      "description": "Front of flashcard"
+    },
+    "answer": {
+      "type": "string",
+      "description": "Back of flashcard"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "easy",
+        "medium",
+        "hard"
+      ],
+      "default": "medium"
+    },
+    "mastery_level": {
+      "type": "number",
+      "default": 0,
+      "description": "User's mastery level (0-100)"
+    },
+    "times_reviewed": {
+      "type": "number",
+      "default": 0
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "capture_id",
+    "question",
+    "answer"
+  ]
+}

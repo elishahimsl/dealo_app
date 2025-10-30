@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, TrendingUp, Sparkles, Star, Clock, Package } from "lucide-react";
+import { Scan, Scale, FolderOpen, Sparkles, TrendingUp, Clock, Award, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const [userName, setUserName] = useState("");
+  const [greeting, setGreeting] = useState("");
+  const [rotatingText, setRotatingText] = useState(0);
+
+  const rotatingMessages = [
+    "Scan something new",
+    "Compare two items", 
+    "See what others discovered"
+  ];
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -29,174 +36,194 @@ export default function Home() {
   });
 
   useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+
     if (user) {
       const firstName = user.full_name?.split(' ')[0] || 'there';
       setUserName(firstName);
     }
   }, [user]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotatingText((prev) => (prev + 1) % rotatingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const smartActions = [
+    { 
+      icon: Scan, 
+      title: "Identify Something", 
+      description: "Snap a picture or upload an image to learn more",
+      gradient: "from-[var(--accent)] to-[var(--primary)]",
+      page: "Snap"
+    },
+    { 
+      icon: Scale, 
+      title: "Compare Mode", 
+      description: "Scan or select two images and I'll analyze the differences",
+      gradient: "from-purple-600 to-blue-600",
+      page: "Compare"
+    },
+    { 
+      icon: FolderOpen, 
+      title: "My Library", 
+      description: "Access your saved scans, discoveries, and notes",
+      gradient: "from-blue-600 to-cyan-600",
+      page: "Library"
+    }
+  ];
+
   const recentScans = captures.slice(0, 3);
-  const trendingProducts = captures.filter(c => c.content_type === 'product').slice(0, 3);
-  const aiSuggestions = captures.slice(3, 6);
+  const trendingTopics = [
+    { title: "Top Tech Gadgets This Week", badge: "Trending" },
+    { title: "Cool Art Finds", badge: "AI Recommended" },
+    { title: "Eco-friendly Materials", badge: "Popular" }
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Header */}
-      <div className="px-6 pt-12 pb-6">
-        <h1 className="text-3xl font-bold text-[var(--smart-gray)] mb-2">
-          Welcome back, {userName || 'there'} 👋
+    <div className="min-h-screen bg-[#1F2421]">
+      {/* Top Section: Greeting */}
+      <div className="px-6 pt-12 pb-8 slide-in">
+        <h1 className="text-3xl font-bold text-[var(--light)] mb-2">
+          {greeting}, {userName || 'there'} 👋
         </h1>
-        <p className="text-[var(--secondary-gray)] text-sm">
-          Discover and explore with SnapSmart
+        <p className="text-[var(--secondary)] text-lg mb-4">
+          What would you like to do today?
         </p>
-      </div>
-
-      {/* Quick Access Buttons */}
-      <div className="px-6 mb-8">
-        <div className="grid grid-cols-2 gap-4">
-          <Link to={createPageUrl("Snap")}>
-            <div className="bg-gradient-to-br from-[var(--electric-blue)] to-[var(--teal-accent)] rounded-3xl p-6 text-white card-shadow smooth-transition hover:scale-105 active:scale-95">
-              <div className="flex items-center justify-between mb-3">
-                <Camera className="w-8 h-8" strokeWidth={2.5} />
-                <Sparkles className="w-6 h-6 opacity-80" />
-              </div>
-              <h3 className="text-xl font-bold mb-1">Snap Now</h3>
-              <p className="text-sm text-white/80">Identify anything</p>
-            </div>
-          </Link>
-
-          <Link to={createPageUrl("Compare")}>
-            <div className="bg-white rounded-3xl p-6 border-2 border-[var(--electric-blue)] card-shadow smooth-transition hover:scale-105 active:scale-95">
-              <div className="flex items-center justify-between mb-3">
-                <Scale className="w-8 h-8 text-[var(--electric-blue)]" strokeWidth={2.5} />
-                <Sparkles className="w-6 h-6 text-[var(--teal-accent)]" />
-              </div>
-              <h3 className="text-xl font-bold text-[var(--smart-gray)] mb-1">Compare</h3>
-              <p className="text-sm text-[var(--secondary-gray)]">2 items side-by-side</p>
-            </div>
-          </Link>
+        
+        {/* Rotating Subtitles */}
+        <div className="h-8 overflow-hidden">
+          <div 
+            className="smooth-transition"
+            style={{ 
+              transform: `translateY(-${rotatingText * 32}px)`,
+              transition: 'transform 0.5s ease-in-out'
+            }}
+          >
+            {rotatingMessages.map((msg, idx) => (
+              <Link 
+                key={idx} 
+                to={createPageUrl(idx === 0 ? "Snap" : idx === 1 ? "Compare" : "Library")}
+                className="h-8 flex items-center gap-2 text-[var(--accent)] font-medium hover:text-[var(--secondary)] smooth-transition"
+              >
+                <Sparkles className="w-4 h-4" />
+                {msg}
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Scroll Feed */}
-      <div className="px-6 pb-8 space-y-8">
-        {/* Recently Scanned Items */}
-        <div className="slide-up">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[var(--electric-blue)]" />
-              <h2 className="text-lg font-bold text-[var(--smart-gray)]">Recently Scanned</h2>
-            </div>
-            <Link to={createPageUrl("Library")}>
-              <Button variant="ghost" size="sm" className="text-[var(--electric-blue)] font-semibold">
-                View All
-              </Button>
-            </Link>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-3 gap-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square rounded-2xl shimmer" />
-              ))}
-            </div>
-          ) : recentScans.length === 0 ? (
-            <div className="bg-white rounded-3xl p-8 text-center border border-[var(--border-gray)] soft-shadow">
-              <Camera className="w-12 h-12 text-[var(--secondary-gray)] mx-auto mb-3" />
-              <p className="text-[var(--secondary-gray)] text-sm">No scans yet. Start snapping!</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 gap-3">
-              {recentScans.map((scan) => (
-                <Link key={scan.id} to={`${createPageUrl("Preview")}?id=${scan.id}`}>
-                  <div className="aspect-square rounded-2xl overflow-hidden bg-white border border-[var(--border-gray)] soft-shadow smooth-transition hover:scale-105">
-                    <img 
-                      src={scan.file_url} 
-                      alt={scan.title} 
-                      className="w-full h-full object-cover"
-                    />
+      {/* Middle Section: Smart Actions Grid */}
+      <div className="px-6 pb-8">
+        <div className="grid grid-cols-1 gap-4">
+          {smartActions.map((action, idx) => {
+            const Icon = action.icon;
+            return (
+              <Link key={idx} to={createPageUrl(action.page)}>
+                <div 
+                  className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 shadow-2xl smooth-transition hover:scale-105 active:scale-95 slide-in`}
+                  style={{ animationDelay: `${idx * 0.1}s` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-8 h-8 text-white" strokeWidth={2.5} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-white mb-2">{action.title}</h3>
+                      <p className="text-white/80 text-sm leading-relaxed">
+                        {action.description}
+                      </p>
+                    </div>
                   </div>
-                </Link>
-              ))}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Lower Section: Smart Recommendations Feed */}
+      <div className="px-6 pb-32">
+        <div className="flex items-center gap-2 mb-6">
+          <Sparkles className="w-5 h-5 text-[var(--accent)]" />
+          <h2 className="text-xl font-bold text-[var(--light)]">Smart Picks for You 🌟</h2>
+        </div>
+
+        {/* Horizontal Scrollable Cards */}
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide mb-6">
+          {recentScans.map((scan, idx) => (
+            <Link key={scan.id} to={`${createPageUrl("Preview")}?id=${scan.id}`}>
+              <div className="flex-shrink-0 w-64 glass-dark rounded-3xl overflow-hidden smooth-transition hover:scale-105">
+                <div className="h-40 bg-gradient-to-br from-[var(--primary)] to-[var(--accent)]">
+                  <img 
+                    src={scan.file_url} 
+                    alt={scan.title}
+                    className="w-full h-full object-cover opacity-90"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-[var(--light)] text-sm line-clamp-1 mb-1">
+                    {scan.title}
+                  </h3>
+                  <p className="text-[var(--secondary)] text-xs line-clamp-2 mb-3">
+                    {scan.ai_summary || "Recent discovery"}
+                  </p>
+                  <Badge className="bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30">
+                    <Clock className="w-3 h-3 mr-1" />
+                    Recent
+                  </Badge>
+                </div>
+              </div>
+            </Link>
+          ))}
+
+          {/* AI Curated Topics */}
+          {trendingTopics.map((topic, idx) => (
+            <div key={idx} className="flex-shrink-0 w-64 glass-dark rounded-3xl p-4 smooth-transition hover:scale-105">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center mb-3">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-bold text-[var(--light)] text-sm mb-2">
+                {topic.title}
+              </h3>
+              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                {topic.badge}
+              </Badge>
             </div>
+          ))}
+
+          {/* Your Past Scans Suggestion */}
+          {captures.length > 3 && (
+            <Link to={createPageUrl("Library")}>
+              <div className="flex-shrink-0 w-64 glass-dark rounded-3xl p-4 smooth-transition hover:scale-105">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center mb-3">
+                  <Award className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-bold text-[var(--light)] text-sm mb-2">
+                  You have {captures.length} discoveries
+                </h3>
+                <p className="text-[var(--secondary)] text-xs mb-3">
+                  Want to explore them again?
+                </p>
+                <Badge className="bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30">
+                  From Your Library
+                </Badge>
+              </div>
+            </Link>
           )}
         </div>
 
-        {/* Trending Products */}
-        {trendingProducts.length > 0 && (
-          <div className="slide-up">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-[var(--purple-accent)]" />
-              <h2 className="text-lg font-bold text-[var(--smart-gray)]">Trending Products</h2>
-            </div>
-            <div className="space-y-3">
-              {trendingProducts.map((product) => (
-                <Link key={product.id} to={`${createPageUrl("Preview")}?id=${product.id}`}>
-                  <div className="bg-white rounded-2xl p-4 border border-[var(--border-gray)] soft-shadow smooth-transition hover:shadow-lg flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-                      <img 
-                        src={product.file_url} 
-                        alt={product.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-[var(--smart-gray)] text-sm line-clamp-1 mb-1">
-                        {product.title}
-                      </h3>
-                      <p className="text-xs text-[var(--secondary-gray)] line-clamp-2 mb-2">
-                        {product.ai_summary}
-                      </p>
-                      <Badge className="bg-purple-50 text-purple-600 border-purple-200 text-xs">
-                        Trending
-                      </Badge>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* AI Suggestions */}
-        {aiSuggestions.length > 0 && (
-          <div className="slide-up">
-            <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-[var(--teal-accent)]" />
-              <h2 className="text-lg font-bold text-[var(--smart-gray)]">AI Suggestions for You</h2>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {aiSuggestions.map((suggestion) => (
-                <Link key={suggestion.id} to={`${createPageUrl("Preview")}?id=${suggestion.id}`}>
-                  <div className="bg-white rounded-2xl overflow-hidden border border-[var(--border-gray)] soft-shadow smooth-transition hover:scale-105">
-                    <div className="aspect-square bg-gray-100">
-                      <img 
-                        src={suggestion.file_url} 
-                        alt={suggestion.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-bold text-[var(--smart-gray)] text-sm line-clamp-1 mb-1">
-                        {suggestion.title}
-                      </h3>
-                      <p className="text-xs text-[var(--secondary-gray)] line-clamp-2">
-                        {suggestion.ai_summary}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Motivational Tagline */}
-      <div className="px-6 pb-8">
-        <div className="text-center">
-          <p className="text-[var(--secondary-gray)] text-sm font-medium italic">
-            "Learn more with every snap."
+        {/* Motivational Text */}
+        <div className="text-center mt-8">
+          <p className="text-[var(--secondary)] text-sm italic">
+            "Smart discovery starts here."
           </p>
         </div>
       </div>

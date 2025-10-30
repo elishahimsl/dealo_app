@@ -19,10 +19,11 @@ export default function Layout({ children, currentPageName }) {
     <div className="min-h-screen bg-white flex flex-col">
       <style>{`
         :root {
-          --electric-blue: #0066FF;
-          --smart-gray: #1A1A1A;
+          --primary-blue: #007BFF;
+          --secondary-blue: #E6F4FE;
+          --smart-gray: #1C1C1E;
           --secondary-gray: #6B7280;
-          --light-blue: #EBF5FF;
+          --light-blue: #E6F4FE;
           --border-gray: #E5E7EB;
         }
         
@@ -46,6 +47,31 @@ export default function Layout({ children, currentPageName }) {
         .smooth-transition {
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        .card-shadow {
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+        }
+        
+        @keyframes confetti {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+        
+        .transform-style-3d {
+          transform-style: preserve-3d;
+        }
+        
+        .backface-hidden {
+          backface-visibility: hidden;
+        }
+        
+        .rotate-y-180 {
+          transform: rotateY(180deg);
+        }
       `}</style>
 
       {/* Main Content */}
@@ -67,20 +93,20 @@ export default function Layout({ children, currentPageName }) {
                   to={item.path}
                   className="flex flex-col items-center justify-center flex-1 smooth-transition group"
                 >
-                  <div className={`p-2.5 rounded-2xl smooth-transition ${
+                  <div className={`p-2.5 rounded-full smooth-transition ${
                     active 
-                      ? 'bg-[var(--electric-blue)] shadow-lg shadow-blue-500/30' 
-                      : 'group-hover:bg-[var(--light-blue)]'
+                      ? 'bg-[var(--primary-blue)] shadow-lg shadow-blue-500/30' 
+                      : 'group-hover:bg-[var(--secondary-blue)]'
                   }`}>
                     <Icon 
                       className={`w-5 h-5 smooth-transition ${
-                        active ? 'text-white' : 'text-[var(--secondary-gray)] group-hover:text-[var(--electric-blue)]'
+                        active ? 'text-white' : 'text-[var(--secondary-gray)] group-hover:text-[var(--primary-blue)]'
                       }`}
                       strokeWidth={active ? 2.5 : 2}
                     />
                   </div>
                   <span className={`text-xs mt-1 smooth-transition font-medium ${
-                    active ? 'text-[var(--electric-blue)]' : 'text-[var(--secondary-gray)]'
+                    active ? 'text-[var(--primary-blue)]' : 'text-[var(--secondary-gray)]'
                   }`}>
                     {item.name}
                   </span>

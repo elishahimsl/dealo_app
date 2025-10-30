@@ -3,8 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Grid3x3, List, FolderPlus, ArrowLeft } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Grid3x3, List, FolderPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import FolderCard from "../components/library/FolderCard";
@@ -22,12 +21,6 @@ export default function Library() {
     initialData: [],
   });
 
-  const { data: folders } = useQuery({
-    queryKey: ['folders'],
-    queryFn: () => base44.entities.Folder.list(),
-    initialData: [],
-  });
-
   const filteredCaptures = captures.filter(capture => {
     const matchesSearch = capture.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          capture.ai_summary?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -40,22 +33,21 @@ export default function Library() {
     notes: captures.filter(c => c.content_type === 'notes').length,
     ideas: captures.filter(c => c.content_type === 'idea').length,
     projects: captures.filter(c => c.content_type === 'project').length,
-    reminders: captures.filter(c => c.content_type === 'reminder').length,
   };
 
+  const filterOptions = [
+    { value: "all", label: "All" },
+    { value: "homework", label: "Homework" },
+    { value: "notes", label: "Notes" },
+    { value: "idea", label: "Ideas" },
+    { value: "project", label: "Projects" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="px-6 pt-12 pb-6 sticky top-0 bg-white/80 backdrop-blur-xl z-10 border-b border-[var(--border-gray)]">
-        <div className="flex items-center gap-4 mb-6">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => navigate(createPageUrl("Home"))}
-            className="rounded-xl"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
+      <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-[var(--border-gray)]">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-[var(--smart-gray)]">Smart Library</h1>
             <p className="text-sm text-[var(--secondary-gray)]">{captures.length} items organized</p>
@@ -64,7 +56,7 @@ export default function Library() {
             size="icon"
             variant="ghost"
             onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-            className="rounded-xl"
+            className="rounded-full"
           >
             {viewMode === 'grid' ? <List className="w-5 h-5" /> : <Grid3x3 className="w-5 h-5" />}
           </Button>
@@ -74,32 +66,39 @@ export default function Library() {
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--secondary-gray)]" />
           <Input
-            placeholder="Search your captures..."
+            placeholder="Search your files"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-12 rounded-2xl border-[var(--border-gray)] text-base"
+            className="pl-12 h-12 rounded-full border-[var(--border-gray)] text-base"
           />
         </div>
 
-        {/* Filter Tabs */}
-        <Tabs value={activeFilter} onValueChange={setActiveFilter}>
-          <TabsList className="w-full bg-[var(--light-blue)] rounded-2xl p-1 grid grid-cols-4">
-            <TabsTrigger value="all" className="rounded-xl text-xs font-semibold">All</TabsTrigger>
-            <TabsTrigger value="notes" className="rounded-xl text-xs font-semibold">Notes</TabsTrigger>
-            <TabsTrigger value="homework" className="rounded-xl text-xs font-semibold">Homework</TabsTrigger>
-            <TabsTrigger value="idea" className="rounded-xl text-xs font-semibold">Ideas</TabsTrigger>
-          </TabsList>
-        </Tabs>
+        {/* Filter Chips Row */}
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {filterOptions.map((filter) => (
+            <button
+              key={filter.value}
+              onClick={() => setActiveFilter(filter.value)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap smooth-transition ${
+                activeFilter === filter.value
+                  ? 'bg-[var(--primary-blue)] text-white'
+                  : 'bg-[var(--secondary-blue)] text-[var(--primary-blue)] hover:bg-blue-100'
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="px-6 pb-8">
-        {/* Smart Folders */}
+      <div className="px-6 pb-8 pt-6">
+        {/* Smart Folders - 2 column grid, 140x140px cards */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[var(--smart-gray)]">Smart Folders</h2>
+            <h2 className="text-base font-semibold text-[var(--smart-gray)]">Smart Folders</h2>
             <span className="text-xs text-[var(--secondary-gray)] font-medium">Auto-organized</span>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <FolderCard 
               name="Homework" 
               count={smartFolderStats.homework} 
@@ -122,15 +121,15 @@ export default function Library() {
               name="Projects" 
               count={smartFolderStats.projects} 
               color="bg-emerald-500" 
-              icon="Star"
+              icon="Sparkles"
             />
           </div>
         </div>
 
-        {/* All Captures */}
+        {/* Recent Uploads List */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[var(--smart-gray)]">All Captures</h2>
+            <h2 className="text-base font-semibold text-[var(--smart-gray)]">Recent Uploads</h2>
             <span className="text-xs text-[var(--secondary-gray)] font-medium">
               {filteredCaptures.length} items
             </span>
@@ -139,11 +138,11 @@ export default function Library() {
           {isLoading ? (
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-white rounded-3xl h-48 shimmer border border-[var(--border-gray)]" />
+                <div key={i} className="bg-white rounded-2xl h-48 shimmer border border-[var(--border-gray)]" />
               ))}
             </div>
           ) : filteredCaptures.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 border border-[var(--border-gray)] text-center">
+            <div className="bg-white rounded-2xl p-12 border border-[var(--border-gray)] text-center">
               <p className="text-[var(--secondary-gray)]">No captures found</p>
             </div>
           ) : (
@@ -151,6 +150,11 @@ export default function Library() {
           )}
         </div>
       </div>
+
+      {/* Floating Action Button */}
+      <button className="fixed bottom-24 right-6 w-14 h-14 bg-[var(--primary-blue)] rounded-full flex items-center justify-center card-shadow hover:scale-110 smooth-transition active:scale-95 z-40">
+        <FolderPlus className="w-6 h-6 text-white" />
+      </button>
     </div>
   );
 }

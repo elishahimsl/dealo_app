@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Star, Trash2, Sparkles, FileText, ChevronDown, ChevronUp, FileDown, MessageSquare } from "lucide-react";
+import { ArrowLeft, Star, Trash2, Sparkles, FileText, Lightbulb, Package, RotateCcw, Home, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import FlashcardGenerator from "../components/preview/FlashcardGenerator";
@@ -14,8 +14,9 @@ export default function Preview() {
   const queryClient = useQueryClient();
   const urlParams = new URLSearchParams(window.location.search);
   const captureId = urlParams.get('id');
+  const isNewScan = urlParams.get('new') === 'true';
   const [showFlashcards, setShowFlashcards] = useState(false);
-  const [summaryExpanded, setSummaryExpanded] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const { data: capture, isLoading } = useQuery({
     queryKey: ['capture', captureId],
@@ -26,6 +27,13 @@ export default function Preview() {
     enabled: !!captureId
   });
 
+  useEffect(() => {
+    if (isNewScan && capture) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
+  }, [isNewScan, capture]);
+
   const toggleFavoriteMutation = useMutation({
     mutationFn: async () => {
       return await base44.entities.Capture.update(captureId, {
@@ -34,7 +42,6 @@ export default function Preview() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['capture', captureId]);
-      queryClient.invalidateQueries(['recentCaptures']);
       queryClient.invalidateQueries(['allCaptures']);
     }
   });
@@ -51,7 +58,7 @@ export default function Preview() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--primary-blue)] border-t-transparent" />
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-[var(--neon-green)] border-t-transparent" />
       </div>
     );
   }
@@ -59,7 +66,7 @@ export default function Preview() {
   if (!capture) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-[var(--secondary-gray)]">Capture not found</p>
+        <p className="text-[var(--secondary-gray)]">Scan not found</p>
       </div>
     );
   }
@@ -74,7 +81,36 @@ export default function Preview() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-white">
+      {/* Confetti Animation */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 rounded-full animate-confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: '-10px',
+                backgroundColor: ['#00FF88', '#00D9FF', '#FF6B6B', '#FFD93D'][Math.floor(Math.random() * 4)],
+                animationDelay: `${Math.random() * 0.5}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes confetti {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .animate-confetti {
+          animation: confetti 3s ease-out forwards;
+        }
+      `}</style>
+
       {/* Header */}
       <div className="px-6 pt-12 pb-6 bg-white sticky top-0 z-10 border-b border-[var(--border-gray)]">
         <div className="flex items-center justify-between mb-4">
@@ -101,7 +137,7 @@ export default function Preview() {
               variant="ghost"
               size="icon"
               onClick={() => {
-                if (confirm("Delete this capture?")) {
+                if (confirm("Delete this scan?")) {
                   deleteMutation.mutate();
                 }
               }}
@@ -120,121 +156,89 @@ export default function Preview() {
           <span className="text-xs text-[var(--secondary-gray)]">
             {format(new Date(capture.created_date), "MMM d, yyyy")}
           </span>
-          {capture.has_due_date && capture.due_date && (
-            <Badge variant="outline" className="border-red-200 bg-red-50 text-red-600 rounded-full">
-              Due {format(new Date(capture.due_date), "MMM d")}
-            </Badge>
-          )}
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Preview Pane - Image/PDF viewer */}
+      <div className="px-6 py-6 space-y-6 pb-32">
+        {/* Top Half: Image Preview */}
         <div className="bg-white rounded-2xl overflow-hidden border border-[var(--border-gray)] card-shadow">
           <img src={capture.file_url} alt={capture.title} className="w-full max-h-96 object-contain" />
         </div>
 
-        {/* AI Summary Section - Expandable */}
-        {capture.ai_summary && (
-          <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-blue-200 overflow-hidden card-shadow">
-            <button
-              onClick={() => setSummaryExpanded(!summaryExpanded)}
-              className="w-full flex items-center justify-between p-5"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <Sparkles className="w-5 h-5 text-[var(--primary-blue)]" />
-                </div>
-                <h3 className="font-bold text-[var(--smart-gray)]">AI Summary</h3>
-              </div>
-              {summaryExpanded ? (
-                <ChevronUp className="w-5 h-5 text-[var(--secondary-gray)]" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-[var(--secondary-gray)]" />
-              )}
-            </button>
-            
-            {summaryExpanded && (
-              <div className="px-5 pb-5 space-y-3">
-                <p className="text-[var(--secondary-gray)] leading-relaxed">
-                  {capture.ai_summary}
-                </p>
-                
-                {/* Key Points */}
-                {capture.keywords && capture.keywords.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-[var(--smart-gray)] text-sm mb-2">Key Points:</h4>
-                    <ul className="space-y-1">
-                      {capture.keywords.slice(0, 3).map((keyword, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-[var(--secondary-gray)]">
-                          <span className="text-[var(--primary-blue)] mt-1">✓</span>
-                          <span>{keyword}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+        {/* Detected Object Name - Big and Bold */}
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-[var(--smart-gray)] mb-2">
+            {capture.title}
+          </h2>
+          {capture.keywords && capture.keywords.length > 0 && (
+            <div className="flex justify-center gap-2 flex-wrap">
+              {capture.keywords.slice(0, 3).map((keyword, idx) => (
+                <span 
+                  key={idx}
+                  className="text-sm text-[var(--secondary-gray)] bg-[var(--secondary-blue)] px-3 py-1 rounded-full"
+                >
+                  {keyword}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
 
-                {/* Keywords chips */}
-                {capture.keywords && capture.keywords.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {capture.keywords.map((keyword, idx) => (
-                      <span 
-                        key={idx}
-                        className="bg-white text-[var(--primary-blue)] px-3 py-1 rounded-full text-xs font-semibold border border-blue-200"
-                      >
-                        {keyword}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Extracted Text */}
+        {/* 🔍 Details Section */}
         {capture.extracted_text && (
           <div className="bg-white rounded-2xl p-5 border border-[var(--border-gray)] card-shadow">
             <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-5 h-5 text-[var(--primary-blue)]" />
-              <h3 className="font-bold text-[var(--smart-gray)]">Extracted Text</h3>
+              <Package className="w-5 h-5 text-[var(--neon-green)]" />
+              <h3 className="font-bold text-[var(--smart-gray)]">🔍 Details</h3>
             </div>
             <p className="text-[var(--secondary-gray)] text-sm leading-relaxed whitespace-pre-wrap">
               {capture.extracted_text}
             </p>
           </div>
         )}
+
+        {/* 💡 Smart Tips Section */}
+        {capture.ai_summary && (
+          <div className="bg-gradient-to-br from-emerald-50 to-cyan-50 rounded-2xl p-5 border border-emerald-200 card-shadow">
+            <div className="flex items-center gap-2 mb-3">
+              <Lightbulb className="w-5 h-5 text-[var(--neon-green)]" />
+              <h3 className="font-bold text-[var(--smart-gray)]">💡 Smart Tips</h3>
+            </div>
+            <p className="text-[var(--secondary-gray)] text-sm leading-relaxed">
+              {capture.ai_summary}
+            </p>
+          </div>
+        )}
+
+        {/* Save to My Scans - Confirmation */}
+        {isNewScan && (
+          <div className="bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-cyan)] rounded-2xl p-5 text-center">
+            <div className="text-white text-lg font-bold mb-2">✅ Scan Saved!</div>
+            <p className="text-white/90 text-sm">
+              This scan has been added to your history
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Sticky Footer - Action Buttons */}
-      <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-[var(--border-gray)] p-6 z-20">
-        <div className="max-w-lg mx-auto space-y-3">
-          <Button 
-            onClick={() => setShowFlashcards(true)}
-            className="w-4/5 mx-auto block h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:shadow-xl font-semibold text-base"
+      {/* Bottom Bar - Action Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[var(--border-gray)] p-6 z-20">
+        <div className="max-w-lg mx-auto grid grid-cols-2 gap-3">
+          <Button
+            onClick={() => navigate(createPageUrl("Home"))}
+            variant="outline"
+            className="h-12 rounded-full border-2 font-semibold"
           >
-            <Sparkles className="w-5 h-5 mr-2" />
-            Generate Flashcards
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Rescan
           </Button>
-          <div className="flex gap-3">
-            <Button 
-              variant="outline"
-              className="flex-1 h-12 rounded-full border-2 font-semibold"
-              onClick={() => navigate(createPageUrl("AIAssistant"))}
-            >
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Ask AI
-            </Button>
-            <Button 
-              variant="outline"
-              className="flex-1 h-12 rounded-full border-2 font-semibold"
-              onClick={() => window.open(capture.file_url, '_blank')}
-            >
-              <FileDown className="w-4 h-4 mr-2" />
-              Export PDF
-            </Button>
-          </div>
+          <Button
+            onClick={() => navigate(createPageUrl("Home"))}
+            className="h-12 rounded-full bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-cyan)] hover:opacity-90 font-semibold"
+          >
+            <Home className="w-4 h-4 mr-2" />
+            Home
+          </Button>
         </div>
       </div>
     </div>

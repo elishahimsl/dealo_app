@@ -1,25 +1,20 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Camera, FolderOpen, Sparkles } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
-
-  const navItems = [
-    { name: "Home", icon: Home, path: createPageUrl("Home") },
-    { name: "Snap", icon: Camera, path: createPageUrl("Snap") },
-    { name: "Library", icon: FolderOpen, path: createPageUrl("Library") },
-    { name: "AI", icon: Sparkles, path: createPageUrl("AIAssistant") },
-  ];
-
-  const isActive = (path) => location.pathname === path;
+  
+  // Hide navigation on home screen (camera view)
+  const isHome = location.pathname === createPageUrl("Home");
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <style>{`
         :root {
           --primary-blue: #007BFF;
+          --neon-green: #00FF88;
+          --neon-cyan: #00D9FF;
           --secondary-blue: #E6F4FE;
           --smart-gray: #1C1C1E;
           --secondary-gray: #6B7280;
@@ -30,6 +25,15 @@ export default function Layout({ children, currentPageName }) {
         @keyframes shimmer {
           0% { background-position: -1000px 0; }
           100% { background-position: 1000px 0; }
+        }
+        
+        @keyframes ping {
+          0% { transform: scale(1); opacity: 1; }
+          75%, 100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .animate-ping {
+          animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
         
         .shimmer {
@@ -52,11 +56,6 @@ export default function Layout({ children, currentPageName }) {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
         }
         
-        @keyframes confetti {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-        
         .perspective-1000 {
           perspective: 1000px;
         }
@@ -72,50 +71,21 @@ export default function Layout({ children, currentPageName }) {
         .rotate-y-180 {
           transform: rotateY(180deg);
         }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20 overflow-auto">
+      <main className={`flex-1 ${isHome ? '' : 'pb-0'} overflow-auto`}>
         {children}
       </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 glass-effect border-t border-[var(--border-gray)] safe-bottom z-50">
-        <div className="max-w-lg mx-auto px-4">
-          <div className="flex items-center justify-around h-16">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="flex flex-col items-center justify-center flex-1 smooth-transition group"
-                >
-                  <div className={`p-2.5 rounded-full smooth-transition ${
-                    active 
-                      ? 'bg-[var(--primary-blue)] shadow-lg shadow-blue-500/30' 
-                      : 'group-hover:bg-[var(--secondary-blue)]'
-                  }`}>
-                    <Icon 
-                      className={`w-5 h-5 smooth-transition ${
-                        active ? 'text-white' : 'text-[var(--secondary-gray)] group-hover:text-[var(--primary-blue)]'
-                      }`}
-                      strokeWidth={active ? 2.5 : 2}
-                    />
-                  </div>
-                  <span className={`text-xs mt-1 smooth-transition font-medium ${
-                    active ? 'text-[var(--primary-blue)]' : 'text-[var(--secondary-gray)]'
-                  }`}>
-                    {item.name}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
     </div>
   );
 }

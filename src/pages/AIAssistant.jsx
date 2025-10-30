@@ -1,17 +1,31 @@
 import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Send, Loader2, FileText, Zap, Target, Brain } from "lucide-react";
+import { Sparkles, Send, Loader2, ArrowLeft, Info, Trash2, Camera as CameraIcon } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function AIAssistant() {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const { data: captures } = useQuery({
+  const { data: captures, refetch } = useQuery({
     queryKey: ['allCaptures'],
     queryFn: () => base44.entities.Capture.list('-created_date'),
     initialData: [],
@@ -39,13 +53,13 @@ export default function AIAssistant() {
       ).join('\n\n---\n\n');
 
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an AI study assistant helping a student. Here are their recent captures:
+        prompt: `You are an AI assistant for SnapSmart, helping users understand their scans. Here are their recent scans:
 
 ${context}
 
 User's question: ${userMessage}
 
-Provide a helpful, concise response. If they ask about specific notes or captures, reference the content above. If they ask you to create flashcards or summaries, provide those directly in your response.`,
+Provide a helpful, concise response. Reference scan content when relevant.`,
       });
 
       setMessages(prev => [...prev, { role: "assistant", content: response }]);
@@ -59,124 +73,132 @@ Provide a helpful, concise response. If they ask about specific notes or capture
     setLoading(false);
   };
 
-  const smartActions = [
-    { icon: FileText, label: "Summarize", prompt: "Summarize my recent notes" },
-    { icon: Sparkles, label: "Flashcards", prompt: "Create flashcards from my latest capture" },
-    { icon: Zap, label: "Quiz Me", prompt: "Create a quiz from my captures" },
-    { icon: Target, label: "Organize", prompt: "Help me organize my files by subject" },
-  ];
+  const clearHistory = async () => {
+    try {
+      for (const capture of captures) {
+        await base44.entities.Capture.delete(capture.id);
+      }
+      refetch();
+      setMessages([]);
+    } catch (error) {
+      console.error("Error clearing history:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <div className="px-6 pt-12 pb-6 bg-white border-b border-[var(--border-gray)]">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
-            <Sparkles className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-[var(--smart-gray)]">🤖 SnapSmart AI Assistant</h1>
-            <p className="text-sm text-[var(--secondary-gray)]">Your smart learning companion</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Smart Actions Strip - Horizontal chips */}
-      {messages.length === 0 && (
-        <div className="px-6 py-4 border-b border-[var(--border-gray)] bg-[var(--secondary-blue)]">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {smartActions.map((action, idx) => {
-              const Icon = action.icon;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleSend(action.prompt)}
-                  className="flex items-center gap-2 bg-white border border-blue-200 rounded-full px-4 py-2 whitespace-nowrap smooth-transition hover:bg-blue-50 hover:border-[var(--primary-blue)] flex-shrink-0"
-                >
-                  <Icon className="w-4 h-4 text-[var(--primary-blue)]" />
-                  <span className="text-sm font-semibold text-[var(--smart-gray)]">{action.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mb-6">
-              <Brain className="w-10 h-10 text-[var(--primary-blue)]" />
-            </div>
-            <h2 className="text-xl font-bold text-[var(--smart-gray)] mb-2">
-              Ask me to analyze your latest upload 📚
-            </h2>
-            <p className="text-[var(--secondary-gray)] text-sm leading-relaxed">
-              I can help you summarize notes, create flashcards, solve problems, and organize your captures.
-            </p>
-          </div>
-        ) : (
-          <>
-            {messages.map((message, idx) => (
-              <div
-                key={idx}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-3xl px-5 py-3 ${
-                    message.role === 'user'
-                      ? 'bg-[var(--primary-blue)] text-white'
-                      : 'bg-white border border-[var(--border-gray)] text-[var(--smart-gray)]'
-                  }`}
-                >
-                  {message.role === 'assistant' && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-4 h-4 text-[var(--primary-blue)]" />
-                      <span className="text-xs font-semibold text-[var(--primary-blue)]">AI Assistant</span>
-                    </div>
-                  )}
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                </div>
-              </div>
-            ))}
-            
-            {loading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-[var(--border-gray)] rounded-3xl px-5 py-3 flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-[var(--primary-blue)]" />
-                  <span className="text-sm text-[var(--secondary-gray)]">Thinking...</span>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-        
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Bar */}
-      <div className="px-6 pb-24 pt-4 bg-white border-t border-[var(--border-gray)]">
-        <div className="flex gap-3 max-w-lg mx-auto">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask me anything..."
-            className="flex-1 h-12 rounded-full border-[var(--border-gray)] text-base px-5"
-            disabled={loading}
-          />
-          <Button
-            onClick={() => handleSend()}
-            disabled={!input.trim() || loading}
-            className="h-12 w-12 rounded-full bg-[var(--primary-blue)] hover:bg-blue-600 p-0 flex-shrink-0"
+        <div className="flex items-center gap-4 mb-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(createPageUrl("Home"))}
+            className="rounded-full"
           >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Send className="w-5 h-5" />
-            )}
+            <ArrowLeft className="w-5 h-5" />
           </Button>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-[var(--smart-gray)]">⚙️ Settings</h1>
+          </div>
+        </div>
+      </div>
+
+      {/* Settings Options */}
+      <div className="px-6 py-6 space-y-3">
+        {/* Camera Permissions */}
+        <button className="w-full bg-white border border-[var(--border-gray)] rounded-2xl p-5 text-left smooth-transition hover:shadow-md card-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[var(--secondary-blue)] rounded-full flex items-center justify-center">
+                <CameraIcon className="w-5 h-5 text-[var(--primary-blue)]" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--smart-gray)]">Camera Permissions</h3>
+                <p className="text-sm text-[var(--secondary-gray)]">Manage camera access</p>
+              </div>
+            </div>
+          </div>
+        </button>
+
+        {/* Smart Mode Toggle */}
+        <button className="w-full bg-white border border-[var(--border-gray)] rounded-2xl p-5 text-left smooth-transition hover:shadow-md card-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-cyan)] rounded-full flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--smart-gray)]">Smart Mode</h3>
+                <p className="text-sm text-[var(--secondary-gray)]">Advanced AI insights enabled</p>
+              </div>
+            </div>
+            <div className="w-12 h-6 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-cyan)] rounded-full relative">
+              <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
+            </div>
+          </div>
+        </button>
+
+        {/* Clear History */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <button className="w-full bg-white border border-red-200 rounded-2xl p-5 text-left smooth-transition hover:shadow-md hover:border-red-300">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                    <Trash2 className="w-5 h-5 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-red-600">Clear History</h3>
+                    <p className="text-sm text-[var(--secondary-gray)]">Delete all saved scans</p>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear all scan history?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete all your saved scans. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={clearHistory} className="bg-red-500 hover:bg-red-600">
+                Clear History
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* About SnapSmart */}
+        <button 
+          onClick={() => navigate(createPageUrl("Library"))}
+          className="w-full bg-white border border-[var(--border-gray)] rounded-2xl p-5 text-left smooth-transition hover:shadow-md card-shadow"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
+                <Info className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-[var(--smart-gray)]">About SnapSmart</h3>
+                <p className="text-sm text-[var(--secondary-gray)]">Version 1.0.0</p>
+              </div>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      {/* App Info */}
+      <div className="px-6 py-6 mt-auto">
+        <div className="bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-cyan)] rounded-2xl p-6 text-center">
+          <Sparkles className="w-12 h-12 text-white mx-auto mb-3" />
+          <h3 className="text-white font-bold text-lg mb-2">SnapSmart AI</h3>
+          <p className="text-white/90 text-sm leading-relaxed">
+            Your intelligent companion for scanning, organizing, and learning from the world around you.
+          </p>
         </div>
       </div>
     </div>

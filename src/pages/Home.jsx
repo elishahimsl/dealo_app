@@ -3,20 +3,12 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Scan, Scale, FolderOpen, Sparkles, TrendingUp, Clock, Award, ChevronRight } from "lucide-react";
-import { format } from "date-fns";
+import { Scan, Scale, Lightbulb, FolderOpen, TrendingUp, DollarSign, Star, ChevronRight, Zap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 export default function Home() {
   const [userName, setUserName] = useState("");
-  const [greeting, setGreeting] = useState("");
-  const [rotatingText, setRotatingText] = useState(0);
-
-  const rotatingMessages = [
-    "Scan something new",
-    "Compare two items", 
-    "See what others discovered"
-  ];
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -29,119 +21,77 @@ export default function Home() {
     }
   });
 
-  const { data: captures, isLoading } = useQuery({
+  const { data: captures } = useQuery({
     queryKey: ['recentCaptures'],
     queryFn: () => base44.entities.Capture.list('-created_date', 10),
     initialData: [],
   });
 
   useEffect(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Good morning");
-    else if (hour < 18) setGreeting("Good afternoon");
-    else setGreeting("Good evening");
-
     if (user) {
       const firstName = user.full_name?.split(' ')[0] || 'there';
       setUserName(firstName);
     }
   }, [user]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRotatingText((prev) => (prev + 1) % rotatingMessages.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const smartActions = [
+  const quickActions = [
     { 
       icon: Scan, 
-      title: "Identify Something", 
-      description: "Snap a picture or upload an image to learn more",
-      gradient: "from-[var(--accent)] to-[var(--primary)]",
+      title: "Scan Product", 
+      description: "Identify any product instantly",
+      gradient: "from-[var(--primary)] to-[var(--secondary)]",
       page: "Snap"
     },
     { 
       icon: Scale, 
       title: "Compare Mode", 
-      description: "Scan or select two images and I'll analyze the differences",
+      description: "Side-by-side product comparison",
       gradient: "from-purple-600 to-blue-600",
       page: "Compare"
     },
     { 
+      icon: Lightbulb, 
+      title: "Smart Recommendations", 
+      description: "AI-powered product suggestions",
+      gradient: "from-orange-500 to-yellow-500",
+      page: "Library"
+    },
+    { 
       icon: FolderOpen, 
-      title: "My Library", 
-      description: "Access your saved scans, discoveries, and notes",
-      gradient: "from-blue-600 to-cyan-600",
+      title: "Library Access", 
+      description: "View your saved scans & comparisons",
+      gradient: "from-cyan-600 to-teal-600",
       page: "Library"
     }
   ];
 
-  const recentScans = captures.slice(0, 3);
-  const trendingTopics = [
-    { title: "Top Tech Gadgets This Week", badge: "Trending" },
-    { title: "Cool Art Finds", badge: "AI Recommended" },
-    { title: "Eco-friendly Materials", badge: "Popular" }
-  ];
+  const recommendedProducts = captures.slice(0, 3);
 
   return (
-    <div className="min-h-screen bg-[#1F2421]">
-      {/* Top Section: Greeting */}
-      <div className="px-6 pt-12 pb-8 slide-in">
-        <h1 className="text-3xl font-bold text-[var(--light)] mb-2">
-          {greeting}, {userName || 'there'} 👋
+    <div className="min-h-screen bg-background theme-transition">
+      {/* Header */}
+      <div className="px-6 pt-12 pb-8 fade-in">
+        <h1 className="text-3xl font-bold text-main mb-2">
+          👋 Hi {userName || 'there'}, what would you like to do today?
         </h1>
-        <p className="text-[var(--secondary)] text-lg mb-4">
-          What would you like to do today?
-        </p>
-        
-        {/* Rotating Subtitles */}
-        <div className="h-8 overflow-hidden">
-          <div 
-            className="smooth-transition"
-            style={{ 
-              transform: `translateY(-${rotatingText * 32}px)`,
-              transition: 'transform 0.5s ease-in-out'
-            }}
-          >
-            {rotatingMessages.map((msg, idx) => (
-              <Link 
-                key={idx} 
-                to={createPageUrl(idx === 0 ? "Snap" : idx === 1 ? "Compare" : "Library")}
-                className="h-8 flex items-center gap-2 text-[var(--accent)] font-medium hover:text-[var(--secondary)] smooth-transition"
-              >
-                <Sparkles className="w-4 h-4" />
-                {msg}
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* Middle Section: Smart Actions Grid */}
+      {/* Quick Action Tiles - 2x2 Grid */}
       <div className="px-6 pb-8">
-        <div className="grid grid-cols-1 gap-4">
-          {smartActions.map((action, idx) => {
+        <div className="grid grid-cols-2 gap-4">
+          {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (
               <Link key={idx} to={createPageUrl(action.page)}>
                 <div 
-                  className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 shadow-2xl smooth-transition hover:scale-105 active:scale-95 slide-in`}
+                  className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 card-shadow transition-transform hover:scale-105 active:scale-95 bounce-tap fade-in`}
                   style={{ animationDelay: `${idx * 0.1}s` }}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-8 h-8 text-white" strokeWidth={2.5} />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-white mb-2">{action.title}</h3>
-                      <p className="text-white/80 text-sm leading-relaxed">
-                        {action.description}
-                      </p>
-                    </div>
-                  </div>
+                  <Icon className="w-10 h-10 text-white mb-3" strokeWidth={2.5} />
+                  <h3 className="text-lg font-bold text-white mb-1">{action.title}</h3>
+                  <p className="text-white/80 text-xs leading-relaxed">
+                    {action.description}
+                  </p>
                 </div>
               </Link>
             );
@@ -149,83 +99,94 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Lower Section: Smart Recommendations Feed */}
-      <div className="px-6 pb-32">
-        <div className="flex items-center gap-2 mb-6">
-          <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-          <h2 className="text-xl font-bold text-[var(--light)]">Smart Picks for You 🌟</h2>
-        </div>
-
-        {/* Horizontal Scrollable Cards */}
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide mb-6">
-          {recentScans.map((scan, idx) => (
-            <Link key={scan.id} to={`${createPageUrl("Preview")}?id=${scan.id}`}>
-              <div className="flex-shrink-0 w-64 glass-dark rounded-3xl overflow-hidden smooth-transition hover:scale-105">
-                <div className="h-40 bg-gradient-to-br from-[var(--primary)] to-[var(--accent)]">
-                  <img 
-                    src={scan.file_url} 
-                    alt={scan.title}
-                    className="w-full h-full object-cover opacity-90"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-[var(--light)] text-sm line-clamp-1 mb-1">
-                    {scan.title}
-                  </h3>
-                  <p className="text-[var(--secondary)] text-xs line-clamp-2 mb-3">
-                    {scan.ai_summary || "Recent discovery"}
-                  </p>
-                  <Badge className="bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30">
-                    <Clock className="w-3 h-3 mr-1" />
-                    Recent
-                  </Badge>
-                </div>
-              </div>
-            </Link>
-          ))}
-
-          {/* AI Curated Topics */}
-          {trendingTopics.map((topic, idx) => (
-            <div key={idx} className="flex-shrink-0 w-64 glass-dark rounded-3xl p-4 smooth-transition hover:scale-105">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center mb-3">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="font-bold text-[var(--light)] text-sm mb-2">
-                {topic.title}
-              </h3>
-              <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                {topic.badge}
-              </Badge>
-            </div>
-          ))}
-
-          {/* Your Past Scans Suggestion */}
-          {captures.length > 3 && (
+      {/* Dynamic Carousel Section */}
+      {recommendedProducts.length > 0 && (
+        <div className="px-6 pb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-main">Because you liked...</h2>
             <Link to={createPageUrl("Library")}>
-              <div className="flex-shrink-0 w-64 glass-dark rounded-3xl p-4 smooth-transition hover:scale-105">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center mb-3">
-                  <Award className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="font-bold text-[var(--light)] text-sm mb-2">
-                  You have {captures.length} discoveries
-                </h3>
-                <p className="text-[var(--secondary)] text-xs mb-3">
-                  Want to explore them again?
-                </p>
-                <Badge className="bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30">
-                  From Your Library
-                </Badge>
-              </div>
+              <button className="text-primary font-semibold text-sm flex items-center gap-1">
+                View All
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </Link>
-          )}
-        </div>
+          </div>
 
-        {/* Motivational Text */}
-        <div className="text-center mt-8">
-          <p className="text-[var(--secondary)] text-sm italic">
-            "Smart discovery starts here."
-          </p>
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            {recommendedProducts.map((product) => (
+              <Link key={product.id} to={`${createPageUrl("Preview")}?id=${product.id}`}>
+                <div className="flex-shrink-0 w-64 bg-card glass-effect rounded-3xl overflow-hidden card-shadow transition-transform hover:scale-105 bounce-tap">
+                  <div className="h-40 bg-gradient-to-br from-primary/20 to-secondary/20">
+                    <img 
+                      src={product.file_url} 
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-main text-sm line-clamp-1 mb-2">
+                      {product.title}
+                    </h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-semibold text-main">4.5</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-4 h-4 text-primary" />
+                        <span className="text-sm font-bold text-primary">Best Price</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-primary/20 text-primary border-0 text-xs">
+                        <Zap className="w-3 h-3 mr-1" />
+                        Smart Buy
+                      </Badge>
+                      <span className="text-xs text-secondary">95% Score</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+
+            {/* AI Recommendation Card */}
+            <div className="flex-shrink-0 w-64 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl p-6 card-shadow">
+              <TrendingUp className="w-12 h-12 text-white mb-4" />
+              <h3 className="text-lg font-bold text-white mb-2">Trending Deals</h3>
+              <p className="text-white/80 text-sm mb-4">
+                AI found {captures.length} products you might love
+              </p>
+              <button className="bg-white text-purple-600 font-semibold text-sm px-4 py-2 rounded-full hover:bg-white/90 transition-colors">
+                Explore Now
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Empty State */}
+      {recommendedProducts.length === 0 && (
+        <div className="px-6 pb-8">
+          <div className="bg-card glass-effect rounded-3xl p-12 text-center card-shadow">
+            <Scan className="w-16 h-16 text-primary mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-main mb-2">Start Scanning!</h3>
+            <p className="text-secondary text-sm mb-6">
+              Scan your first product to get personalized recommendations
+            </p>
+            <Link to={createPageUrl("Snap")}>
+              <button className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-full hover:scale-105 transition-transform bounce-tap">
+                Scan Product
+              </button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Tagline */}
+      <div className="px-6 pb-12 text-center">
+        <p className="text-secondary text-sm italic">
+          "Shop Smarter, Save Big."
+        </p>
       </div>
     </div>
   );

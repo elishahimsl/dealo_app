@@ -1,78 +1,119 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, Scale, FolderOpen, User, Camera } from "lucide-react";
+import { Home, FolderOpen, Camera, User } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
+  const [theme, setTheme] = useState('dark');
+
+  // Load theme from localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('snapsmart-theme') || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
 
   const navItems = [
     { name: "Home", icon: Home, path: createPageUrl("Home") },
-    { name: "Compare", icon: Scale, path: createPageUrl("Compare") },
-    { name: "Snap", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
     { name: "Library", icon: FolderOpen, path: createPageUrl("Library") },
+    { name: "Camera", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
     { name: "Profile", icon: User, path: createPageUrl("Profile") },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-[#1F2421] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <style>{`
         :root {
           --bg-dark: #1F2421;
-          --primary: #216869;
-          --accent: #49A078;
-          --secondary: #9CC5A1;
-          --light: #DCE1DE;
+          --bg-light: #F8F9F7;
+          --primary-dark: #216869;
+          --primary-light: #49A078;
+          --secondary-dark: #49A078;
+          --secondary-light: #216869;
+          --soft-accent: #9CC5A1;
+          --text-dark: #DCE1DE;
+          --text-light: #1F2421;
         }
         
-        @keyframes shimmer {
-          0% { background-position: -1000px 0; }
-          100% { background-position: 1000px 0; }
+        [data-theme="dark"] {
+          --background: var(--bg-dark);
+          --primary: var(--primary-dark);
+          --secondary: var(--secondary-dark);
+          --text: var(--text-dark);
+          --card-bg: rgba(33, 104, 105, 0.1);
+          --border: rgba(73, 160, 120, 0.2);
         }
         
-        @keyframes glow {
-          0%, 100% { box-shadow: 0 0 20px rgba(73, 160, 120, 0.5); }
-          50% { box-shadow: 0 0 30px rgba(73, 160, 120, 0.8); }
+        [data-theme="light"] {
+          --background: var(--bg-light);
+          --primary: var(--primary-light);
+          --secondary: var(--secondary-light);
+          --text: var(--text-light);
+          --card-bg: rgba(255, 255, 255, 0.9);
+          --border: rgba(156, 197, 161, 0.3);
+        }
+        
+        .bg-background { background-color: var(--background); }
+        .text-primary { color: var(--primary); }
+        .text-secondary { color: var(--secondary); }
+        .text-main { color: var(--text); }
+        .bg-card { background-color: var(--card-bg); }
+        .border-theme { border-color: var(--border); }
+        
+        @keyframes ripple {
+          0% { transform: scale(0.8); opacity: 1; }
+          100% { transform: scale(2.4); opacity: 0; }
         }
         
         @keyframes float {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
+          50% { transform: translateY(-8px); }
         }
         
-        @keyframes slideIn {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
         
-        .shimmer {
-          animation: shimmer 2s infinite linear;
-          background: linear-gradient(to right, #2a3330 0%, #3a4340 20%, #2a3330 40%, #2a3330 100%);
-          background-size: 1000px 100%;
+        @keyframes bounce {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
         }
         
-        .glow-pulse {
-          animation: glow 2s ease-in-out infinite;
+        .theme-transition {
+          transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .ripple-effect {
+          animation: ripple 1.5s ease-out infinite;
         }
         
         .float-animation {
           animation: float 3s ease-in-out infinite;
         }
         
-        .slide-in {
-          animation: slideIn 0.5s ease-out;
-        }
-
-        .smooth-transition {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .fade-in {
+          animation: fadeIn 0.5s ease-out;
         }
         
-        .glass-dark {
+        .bounce-tap:active {
+          animation: bounce 0.3s ease-out;
+        }
+        
+        .glass-effect {
           backdrop-filter: blur(20px) saturate(180%);
-          background-color: rgba(31, 36, 33, 0.85);
-          border: 1px solid rgba(73, 160, 120, 0.2);
+          border: 1px solid var(--border);
+        }
+        
+        .card-shadow {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        [data-theme="dark"] .card-shadow {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
         
         .scrollbar-hide::-webkit-scrollbar {
@@ -86,17 +127,17 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {/* Main Content */}
-      <main className="flex-1 pb-24 overflow-auto">
+      <main className="flex-1 pb-24 overflow-auto theme-transition">
         {children}
       </main>
 
-      {/* Bottom Navigation with Floating Center Button */}
-      <nav className="fixed bottom-0 left-0 right-0 glass-dark border-t border-[var(--accent)]/20 z-50">
+      {/* Bottom Navigation with Floating Camera Button */}
+      <nav className="fixed bottom-0 left-0 right-0 glass-effect bg-card border-t border-theme z-50 theme-transition">
         <div className="max-w-lg mx-auto px-6 relative">
-          {/* Floating Camera Button */}
+          {/* Floating Camera Button - TikTok style */}
           <Link to={createPageUrl("Snap")}>
             <div className="absolute left-1/2 -translate-x-1/2 -top-8">
-              <button className="w-16 h-16 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] shadow-2xl glow-pulse flex items-center justify-center smooth-transition hover:scale-110 active:scale-95">
+              <button className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-secondary shadow-2xl float-animation flex items-center justify-center bounce-tap hover:scale-110 active:scale-95 transition-transform">
                 <Camera className="w-8 h-8 text-white" strokeWidth={2.5} />
               </button>
             </div>
@@ -116,16 +157,16 @@ export default function Layout({ children, currentPageName }) {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className="flex flex-col items-center justify-center flex-1 smooth-transition group"
+                  className="flex flex-col items-center justify-center flex-1 transition-all bounce-tap"
                 >
                   <Icon 
-                    className={`w-6 h-6 mb-1 smooth-transition ${
-                      active ? 'text-[var(--accent)]' : 'text-[var(--secondary)] group-hover:text-[var(--accent)]'
+                    className={`w-6 h-6 mb-1 transition-colors ${
+                      active ? 'text-primary' : 'text-secondary'
                     }`}
                     strokeWidth={active ? 2.5 : 2}
                   />
-                  <span className={`text-xs smooth-transition font-medium ${
-                    active ? 'text-[var(--accent)]' : 'text-[var(--secondary)]'
+                  <span className={`text-xs font-semibold transition-colors ${
+                    active ? 'text-primary' : 'text-secondary'
                   }`}>
                     {item.name}
                   </span>

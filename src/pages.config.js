@@ -5,6 +5,9 @@ import Preview from './pages/Preview';
 import AIAssistant from './pages/AIAssistant';
 import Compare from './pages/Compare';
 import Profile from './pages/Profile';
+import Splash from './pages/Splash';
+import MyCart from './pages/MyCart';
+import More from './pages/More';
 import Layout from './Layout.jsx';
 
 
@@ -16,6 +19,9 @@ export const PAGES = {
     "AIAssistant": AIAssistant,
     "Compare": Compare,
     "Profile": Profile,
+    "Splash": Splash,
+    "MyCart": MyCart,
+    "More": More,
 }
 
 export const pagesConfig = {

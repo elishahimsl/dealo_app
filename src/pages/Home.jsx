@@ -1,97 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Scan, Scale, Lightbulb, FolderOpen, TrendingUp, DollarSign, Star, ChevronRight, Zap } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
+import { Camera, Scale, ShoppingCart, Search, Star, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
-  const [userName, setUserName] = useState("");
-
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      try {
-        return await base44.auth.me();
-      } catch {
-        return null;
-      }
-    }
-  });
-
   const { data: captures } = useQuery({
     queryKey: ['recentCaptures'],
     queryFn: () => base44.entities.Capture.list('-created_date', 10),
     initialData: [],
   });
 
-  useEffect(() => {
-    if (user) {
-      const firstName = user.full_name?.split(' ')[0] || 'there';
-      setUserName(firstName);
-    }
-  }, [user]);
-
   const quickActions = [
-    { 
-      icon: Scan, 
-      title: "Scan Product", 
-      description: "Identify any product instantly",
-      gradient: "from-[var(--primary)] to-[var(--secondary)]",
-      page: "Snap"
-    },
-    { 
-      icon: Scale, 
-      title: "Compare Mode", 
-      description: "Side-by-side product comparison",
-      gradient: "from-purple-600 to-blue-600",
-      page: "Compare"
-    },
-    { 
-      icon: Lightbulb, 
-      title: "Smart Recommendations", 
-      description: "AI-powered product suggestions",
-      gradient: "from-orange-500 to-yellow-500",
-      page: "Library"
-    },
-    { 
-      icon: FolderOpen, 
-      title: "Library Access", 
-      description: "View your saved scans & comparisons",
-      gradient: "from-cyan-600 to-teal-600",
-      page: "Library"
-    }
+    { icon: Camera, label: "Identify", page: "Snap" },
+    { icon: Scale, label: "Compare", page: "Compare" },
+    { icon: ShoppingCart, label: "My Cart", page: "MyCart" }
   ];
 
-  const recommendedProducts = captures.slice(0, 3);
+  // Mock trending products
+  const trendingProducts = captures.slice(0, 8).length > 0 ? captures.slice(0, 8) : [
+    { id: 1, title: "Wireless Headphones", price: "$89.99", rating: 4.5, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" },
+    { id: 2, title: "Smart Watch", price: "$199.99", rating: 4.8, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
+    { id: 3, title: "Bluetooth Speaker", price: "$59.99", rating: 4.6, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400" },
+    { id: 4, title: "Phone Case", price: "$24.99", rating: 4.3, image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400" },
+  ];
+
+  // Mock deals near you
+  const dealsNearYou = [
+    { id: 1, store: "Target", discount: "Up to 40% OFF", image: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600" },
+    { id: 2, store: "Walmart", discount: "Flash Sale - 25% OFF", image: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600" },
+  ];
 
   return (
-    <div className="min-h-screen bg-background theme-transition">
+    <div className="min-h-screen bg-[#F9FAFB] pb-8">
       {/* Header */}
-      <div className="px-6 pt-12 pb-8 fade-in">
-        <h1 className="text-3xl font-bold text-main mb-2">
-          👋 Hi {userName || 'there'}, what would you like to do today?
+      <div className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-bold text-[#2E2E38] mb-1 border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Home
         </h1>
       </div>
 
-      {/* Quick Action Tiles - 2x2 Grid */}
-      <div className="px-6 pb-8">
-        <div className="grid grid-cols-2 gap-4">
+      {/* Search Bar */}
+      <div className="px-6 mb-6">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
+          <Input
+            placeholder="Search products"
+            className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-white text-[#2E2E38]"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          />
+        </div>
+      </div>
+
+      {/* Quick Action Cards */}
+      <div className="px-6 mb-8">
+        <div className="grid grid-cols-3 gap-4">
           {quickActions.map((action, idx) => {
             const Icon = action.icon;
             return (
               <Link key={idx} to={createPageUrl(action.page)}>
-                <div 
-                  className={`bg-gradient-to-br ${action.gradient} rounded-3xl p-6 card-shadow transition-transform hover:scale-105 active:scale-95 bounce-tap fade-in`}
-                  style={{ animationDelay: `${idx * 0.1}s` }}
-                >
-                  <Icon className="w-10 h-10 text-white mb-3" strokeWidth={2.5} />
-                  <h3 className="text-lg font-bold text-white mb-1">{action.title}</h3>
-                  <p className="text-white/80 text-xs leading-relaxed">
-                    {action.description}
-                  </p>
+                <div className="bg-white rounded-2xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-2">
+                    <Icon className="w-6 h-6 text-white" strokeWidth={2} />
+                  </div>
+                  <span className="text-xs font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                    {action.label}
+                  </span>
                 </div>
               </Link>
             );
@@ -99,94 +76,109 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Dynamic Carousel Section */}
-      {recommendedProducts.length > 0 && (
-        <div className="px-6 pb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-main">Because you liked...</h2>
-            <Link to={createPageUrl("Library")}>
-              <button className="text-primary font-semibold text-sm flex items-center gap-1">
-                View All
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </Link>
-          </div>
-
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            {recommendedProducts.map((product) => (
-              <Link key={product.id} to={`${createPageUrl("Preview")}?id=${product.id}`}>
-                <div className="flex-shrink-0 w-64 bg-card glass-effect rounded-3xl overflow-hidden card-shadow transition-transform hover:scale-105 bounce-tap">
-                  <div className="h-40 bg-gradient-to-br from-primary/20 to-secondary/20">
-                    <img 
-                      src={product.file_url} 
-                      alt={product.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-main text-sm line-clamp-1 mb-2">
-                      {product.title}
-                    </h3>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                        <span className="text-sm font-semibold text-main">4.5</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-bold text-primary">Best Price</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-primary/20 text-primary border-0 text-xs">
-                        <Zap className="w-3 h-3 mr-1" />
-                        Smart Buy
-                      </Badge>
-                      <span className="text-xs text-secondary">95% Score</span>
-                    </div>
-                  </div>
+      {/* Trending Section */}
+      <div className="px-6 mb-8">
+        <h2 className="text-xl font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Trending
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          {trendingProducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E4E8ED] shadow-sm">
+              <div className="aspect-square bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
+                <img 
+                  src={product.file_url || product.image} 
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="p-3">
+                <h3 className="font-semibold text-[#2E2E38] text-sm line-clamp-1 mb-1">
+                  {product.title}
+                </h3>
+                <div className="flex items-center gap-1 mb-2">
+                  <Star className="w-3 h-3 text-[#FF8AC6] fill-[#FF8AC6]" />
+                  <span className="text-xs text-[#60656F]">{product.rating || 4.5}</span>
                 </div>
-              </Link>
-            ))}
-
-            {/* AI Recommendation Card */}
-            <div className="flex-shrink-0 w-64 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl p-6 card-shadow">
-              <TrendingUp className="w-12 h-12 text-white mb-4" />
-              <h3 className="text-lg font-bold text-white mb-2">Trending Deals</h3>
-              <p className="text-white/80 text-sm mb-4">
-                AI found {captures.length} products you might love
-              </p>
-              <button className="bg-white text-purple-600 font-semibold text-sm px-4 py-2 rounded-full hover:bg-white/90 transition-colors">
-                Explore Now
-              </button>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-[#5EE177]">{product.price || "$99.99"}</span>
+                  <Button size="sm" className="h-7 px-3 bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] hover:opacity-90">
+                    <Plus className="w-3 h-3" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Empty State */}
-      {recommendedProducts.length === 0 && (
-        <div className="px-6 pb-8">
-          <div className="bg-card glass-effect rounded-3xl p-12 text-center card-shadow">
-            <Scan className="w-16 h-16 text-primary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-main mb-2">Start Scanning!</h3>
-            <p className="text-secondary text-sm mb-6">
-              Scan your first product to get personalized recommendations
-            </p>
-            <Link to={createPageUrl("Snap")}>
-              <button className="bg-gradient-to-r from-primary to-secondary text-white font-bold px-6 py-3 rounded-full hover:scale-105 transition-transform bounce-tap">
-                Scan Product
-              </button>
-            </Link>
-          </div>
+      {/* Deals Near You */}
+      <div className="px-6 mb-8">
+        <h2 className="text-xl font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Deals Near You
+        </h2>
+        <div className="space-y-4">
+          {dealsNearYou.map((deal) => (
+            <div key={deal.id} className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] rounded-3xl p-6 shadow-lg relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Poppons, sans-serif' }}>
+                  {deal.discount}
+                </h3>
+                <p className="text-white/90 text-lg font-semibold mb-4">
+                  {deal.store}
+                </p>
+                <Button className="bg-white text-[#5EE177] hover:bg-white/90 font-semibold rounded-full">
+                  View All Deals
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Tagline */}
-      <div className="px-6 pb-12 text-center">
-        <p className="text-secondary text-sm italic">
-          "Shop Smarter, Save Big."
-        </p>
+      {/* SnapSmart Landing Section */}
+      <div className="px-6 pb-12">
+        <div className="bg-white rounded-3xl p-8 border border-[#E4E8ED] shadow-lg text-center">
+          {/* Venn Diagram Logo */}
+          <div className="relative w-24 h-24 mx-auto mb-4">
+            <svg viewBox="0 0 120 120" className="w-full h-full">
+              <ellipse
+                cx="45"
+                cy="60"
+                rx="30"
+                ry="45"
+                transform="rotate(45 45 60)"
+                fill="#5EE177"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="75"
+                cy="60"
+                rx="30"
+                ry="45"
+                transform="rotate(135 75 60)"
+                fill="#FF8AC6"
+                opacity="0.9"
+              />
+            </svg>
+          </div>
+
+          {/* Text */}
+          <h2 className="text-2xl font-bold text-[#2E2E38] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            SnapSmart
+          </h2>
+          <p className="text-lg text-[#60656F] font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Lens of the Future
+          </p>
+          <p className="text-sm text-[#60656F] opacity-80 mb-4">
+            Shop Smart. Save Big.
+          </p>
+          <a 
+            href="#" 
+            className="text-sm font-semibold underline bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+          >
+            Learn more about us
+          </a>
+        </div>
       </div>
     </div>
   );

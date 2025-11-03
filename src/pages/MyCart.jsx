@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, Trash2, Plus, Minus, Search, User, Heart, MapPin, Star, Filter, FolderPlus } from "lucide-react";
+import { ShoppingCart, Trash2, Search, MapPin, Star, Clock, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,94 +47,66 @@ export default function MyCart() {
   // Use actual captures for Snap History
   const snapHistory = captures.slice(0, 10);
 
-  const categories = [
-    { name: "Soccer Stuff", items: 5 },
-    { name: "Tech", items: 12 },
-    { name: "Clothes", items: 8 },
-    { name: "Food", items: 3 },
-  ];
-
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header with Tabs */}
+      {/* Header with Tabs - Very Top */}
       <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E4E8ED]">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex gap-6">
-            <button
-              onClick={() => setActiveTab("cart")}
-              className={`text-lg font-bold pb-2 transition-colors ${
-                activeTab === "cart" 
-                  ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
-                  : "text-[#60656F]"
-              }`}
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              My Cart
-            </button>
-            <button
-              onClick={() => setActiveTab("history")}
-              className={`text-lg font-bold pb-2 transition-colors ${
-                activeTab === "history" 
-                  ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
-                  : "text-[#60656F]"
-              }`}
-              style={{ fontFamily: 'Poppins, sans-serif' }}
-            >
-              Snap History
-            </button>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-              <MapPin className="w-5 h-5 text-[#60656F]" />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-              <FolderPlus className="w-5 h-5 text-[#60656F]" />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-              <Filter className="w-5 h-5 text-[#60656F]" />
-            </button>
-          </div>
+        <div className="flex gap-8 mb-4">
+          <button
+            onClick={() => setActiveTab("cart")}
+            className={`text-2xl font-bold pb-2 transition-colors ${
+              activeTab === "cart" 
+                ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
+                : "text-[#60656F]"
+            }`}
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            My Cart
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`text-2xl font-bold pb-2 transition-colors ${
+              activeTab === "history" 
+                ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
+                : "text-[#60656F]"
+            }`}
+            style={{ fontFamily: 'Poppins, sans-serif' }}
+          >
+            Snap History
+          </button>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
-          <Input
-            placeholder="Search products..."
-            className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38]"
-            style={{ fontFamily: 'Inter, sans-serif' }}
-          />
-        </div>
-
-        {/* Create Folder Button */}
-        <Button className="w-full bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] hover:opacity-90 rounded-2xl h-12 font-semibold">
-          + Create Folder
-        </Button>
-      </div>
-
-      {/* AI Product Finder - Shorter Height */}
-      <div className="px-6 py-4">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-              <ShoppingCart className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-white font-bold text-base mb-1">AI Product Finder</h3>
-              <p className="text-white/90 text-xs leading-snug">
-                Finds best deals for you across stores nearby
-              </p>
-            </div>
-            <Button size="sm" className="bg-white text-blue-600 hover:bg-white/90 font-semibold text-xs px-3 h-8 rounded-full flex-shrink-0">
-              Start
-            </Button>
+        {/* Search Bar with Icons on Right */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
+            <Input
+              placeholder="Search products"
+              className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38]"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            />
           </div>
+          
+          {/* Clock Icon - Sort by Latest/Oldest */}
+          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <Clock className="w-5 h-5 text-[#60656F]" />
+          </button>
+
+          {/* Location Icon */}
+          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <MapPin className="w-5 h-5 text-[#60656F]" />
+          </button>
+
+          {/* Add Folder Icon */}
+          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <FolderPlus className="w-5 h-5 text-[#60656F]" />
+          </button>
         </div>
       </div>
 
       {/* Sort By */}
       {activeTab === "cart" && (
-        <div className="px-6 pb-4 flex items-center justify-between">
+        <div className="px-6 py-4 flex items-center justify-between">
           <p className="text-sm text-[#60656F]">{cartItems.length} items</p>
           <div className="flex items-center gap-2">
             <span className="text-sm text-[#60656F]">Sort by:</span>
@@ -222,24 +194,6 @@ export default function MyCart() {
             )}
           </div>
         )}
-      </div>
-
-      {/* Bottom Category Bar */}
-      <div className="fixed bottom-20 left-0 right-0 bg-white border-t border-[#E4E8ED] z-40 px-6 py-4">
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-          {categories.map((cat, idx) => (
-            <div 
-              key={idx}
-              className="flex-shrink-0 bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] rounded-2xl p-4 min-w-[120px]"
-            >
-              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center mb-2">
-                <ShoppingCart className="w-5 h-5 text-white" />
-              </div>
-              <h4 className="text-white font-bold text-sm mb-1">{cat.name}</h4>
-              <p className="text-white/80 text-xs">{cat.items} items</p>
-            </div>
-          ))}
-        </div>
       </div>
 
       <style>{`

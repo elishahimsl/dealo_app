@@ -1,13 +1,13 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, ShoppingCart, MoreHorizontal, User, Camera } from "lucide-react";
+import { Home, ShoppingCart, User, Camera, Grid2x2 } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
 
-  // Hide nav on splash screen
-  if (location.pathname === createPageUrl("Splash")) {
+  // Hide nav on splash screen AND camera page
+  if (location.pathname === createPageUrl("Splash") || location.pathname === createPageUrl("Snap")) {
     return <div className="min-h-screen">{children}</div>;
   }
 
@@ -15,7 +15,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Home", icon: Home, path: createPageUrl("Home") },
     { name: "My Cart", icon: ShoppingCart, path: createPageUrl("MyCart") },
     { name: "Scan", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
-    { name: "More", icon: MoreHorizontal, path: createPageUrl("More") },
+    { name: "More", icon: Grid2x2, path: createPageUrl("More") },
     { name: "Profile", icon: User, path: createPageUrl("Profile") },
   ];
 
@@ -23,21 +23,6 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
-      <style>{`
-        @keyframes scanLine {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(200%); }
-        }
-        
-        .scan-line {
-          animation: scanLine 2s ease-in-out infinite;
-        }
-        
-        .smooth-transition {
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-      `}</style>
-
       {/* Main Content */}
       <main className="flex-1 pb-24 overflow-auto">
         {children}
@@ -49,7 +34,7 @@ export default function Layout({ children, currentPageName }) {
           {/* Center Camera Button */}
           <Link to={createPageUrl("Snap")}>
             <div className="absolute left-1/2 -translate-x-1/2 -top-8">
-              <button className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] shadow-2xl flex items-center justify-center smooth-transition hover:scale-105 active:scale-95">
+              <button className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
                 <Camera className="w-10 h-10 text-white" strokeWidth={2.5} />
               </button>
             </div>
@@ -68,15 +53,15 @@ export default function Layout({ children, currentPageName }) {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className="flex flex-col items-center justify-center flex-1 smooth-transition"
+                  className="flex flex-col items-center justify-center flex-1 transition-all"
                 >
                   <Icon 
-                    className={`w-6 h-6 mb-1 smooth-transition ${
+                    className={`w-6 h-6 mb-1 transition-colors ${
                       active ? 'text-[#5EE177]' : 'text-[#60656F]'
                     }`}
                     strokeWidth={active ? 2.5 : 2}
                   />
-                  <span className={`text-xs font-semibold smooth-transition ${
+                  <span className={`text-xs font-semibold transition-colors ${
                     active ? 'text-[#5EE177]' : 'text-[#60656F]'
                   }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
                     {item.name}

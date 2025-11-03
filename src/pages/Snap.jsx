@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle, Image as ImageIcon, RefreshCw, Zap, ZoomIn, Scan } from "lucide-react";
+import { Camera, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle, Image as ImageIcon, RefreshCw, Zap, ZoomIn, ZoomOut, Scan, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Snap() {
@@ -12,11 +12,13 @@ export default function Snap() {
   const [cameraReady, setCameraReady] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
-  const [mode, setMode] = useState('identify'); // identify, scan, ar
+  const [mode, setMode] = useState('identify');
+  const [increaseAccuracy, setIncreaseAccuracy] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
-  const [isMobile] = useState(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+  const [isMobile] = useState(/iPhone|iPad|Pod|Android/i.test(navigator.userAgent));
 
   useEffect(() => {
     if (!result) {
@@ -34,6 +36,7 @@ export default function Snap() {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.style.transform = `scale(${zoom})`; // Apply current zoom level
       }
       setCameraReady(true);
     } catch (err) {
@@ -47,6 +50,16 @@ export default function Snap() {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+  };
+
+  const handleZoom = (direction) => {
+    setZoom(prev => {
+      const newZoom = direction === 'in' ? Math.min(prev + 0.5, 3) : Math.max(prev - 0.5, 1);
+      if (videoRef.current) {
+        videoRef.current.style.transform = `scale(${newZoom})`;
+      }
+      return newZoom;
+    });
   };
 
   const capturePhoto = async () => {
@@ -140,7 +153,7 @@ export default function Snap() {
     try {
       await base44.entities.Capture.create({
         title: result.title || "Untitled Scan",
-        content_type: "product",
+        content_type: "other",
         file_url: result.file_url,
         file_type: 'image',
         ai_summary: result.description || "",
@@ -171,6 +184,7 @@ export default function Snap() {
             size="icon"
             onClick={() => {
               setResult(null);
+              setZoom(1); // Reset zoom state when returning to camera
               startCamera();
             }}
             className="absolute top-6 right-6 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70"
@@ -179,7 +193,7 @@ export default function Snap() {
           </Button>
         </div>
 
-        <div className="px-6 -mt-8 relative z-10 space-y-6 slide-in">
+        <div className="px-6 -mt-8 relative z-10 space-y-6">
           {/* AI Conversational Card */}
           <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
             <div className="flex items-start gap-3 mb-4">
@@ -236,50 +250,6 @@ export default function Snap() {
               </div>
             </div>
           )}
-
-          {/* Similar Items */}
-          {result.similar_items && result.similar_items.length > 0 && (
-            <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
-              <h3 className="font-bold text-[#2E2E38] mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#5EE177]" />
-                Similar Items
-              </h3>
-              <ul className="space-y-2">
-                {result.similar_items.map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-[#60656F]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#5EE177]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Product Links */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
-            <h3 className="font-bold text-[#2E2E38] mb-4 flex items-center gap-2">
-              <ExternalLink className="w-5 h-5 text-[#5EE177]" />
-              Find Online
-            </h3>
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start rounded-2xl border-[#E4E8ED] text-[#2E2E38] hover:bg-[#F9FAFB]"
-                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(result.title)}`, '_blank')}
-              >
-                <img src="https://www.google.com/favicon.ico" className="w-4 h-4 mr-2" />
-                Search on Google
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full justify-start rounded-2xl border-[#E4E8ED] text-[#2E2E38] hover:bg-[#F9FAFB]"
-                onClick={() => window.open(`https://www.amazon.com/s?k=${encodeURIComponent(result.title)}`, '_blank')}
-              >
-                <img src="https://www.amazon.com/favicon.ico" className="w-4 h-4 mr-2" />
-                Find on Amazon
-              </Button>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Actions */}
@@ -323,15 +293,20 @@ export default function Snap() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover transition-transform"
       />
 
-      {/* Scan Mode Overlay - Only show in scan mode */}
+      {/* Identify Mode - Big Scan Icon in Center */}
+      {mode === 'identify' && !scanning && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <Scan className="w-48 h-48 text-[#5EE177] opacity-30" strokeWidth={1.5} />
+        </div>
+      )}
+
+      {/* Scan Mode - Big Scan Icon (no box) */}
       {mode === 'scan' && !scanning && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="w-64 h-40 border-4 border-[#5EE177] rounded-2xl bg-[#5EE177]/10 backdrop-blur-sm flex items-center justify-center">
-            <Scan className="w-20 h-20 text-[#5EE177]" strokeWidth={2} />
-          </div>
+          <Scan className="w-64 h-64 text-[#5EE177]" strokeWidth={2} />
           <p className="absolute bottom-32 text-white text-sm font-medium">
             Align barcode within frame
           </p>
@@ -340,7 +315,6 @@ export default function Snap() {
 
       {/* Top Controls */}
       <div className="absolute top-0 left-0 right-0 z-20 pt-12 px-6 flex items-center justify-between">
-        {/* X button top left */}
         <Button
           variant="ghost"
           size="icon"
@@ -350,9 +324,7 @@ export default function Snap() {
           <X className="w-5 h-5 text-white" />
         </Button>
 
-        {/* Top right controls */}
         <div className="flex items-center gap-2">
-          {/* Flash */}
           <Button
             variant="ghost"
             size="icon"
@@ -360,13 +332,19 @@ export default function Snap() {
           >
             <Zap className="w-5 h-5 text-white" />
           </Button>
-          {/* Flip camera */}
           <Button
             variant="ghost"
             size="icon"
             className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
           >
             <RefreshCw className="w-5 h-5 text-white" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
+          >
+            <HelpCircle className="w-5 h-5 text-white" />
           </Button>
         </div>
       </div>
@@ -385,12 +363,26 @@ export default function Snap() {
 
       {/* Bottom Controls */}
       {!scanning && (
-        <div className="absolute bottom-0 left-0 right-0 pb-12 z-20">
-          {/* Mode Selection - Above green button */}
-          <div className="flex justify-center gap-6 mb-8">
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          {/* Increase Accuracy Toggle */}
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={() => setIncreaseAccuracy(!increaseAccuracy)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+                increaseAccuracy 
+                  ? 'bg-[#5EE177] text-white' 
+                  : 'bg-white/20 text-white backdrop-blur-md border border-white/30'
+              }`}
+            >
+              {increaseAccuracy ? '✓ ' : ''}Increase Accuracy
+            </button>
+          </div>
+
+          {/* Mode Selection */}
+          <div className="flex justify-center gap-6 mb-6">
             <button
               onClick={() => setMode('identify')}
-              className={`text-sm font-semibold ${
+              className={`text-sm font-semibold transition-colors ${
                 mode === 'identify' ? 'text-[#5EE177]' : 'text-white/70'
               }`}
             >
@@ -398,7 +390,7 @@ export default function Snap() {
             </button>
             <button
               onClick={() => setMode('scan')}
-              className={`text-sm font-semibold ${
+              className={`text-sm font-semibold transition-colors ${
                 mode === 'scan' ? 'text-[#5EE177]' : 'text-white/70'
               }`}
             >
@@ -406,7 +398,7 @@ export default function Snap() {
             </button>
             <button
               onClick={() => setMode('ar')}
-              className={`text-sm font-semibold ${
+              className={`text-sm font-semibold transition-colors ${
                 mode === 'ar' ? 'text-[#5EE177]' : 'text-white/70'
               }`}
             >
@@ -414,41 +406,52 @@ export default function Snap() {
             </button>
           </div>
 
-          {/* Bottom Bar with Buttons */}
-          <div className="flex items-center justify-center gap-8 px-12">
-            {/* Gallery button - left */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              ref={fileInputRef}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
-            >
-              <ImageIcon className="w-6 h-6 text-white" />
-            </button>
-
-            {/* Green Circle Button - center */}
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
+          {/* Grey Bar with Controls */}
+          <div className="bg-gray-800/80 backdrop-blur-md py-6 px-8">
+            <div className="flex items-center justify-between max-w-lg mx-auto">
+              {/* Gallery button - left */}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                ref={fileInputRef}
+                className="hidden"
+              />
               <button
-                onClick={capturePhoto}
-                disabled={!cameraReady}
-                className="relative w-20 h-20 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl smooth-transition hover:scale-110 active:scale-95 disabled:opacity-50"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90"
               >
-                {/* <Camera className="w-10 h-10 text-white" strokeWidth={2.5} /> Remove this since the button itself is the camera icon now */}
+                <ImageIcon className="w-6 h-6 text-white" />
               </button>
-            </div>
 
-            {/* Zoom button - right */}
-            <button
-              className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
-            >
-              <ZoomIn className="w-6 h-6 text-white" />
-            </button>
+              {/* Green Circle Button - center (smaller) */}
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
+                <button
+                  onClick={capturePhoto}
+                  disabled={!cameraReady}
+                  className="relative w-16 h-16 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                />
+              </div>
+
+              {/* Zoom controls - right */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleZoom('out')}
+                  disabled={zoom <= 1}
+                  className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                >
+                  <ZoomOut className="w-5 h-5 text-white" />
+                </button>
+                <button
+                  onClick={() => handleZoom('in')}
+                  disabled={zoom >= 3}
+                  className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                >
+                  <ZoomIn className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

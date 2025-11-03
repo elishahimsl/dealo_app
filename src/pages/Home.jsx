@@ -8,24 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function Home() {
-  const { data: captures } = useQuery({
-    queryKey: ['recentCaptures'],
-    queryFn: () => base44.entities.Capture.list('-created_date', 10),
-    initialData: [],
-  });
-
   const quickActions = [
     { icon: Camera, label: "Identify", page: "Snap" },
     { icon: Scale, label: "Compare", page: "Compare" },
     { icon: ShoppingCart, label: "My Cart", page: "MyCart" }
   ];
 
-  // Mock trending products
-  const trendingProducts = captures.slice(0, 8).length > 0 ? captures.slice(0, 8) : [
+  // Mock trending products - ALWAYS use these placeholders
+  const trendingProducts = [
     { id: 1, title: "Wireless Headphones", price: "$89.99", rating: 4.5, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" },
     { id: 2, title: "Smart Watch", price: "$199.99", rating: 4.8, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
     { id: 3, title: "Bluetooth Speaker", price: "$59.99", rating: 4.6, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400" },
     { id: 4, title: "Phone Case", price: "$24.99", rating: 4.3, image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400" },
+    { id: 5, title: "USB-C Cable", price: "$14.99", rating: 4.7, image: "https://images.unsplash.com/photo-1585419372611-f0ffebad6659?w=400" },
+    { id: 6, title: "Laptop Stand", price: "$34.99", rating: 4.4, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400" },
+    { id: 7, title: "Wireless Mouse", price: "$29.99", rating: 4.6, image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400" },
+    { id: 8, title: "Backpack", price: "$49.99", rating: 4.5, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400" },
   ];
 
   // Mock deals near you
@@ -87,7 +85,7 @@ export default function Home() {
             <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E4E8ED] shadow-sm">
               <div className="aspect-square bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
                 <img 
-                  src={product.file_url || product.image} 
+                  src={product.image} 
                   alt={product.title}
                   className="w-full h-full object-cover"
                 />
@@ -98,10 +96,10 @@ export default function Home() {
                 </h3>
                 <div className="flex items-center gap-1 mb-2">
                   <Star className="w-3 h-3 text-[#FF8AC6] fill-[#FF8AC6]" />
-                  <span className="text-xs text-[#60656F]">{product.rating || 4.5}</span>
+                  <span className="text-xs text-[#60656F]">{product.rating}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-[#5EE177]">{product.price || "$99.99"}</span>
+                  <span className="text-sm font-bold text-[#5EE177]">{product.price}</span>
                   <Button size="sm" className="h-7 px-3 bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] hover:opacity-90">
                     <Plus className="w-3 h-3" />
                   </Button>
@@ -180,6 +178,16 @@ export default function Home() {
           Learn more about us
         </a>
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

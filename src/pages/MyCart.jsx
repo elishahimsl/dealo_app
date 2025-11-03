@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { ShoppingCart, Trash2, Plus, Minus, Search, User, Heart, MapPin, Star } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
+import { ShoppingCart, Trash2, Plus, Minus, Search, User, Heart, MapPin, Star, Filter, FolderPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +15,12 @@ import {
 export default function MyCart() {
   const [activeTab, setActiveTab] = useState("cart");
   const [sortBy, setSortBy] = useState("recent");
+
+  const { data: captures } = useQuery({
+    queryKey: ['allCaptures'],
+    queryFn: () => base44.entities.Capture.list('-created_date'),
+    initialData: [],
+  });
 
   // Mock cart items
   const cartItems = [
@@ -36,10 +44,8 @@ export default function MyCart() {
     },
   ];
 
-  const snapHistory = [
-    { id: 1, title: "Nike Shoes", date: "2 days ago", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200" },
-    { id: 2, title: "Apple Watch", date: "5 days ago", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200" },
-  ];
+  // Use actual captures for Snap History
+  const snapHistory = captures.slice(0, 10);
 
   const categories = [
     { name: "Soccer Stuff", items: 5 },
@@ -47,10 +53,6 @@ export default function MyCart() {
     { name: "Clothes", items: 8 },
     { name: "Food", items: 3 },
   ];
-
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
@@ -82,17 +84,14 @@ export default function MyCart() {
             </button>
           </div>
           <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center">
-              <User className="w-5 h-5 text-[#60656F]" />
+            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+              <MapPin className="w-5 h-5 text-[#60656F]" />
             </button>
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center">
-              <Heart className="w-5 h-5 text-[#60656F]" />
+            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+              <FolderPlus className="w-5 h-5 text-[#60656F]" />
             </button>
-            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center relative">
-              <ShoppingCart className="w-5 h-5 text-[#60656F]" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#5EE177] rounded-full text-white text-xs flex items-center justify-center font-bold">
-                {cartItems.length}
-              </span>
+            <button className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+              <Filter className="w-5 h-5 text-[#60656F]" />
             </button>
           </div>
         </div>
@@ -101,7 +100,7 @@ export default function MyCart() {
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
           <Input
-            placeholder="Search products"
+            placeholder="Search products..."
             className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38]"
             style={{ fontFamily: 'Inter, sans-serif' }}
           />
@@ -113,19 +112,22 @@ export default function MyCart() {
         </Button>
       </div>
 
-      {/* AI Product Finder */}
+      {/* AI Product Finder - Shorter Height */}
       <div className="px-6 py-4">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
               <ShoppingCart className="w-6 h-6 text-white" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-white font-bold text-lg mb-2">AI Product Finder</h3>
-              <p className="text-white/90 text-sm mb-3">
-                Finds best deals, more for you across stores near—the best selected.
+            <div className="flex-1 min-w-0">
+              <h3 className="text-white font-bold text-base mb-1">AI Product Finder</h3>
+              <p className="text-white/90 text-xs leading-snug">
+                Finds best deals for you across stores nearby
               </p>
             </div>
+            <Button size="sm" className="bg-white text-blue-600 hover:bg-white/90 font-semibold text-xs px-3 h-8 rounded-full flex-shrink-0">
+              Start
+            </Button>
           </div>
         </div>
       </div>
@@ -188,18 +190,36 @@ export default function MyCart() {
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
-            {snapHistory.map((item) => (
-              <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm flex items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-[#2E2E38] mb-1">{item.title}</h3>
-                  <p className="text-xs text-[#60656F]">{item.date}</p>
-                </div>
+          <div>
+            {snapHistory.length === 0 ? (
+              <div className="bg-white rounded-3xl p-12 text-center border border-[#E4E8ED] shadow-sm">
+                <ShoppingCart className="w-16 h-16 text-[#60656F] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#2E2E38] mb-2">No Snap History Yet</h3>
+                <p className="text-[#60656F] text-sm">
+                  Start scanning products to build your history
+                </p>
               </div>
-            ))}
+            ) : (
+              <div className="space-y-4">
+                {snapHistory.map((item) => (
+                  <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
+                      <img src={item.file_url} alt={item.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-[#2E2E38] mb-1 line-clamp-1">{item.title}</h3>
+                      <p className="text-xs text-[#60656F]">
+                        {new Date(item.created_date).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -221,6 +241,16 @@ export default function MyCart() {
           ))}
         </div>
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

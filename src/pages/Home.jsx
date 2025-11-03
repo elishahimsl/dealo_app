@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, ShoppingCart, Search, Star, Plus } from "lucide-react";
+import { Camera, Scale, ShoppingCart, Search, Star, Plus, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -32,6 +32,7 @@ export default function Home() {
   const dealsNearYou = [
     { id: 1, store: "Target", discount: "Up to 40% OFF", image: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600" },
     { id: 2, store: "Walmart", discount: "Flash Sale - 25% OFF", image: "https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=600" },
+    { id: 3, store: "Best Buy", discount: "Tech Deals - 30% OFF", image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600" },
   ];
 
   return (
@@ -111,74 +112,73 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Deals Near You */}
+      {/* Deals Near You - Horizontal Scroll */}
       <div className="px-6 mb-8">
-        <h2 className="text-xl font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Deals Near You
-        </h2>
-        <div className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Deals Near You
+          </h2>
+          <button className="text-[#5EE177] font-semibold text-sm flex items-center gap-1">
+            View All
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
           {dealsNearYou.map((deal) => (
-            <div key={deal.id} className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] rounded-3xl p-6 shadow-lg relative overflow-hidden">
-              <div className="relative z-10">
-                <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Poppons, sans-serif' }}>
-                  {deal.discount}
-                </h3>
-                <p className="text-white/90 text-lg font-semibold mb-4">
-                  {deal.store}
-                </p>
-                <Button className="bg-white text-[#5EE177] hover:bg-white/90 font-semibold rounded-full">
-                  View All Deals
-                </Button>
-              </div>
+            <div key={deal.id} className="flex-shrink-0 w-72 bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] rounded-3xl p-6 shadow-lg">
+              <h3 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                {deal.discount}
+              </h3>
+              <p className="text-white/90 text-lg font-semibold mb-4">
+                {deal.store}
+              </p>
+              <Button className="bg-white text-[#5EE177] hover:bg-white/90 font-semibold rounded-full">
+                View Deals
+              </Button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* SnapSmart Landing Section */}
-      <div className="px-6 pb-12">
-        <div className="bg-white rounded-3xl p-8 border border-[#E4E8ED] shadow-lg text-center">
-          {/* Venn Diagram Logo */}
-          <div className="relative w-24 h-24 mx-auto mb-4">
-            <svg viewBox="0 0 120 120" className="w-full h-full">
-              <ellipse
-                cx="45"
-                cy="60"
-                rx="30"
-                ry="45"
-                transform="rotate(45 45 60)"
-                fill="#5EE177"
-                opacity="0.9"
-              />
-              <ellipse
-                cx="75"
-                cy="60"
-                rx="30"
-                ry="45"
-                transform="rotate(135 75 60)"
-                fill="#FF8AC6"
-                opacity="0.9"
-              />
-            </svg>
-          </div>
-
-          {/* Text */}
-          <h2 className="text-2xl font-bold text-[#2E2E38] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            SnapSmart
-          </h2>
-          <p className="text-lg text-[#60656F] font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Lens of the Future
-          </p>
-          <p className="text-sm text-[#60656F] opacity-80 mb-4">
-            Shop Smart. Save Big.
-          </p>
-          <a 
-            href="#" 
-            className="text-sm font-semibold underline bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
-          >
-            Learn more about us
-          </a>
+      {/* SnapSmart Landing Section - No card, just on screen */}
+      <div className="px-6 pb-12 pt-8 text-center">
+        {/* Venn Diagram Logo Only */}
+        <div className="relative w-24 h-24 mx-auto mb-4">
+          <svg viewBox="0 0 120 120" className="w-full h-full">
+            <ellipse
+              cx="45"
+              cy="60"
+              rx="30"
+              ry="45"
+              transform="rotate(45 45 60)"
+              fill="#5EE177"
+              opacity="0.9"
+            />
+            <ellipse
+              cx="75"
+              cy="60"
+              rx="30"
+              ry="45"
+              transform="rotate(135 75 60)"
+              fill="#FF8AC6"
+              opacity="0.9"
+            />
+          </svg>
         </div>
+
+        {/* Text directly on screen */}
+        <p className="text-lg text-[#60656F] font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Lens of the Future
+        </p>
+        <p className="text-sm text-[#60656F] opacity-80 mb-4">
+          Shop Smart. Save Big.
+        </p>
+        <a 
+          href="#" 
+          className="text-sm font-semibold underline bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+        >
+          Learn more about us
+        </a>
       </div>
     </div>
   );

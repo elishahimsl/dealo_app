@@ -1,9 +1,10 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, Upload, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle } from "lucide-react";
+import { Camera, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle, Image as ImageIcon, RefreshCw, Zap, ZoomIn, Scan } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Snap() {
@@ -11,6 +12,7 @@ export default function Snap() {
   const [cameraReady, setCameraReady] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
+  const [mode, setMode] = useState('identify'); // identify, scan, ar
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -99,10 +101,6 @@ export default function Snap() {
     }, 'image/jpeg', 0.9);
   };
 
-  const handleFileUpload = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleFileSelect = async (e) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
@@ -159,7 +157,7 @@ export default function Snap() {
   // Result View
   if (result) {
     return (
-      <div className="min-h-screen bg-[#1F2421] pb-32">
+      <div className="min-h-screen bg-[#F9FAFB] pb-32">
         {/* Image Preview */}
         <div className="relative h-80">
           <img 
@@ -167,7 +165,7 @@ export default function Snap() {
             alt="Scanned item"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1F2421]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#F9FAFB]" />
           <Button
             variant="ghost"
             size="icon"
@@ -183,33 +181,33 @@ export default function Snap() {
 
         <div className="px-6 -mt-8 relative z-10 space-y-6 slide-in">
           {/* AI Conversational Card */}
-          <div className="glass-dark rounded-3xl p-6">
+          <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-[var(--light)] italic text-sm mb-2">
+                <p className="text-[#2E2E38] italic text-sm mb-2">
                   "{result.conversational_intro || "Here's what I found..."}"
                 </p>
-                <h1 className="text-2xl font-bold text-[var(--light)] mb-2">
+                <h1 className="text-2xl font-bold text-[#2E2E38] mb-2">
                   {result.title}
                 </h1>
                 {result.brand && (
-                  <p className="text-[var(--secondary)] text-sm mb-2">
+                  <p className="text-[#60656F] text-sm mb-2">
                     <span className="font-semibold">{result.brand}</span>
                     {result.model && ` • ${result.model}`}
                   </p>
                 )}
                 {result.price_range && (
-                  <p className="text-[var(--accent)] font-bold text-lg mb-3">
+                  <p className="text-[#5EE177] font-bold text-lg mb-3">
                     {result.price_range}
                   </p>
                 )}
               </div>
             </div>
             
-            <p className="text-[var(--secondary)] text-sm leading-relaxed mb-4">
+            <p className="text-[#60656F] text-sm leading-relaxed mb-4">
               {result.description}
             </p>
 
@@ -218,7 +216,7 @@ export default function Snap() {
                 {result.keywords.map((keyword, idx) => (
                   <Badge 
                     key={idx}
-                    className="bg-[var(--accent)]/20 text-[var(--accent)] border-[var(--accent)]/30"
+                    className="bg-[#A8F3C1] text-[#2E2E38] border-0"
                   >
                     {keyword}
                   </Badge>
@@ -229,10 +227,10 @@ export default function Snap() {
 
           {/* Helpful Suggestion */}
           {result.helpful_suggestion && (
-            <div className="glass-dark rounded-3xl p-5 border-l-4 border-[var(--accent)]">
+            <div className="bg-white rounded-3xl p-5 border-l-4 border-[#5EE177]">
               <div className="flex items-start gap-3">
-                <MessageCircle className="w-5 h-5 text-[var(--accent)] flex-shrink-0 mt-0.5" />
-                <p className="text-[var(--light)] text-sm italic">
+                <MessageCircle className="w-5 h-5 text-[#5EE177] flex-shrink-0 mt-0.5" />
+                <p className="text-[#2E2E38] text-sm italic">
                   {result.helpful_suggestion}
                 </p>
               </div>
@@ -241,15 +239,15 @@ export default function Snap() {
 
           {/* Similar Items */}
           {result.similar_items && result.similar_items.length > 0 && (
-            <div className="glass-dark rounded-3xl p-6">
-              <h3 className="font-bold text-[var(--light)] mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[var(--accent)]" />
+            <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
+              <h3 className="font-bold text-[#2E2E38] mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#5EE177]" />
                 Similar Items
               </h3>
               <ul className="space-y-2">
                 {result.similar_items.map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-[var(--secondary)]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                  <li key={idx} className="flex items-center gap-2 text-sm text-[#60656F]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#5EE177]" />
                     {item}
                   </li>
                 ))}
@@ -258,15 +256,15 @@ export default function Snap() {
           )}
 
           {/* Product Links */}
-          <div className="glass-dark rounded-3xl p-6">
-            <h3 className="font-bold text-[var(--light)] mb-4 flex items-center gap-2">
-              <ExternalLink className="w-5 h-5 text-[var(--accent)]" />
+          <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
+            <h3 className="font-bold text-[#2E2E38] mb-4 flex items-center gap-2">
+              <ExternalLink className="w-5 h-5 text-[#5EE177]" />
               Find Online
             </h3>
             <div className="space-y-2">
               <Button 
                 variant="outline" 
-                className="w-full justify-start rounded-2xl border-[var(--secondary)]/30 text-[var(--light)] hover:bg-[var(--accent)]/10"
+                className="w-full justify-start rounded-2xl border-[#E4E8ED] text-[#2E2E38] hover:bg-[#F9FAFB]"
                 onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(result.title)}`, '_blank')}
               >
                 <img src="https://www.google.com/favicon.ico" className="w-4 h-4 mr-2" />
@@ -274,7 +272,7 @@ export default function Snap() {
               </Button>
               <Button 
                 variant="outline" 
-                className="w-full justify-start rounded-2xl border-[var(--secondary)]/30 text-[var(--light)] hover:bg-[var(--accent)]/10"
+                className="w-full justify-start rounded-2xl border-[#E4E8ED] text-[#2E2E38] hover:bg-[#F9FAFB]"
                 onClick={() => window.open(`https://www.amazon.com/s?k=${encodeURIComponent(result.title)}`, '_blank')}
               >
                 <img src="https://www.amazon.com/favicon.ico" className="w-4 h-4 mr-2" />
@@ -286,26 +284,26 @@ export default function Snap() {
 
         {/* Bottom Actions */}
         <div className="fixed bottom-24 left-0 right-0 px-6 z-20">
-          <div className="glass-dark rounded-3xl p-4 shadow-2xl">
+          <div className="bg-white rounded-3xl p-4 shadow-2xl border border-[#E4E8ED]">
             <div className="grid grid-cols-3 gap-3">
               <Button
                 onClick={() => navigate(createPageUrl("Compare"))}
                 variant="outline"
-                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 border-[var(--secondary)]/30 text-[var(--light)] hover:bg-[var(--accent)]/10"
+                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 border-2 text-[#2E2E38] hover:bg-[#F9FAFB]"
               >
                 <Scale className="w-5 h-5" />
                 <span className="text-xs font-semibold">Compare</span>
               </Button>
               <Button
                 onClick={handleSave}
-                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 bg-gradient-to-br from-[var(--accent)] to-[var(--primary)]"
+                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] text-white"
               >
                 <Bookmark className="w-5 h-5" />
                 <span className="text-xs font-semibold">Save</span>
               </Button>
               <Button
                 variant="outline"
-                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 border-[var(--secondary)]/30 text-[var(--light)] hover:bg-[var(--accent)]/10"
+                className="rounded-2xl flex flex-col items-center gap-1 h-auto py-3 border-2 text-[#2E2E38] hover:bg-[#F9FAFB]"
               >
                 <Share2 className="w-5 h-5" />
                 <span className="text-xs font-semibold">Share</span>
@@ -328,56 +326,130 @@ export default function Snap() {
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Overlay Instruction */}
-      {!scanning && (
-        <div className="absolute top-24 left-0 right-0 text-center z-10 px-6">
-          <p className="text-white text-sm font-medium drop-shadow-2xl">
-            Align your item within the frame
+      {/* Scan Mode Overlay - Only show in scan mode */}
+      {mode === 'scan' && !scanning && (
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="w-64 h-40 border-4 border-[#5EE177] rounded-2xl bg-[#5EE177]/10 backdrop-blur-sm flex items-center justify-center">
+            <Scan className="w-20 h-20 text-[#5EE177]" strokeWidth={2} />
+          </div>
+          <p className="absolute bottom-32 text-white text-sm font-medium">
+            Align barcode within frame
           </p>
         </div>
       )}
 
-      {/* Top Actions */}
+      {/* Top Controls */}
       <div className="absolute top-0 left-0 right-0 z-20 pt-12 px-6 flex items-center justify-between">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileSelect}
-          ref={fileInputRef}
-          className="hidden"
-        />
+        {/* X button top left */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleFileUpload}
+          onClick={() => navigate(createPageUrl("Home"))}
           className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
         >
-          <Upload className="w-5 h-5 text-white" />
+          <X className="w-5 h-5 text-white" />
         </Button>
+
+        {/* Top right controls */}
+        <div className="flex items-center gap-2">
+          {/* Flash */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
+          >
+            <Zap className="w-5 h-5 text-white" />
+          </Button>
+          {/* Flip camera */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
+          >
+            <RefreshCw className="w-5 h-5 text-white" />
+          </Button>
+        </div>
       </div>
 
       {/* Scanning Overlay */}
       {scanning && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
           <div className="relative mb-6">
-            <div className="w-24 h-24 rounded-full border-4 border-[var(--accent)] animate-ping absolute" />
-            <Loader2 className="w-24 h-24 text-[var(--accent)] animate-spin" />
+            <div className="w-24 h-24 rounded-full border-4 border-[#5EE177] animate-ping absolute" />
+            <Loader2 className="w-24 h-24 text-[#5EE177] animate-spin" />
           </div>
           <p className="text-white text-xl font-semibold mb-2">Analyzing... 🔍</p>
           <p className="text-white/70 text-sm">Got it — analyzing now...</p>
         </div>
       )}
 
-      {/* Main Capture Button */}
+      {/* Bottom Controls */}
       {!scanning && (
-        <div className="absolute bottom-12 left-0 right-0 px-6 z-20 flex justify-center">
-          <button
-            onClick={capturePhoto}
-            disabled={!cameraReady}
-            className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--primary)] shadow-2xl glow-pulse flex items-center justify-center smooth-transition hover:scale-110 active:scale-95 disabled:opacity-50"
-          >
-            <Camera className="w-10 h-10 text-white" strokeWidth={2.5} />
-          </button>
+        <div className="absolute bottom-0 left-0 right-0 pb-12 z-20">
+          {/* Mode Selection - Above green button */}
+          <div className="flex justify-center gap-6 mb-8">
+            <button
+              onClick={() => setMode('identify')}
+              className={`text-sm font-semibold ${
+                mode === 'identify' ? 'text-[#5EE177]' : 'text-white/70'
+              }`}
+            >
+              Identify
+            </button>
+            <button
+              onClick={() => setMode('scan')}
+              className={`text-sm font-semibold ${
+                mode === 'scan' ? 'text-[#5EE177]' : 'text-white/70'
+              }`}
+            >
+              Scan
+            </button>
+            <button
+              onClick={() => setMode('ar')}
+              className={`text-sm font-semibold ${
+                mode === 'ar' ? 'text-[#5EE177]' : 'text-white/70'
+              }`}
+            >
+              AR Mode
+            </button>
+          </div>
+
+          {/* Bottom Bar with Buttons */}
+          <div className="flex items-center justify-center gap-8 px-12">
+            {/* Gallery button - left */}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              ref={fileInputRef}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
+            >
+              <ImageIcon className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Green Circle Button - center */}
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
+              <button
+                onClick={capturePhoto}
+                disabled={!cameraReady}
+                className="relative w-20 h-20 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl smooth-transition hover:scale-110 active:scale-95 disabled:opacity-50"
+              >
+                {/* <Camera className="w-10 h-10 text-white" strokeWidth={2.5} /> Remove this since the button itself is the camera icon now */}
+              </button>
+            </div>
+
+            {/* Zoom button - right */}
+            <button
+              className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center smooth-transition hover:bg-white/30 active:scale-90"
+            >
+              <ZoomIn className="w-6 h-6 text-white" />
+            </button>
+          </div>
         </div>
       )}
     </div>

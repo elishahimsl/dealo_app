@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User, Scan, DollarSign, TrendingDown, Moon, Sun, Settings, CreditCard, Sparkles, Award, LogOut } from "lucide-react";
+import { User, Scan, DollarSign, TrendingDown, Settings, CreditCard, Sparkles, Award, LogOut, Bell, HelpCircle, Shield } from "lucide-react";
 
 export default function Profile() {
-  const [theme, setTheme] = useState('dark');
-
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
@@ -24,36 +22,31 @@ export default function Profile() {
     initialData: [],
   });
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('snapsmart-theme') || 'dark';
-    setTheme(savedTheme);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('snapsmart-theme', newTheme);
-    document.documentElement.setAttribute('data-theme', newTheme);
-  };
-
   const totalScans = captures.length;
   const moneySaved = 247; // Mock data
   const dealsTracked = 12; // Mock data
 
   return (
-    <div className="min-h-screen bg-background theme-transition">
-      {/* Profile Header */}
-      <div className="px-6 pt-12 pb-8">
-        <div className="bg-card glass-effect rounded-3xl p-6 card-shadow fade-in">
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Header */}
+      <div className="px-6 pt-8 pb-4">
+        <h1 className="text-2xl font-bold text-[#2E2E38] mb-1 border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Profile
+        </h1>
+      </div>
+
+      {/* Profile Card */}
+      <div className="px-6 mb-6">
+        <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <User className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center">
+              <User className="w-10 h-10 text-white" strokeWidth={2.5} />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-main mb-1">
+              <h2 className="text-xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 {user?.full_name || 'Guest User'}
               </h2>
-              <p className="text-secondary text-sm">
+              <p className="text-[#60656F] text-sm">
                 {user?.email || 'guest@snapsmart.com'}
               </p>
             </div>
@@ -61,99 +54,41 @@ export default function Profile() {
 
           {/* Stats Row */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-2">
+            <div className="text-center bg-[#F9FAFB] rounded-2xl p-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mx-auto mb-2">
                 <Scan className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-main">{totalScans}</p>
-              <p className="text-xs text-secondary">Scans</p>
+              <p className="text-2xl font-bold text-[#2E2E38]">{totalScans}</p>
+              <p className="text-xs text-[#60656F]">Scans</p>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-2">
+            <div className="text-center bg-[#F9FAFB] rounded-2xl p-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mx-auto mb-2">
                 <DollarSign className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-main">${moneySaved}</p>
-              <p className="text-xs text-secondary">Saved</p>
+              <p className="text-2xl font-bold text-[#2E2E38]">${moneySaved}</p>
+              <p className="text-xs text-[#60656F]">Saved</p>
             </div>
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-2">
+            <div className="text-center bg-[#F9FAFB] rounded-2xl p-4">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mx-auto mb-2">
                 <TrendingDown className="w-6 h-6 text-white" />
               </div>
-              <p className="text-2xl font-bold text-main">{dealsTracked}</p>
-              <p className="text-xs text-secondary">Deals</p>
+              <p className="text-2xl font-bold text-[#2E2E38]">{dealsTracked}</p>
+              <p className="text-xs text-[#60656F]">Deals</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Settings Section */}
-      <div className="px-6 pb-8 space-y-3">
-        {/* Theme Toggle */}
-        <div className="bg-card glass-effect rounded-2xl p-5 card-shadow bounce-tap transition-transform hover:scale-105">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                theme === 'dark' ? 'bg-gradient-to-br from-indigo-600 to-purple-600' : 'bg-gradient-to-br from-yellow-400 to-orange-500'
-              }`}>
-                {theme === 'dark' ? (
-                  <Moon className="w-5 h-5 text-white" />
-                ) : (
-                  <Sun className="w-5 h-5 text-white" />
-                )}
-              </div>
-              <div>
-                <h4 className="font-bold text-main">Theme</h4>
-                <p className="text-xs text-secondary">
-                  {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={toggleTheme}
-              className={`w-14 h-7 rounded-full relative transition-all ${
-                theme === 'dark' ? 'bg-primary' : 'bg-gray-300'
-              }`}
-            >
-              <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all ${
-                theme === 'dark' ? 'right-1' : 'left-1'
-              }`} />
-            </button>
-          </div>
-        </div>
-
-        {/* Account / Subscription */}
-        <button className="w-full bg-card glass-effect rounded-2xl p-5 card-shadow text-left bounce-tap transition-transform hover:scale-105">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center">
-              <CreditCard className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h4 className="font-bold text-main">Account & Subscription</h4>
-              <p className="text-xs text-secondary">Manage premium features</p>
-            </div>
-          </div>
-        </button>
-
-        {/* AI Personalization */}
-        <button className="w-full bg-card glass-effect rounded-2xl p-5 card-shadow text-left bounce-tap transition-transform hover:scale-105">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h4 className="font-bold text-main">AI Personalization</h4>
-              <p className="text-xs text-secondary">Customize your experience</p>
-            </div>
-          </div>
-        </button>
-
-        {/* Achievement Badges */}
-        <div className="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl p-5 card-shadow">
+      {/* Achievement Badge */}
+      <div className="px-6 mb-6">
+        <div className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] rounded-3xl p-6 shadow-lg">
           <div className="flex items-center gap-3 mb-3">
             <Award className="w-8 h-8 text-white" />
             <div>
-              <h4 className="font-bold text-white text-lg">Achievement Unlocked!</h4>
-              <p className="text-white/80 text-sm">Saved $100 This Month</p>
+              <h4 className="font-bold text-white text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                Achievement Unlocked!
+              </h4>
+              <p className="text-white/90 text-sm">Saved $100 This Month</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -168,16 +103,96 @@ export default function Profile() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Settings Section */}
+      <div className="px-6 pb-32 space-y-3">
+        {/* Account & Subscription */}
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <CreditCard className="w-6 h-6 text-[#2E2E38]" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Account & Subscription
+              </h4>
+              <p className="text-xs text-[#60656F]">Manage premium features</p>
+            </div>
+          </div>
+        </button>
+
+        {/* Notifications */}
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <Bell className="w-6 h-6 text-[#2E2E38]" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Notifications
+              </h4>
+              <p className="text-xs text-[#60656F]">Manage alerts and reminders</p>
+            </div>
+          </div>
+        </button>
+
+        {/* AI Personalization */}
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-[#2E2E38]" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                AI Personalization
+              </h4>
+              <p className="text-xs text-[#60656F]">Customize your experience</p>
+            </div>
+          </div>
+        </button>
+
+        {/* Privacy & Security */}
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <Shield className="w-6 h-6 text-[#2E2E38]" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Privacy & Security
+              </h4>
+              <p className="text-xs text-[#60656F]">Manage your data and privacy</p>
+            </div>
+          </div>
+        </button>
+
+        {/* Help & Support */}
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <HelpCircle className="w-6 h-6 text-[#2E2E38]" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Help & Support
+              </h4>
+              <p className="text-xs text-[#60656F]">Get assistance</p>
+            </div>
+          </div>
+        </button>
 
         {/* Settings */}
-        <button className="w-full bg-card glass-effect rounded-2xl p-5 card-shadow text-left bounce-tap transition-transform hover:scale-105">
+        <button className="w-full bg-white rounded-2xl p-5 border border-[#E4E8ED] shadow-sm text-left hover:shadow-md transition-all">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center">
-              <Settings className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] rounded-full flex items-center justify-center">
+              <Settings className="w-6 h-6 text-[#2E2E38]" />
             </div>
-            <div>
-              <h4 className="font-bold text-main">Settings</h4>
-              <p className="text-xs text-secondary">App preferences & privacy</p>
+            <div className="flex-1">
+              <h4 className="font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Settings
+              </h4>
+              <p className="text-xs text-[#60656F]">App preferences</p>
             </div>
           </div>
         </button>
@@ -185,24 +200,29 @@ export default function Profile() {
         {/* Logout */}
         <button 
           onClick={() => base44.auth.logout()}
-          className="w-full bg-red-500/10 border-2 border-red-500/30 rounded-2xl p-5 text-left bounce-tap transition-transform hover:scale-105"
+          className="w-full bg-white rounded-2xl p-5 border-2 border-red-200 text-left hover:bg-red-50 transition-all"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
-              <LogOut className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <LogOut className="w-6 h-6 text-red-600" />
             </div>
-            <div>
-              <h4 className="font-bold text-red-600">Log Out</h4>
+            <div className="flex-1">
+              <h4 className="font-semibold text-red-600" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                Log Out
+              </h4>
+              <p className="text-xs text-[#60656F]">Sign out of your account</p>
             </div>
           </div>
         </button>
       </div>
 
       {/* Footer */}
-      <div className="px-6 pb-12 text-center">
-        <p className="text-secondary text-xs">
-          SnapSmart © 2025 • Shop Smarter, Save Big
-        </p>
+      <div className="fixed bottom-24 left-0 right-0 px-6">
+        <div className="bg-white rounded-2xl p-4 border border-[#E4E8ED] text-center shadow-sm">
+          <p className="text-[#60656F] text-xs">
+            SnapSmart © 2025 • Shop Smart. Save Big.
+          </p>
+        </div>
       </div>
     </div>
   );

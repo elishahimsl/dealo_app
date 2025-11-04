@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -81,7 +82,7 @@ export default function MyCart() {
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
             <Input
-              placeholder="Search shelf"
+              placeholder="Search favorites"
               className="pl-12 h-14 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38] text-base"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, User, Camera, Grid2x2, BookMarked } from "lucide-react";
+import { Home, User, Camera, Compass, Heart } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -13,9 +13,9 @@ export default function Layout({ children, currentPageName }) {
 
   const navItems = [
     { name: "Home", icon: Home, path: createPageUrl("Home") },
-    { name: "My Shelf", icon: BookMarked, path: createPageUrl("MyCart") },
+    { name: "Favorites", icon: Heart, path: createPageUrl("MyCart") },
     { name: "Scan", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
-    { name: "More", icon: Grid2x2, path: createPageUrl("More") },
+    { name: "Discover", icon: Compass, path: createPageUrl("More") },
     { name: "Profile", icon: User, path: createPageUrl("Profile") },
   ];
 

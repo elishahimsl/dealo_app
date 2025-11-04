@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 
 export default function MyCart() {
-  const [activeTab, setActiveTab] = useState("cart");
+  const [activeTab, setActiveTab] = useState("favorites");
   const [sortBy, setSortBy] = useState("recent");
 
   const { data: captures } = useQuery({
@@ -51,21 +51,21 @@ export default function MyCart() {
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Header with Tabs - Very Top */}
       <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E4E8ED]">
-        <div className="flex gap-8 mb-4">
+        <div className="flex justify-center gap-12 mb-4">
           <button
-            onClick={() => setActiveTab("cart")}
-            className={`text-2xl font-bold pb-2 transition-colors ${
-              activeTab === "cart" 
+            onClick={() => setActiveTab("favorites")}
+            className={`text-lg font-bold pb-2 transition-colors ${
+              activeTab === "favorites" 
                 ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
                 : "text-[#60656F]"
             }`}
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
-            My Cart
+            Favorites
           </button>
           <button
             onClick={() => setActiveTab("history")}
-            className={`text-2xl font-bold pb-2 transition-colors ${
+            className={`text-lg font-bold pb-2 transition-colors ${
               activeTab === "history" 
                 ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
                 : "text-[#60656F]"
@@ -81,31 +81,31 @@ export default function MyCart() {
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
             <Input
-              placeholder="Search products"
-              className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38]"
+              placeholder="Search shelf"
+              className="pl-12 h-14 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38] text-base"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
           
           {/* Clock Icon - Sort by Latest/Oldest */}
-          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-            <Clock className="w-5 h-5 text-[#60656F]" />
+          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <Clock className="w-4 h-4 text-[#60656F]" />
           </button>
 
           {/* Location Icon */}
-          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-            <MapPin className="w-5 h-5 text-[#60656F]" />
+          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <MapPin className="w-4 h-4 text-[#60656F]" />
           </button>
 
           {/* Add Folder Icon */}
-          <button className="w-12 h-12 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-            <FolderPlus className="w-5 h-5 text-[#60656F]" />
+          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+            <FolderPlus className="w-4 h-4 text-[#60656F]" />
           </button>
         </div>
       </div>
 
       {/* Sort By */}
-      {activeTab === "cart" && (
+      {activeTab === "favorites" && (
         <div className="px-6 py-4 flex items-center justify-between">
           <p className="text-sm text-[#60656F]">{cartItems.length} items</p>
           <div className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export default function MyCart() {
 
       {/* Content */}
       <div className="px-6 pb-32">
-        {activeTab === "cart" ? (
+        {activeTab === "favorites" ? (
           <div className="space-y-4">
             {cartItems.map((item) => (
               <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm">

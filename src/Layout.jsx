@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Home, ShoppingCart, User, Camera, Grid2x2 } from "lucide-react";
+import { Home, User, Camera, Grid2x2, BookMarked } from "lucide-react";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -13,7 +13,7 @@ export default function Layout({ children, currentPageName }) {
 
   const navItems = [
     { name: "Home", icon: Home, path: createPageUrl("Home") },
-    { name: "My Cart", icon: ShoppingCart, path: createPageUrl("MyCart") },
+    { name: "My Shelf", icon: BookMarked, path: createPageUrl("MyCart") },
     { name: "Scan", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
     { name: "More", icon: Grid2x2, path: createPageUrl("More") },
     { name: "Profile", icon: User, path: createPageUrl("Profile") },

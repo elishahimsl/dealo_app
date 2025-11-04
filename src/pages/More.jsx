@@ -4,41 +4,12 @@ import { Input } from "@/components/ui/input";
 
 export default function Discover() {
   const specialTools = [
-    { 
-      id: 1,
-      icon: Sparkles, 
-      name: "SmartFinder", 
-      description: "Find alternatives or dupes instantly",
-      color: "bg-[#5EE177]"
-    },
-    { 
-      id: 2,
-      icon: Scale, 
-      name: "SnapCompare", 
-      description: "Compare two scanned products side-by-side",
-      color: "bg-[#5EA7FF]"
-    },
-    { 
-      id: 3,
-      icon: ScanSearch, 
-      name: "DealScanner", 
-      description: "Locate price drops and local discounts",
-      color: "bg-[#FF8AC6]"
-    },
-    { 
-      id: 4,
-      icon: Leaf, 
-      name: "EcoMeter", 
-      description: "Check product sustainability",
-      color: "bg-[#5EE177]"
-    },
-    { 
-      id: 5,
-      icon: BarChart3, 
-      name: "SmartReview Analyzer", 
-      description: "AI summarizes what reviewers really say",
-      color: "bg-[#5EA7FF]"
-    },
+    { id: 1, icon: Sparkles, name: "SmartFinder", color: "bg-[#5EE177]" },
+    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-[#5EA7FF]" },
+    { id: 3, icon: ScanSearch, name: "DealScanner", color: "bg-[#FF8AC6]" },
+    { id: 4, icon: Leaf, name: "EcoMeter", color: "bg-[#5EE177]" },
+    { id: 5, icon: BarChart3, name: "SmartReview", color: "bg-[#5EA7FF]" },
+    { id: 6, icon: Sparkles, name: "PriceDrop", color: "bg-[#FF8AC6]" },
   ];
 
   const topics = [
@@ -48,6 +19,9 @@ export default function Discover() {
     { id: 4, name: "Eco", icon: Leaf, color: "bg-[#5EE177]" },
     { id: 5, name: "Health", icon: HeartIcon, color: "bg-[#FF8AC6]" },
     { id: 6, name: "Gifts", icon: Gift, color: "bg-[#5EA7FF]" },
+    { id: 7, name: "Beauty", icon: Sparkles, color: "bg-[#FF8AC6]" },
+    { id: 8, name: "Sports", icon: HeartIcon, color: "bg-[#5EE177]" },
+    { id: 9, name: "Food", icon: Gift, color: "bg-[#5EA7FF]" },
   ];
 
   const forYou = [
@@ -82,46 +56,33 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* Special Tools Section */}
+      {/* ShopSmart Tools Section - Small Cards */}
       <div className="px-6 mb-8">
-        <div className="mb-4">
-          <h2 className="text-lg font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Special Tools
-          </h2>
-          <p className="text-sm text-[#60656F]">
-            Powerful utilities to enhance your shopping
-          </p>
-        </div>
+        <h2 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          ShopSmart Tools
+        </h2>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-3">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <button 
                 key={tool.id}
-                className="w-full bg-white rounded-3xl p-5 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all text-left"
+                className="bg-white rounded-2xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center"
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 ${tool.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                    <Icon className="w-7 h-7 text-white" strokeWidth={2} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2E2E38] text-base mb-1">
-                      {tool.name}
-                    </h3>
-                    <p className="text-sm text-[#60656F] line-clamp-1">
-                      {tool.description}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-[#60656F] flex-shrink-0" />
+                <div className={`w-12 h-12 ${tool.color} rounded-2xl flex items-center justify-center mb-2`}>
+                  <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                 </div>
+                <span className="text-xs font-semibold text-[#2E2E38] text-center leading-tight">
+                  {tool.name}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Browse Topics Section */}
+      {/* Browse Topics Section - Takes up most of the page */}
       <div className="mb-8">
         <div className="px-6 mb-4">
           <h2 className="text-lg font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -132,13 +93,13 @@ export default function Discover() {
           </p>
         </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+        <div className="grid grid-cols-3 gap-4 px-6">
           {topics.map((topic) => {
             const Icon = topic.icon;
             return (
               <button 
                 key={topic.id}
-                className="flex-shrink-0 w-36 h-40 rounded-3xl shadow-sm hover:shadow-md transition-all"
+                className="aspect-square rounded-3xl shadow-sm hover:shadow-md transition-all"
               >
                 <div className={`w-full h-full ${topic.color} rounded-3xl p-4 flex flex-col items-center justify-center`}>
                   <Icon className="w-12 h-12 text-white mb-3" strokeWidth={2} />

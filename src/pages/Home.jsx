@@ -1,3 +1,4 @@
+
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
@@ -22,8 +23,6 @@ export default function Home() {
     { id: 4, title: "Phone Case", price: "$24.99", rating: 4.3, image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400" },
     { id: 5, title: "USB-C Cable", price: "$14.99", rating: 4.7, image: "https://images.unsplash.com/photo-1585419372611-f0ffebad6659?w=400" },
     { id: 6, title: "Laptop Stand", price: "$34.99", rating: 4.4, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400" },
-    { id: 7, title: "Wireless Mouse", price: "$29.99", rating: 4.6, image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=400" },
-    { id: 8, title: "Backpack", price: "$49.99", rating: 4.5, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400" },
   ];
 
   // Mock deals near you
@@ -75,35 +74,40 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section */}
+      {/* Trending Section - 2 rows of 3 */}
       <div className="px-6 mb-8">
-        <h2 className="text-xl font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Trending
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Trending
+          </h2>
+          <button className="text-[#5EE177] font-semibold text-sm flex items-center gap-1">
+            View All
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
           {trendingProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E4E8ED] shadow-sm">
-              <div className="aspect-square bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
+              <div className="aspect-square bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] relative">
                 <img 
                   src={product.image} 
                   alt={product.title}
                   className="w-full h-full object-cover"
                 />
+                {/* Heart icon for favoriting */}
+                <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-md">
+                  <Star className="w-4 h-4 text-[#FF8AC6]" />
+                </button>
               </div>
-              <div className="p-3">
-                <h3 className="font-semibold text-[#2E2E38] text-sm line-clamp-1 mb-1">
+              <div className="p-2">
+                <h3 className="font-semibold text-[#2E2E38] text-xs line-clamp-1 mb-1">
                   {product.title}
                 </h3>
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="w-3 h-3 text-[#FF8AC6] fill-[#FF8AC6]" />
+                <div className="flex items-center gap-1 mb-1">
+                  <Star className="w-2.5 h-2.5 text-[#FF8AC6] fill-[#FF8AC6]" />
                   <span className="text-xs text-[#60656F]">{product.rating}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-[#5EE177]">{product.price}</span>
-                  <Button size="sm" className="h-7 px-3 bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] hover:opacity-90">
-                    <Plus className="w-3 h-3" />
-                  </Button>
-                </div>
+                <span className="text-sm font-bold text-[#5EE177]">{product.price}</span>
               </div>
             </div>
           ))}

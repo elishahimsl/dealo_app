@@ -52,9 +52,9 @@ export default function Splash() {
           </svg>
         </div>
 
-        {/* SnapSmart Text */}
+        {/* ShopSmart Text */}
         <h1 className="text-4xl font-bold text-[#2E2E38] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          SnapSmart
+          ShopSmart
         </h1>
         
         {/* Taglines */}

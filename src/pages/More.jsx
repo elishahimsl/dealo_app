@@ -1,42 +1,43 @@
 import React from "react";
-import { Search, Filter, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight } from "lucide-react";
+import { Search, Filter, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export default function Discover() {
   const specialTools = [
     { id: 1, icon: Sparkles, name: "SmartFinder", color: "bg-[#5EE177]" },
-    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-[#5EA7FF]" },
+    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
     { id: 3, icon: ScanSearch, name: "DealScanner", color: "bg-[#FF8AC6]" },
-    { id: 4, icon: Leaf, name: "EcoMeter", color: "bg-[#5EE177]" },
-    { id: 5, icon: BarChart3, name: "SmartReview", color: "bg-[#5EA7FF]" },
-    { id: 6, icon: Sparkles, name: "PriceDrop", color: "bg-[#FF8AC6]" },
+    { id: 4, icon: Leaf, name: "SmartReview", color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
   ];
 
   const topics = [
-    { id: 1, name: "Home & Living", icon: HomeIcon, color: "bg-[#5EA7FF]" },
-    { id: 2, name: "Fashion", icon: Shirt, color: "bg-[#FF8AC6]" },
-    { id: 3, name: "Tech", icon: Laptop, color: "bg-[#5EE177]" },
-    { id: 4, name: "Eco", icon: Leaf, color: "bg-[#5EE177]" },
-    { id: 5, name: "Health", icon: HeartIcon, color: "bg-[#FF8AC6]" },
-    { id: 6, name: "Gifts", icon: Gift, color: "bg-[#5EA7FF]" },
-    { id: 7, name: "Beauty", icon: Sparkles, color: "bg-[#FF8AC6]" },
-    { id: 8, name: "Sports", icon: HeartIcon, color: "bg-[#5EE177]" },
-    { id: 9, name: "Food", icon: Gift, color: "bg-[#5EA7FF]" },
+    { id: 1, name: "Sports", icon: Dumbbell, color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
+    { id: 2, name: "Health", icon: HeartIcon, color: "bg-[#FF8AC6]" },
+    { id: 3, name: "Fashion", icon: Shirt, color: "bg-[#5EE177]" },
+    { id: 4, name: "Tech", icon: Laptop, color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
+    { id: 5, name: "Food", icon: Utensils, color: "bg-[#5EE177]" },
   ];
 
   const forYou = [
-    { id: 1, title: "Top Deals Nearby", description: "Fresh discounts in your area" },
-    { id: 2, title: "Recently Viewed", description: "Pick up where you left off" },
-    { id: 3, title: "New Tools", description: "Explore the latest features" },
+    { id: 1, title: "Recently Viewed", icon: "👁️" },
+    { id: 2, title: "Top Stores", icon: "🏬" },
+    { id: 3, title: "AI Picks", icon: "🤖" },
   ];
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header */}
-      <div className="px-6 pt-8 pb-4">
-        <h1 className="text-2xl font-bold text-[#2E2E38] mb-1 border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Header with 3 dots */}
+      <div className="px-6 pt-8 pb-4 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-[#2E2E38] border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Discover
         </h1>
+        <button className="text-[#60656F]">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+          </svg>
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -50,30 +51,30 @@ export default function Discover() {
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
-          <button className="w-12 h-12 rounded-2xl bg-white border border-[#E4E8ED] flex items-center justify-center hover:bg-[#F9FAFB] transition-colors">
-            <Filter className="w-5 h-5 text-[#60656F]" />
-          </button>
         </div>
       </div>
 
-      {/* ShopSmart Tools Section - Small Cards */}
-      <div className="px-6 mb-8">
-        <h2 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          ShopSmart Tools
-        </h2>
+      {/* ShopSmart Tools Section - Smaller, 2x2 grid */}
+      <div className="px-6 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            ShopSmart Tools
+          </h2>
+          <button className="text-xs font-semibold text-[#5EE177]">More →</button>
+        </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <button 
                 key={tool.id}
-                className="bg-white rounded-2xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center"
+                className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex items-center gap-3"
               >
-                <div className={`w-12 h-12 ${tool.color} rounded-2xl flex items-center justify-center mb-2`}>
+                <div className={`w-12 h-12 ${tool.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
                   <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                 </div>
-                <span className="text-xs font-semibold text-[#2E2E38] text-center leading-tight">
+                <span className="text-sm font-bold text-[#2E2E38]">
                   {tool.name}
                 </span>
               </button>
@@ -82,28 +83,26 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* Browse Topics Section - Takes up most of the page */}
-      <div className="mb-8">
-        <div className="px-6 mb-4">
-          <h2 className="text-lg font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Browse Topics Section - 16:9 aspect ratio cards */}
+      <div className="mb-6">
+        <div className="px-6 mb-3">
+          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Browse Topics
           </h2>
-          <p className="text-sm text-[#60656F]">
-            Explore by category or trend
-          </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4 px-6">
+        <div className="space-y-3 px-6">
           {topics.map((topic) => {
             const Icon = topic.icon;
             return (
               <button 
                 key={topic.id}
-                className="aspect-square rounded-3xl shadow-sm hover:shadow-md transition-all"
+                className="w-full rounded-3xl shadow-sm hover:shadow-md transition-all overflow-hidden"
+                style={{ aspectRatio: '16/9' }}
               >
-                <div className={`w-full h-full ${topic.color} rounded-3xl p-4 flex flex-col items-center justify-center`}>
-                  <Icon className="w-12 h-12 text-white mb-3" strokeWidth={2} />
-                  <span className="font-bold text-white text-sm text-center">
+                <div className={`w-full h-full ${topic.color} p-6 flex items-center gap-4`}>
+                  <Icon className="w-16 h-16 text-white" strokeWidth={1.5} />
+                  <span className="font-bold text-white text-2xl">
                     {topic.name}
                   </span>
                 </div>
@@ -113,34 +112,24 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* For You Section */}
+      {/* For You Section - 3 square cards in a row */}
       <div className="px-6 mb-8">
-        <div className="mb-4">
-          <h2 className="text-lg font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Recommended For You
+        <div className="mb-3">
+          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            For You
           </h2>
-          <p className="text-sm text-[#60656F]">
-            Tailored suggestions based on your activity
-          </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-3 gap-3">
           {forYou.map((item) => (
             <button 
               key={item.id}
-              className="w-full bg-white rounded-2xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all text-left"
+              className="aspect-square bg-white rounded-2xl border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-[#2E2E38] text-sm mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-xs text-[#60656F]">
-                    {item.description}
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-[#60656F]" />
-              </div>
+              <span className="text-3xl">{item.icon}</span>
+              <span className="text-xs font-semibold text-[#2E2E38] text-center px-2">
+                {item.title}
+              </span>
             </button>
           ))}
         </div>

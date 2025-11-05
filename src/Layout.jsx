@@ -31,11 +31,11 @@ export default function Layout({ children, currentPageName }) {
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E4E8ED] z-50 shadow-lg">
         <div className="max-w-lg mx-auto px-4 relative">
-          {/* Center Camera Button */}
+          {/* Center Camera Button - Smaller */}
           <Link to={createPageUrl("Snap")}>
-            <div className="absolute left-1/2 -translate-x-1/2 -top-8">
-              <button className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
-                <Camera className="w-10 h-10 text-white" strokeWidth={2.5} />
+            <div className="absolute left-1/2 -translate-x-1/2 -top-6">
+              <button className="w-16 h-16 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+                <Camera className="w-8 h-8 text-white" strokeWidth={2.5} />
               </button>
             </div>
           </Link>

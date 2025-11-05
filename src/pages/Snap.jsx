@@ -299,17 +299,22 @@ export default function Snap() {
       {/* Identify Mode - Big Scan Icon in Center */}
       {mode === 'identify' && !scanning && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <Scan className="w-48 h-48 text-[#5EE177] opacity-30" strokeWidth={1.5} />
+          <Scan className="w-48 h-48 text-white opacity-40" strokeWidth={1} />
         </div>
       )}
 
-      {/* Scan Mode - Big Scan Icon (no box) */}
+      {/* Scan Mode - Barcode Size Icon with Text on Top */}
       {mode === 'scan' && !scanning && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <Scan className="w-64 h-64 text-[#5EE177]" strokeWidth={2} />
-          <p className="absolute bottom-32 text-white text-sm font-medium">
-            Align barcode within frame
-          </p>
+          <div className="relative flex flex-col items-center">
+            <p className="text-white text-sm font-medium mb-4">
+              Align Barcode within Frame
+            </p>
+            {/* Barcode dimensions: 1.469" x 1.02" = approx 118px x 82px at standard size */}
+            <div className="relative" style={{ width: '118px', height: '82px' }}>
+              <Scan className="w-full h-full text-white" strokeWidth={0.8} />
+            </div>
+          </div>
         </div>
       )}
 
@@ -364,17 +369,22 @@ export default function Snap() {
       {/* Bottom Controls */}
       {!scanning && (
         <div className="absolute bottom-0 left-0 right-0 z-20">
-          {/* Increase Accuracy Toggle */}
+          {/* Increase Accuracy Toggle - Switch Style */}
           <div className="flex justify-center mb-4">
             <button
               onClick={() => setIncreaseAccuracy(!increaseAccuracy)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                increaseAccuracy 
-                  ? 'bg-[#5EE177] text-white' 
-                  : 'bg-white/20 text-white backdrop-blur-md border border-white/30'
-              }`}
+              className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30"
             >
-              {increaseAccuracy ? '✓ ' : ''}Increase Accuracy
+              <span className="text-xs font-semibold text-white">
+                Increase Accuracy
+              </span>
+              <div className={`w-12 h-6 rounded-full relative transition-all ${
+                increaseAccuracy ? 'bg-[#5EE177]' : 'bg-white/30'
+              }`}>
+                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
+                  increaseAccuracy ? 'right-1' : 'left-1'
+                }`} />
+              </div>
             </button>
           </div>
 
@@ -424,7 +434,7 @@ export default function Snap() {
                 <ImageIcon className="w-6 h-6 text-white" />
               </button>
 
-              {/* Green Circle Button - center (smaller) */}
+              {/* Green Circle Button - center (in middle of bar) */}
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
                 <button
@@ -434,21 +444,21 @@ export default function Snap() {
                 />
               </div>
 
-              {/* Zoom controls - right */}
+              {/* Zoom controls - right (smaller) */}
               <div className="flex gap-2">
                 <button
                   onClick={() => handleZoom('out')}
                   disabled={zoom <= 1}
-                  className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                  className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
                 >
-                  <ZoomOut className="w-5 h-5 text-white" />
+                  <ZoomOut className="w-4 h-4 text-white" />
                 </button>
                 <button
                   onClick={() => handleZoom('in')}
                   disabled={zoom >= 3}
-                  className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                  className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
                 >
-                  <ZoomIn className="w-5 h-5 text-white" />
+                  <ZoomIn className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>

@@ -1,27 +1,32 @@
 import React from "react";
-import { Search, Filter, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils } from "lucide-react";
+import { Search, Filter, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export default function Discover() {
   const specialTools = [
-    { id: 1, icon: Sparkles, name: "SmartFinder", color: "bg-[#5EE177]" },
-    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
-    { id: 3, icon: ScanSearch, name: "DealScanner", color: "bg-[#FF8AC6]" },
+    { id: 1, icon: Sparkles, name: "SmartFinder", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
+    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
+    { id: 3, icon: ScanSearch, name: "DealScanner", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
     { id: 4, icon: Leaf, name: "SmartReview", color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
   ];
 
   const topics = [
-    { id: 1, name: "Sports", icon: Dumbbell, color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
-    { id: 2, name: "Health", icon: HeartIcon, color: "bg-[#FF8AC6]" },
-    { id: 3, name: "Fashion", icon: Shirt, color: "bg-[#5EE177]" },
-    { id: 4, name: "Tech", icon: Laptop, color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
-    { id: 5, name: "Food", icon: Utensils, color: "bg-[#5EE177]" },
+    { id: 1, name: "Sports", icon: Dumbbell, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
+    { id: 2, name: "Health", icon: HeartIcon, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
+    { id: 3, name: "Fashion", icon: Shirt, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
+    { id: 4, name: "Tech", icon: Laptop, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
+    { id: 5, name: "Food", icon: Utensils, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
+    { id: 6, name: "Home", icon: HomeIcon, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
+    { id: 7, name: "Beauty", icon: Sparkles, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
+    { id: 8, name: "Toys", icon: Gift, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
+    { id: 9, name: "Books", icon: Package, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
+    { id: 10, name: "Garden", icon: Leaf, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
   ];
 
   const forYou = [
-    { id: 1, title: "Recently Viewed", icon: "👁️" },
-    { id: 2, title: "Top Stores", icon: "🏬" },
-    { id: 3, title: "AI Picks", icon: "🤖" },
+    { id: 1, title: "Recently Viewed", icon: Clock },
+    { id: 2, title: "Top Stores", icon: TrendingUp },
+    { id: 3, title: "AI Picks", icon: Sparkles },
   ];
 
   return (
@@ -54,7 +59,7 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* ShopSmart Tools Section - Smaller, 2x2 grid */}
+      {/* ShopSmart Tools Section - Words top left, icon bottom right tilted */}
       <div className="px-6 mb-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -69,21 +74,21 @@ export default function Discover() {
             return (
               <button 
                 key={tool.id}
-                className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex items-center gap-3"
+                className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden h-24"
               >
-                <div className={`w-12 h-12 ${tool.color} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                  <Icon className="w-6 h-6 text-white" strokeWidth={2} />
-                </div>
-                <span className="text-sm font-bold text-[#2E2E38]">
+                <span className="text-sm font-bold text-[#2E2E38] relative z-10">
                   {tool.name}
                 </span>
+                <div className={`absolute -bottom-2 -right-2 w-16 h-16 ${tool.color} rounded-2xl flex items-center justify-center transform rotate-12`}>
+                  <Icon className="w-8 h-8 text-white" strokeWidth={2} />
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Browse Topics Section - 16:9 aspect ratio cards */}
+      {/* Browse Topics Section - 2 cards per row, 16:9 aspect ratio */}
       <div className="mb-6">
         <div className="px-6 mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -91,18 +96,18 @@ export default function Discover() {
           </h2>
         </div>
 
-        <div className="space-y-3 px-6">
+        <div className="grid grid-cols-2 gap-3 px-6">
           {topics.map((topic) => {
             const Icon = topic.icon;
             return (
               <button 
                 key={topic.id}
-                className="w-full rounded-3xl shadow-sm hover:shadow-md transition-all overflow-hidden"
+                className="rounded-3xl shadow-sm hover:shadow-md transition-all overflow-hidden"
                 style={{ aspectRatio: '16/9' }}
               >
-                <div className={`w-full h-full ${topic.color} p-6 flex items-center gap-4`}>
-                  <Icon className="w-16 h-16 text-white" strokeWidth={1.5} />
-                  <span className="font-bold text-white text-2xl">
+                <div className={`w-full h-full ${topic.color} p-4 flex flex-col justify-between`}>
+                  <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                  <span className="font-bold text-white text-lg text-left">
                     {topic.name}
                   </span>
                 </div>
@@ -112,7 +117,7 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* For You Section - 3 square cards in a row */}
+      {/* For You Section - Icons instead of emojis */}
       <div className="px-6 mb-8">
         <div className="mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -121,17 +126,51 @@ export default function Discover() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          {forYou.map((item) => (
-            <button 
-              key={item.id}
-              className="aspect-square bg-white rounded-2xl border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
-            >
-              <span className="text-3xl">{item.icon}</span>
-              <span className="text-xs font-semibold text-[#2E2E38] text-center px-2">
-                {item.title}
-              </span>
-            </button>
-          ))}
+          {forYou.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button 
+                key={item.id}
+                className="aspect-square bg-white rounded-2xl border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
+              >
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <span className="text-xs font-semibold text-[#2E2E38] text-center px-2">
+                  {item.title}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Greyed out logo at bottom */}
+      <div className="px-6 pb-8 pt-4">
+        <div className="flex flex-col items-center opacity-30">
+          <div className="relative w-16 h-16 mb-2">
+            <svg viewBox="0 0 120 120" className="w-full h-full">
+              <ellipse
+                cx="45"
+                cy="60"
+                rx="30"
+                ry="45"
+                transform="rotate(45 45 60)"
+                fill="#2E2E38"
+                opacity="0.9"
+              />
+              <ellipse
+                cx="75"
+                cy="60"
+                rx="30"
+                ry="45"
+                transform="rotate(135 75 60)"
+                fill="#2E2E38"
+                opacity="0.9"
+              />
+            </svg>
+          </div>
+          <p className="text-xs text-[#2E2E38] font-semibold">ShopSmart</p>
         </div>
       </div>
 

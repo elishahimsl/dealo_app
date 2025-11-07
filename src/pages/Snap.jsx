@@ -303,17 +303,16 @@ export default function Snap() {
         </div>
       )}
 
-      {/* Scan Mode - Barcode rectangular icon in center of black portion */}
+      {/* Scan Mode - Barcode rectangular shaped scan icon */}
       {mode === 'scan' && !scanning && (
         <div className="absolute top-0 left-0 right-0 bottom-32 flex items-center justify-center z-10">
           <div className="relative flex flex-col items-center">
             <p className="text-white text-sm font-medium mb-6">
               Align Barcode within Frame
             </p>
-            {/* Rectangular barcode size: wider than tall */}
-            <div className="relative" style={{ width: '200px', height: '120px' }}>
-              <div className="absolute inset-0 border-2 border-white rounded-lg" />
-              <Scan className="w-full h-full text-white opacity-60" strokeWidth={0.6} />
+            {/* Rectangular barcode-shaped scan icon */}
+            <div className="relative" style={{ width: '240px', height: '140px' }}>
+              <Scan className="w-full h-full text-white opacity-80" strokeWidth={0.5} style={{ transform: 'scaleX(1.2)' }} />
             </div>
           </div>
         </div>
@@ -410,10 +409,10 @@ export default function Snap() {
             </button>
           </div>
 
-          {/* Grey Bar with Controls - Green button more centered */}
-          <div className="bg-gray-800/80 backdrop-blur-md py-6 px-8">
-            <div className="flex items-center justify-center gap-8 max-w-lg mx-auto">
-              {/* Gallery button - left, smaller */}
+          {/* Grey Bar with Controls - Green button in center */}
+          <div className="bg-gray-800/80 backdrop-blur-md py-6">
+            <div className="flex items-center justify-center gap-12 max-w-lg mx-auto px-8">
+              {/* Gallery button - left, no outline */}
               <input
                 type="file"
                 accept="image/*"
@@ -423,22 +422,22 @@ export default function Snap() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90"
+                className="transition-all hover:opacity-70 active:scale-90"
               >
-                <ImageIcon className="w-5 h-5 text-white" />
+                <ImageIcon className="w-6 h-6 text-white" />
               </button>
 
-              {/* Green Circle Button - more centered */}
+              {/* Green Circle Button - centered, smaller */}
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
                 <button
                   onClick={capturePhoto}
                   disabled={!cameraReady}
-                  className="relative w-20 h-20 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                  className="relative w-16 h-16 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
                 />
               </div>
 
-              {/* Zoom controls - right, smaller */}
+              {/* Zoom controls - right */}
               <div className="flex gap-2">
                 <button
                   onClick={() => handleZoom('out')}

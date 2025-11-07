@@ -45,16 +45,15 @@ export default function Profile() {
 
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB]">
-        {/* Settings View */}
+      <div className="min-h-screen bg-white">
         <div className="px-6 pt-8 pb-4">
           <button 
             onClick={() => setShowSettings(false)}
-            className="flex items-center gap-2 mb-4 text-[#60656F] hover:text-[#2E2E38]"
+            className="flex items-center gap-2 mb-4 text-[#2E2E38] hover:text-[#5EE177]"
           >
             <span className="font-semibold">← Back</span>
           </button>
-          <h1 className="text-2xl font-bold text-[#2E2E38] mb-1 border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-2xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Settings
           </h1>
         </div>
@@ -63,9 +62,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* Header Section */}
-      <div className="px-6 pt-8 pb-6 bg-white border-b border-[#E4E8ED]">
+      <div className="px-6 pt-8 pb-6 border-b border-[#E4E8ED]">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Profile
@@ -74,15 +73,15 @@ export default function Profile() {
             onClick={() => setShowSettings(true)}
             className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors"
           >
-            <Settings className="w-5 h-5 text-[#60656F]" />
+            <Settings className="w-5 h-5 text-[#2E2E38]" />
           </button>
         </div>
 
         {/* Profile Picture & Info - Centered */}
         <div className="flex flex-col items-center text-center">
-          <button className="w-24 h-24 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center shadow-lg mb-4">
+          <div className="w-24 h-24 rounded-full bg-[#5EE177] flex items-center justify-center shadow-lg mb-4">
             <User className="w-12 h-12 text-white" strokeWidth={2.5} />
-          </button>
+          </div>
           <h2 className="text-xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             {user?.full_name || 'ElishaH'}
           </h2>
@@ -93,7 +92,7 @@ export default function Profile() {
       </div>
 
       {/* Achievements Section */}
-      <div className="px-6 py-6">
+      <div className="px-6 py-6 bg-[#F9FAFB]">
         <h3 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Achievements
         </h3>
@@ -106,7 +105,7 @@ export default function Profile() {
                 key={badge.id}
                 className="flex flex-col items-center gap-2"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center shadow-lg">
+                <div className="w-16 h-16 rounded-2xl bg-[#5EE177] flex items-center justify-center shadow-md">
                   <Icon className="w-8 h-8 text-white" strokeWidth={2} />
                 </div>
                 <span className="text-xs font-semibold text-[#2E2E38] text-center leading-tight">
@@ -118,8 +117,8 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Personal Insights Section (2x2 Grid) */}
-      <div className="px-6 pb-6">
+      {/* Personal Insights Section */}
+      <div className="px-6 py-6">
         <h3 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Personal Insights
         </h3>
@@ -130,15 +129,15 @@ export default function Profile() {
             return (
               <div 
                 key={idx}
-                className="bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] rounded-3xl p-5 shadow-lg"
+                className="bg-white border-2 border-[#5EE177] rounded-3xl p-5 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-[#5EE177] flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-2xl font-bold text-white mb-1">
+                <p className="text-2xl font-bold text-[#2E2E38] mb-1">
                   {stat.value}
                 </p>
-                <p className="text-xs text-white/90">
+                <p className="text-xs text-[#60656F]">
                   {stat.label}
                 </p>
               </div>
@@ -149,7 +148,7 @@ export default function Profile() {
 
       {/* Invite Friends Card */}
       <div className="px-6 pb-6">
-        <div className="bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] rounded-3xl p-6 shadow-lg">
+        <div className="bg-[#5EE177] rounded-3xl p-6 shadow-lg">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <Share2 className="w-6 h-6 text-white" />
@@ -175,16 +174,6 @@ export default function Profile() {
           Lens of the Future
         </p>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }

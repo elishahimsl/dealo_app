@@ -12,7 +12,7 @@ export default function Home() {
   const quickActions = [
     { icon: Camera, label: "Identify", page: "Snap" },
     { icon: Scale, label: "Compare", page: "Compare" },
-    { icon: ShoppingCart, label: "My Cart", page: "MyCart" }
+    { icon: ShoppingCart, label: "Favorites", page: "MyCart" }
   ];
 
   // Mock trending products - ALWAYS use these placeholders

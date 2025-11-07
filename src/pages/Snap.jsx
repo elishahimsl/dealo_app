@@ -29,9 +29,9 @@ export default function Snap() {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: isMobile ? 'environment' : 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false 
+        audio: false
       });
       streamRef.current = stream;
       if (videoRef.current) {
@@ -75,7 +75,7 @@ export default function Snap() {
 
     canvas.toBlob(async (blob) => {
       const capturedFile = new File([blob], `snap-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      
+
       try {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
 
@@ -109,7 +109,7 @@ export default function Snap() {
         console.error("Error processing scan:", error);
         alert("Failed to process image. Please try again.");
       }
-      
+
       setScanning(false);
     }, 'image/jpeg', 0.9);
   };
@@ -145,7 +145,7 @@ export default function Snap() {
       console.error("Error processing file:", error);
       alert("Failed to process file. Please try again.");
     }
-    
+
     setScanning(false);
   };
 
@@ -173,8 +173,8 @@ export default function Snap() {
       <div className="min-h-screen bg-[#F9FAFB] pb-32">
         {/* Image Preview */}
         <div className="relative h-80">
-          <img 
-            src={result.file_url} 
+          <img
+            src={result.file_url}
             alt="Scanned item"
             className="w-full h-full object-cover"
           />
@@ -220,7 +220,7 @@ export default function Snap() {
                 )}
               </div>
             </div>
-            
+
             <p className="text-[#60656F] text-sm leading-relaxed mb-4">
               {result.description}
             </p>
@@ -228,7 +228,7 @@ export default function Snap() {
             {result.keywords && result.keywords.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {result.keywords.map((keyword, idx) => (
-                  <Badge 
+                  <Badge
                     key={idx}
                     className="bg-[#A8F3C1] text-[#2E2E38] border-0"
                   >
@@ -296,29 +296,30 @@ export default function Snap() {
         className="absolute inset-0 w-full h-full object-cover transition-transform"
       />
 
-      {/* Identify Mode - Big Scan Icon in Center */}
+      {/* Identify Mode - Big Scan Icon in Center of black portion */}
       {mode === 'identify' && !scanning && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <Scan className="w-48 h-48 text-white opacity-40" strokeWidth={1} />
+        <div className="absolute top-0 left-0 right-0 bottom-32 flex items-center justify-center z-10 pointer-events-none">
+          <Scan className="w-56 h-56 text-white opacity-40" strokeWidth={0.8} />
         </div>
       )}
 
-      {/* Scan Mode - Barcode Size Icon with Text on Top */}
+      {/* Scan Mode - Barcode rectangular icon in center of black portion */}
       {mode === 'scan' && !scanning && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="absolute top-0 left-0 right-0 bottom-32 flex items-center justify-center z-10">
           <div className="relative flex flex-col items-center">
-            <p className="text-white text-sm font-medium mb-4">
+            <p className="text-white text-sm font-medium mb-6">
               Align Barcode within Frame
             </p>
-            {/* Barcode dimensions: 1.469" x 1.02" = approx 118px x 82px at standard size */}
-            <div className="relative" style={{ width: '118px', height: '82px' }}>
-              <Scan className="w-full h-full text-white" strokeWidth={0.8} />
+            {/* Rectangular barcode size: wider than tall */}
+            <div className="relative" style={{ width: '200px', height: '120px' }}>
+              <div className="absolute inset-0 border-2 border-white rounded-lg" />
+              <Scan className="w-full h-full text-white opacity-60" strokeWidth={0.6} />
             </div>
           </div>
         </div>
       )}
 
-      {/* Top Controls */}
+      {/* Top Controls - Only Flash and Help */}
       <div className="absolute top-0 left-0 right-0 z-20 pt-12 px-6 flex items-center justify-between">
         <Button
           variant="ghost"
@@ -336,13 +337,6 @@ export default function Snap() {
             className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
           >
             <Zap className="w-5 h-5 text-white" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
-          >
-            <RefreshCw className="w-5 h-5 text-white" />
           </Button>
           <Button
             variant="ghost"
@@ -369,7 +363,7 @@ export default function Snap() {
       {/* Bottom Controls */}
       {!scanning && (
         <div className="absolute bottom-0 left-0 right-0 z-20">
-          {/* Increase Accuracy Toggle - Switch Style */}
+          {/* Increase Accuracy Toggle */}
           <div className="flex justify-center mb-4">
             <button
               onClick={() => setIncreaseAccuracy(!increaseAccuracy)}
@@ -416,10 +410,10 @@ export default function Snap() {
             </button>
           </div>
 
-          {/* Grey Bar with Controls */}
+          {/* Grey Bar with Controls - Green button more centered */}
           <div className="bg-gray-800/80 backdrop-blur-md py-6 px-8">
-            <div className="flex items-center justify-between max-w-lg mx-auto">
-              {/* Gallery button - left */}
+            <div className="flex items-center justify-center gap-8 max-w-lg mx-auto">
+              {/* Gallery button - left, smaller */}
               <input
                 type="file"
                 accept="image/*"
@@ -429,36 +423,36 @@ export default function Snap() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90"
+                className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90"
               >
-                <ImageIcon className="w-6 h-6 text-white" />
+                <ImageIcon className="w-5 h-5 text-white" />
               </button>
 
-              {/* Green Circle Button - center (in middle of bar) */}
+              {/* Green Circle Button - more centered */}
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
                 <button
                   onClick={capturePhoto}
                   disabled={!cameraReady}
-                  className="relative w-16 h-16 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                  className="relative w-20 h-20 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
                 />
               </div>
 
-              {/* Zoom controls - right (smaller) */}
+              {/* Zoom controls - right, smaller */}
               <div className="flex gap-2">
                 <button
                   onClick={() => handleZoom('out')}
                   disabled={zoom <= 1}
-                  className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                  className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
                 >
-                  <ZoomOut className="w-4 h-4 text-white" />
+                  <ZoomOut className="w-3.5 h-3.5 text-white" />
                 </button>
                 <button
                   onClick={() => handleZoom('in')}
                   disabled={zoom >= 3}
-                  className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
+                  className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
                 >
-                  <ZoomIn className="w-4 h-4 text-white" />
+                  <ZoomIn className="w-3.5 h-3.5 text-white" />
                 </button>
               </div>
             </div>

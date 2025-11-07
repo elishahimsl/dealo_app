@@ -1,13 +1,24 @@
 import React from "react";
-import { Search, Filter, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package } from "lucide-react";
+import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package, Store as StoreIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export default function Discover() {
   const specialTools = [
-    { id: 1, icon: Sparkles, name: "SmartFinder", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
-    { id: 2, icon: Scale, name: "SnapCompare", color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
-    { id: 3, icon: ScanSearch, name: "DealScanner", color: "bg-gradient-to-br from-[#5EE177] to-[#FF8AC6]" },
-    { id: 4, icon: Leaf, name: "SmartReview", color: "bg-gradient-to-br from-[#FF8AC6] to-[#5EE177]" },
+    { id: 1, icon: Sparkles, name: "SmartFinder" },
+    { id: 2, icon: Scale, name: "SnapCompare" },
+    { id: 3, icon: ScanSearch, name: "DealScanner" },
+    { id: 4, icon: Leaf, name: "SmartReview" },
+  ];
+
+  const stores = [
+    { id: 1, name: "Target", color: "#CC0000", hasDeals: true },
+    { id: 2, name: "Walmart", color: "#0071CE", hasDeals: false },
+    { id: 3, name: "Amazon", color: "#FF9900", hasDeals: true },
+    { id: 4, name: "Best Buy", color: "#0046BE", hasDeals: false },
+    { id: 5, name: "Costco", color: "#0063A6", hasDeals: true },
+    { id: 6, name: "Home Depot", color: "#F96302", hasDeals: false },
+    { id: 7, name: "Kroger", color: "#004E9C", hasDeals: false },
+    { id: 8, name: "CVS", color: "#CC0000", hasDeals: true },
   ];
 
   const topics = [
@@ -45,8 +56,8 @@ export default function Discover() {
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="px-6 mb-6">
+      {/* Search Bar with Camera Button */}
+      <div className="px-6 mb-4">
         <div className="relative flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
@@ -56,40 +67,72 @@ export default function Discover() {
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
+          <button className="w-12 h-12 rounded-2xl bg-white border border-[#E4E8ED] flex items-center justify-center hover:bg-[#F9FAFB] transition-colors">
+            <Camera className="w-5 h-5 text-[#60656F]" />
+          </button>
         </div>
       </div>
 
-      {/* ShopSmart Tools Section - Words top left, icon bottom right tilted */}
-      <div className="px-6 mb-6">
+      {/* ShopSmart Tools - Smaller, name in top right */}
+      <div className="px-6 mb-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             ShopSmart Tools
           </h2>
           <button className="text-xs font-semibold text-[#5EE177]">More →</button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <button 
                 key={tool.id}
-                className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden h-24"
+                className="bg-white rounded-2xl p-3 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all h-16 flex items-center justify-center relative"
               >
-                <span className="text-sm font-bold text-[#2E2E38] relative z-10">
+                <span className="text-xs font-bold text-[#2E2E38] absolute top-2 right-3">
                   {tool.name}
                 </span>
-                <div className={`absolute -bottom-2 -right-2 w-16 h-16 ${tool.color} rounded-2xl flex items-center justify-center transform rotate-12`}>
-                  <Icon className="w-8 h-8 text-white" strokeWidth={2} />
-                </div>
+                <Icon className="w-6 h-6 text-[#5EE177]" strokeWidth={2} />
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Browse Topics Section - 2 cards per row, 16:9 aspect ratio */}
-      <div className="mb-6">
+      {/* Browse Stores Section */}
+      <div className="px-6 mb-4">
+        <div className="mb-3">
+          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Browse Stores
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2">
+          {stores.map((store) => (
+            <button 
+              key={store.id}
+              className="aspect-square rounded-2xl shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+              style={{ backgroundColor: store.color }}
+            >
+              {store.hasDeals && (
+                <div className="absolute top-0 left-0 right-0 bg-[#5EE177] text-white text-[9px] font-bold text-center py-0.5">
+                  NEW DEALS
+                </div>
+              )}
+              <div className="absolute bottom-2 right-2">
+                <StoreIcon className="w-5 h-5 text-white opacity-80" />
+              </div>
+              <span className="absolute bottom-2 left-2 text-white text-[10px] font-bold">
+                {store.name}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Browse Topics Section */}
+      <div className="mb-4">
         <div className="px-6 mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Browse Topics
@@ -117,7 +160,7 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* For You Section - Icons instead of emojis */}
+      {/* For You Section */}
       <div className="px-6 mb-8">
         <div className="mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -173,16 +216,6 @@ export default function Discover() {
           <p className="text-xs text-[#2E2E38] font-semibold">ShopSmart</p>
         </div>
       </div>
-
-      <style>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
     </div>
   );
 }

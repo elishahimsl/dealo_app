@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, Trash2, Search, MapPin, Star, Clock, FolderPlus } from "lucide-react";
+import { ShoppingCart, Trash2, Search, MapPin, Star, FolderPlus, Folder, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +15,9 @@ import {
 export default function MyCart() {
   const [activeTab, setActiveTab] = useState("favorites");
   const [sortBy, setSortBy] = useState("recent");
+  const [showFolderModal, setShowFolderModal] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [folders, setFolders] = useState([]);
 
   const { data: captures } = useQuery({
     queryKey: ['allCaptures'],
@@ -45,12 +47,19 @@ export default function MyCart() {
     },
   ];
 
-  // Use actual captures for Snap History
   const snapHistory = captures.slice(0, 10);
+
+  const handleAddFolder = () => {
+    if (newFolderName.trim()) {
+      setFolders([...folders, { id: Date.now(), name: newFolderName, itemCount: 0 }]);
+      setNewFolderName("");
+      setShowFolderModal(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header with Tabs - Very Top */}
+      {/* Header with Tabs */}
       <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E4E8ED]">
         <div className="flex justify-center gap-12 mb-4">
           <button
@@ -77,7 +86,7 @@ export default function MyCart() {
           </button>
         </div>
 
-        {/* Search Bar with Icons on Right */}
+        {/* Search Bar - Extended with only folder button */}
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
@@ -88,18 +97,11 @@ export default function MyCart() {
             />
           </div>
           
-          {/* Clock Icon - Sort by Latest/Oldest */}
-          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-            <Clock className="w-4 h-4 text-[#60656F]" />
-          </button>
-
-          {/* Location Icon */}
-          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
-            <MapPin className="w-4 h-4 text-[#60656F]" />
-          </button>
-
-          {/* Add Folder Icon */}
-          <button className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors">
+          {/* Add Folder Icon - Working */}
+          <button 
+            onClick={() => setShowFolderModal(true)}
+            className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors"
+          >
             <FolderPlus className="w-4 h-4 text-[#60656F]" />
           </button>
         </div>
@@ -119,6 +121,7 @@ export default function MyCart() {
                 <SelectItem value="recent">Recent</SelectItem>
                 <SelectItem value="price">Price</SelectItem>
                 <SelectItem value="rating">Rating</SelectItem>
+                <SelectItem value="location">Location</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -129,6 +132,31 @@ export default function MyCart() {
       <div className="px-6 pb-32">
         {activeTab === "favorites" ? (
           <div className="space-y-4">
+            {/* Folders */}
+            {folders.map((folder) => (
+              <div key={folder.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#5EE177] flex items-center justify-center">
+                    <Folder className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-[#2E2E38]">{folder.name}</h3>
+                    <p className="text-xs text-[#60656F]">{folder.itemCount} items</p>
+                  </div>
+                  <button className="text-[#60656F] hover:text-[#2E2E38]">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Placeholder boxes for items */}
+                <div className="grid grid-cols-4 gap-2 mt-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="aspect-square rounded-xl border-2 border-dashed border-[#E4E8ED] bg-[#F9FAFB]" />
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Regular items with 3 dots */}
             {cartItems.map((item) => (
               <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm">
                 <div className="flex gap-4 mb-3">
@@ -148,8 +176,8 @@ export default function MyCart() {
                     </div>
                     <p className="text-xl font-bold text-[#5EE177] mb-2">${item.price}</p>
                   </div>
-                  <button className="text-[#60656F] hover:text-red-500 transition-colors self-start">
-                    <Trash2 className="w-5 h-5" />
+                  <button className="text-[#60656F] hover:text-[#2E2E38] self-start">
+                    <MoreVertical className="w-5 h-5" />
                   </button>
                 </div>
                 <Button 
@@ -189,6 +217,9 @@ export default function MyCart() {
                         })}
                       </p>
                     </div>
+                    <button className="text-[#60656F] hover:text-red-500">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -196,6 +227,36 @@ export default function MyCart() {
           </div>
         )}
       </div>
+
+      {/* Folder Modal */}
+      {showFolderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
+            <h3 className="text-xl font-bold text-[#2E2E38] mb-4">Create New Folder</h3>
+            <Input
+              placeholder="Folder name"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              className="mb-4 h-12 rounded-2xl"
+            />
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowFolderModal(false)}
+                className="flex-1 rounded-2xl"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAddFolder}
+                className="flex-1 rounded-2xl bg-[#5EE177] hover:bg-[#4dd068]"
+              >
+                Create
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {

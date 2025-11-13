@@ -1,10 +1,9 @@
-
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, ShoppingCart, Search, Star, Plus, ChevronRight } from "lucide-react";
+import { Camera, Scale, Heart, Search, Star, Plus, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -12,7 +11,7 @@ export default function Home() {
   const quickActions = [
     { icon: Camera, label: "Identify", page: "Snap" },
     { icon: Scale, label: "Compare", page: "Compare" },
-    { icon: ShoppingCart, label: "Favorites", page: "MyCart" }
+    { icon: Heart, label: "Favorites", page: "MyCart" }
   ];
 
   // Mock trending products - ALWAYS use these placeholders

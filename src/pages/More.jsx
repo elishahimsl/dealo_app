@@ -1,8 +1,11 @@
-import React from "react";
-import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package, Store as StoreIcon, Zap, Award } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package, Store as StoreIcon, Zap, Award, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Discover() {
+  const [showAllTopics, setShowAllTopics] = useState(false);
+
   const specialTools = [
     { id: 1, icon: Sparkles, name: "SmartFinder" },
     { id: 2, icon: Scale, name: "SnapCompare" },
@@ -13,53 +16,45 @@ export default function Discover() {
   ];
 
   const stores = [
-    { id: 1, name: "Target", color: "#CC0000", logo: "https://logo.clearbit.com/target.com", hasDeals: true },
-    { id: 2, name: "Walmart", color: "#0071CE", logo: "https://logo.clearbit.com/walmart.com", hasDeals: false },
-    { id: 3, name: "Amazon", color: "#FF9900", logo: "https://logo.clearbit.com/amazon.com", hasDeals: true },
-    { id: 4, name: "Best Buy", color: "#0046BE", logo: "https://logo.clearbit.com/bestbuy.com", hasDeals: false },
-    { id: 5, name: "Costco", color: "#0063A6", logo: "https://logo.clearbit.com/costco.com", hasDeals: true },
-    { id: 6, name: "Home Depot", color: "#F96302", logo: "https://logo.clearbit.com/homedepot.com", hasDeals: false },
-    { id: 7, name: "Kroger", color: "#004E9C", logo: "https://logo.clearbit.com/kroger.com", hasDeals: false },
-    { id: 8, name: "CVS", color: "#CC0000", logo: "https://logo.clearbit.com/cvs.com", hasDeals: true },
-    { id: 9, name: "Walgreens", color: "#E31837", logo: "https://logo.clearbit.com/walgreens.com", hasDeals: false },
-    { id: 10, name: "Macy's", color: "#E21B23", logo: "https://logo.clearbit.com/macys.com", hasDeals: true },
-    { id: 11, name: "Nike", color: "#000000", logo: "https://logo.clearbit.com/nike.com", hasDeals: false },
-    { id: 12, name: "Apple", color: "#000000", logo: "https://logo.clearbit.com/apple.com", hasDeals: true },
+    { id: 1, name: "Target", logo: "https://logo.clearbit.com/target.com" },
+    { id: 2, name: "Walmart", logo: "https://logo.clearbit.com/walmart.com" },
+    { id: 3, name: "Amazon", logo: "https://logo.clearbit.com/amazon.com" },
+    { id: 4, name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com" },
+    { id: 5, name: "Costco", logo: "https://logo.clearbit.com/costco.com" },
+    { id: 6, name: "CVS", logo: "https://logo.clearbit.com/cvs.com" },
   ];
 
-  const topics = [
-    { id: 1, name: "Sports", icon: Dumbbell, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
-    { id: 2, name: "Health", icon: HeartIcon, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
-    { id: 3, name: "Fashion", icon: Shirt, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
-    { id: 4, name: "Tech", icon: Laptop, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
-    { id: 5, name: "Food", icon: Utensils, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
-    { id: 6, name: "Home", icon: HomeIcon, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
-    { id: 7, name: "Beauty", icon: Sparkles, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
-    { id: 8, name: "Toys", icon: Gift, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
-    { id: 9, name: "Books", icon: Package, color: "bg-gradient-to-br from-[#5EE177] to-[#A8F3C1]" },
-    { id: 10, name: "Garden", icon: Leaf, color: "bg-gradient-to-br from-[#FF8AC6] to-[#FFB3D9]" },
+  const brands = [
+    { id: 1, name: "Nike", logo: "https://logo.clearbit.com/nike.com" },
+    { id: 2, name: "Apple", logo: "https://logo.clearbit.com/apple.com" },
+    { id: 3, name: "Samsung", logo: "https://logo.clearbit.com/samsung.com" },
+    { id: 4, name: "Sony", logo: "https://logo.clearbit.com/sony.com" },
+    { id: 5, name: "Adidas", logo: "https://logo.clearbit.com/adidas.com" },
+    { id: 6, name: "Canon", logo: "https://logo.clearbit.com/canon.com" },
   ];
 
-  const forYou = [
-    { id: 1, title: "Recently Viewed", icon: Clock },
-    { id: 2, title: "Top Stores", icon: TrendingUp },
-    { id: 3, title: "AI Picks", icon: Sparkles },
+  const allTopics = [
+    { id: 1, name: "Sports", image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400" },
+    { id: 2, name: "Health", image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400" },
+    { id: 3, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400" },
+    { id: 4, name: "Tech", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400" },
+    { id: 5, name: "Food", image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400" },
+    { id: 6, name: "Home", image: "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=400" },
+    { id: 7, name: "Beauty", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400" },
+    { id: 8, name: "Toys", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400" },
+    { id: 9, name: "Women", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400" },
+    { id: 10, name: "Men", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400" },
   ];
+
+  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header with 3 dots */}
-      <div className="px-6 pt-8 pb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-[#2E2E38] border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Discover
+      {/* Big Offers Bar at Top */}
+      <div className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] px-6 py-6 mb-4">
+        <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Offers
         </h1>
-        <button className="text-[#60656F]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-            <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
-          </svg>
-        </button>
       </div>
 
       {/* Search Bar with Camera Button - Smaller */}
@@ -79,26 +74,26 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* ShopSmart Tools - 2 rows of 3, box cards like home page */}
+      {/* ShopSmart Tools - Even Smaller */}
       <div className="px-6 mb-4">
-        <div className="mb-3">
-          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <div className="mb-2">
+          <h2 className="text-xs font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             ShopSmart Tools
           </h2>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
               <div 
                 key={tool.id}
-                className="bg-white rounded-2xl p-3 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center"
+                className="bg-white rounded-xl p-2 border border-[#E4E8ED] shadow-sm flex flex-col items-center"
               >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-2">
-                  <Icon className="w-5 h-5 text-white" strokeWidth={2} />
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-1">
+                  <Icon className="w-4 h-4 text-white" strokeWidth={2} />
                 </div>
-                <span className="text-[10px] font-semibold text-[#2E2E38] text-center leading-tight">
+                <span className="text-[9px] font-semibold text-[#2E2E38] text-center leading-tight">
                   {tool.name}
                 </span>
               </div>
@@ -107,48 +102,71 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* Search Stores Section with More button */}
-      <div className="px-6 mb-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Search Stores
+      {/* Search by Store - Horizontal Scroll */}
+      <div className="mb-4">
+        <div className="px-6 mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Search by Store
           </h2>
-          <button className="text-xs font-semibold text-[#5EE177]">More →</button>
+          <button className="text-[#60656F]">
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-2">
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.map((store) => (
             <button 
               key={store.id}
-              className="aspect-square rounded-2xl shadow-sm hover:shadow-md transition-all relative overflow-hidden"
-              style={{ backgroundColor: store.color }}
+              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gray-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
             >
-              {store.hasDeals && (
-                <div className="absolute top-0 left-0 right-0 bg-[#5EE177] text-white text-[8px] font-bold text-center py-0.5">
-                  NEW DEALS
-                </div>
-              )}
-              <div className="absolute inset-0 flex items-center justify-center p-2">
+              <div className="absolute inset-0 flex items-center justify-center p-4">
                 <img 
                   src={store.logo} 
                   alt={store.name}
                   className="w-full h-full object-contain"
-                  style={{ filter: 'brightness(0) invert(1)' }}
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'block';
                   }}
                 />
-                <div className="hidden">
-                  <StoreIcon className="w-6 h-6 text-white opacity-80" />
-                </div>
               </div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Browse Topics Section */}
+      {/* Search by Brand - Horizontal Scroll */}
+      <div className="mb-4">
+        <div className="px-6 mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Search by Brand
+          </h2>
+          <button className="text-[#60656F]">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+          {brands.map((brand) => (
+            <button 
+              key={brand.id}
+              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gray-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+            >
+              <div className="absolute inset-0 flex items-center justify-center p-4">
+                <img 
+                  src={brand.logo} 
+                  alt={brand.name}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Browse Topics Section - Narrower tiles with stock images */}
       <div className="mb-4">
         <div className="px-6 mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -156,52 +174,35 @@ export default function Discover() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 px-6">
-          {topics.map((topic) => {
-            const Icon = topic.icon;
-            return (
-              <button 
-                key={topic.id}
-                className="rounded-3xl shadow-sm hover:shadow-md transition-all overflow-hidden"
-                style={{ aspectRatio: '16/9' }}
-              >
-                <div className={`w-full h-full ${topic.color} p-4 flex flex-col justify-between`}>
-                  <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
-                  <span className="font-bold text-white text-lg text-left">
-                    {topic.name}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* For You Section */}
-      <div className="px-6 mb-8">
-        <div className="mb-3">
-          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            For You
-          </h2>
+        <div className="grid grid-cols-3 gap-2 px-6">
+          {visibleTopics.map((topic) => (
+            <button 
+              key={topic.id}
+              className="rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden relative"
+              style={{ aspectRatio: '3/4' }}
+            >
+              <img 
+                src={topic.image} 
+                alt={topic.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <span className="absolute bottom-3 left-3 font-bold text-white text-base">
+                {topic.name}
+              </span>
+            </button>
+          ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {forYou.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button 
-                key={item.id}
-                className="aspect-square bg-white rounded-2xl border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-2"
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xs font-semibold text-[#2E2E38] text-center px-2">
-                  {item.title}
-                </span>
-              </button>
-            );
-          })}
+        {/* More/Less Button */}
+        <div className="px-6 mt-3 flex justify-center">
+          <Button
+            onClick={() => setShowAllTopics(!showAllTopics)}
+            variant="outline"
+            className="rounded-2xl border-2 border-[#5EE177] text-[#5EE177] hover:bg-[#5EE177] hover:text-white font-semibold"
+          >
+            {showAllTopics ? 'Show Less' : 'More Topics'}
+          </Button>
         </div>
       </div>
 
@@ -233,6 +234,16 @@ export default function Discover() {
           <p className="text-xs text-[#2E2E38] font-semibold">ShopSmart</p>
         </div>
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,10 +1,9 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle, Image as ImageIcon, RefreshCw, Zap, ZoomIn, ZoomOut, Scan, HelpCircle } from "lucide-react";
+import { Camera, X, Loader2, Sparkles, ExternalLink, Bookmark, Share2, Scale, MessageCircle, Image as ImageIcon, RefreshCw, Zap, Scan, HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function Snap() {
@@ -13,8 +12,7 @@ export default function Snap() {
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState('identify');
-  const [increaseAccuracy, setIncreaseAccuracy] = useState(false);
-  const [zoom, setZoom] = useState(1);
+  const [scanningPhrase, setScanningPhrase] = useState('Detecting your item...');
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -27,6 +25,24 @@ export default function Snap() {
     return () => stopCamera();
   }, [result]);
 
+  // Scanning phrases animation
+  useEffect(() => {
+    if (scanning) {
+      const phrases = [
+        'Detecting your item...',
+        'Finding prices...',
+        'Comparing deals...',
+        'Analyzing product...'
+      ];
+      let index = 0;
+      const interval = setInterval(() => {
+        index = (index + 1) % phrases.length;
+        setScanningPhrase(phrases[index]);
+      }, 1500);
+      return () => clearInterval(interval);
+    }
+  }, [scanning]);
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -36,7 +52,6 @@ export default function Snap() {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.style.transform = `scale(${zoom})`; // Apply current zoom level
       }
       setCameraReady(true);
     } catch (err) {
@@ -50,16 +65,6 @@ export default function Snap() {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
-  };
-
-  const handleZoom = (direction) => {
-    setZoom(prev => {
-      const newZoom = direction === 'in' ? Math.min(prev + 0.5, 3) : Math.max(prev - 0.5, 1);
-      if (videoRef.current) {
-        videoRef.current.style.transform = `scale(${newZoom})`;
-      }
-      return newZoom;
-    });
   };
 
   const capturePhoto = async () => {
@@ -184,7 +189,6 @@ export default function Snap() {
             size="icon"
             onClick={() => {
               setResult(null);
-              setZoom(1); // Reset zoom state when returning to camera
               startCamera();
             }}
             className="absolute top-6 right-6 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/70"
@@ -293,7 +297,7 @@ export default function Snap() {
         autoPlay
         playsInline
         muted
-        className="absolute inset-0 w-full h-full object-cover transition-transform"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
       {/* Identify Mode - Big Scan Icon in Center of black portion */}
@@ -303,16 +307,15 @@ export default function Snap() {
         </div>
       )}
 
-      {/* Scan Mode - Barcode rectangular shaped scan icon */}
+      {/* Scan Mode - Barcode rectangular icon - bigger lengthwise, white color */}
       {mode === 'scan' && !scanning && (
         <div className="absolute top-0 left-0 right-0 bottom-32 flex items-center justify-center z-10">
           <div className="relative flex flex-col items-center">
             <p className="text-white text-sm font-medium mb-6">
               Align Barcode within Frame
             </p>
-            {/* Rectangular barcode-shaped scan icon */}
-            <div className="relative" style={{ width: '240px', height: '140px' }}>
-              <Scan className="w-full h-full text-white opacity-80" strokeWidth={0.5} style={{ transform: 'scaleX(1.2)' }} />
+            <div className="relative" style={{ width: '280px', height: '140px' }}>
+              <Scan className="w-full h-full text-white opacity-80" strokeWidth={0.5} style={{ transform: 'scaleX(1.4)' }} />
             </div>
           </div>
         </div>
@@ -347,40 +350,30 @@ export default function Snap() {
         </div>
       </div>
 
-      {/* Scanning Overlay */}
+      {/* Scanning Overlay with Animation */}
       {scanning && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
           <div className="relative mb-6">
-            <div className="w-24 h-24 rounded-full border-4 border-[#5EE177] animate-ping absolute" />
-            <Loader2 className="w-24 h-24 text-[#5EE177] animate-spin" />
+            {/* Pulsing green circles */}
+            <div className="w-40 h-40 rounded-lg border-2 border-[#5EE177] relative overflow-hidden">
+              {/* Scanning line animation */}
+              <div 
+                className="absolute left-0 right-0 h-1 bg-[#5EE177] shadow-lg shadow-[#5EE177]"
+                style={{
+                  animation: 'scan 2s ease-in-out infinite',
+                }}
+              />
+              <Scan className="w-full h-full text-[#5EE177] opacity-50 p-8" strokeWidth={1} />
+            </div>
           </div>
-          <p className="text-white text-xl font-semibold mb-2">Analyzing... 🔍</p>
-          <p className="text-white/70 text-sm">Got it — analyzing now...</p>
+          <p className="text-white text-xl font-semibold mb-2">Analyzing...</p>
+          <p className="text-[#5EE177] text-sm font-medium">{scanningPhrase}</p>
         </div>
       )}
 
       {/* Bottom Controls */}
       {!scanning && (
         <div className="absolute bottom-0 left-0 right-0 z-20">
-          {/* Increase Accuracy Toggle */}
-          <div className="flex justify-center mb-4">
-            <button
-              onClick={() => setIncreaseAccuracy(!increaseAccuracy)}
-              className="flex items-center gap-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-md border border-white/30"
-            >
-              <span className="text-xs font-semibold text-white">
-                Increase Accuracy
-              </span>
-              <div className={`w-12 h-6 rounded-full relative transition-all ${
-                increaseAccuracy ? 'bg-[#5EE177]' : 'bg-white/30'
-              }`}>
-                <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${
-                  increaseAccuracy ? 'right-1' : 'left-1'
-                }`} />
-              </div>
-            </button>
-          </div>
-
           {/* Mode Selection */}
           <div className="flex justify-center gap-6 mb-6">
             <button
@@ -409,10 +402,10 @@ export default function Snap() {
             </button>
           </div>
 
-          {/* Grey Bar with Controls - Green button in center */}
+          {/* Grey Bar with Controls - Green button centered */}
           <div className="bg-gray-800/80 backdrop-blur-md py-6">
-            <div className="flex items-center justify-center gap-12 max-w-lg mx-auto px-8">
-              {/* Gallery button - left, no outline */}
+            <div className="flex items-center justify-center max-w-lg mx-auto px-8">
+              {/* Gallery button - left */}
               <input
                 type="file"
                 accept="image/*"
@@ -422,12 +415,12 @@ export default function Snap() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="transition-all hover:opacity-70 active:scale-90"
+                className="absolute left-8 transition-all hover:opacity-70 active:scale-90"
               >
                 <ImageIcon className="w-6 h-6 text-white" />
               </button>
 
-              {/* Green Circle Button - centered, smaller */}
+              {/* Green Circle Button - perfectly centered */}
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
                 <button
@@ -436,28 +429,18 @@ export default function Snap() {
                   className="relative w-16 h-16 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
                 />
               </div>
-
-              {/* Zoom controls - right */}
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleZoom('out')}
-                  disabled={zoom <= 1}
-                  className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
-                >
-                  <ZoomOut className="w-3.5 h-3.5 text-white" />
-                </button>
-                <button
-                  onClick={() => handleZoom('in')}
-                  disabled={zoom >= 3}
-                  className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center transition-all hover:bg-white/30 active:scale-90 disabled:opacity-30"
-                >
-                  <ZoomIn className="w-3.5 h-3.5 text-white" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes scan {
+          0% { top: 0; }
+          50% { top: calc(100% - 4px); }
+          100% { top: 0; }
+        }
+      `}</style>
     </div>
   );
 }

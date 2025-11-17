@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2 } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart } from "lucide-react";
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
@@ -43,9 +43,17 @@ export default function Profile() {
     { icon: Tag, value: topCategory, label: "Top Category" },
   ];
 
+  // Mock recently viewed items
+  const recentlyViewed = [
+    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200" },
+    { id: 2, price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200" },
+    { id: 3, price: "$59.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200" },
+    { id: 4, price: "$24.99", image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200" },
+  ];
+
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[#F9FAFB]">
         <div className="px-6 pt-8 pb-4">
           <button 
             onClick={() => setShowSettings(false)}
@@ -62,13 +70,10 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
-      {/* Header Section */}
-      <div className="px-6 pt-8 pb-6 border-b border-[#E4E8ED]">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            Profile
-          </h1>
+    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+      {/* Header Section - No "Profile" text */}
+      <div className="px-6 pt-8 pb-6 bg-white border-b border-[#E4E8ED]">
+        <div className="flex items-center justify-end mb-6">
           <button 
             onClick={() => setShowSettings(true)}
             className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors"
@@ -79,8 +84,8 @@ export default function Profile() {
 
         {/* Profile Picture & Info - Centered */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 rounded-full bg-[#5EE177] flex items-center justify-center shadow-lg mb-4">
-            <User className="w-12 h-12 text-white" strokeWidth={2.5} />
+          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E4E8ED] flex items-center justify-center shadow-sm mb-4">
+            <User className="w-12 h-12 text-[#60656F]" strokeWidth={2} />
           </div>
           <h2 className="text-xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             {user?.full_name || 'ElishaH'}
@@ -91,11 +96,14 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Achievements Section */}
-      <div className="px-6 py-6 bg-[#F9FAFB]">
-        <h3 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Achievements
-        </h3>
+      {/* Achievements Section with Arrow */}
+      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Achievements
+          </h3>
+          <ChevronRight className="w-5 h-5 text-[#60656F]" />
+        </div>
 
         <div className="grid grid-cols-4 gap-3">
           {badges.map((badge) => {
@@ -105,8 +113,8 @@ export default function Profile() {
                 key={badge.id}
                 className="flex flex-col items-center gap-2"
               >
-                <div className="w-16 h-16 rounded-2xl bg-[#5EE177] flex items-center justify-center shadow-md">
-                  <Icon className="w-8 h-8 text-white" strokeWidth={2} />
+                <div className="w-16 h-16 rounded-2xl bg-white border-2 border-[#E4E8ED] flex items-center justify-center shadow-sm">
+                  <Icon className="w-8 h-8 text-[#60656F]" strokeWidth={2} />
                 </div>
                 <span className="text-xs font-semibold text-[#2E2E38] text-center leading-tight">
                   {badge.label}
@@ -117,22 +125,22 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Personal Insights Section */}
-      <div className="px-6 py-6">
+      {/* Personal Insights Section - Rectangular tiles */}
+      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
         <h3 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Personal Insights
         </h3>
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white border-2 border-[#5EE177] rounded-3xl p-5 shadow-sm"
+                className="bg-white border border-[#E4E8ED] rounded-2xl p-4 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-full bg-[#5EE177] flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#60656F]" />
                 </div>
                 <p className="text-2xl font-bold text-[#2E2E38] mb-1">
                   {stat.value}
@@ -146,31 +154,66 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Invite Friends Card */}
-      <div className="px-6 pb-6">
-        <div className="bg-[#5EE177] rounded-3xl p-6 shadow-lg">
+      {/* Recently Viewed Section */}
+      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Recently Viewed
+          </h3>
+          <ChevronRight className="w-5 h-5 text-[#60656F]" />
+        </div>
+
+        <div className="grid grid-cols-4 gap-3">
+          {recentlyViewed.map((item) => (
+            <div 
+              key={item.id}
+              className="bg-white border border-[#E4E8ED] rounded-xl overflow-hidden shadow-sm relative"
+            >
+              <div className="aspect-square relative">
+                <img 
+                  src={item.image} 
+                  alt="Product"
+                  className="w-full h-full object-cover"
+                />
+                {/* Price - top left */}
+                <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+                  <span className="text-xs font-bold text-[#2E2E38]">{item.price}</span>
+                </div>
+                {/* Heart - bottom right */}
+                <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                  <Heart className="w-3 h-3 text-[#FF8AC6]" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Invite Friends Card - Less wide */}
+      <div className="px-6 py-6">
+        <div className="bg-white border border-[#E4E8ED] rounded-3xl p-6 shadow-sm max-w-sm mx-auto">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Share2 className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-full bg-[#F9FAFB] flex items-center justify-center">
+              <UserPlus className="w-6 h-6 text-[#60656F]" />
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-white text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <h4 className="font-bold text-[#2E2E38] text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Invite Friends
               </h4>
-              <p className="text-white/90 text-sm">
+              <p className="text-[#60656F] text-sm">
                 Share ShopSmart with friends
               </p>
             </div>
           </div>
-          <Button className="w-full bg-white text-[#5EE177] hover:bg-white/90 font-bold rounded-2xl h-12">
+          <Button className="w-full bg-[#5EE177] text-white hover:bg-[#4dd068] font-bold rounded-2xl h-12">
             Invite Now
           </Button>
         </div>
       </div>
 
-      {/* Footer Tagline */}
+      {/* Footer Tagline - More faded */}
       <div className="px-6 pb-8">
-        <p className="text-center text-sm text-[#60656F] leading-relaxed font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-center text-sm text-[#60656F] opacity-30 leading-relaxed font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Lens of the Future
         </p>
       </div>

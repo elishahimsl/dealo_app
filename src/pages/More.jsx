@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, BarChart3, Home as HomeIcon, Shirt, Laptop, Heart as HeartIcon, Gift, ChevronRight, Dumbbell, Utensils, Clock, TrendingUp, Package, Store as StoreIcon, Zap, Award, User } from "lucide-react";
+import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, Zap, Award, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +34,8 @@ export default function Discover() {
   ];
 
   const allTopics = [
+    { id: 9, name: "Women", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400" },
+    { id: 10, name: "Men", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400" },
     { id: 1, name: "Sports", image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=400" },
     { id: 2, name: "Health", image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400" },
     { id: 3, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400" },
@@ -42,23 +44,14 @@ export default function Discover() {
     { id: 6, name: "Home", image: "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=400" },
     { id: 7, name: "Beauty", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400" },
     { id: 8, name: "Toys", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400" },
-    { id: 9, name: "Women", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400" },
-    { id: 10, name: "Men", image: "https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?w=400" },
   ];
 
-  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
+  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 8);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Big Offers Bar at Top */}
-      <div className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] px-6 py-6 mb-4">
-        <h1 className="text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Offers
-        </h1>
-      </div>
-
-      {/* Search Bar with Camera Button - Smaller */}
-      <div className="px-6 mb-4">
+      {/* Search Bar with Camera Button */}
+      <div className="px-6 pt-8 mb-4">
         <div className="relative flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#60656F]" />
@@ -74,7 +67,7 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* ShopSmart Tools - Even Smaller */}
+      {/* ShopSmart Tools */}
       <div className="px-6 mb-4">
         <div className="mb-2">
           <h2 className="text-xs font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -102,7 +95,7 @@ export default function Discover() {
         </div>
       </div>
 
-      {/* Search by Store - Horizontal Scroll */}
+      {/* Search by Store - Horizontal Scroll with rectangular tiles */}
       <div className="mb-4">
         <div className="px-6 mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -117,24 +110,23 @@ export default function Discover() {
           {stores.map((store) => (
             <button 
               key={store.id}
-              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gray-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+              className="flex-shrink-0 rounded-2xl bg-white border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
+              style={{ width: '140px', height: '80px' }}
             >
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <img 
-                  src={store.logo} 
-                  alt={store.name}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              </div>
+              <img 
+                src={store.logo} 
+                alt={store.name}
+                className="max-w-[80%] max-h-[60%] object-contain"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
             </button>
           ))}
         </div>
       </div>
 
-      {/* Search by Brand - Horizontal Scroll */}
+      {/* Search by Brand - Horizontal Scroll with rectangular tiles */}
       <div className="mb-4">
         <div className="px-6 mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -149,29 +141,37 @@ export default function Discover() {
           {brands.map((brand) => (
             <button 
               key={brand.id}
-              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gray-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden"
+              className="flex-shrink-0 rounded-2xl bg-white border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
+              style={{ width: '140px', height: '80px' }}
             >
-              <div className="absolute inset-0 flex items-center justify-center p-4">
-                <img 
-                  src={brand.logo} 
-                  alt={brand.name}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-              </div>
+              <img 
+                src={brand.logo} 
+                alt={brand.name}
+                className="max-w-[80%] max-h-[60%] object-contain"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
             </button>
           ))}
         </div>
       </div>
 
-      {/* Browse Topics Section - Narrower tiles with stock images */}
+      {/* Browse Topics Section with big banner on top */}
       <div className="mb-4">
         <div className="px-6 mb-3">
           <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Browse Topics
           </h2>
+        </div>
+
+        {/* Big Rectangle Banner */}
+        <div className="px-6 mb-3">
+          <div className="w-full h-32 rounded-2xl bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] shadow-lg flex items-center justify-center">
+            <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Discover Your Style
+            </h3>
+          </div>
         </div>
 
         <div className="grid grid-cols-3 gap-2 px-6">

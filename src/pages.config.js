@@ -8,7 +8,7 @@ import Profile from './pages/Profile';
 import Splash from './pages/Splash';
 import MyCart from './pages/MyCart';
 import More from './pages/More';
-import Layout from './Layout.jsx';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -27,5 +27,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Home",
     Pages: PAGES,
-    Layout: Layout,
+    Layout: __Layout,
 };

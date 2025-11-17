@@ -22,19 +22,19 @@ export default function Layout({ children, currentPageName }) {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Main Content */}
       <main className="flex-1 pb-24 overflow-auto">
         {children}
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E4E8ED] z-50 shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] z-50 shadow-lg">
         <div className="max-w-lg mx-auto px-4 relative">
-          {/* Center Camera Button - Smaller */}
+          {/* Center Camera Button */}
           <Link to={createPageUrl("Snap")}>
             <div className="absolute left-1/2 -translate-x-1/2 -top-6">
-              <button className="w-16 h-16 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+              <button className="w-16 h-16 rounded-full bg-[#00A36C] shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
                 <Camera className="w-8 h-8 text-white" strokeWidth={2.5} />
               </button>
             </div>
@@ -57,12 +57,12 @@ export default function Layout({ children, currentPageName }) {
                 >
                   <Icon 
                     className={`w-6 h-6 mb-1 transition-colors ${
-                      active ? 'text-[#5EE177]' : 'text-[#60656F]'
+                      active ? 'text-[#00A36C]' : 'text-[#6B7280]'
                     }`}
                     strokeWidth={active ? 2.5 : 2}
                   />
                   <span className={`text-xs font-semibold transition-colors ${
-                    active ? 'text-[#5EE177]' : 'text-[#60656F]'
+                    active ? 'text-[#00A36C]' : 'text-[#6B7280]'
                   }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
                     {item.name}
                   </span>

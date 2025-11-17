@@ -60,14 +60,14 @@ export default function MyCart() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Header with Tabs */}
-      <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E4E8ED]">
+      <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E5E7EB]">
         <div className="flex justify-center gap-12 mb-4">
           <button
             onClick={() => setActiveTab("favorites")}
             className={`text-lg font-bold pb-2 transition-colors ${
               activeTab === "favorites" 
-                ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
-                : "text-[#60656F]"
+                ? "text-[#1F2937] border-b-2 border-[#00A36C]" 
+                : "text-[#6B7280]"
             }`}
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
@@ -77,8 +77,8 @@ export default function MyCart() {
             onClick={() => setActiveTab("history")}
             className={`text-lg font-bold pb-2 transition-colors ${
               activeTab === "history" 
-                ? "text-[#2E2E38] border-b-2 border-[#5EE177]" 
-                : "text-[#60656F]"
+                ? "text-[#1F2937] border-b-2 border-[#00A36C]" 
+                : "text-[#6B7280]"
             }`}
             style={{ fontFamily: 'Poppins, sans-serif' }}
           >
@@ -89,10 +89,10 @@ export default function MyCart() {
         {/* Search Bar - Extended with only folder button */}
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#6B7280]" />
             <Input
               placeholder="Search favorites"
-              className="pl-12 h-14 rounded-2xl border-[#E4E8ED] bg-[#F9FAFB] text-[#2E2E38] text-base"
+              className="pl-12 h-14 rounded-2xl border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937] text-base"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
@@ -100,9 +100,9 @@ export default function MyCart() {
           {/* Add Folder Icon - Working */}
           <button 
             onClick={() => setShowFolderModal(true)}
-            className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E4E8ED] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors"
+            className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
           >
-            <FolderPlus className="w-4 h-4 text-[#60656F]" />
+            <FolderPlus className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
       </div>
@@ -110,11 +110,11 @@ export default function MyCart() {
       {/* Sort By */}
       {activeTab === "favorites" && (
         <div className="px-6 py-4 flex items-center justify-between">
-          <p className="text-sm text-[#60656F]">{cartItems.length} items</p>
+          <p className="text-sm text-[#6B7280]">{cartItems.length} items</p>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-[#60656F]">Sort by:</span>
+            <span className="text-sm text-[#6B7280]">Sort by:</span>
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-28 h-9 rounded-xl border-[#E4E8ED]">
+              <SelectTrigger className="w-28 h-9 rounded-xl border-[#E5E7EB]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -134,23 +134,23 @@ export default function MyCart() {
           <div className="space-y-4">
             {/* Folders */}
             {folders.map((folder) => (
-              <div key={folder.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm">
+              <div key={folder.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[#5EE177] flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-2xl bg-[#00A36C] flex items-center justify-center">
                     <Folder className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-[#2E2E38]">{folder.name}</h3>
-                    <p className="text-xs text-[#60656F]">{folder.itemCount} items</p>
+                    <h3 className="font-bold text-[#1F2937]">{folder.name}</h3>
+                    <p className="text-xs text-[#6B7280]">{folder.itemCount} items</p>
                   </div>
-                  <button className="text-[#60656F] hover:text-[#2E2E38]">
+                  <button className="text-[#6B7280] hover:text-[#1F2937]">
                     <MoreVertical className="w-5 h-5" />
                   </button>
                 </div>
                 {/* Placeholder boxes for items */}
                 <div className="grid grid-cols-4 gap-2 mt-4">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="aspect-square rounded-xl border-2 border-dashed border-[#E4E8ED] bg-[#F9FAFB]" />
+                    <div key={i} className="aspect-square rounded-xl border-2 border-dashed border-[#E5E7EB] bg-[#F9FAFB]" />
                   ))}
                 </div>
               </div>
@@ -158,31 +158,31 @@ export default function MyCart() {
 
             {/* Regular items with 3 dots */}
             {cartItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm">
+              <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm">
                 <div className="flex gap-4 mb-3">
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8] overflow-hidden flex-shrink-0">
+                  <div className="w-24 h-24 rounded-2xl bg-[#D6F5E9] overflow-hidden flex-shrink-0">
                     <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#2E2E38] text-base mb-1">{item.title}</h3>
+                    <h3 className="font-bold text-[#1F2937] text-base mb-1">{item.title}</h3>
                     <div className="flex items-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star 
                           key={i} 
-                          className={`w-3 h-3 ${i < item.rating ? 'text-[#FF8AC6] fill-[#FF8AC6]' : 'text-gray-300'}`} 
+                          className={`w-3 h-3 ${i < item.rating ? 'text-[#00A36C] fill-[#00A36C]' : 'text-gray-300'}`} 
                         />
                       ))}
-                      <span className="text-xs text-[#60656F] ml-1">{item.rating}</span>
+                      <span className="text-xs text-[#6B7280] ml-1">{item.rating}</span>
                     </div>
-                    <p className="text-xl font-bold text-[#5EE177] mb-2">${item.price}</p>
+                    <p className="text-xl font-bold text-[#00A36C] mb-2">${item.price}</p>
                   </div>
-                  <button className="text-[#60656F] hover:text-[#2E2E38] self-start">
+                  <button className="text-[#6B7280] hover:text-[#1F2937] self-start">
                     <MoreVertical className="w-5 h-5" />
                   </button>
                 </div>
                 <Button 
                   variant="outline" 
-                  className="w-full rounded-2xl border-2 border-[#5EE177] text-[#5EE177] hover:bg-[#5EE177] hover:text-white font-semibold"
+                  className="w-full rounded-2xl border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white font-semibold"
                 >
                   <MapPin className="w-4 h-4 mr-2" />
                   Visit {item.store} Store
@@ -193,23 +193,23 @@ export default function MyCart() {
         ) : (
           <div>
             {snapHistory.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-[#E4E8ED] shadow-sm">
-                <ShoppingCart className="w-16 h-16 text-[#60656F] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-[#2E2E38] mb-2">No Snap History Yet</h3>
-                <p className="text-[#60656F] text-sm">
+              <div className="bg-white rounded-3xl p-12 text-center border border-[#E5E7EB] shadow-sm">
+                <ShoppingCart className="w-16 h-16 text-[#6B7280] mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-[#1F2937] mb-2">No Snap History Yet</h3>
+                <p className="text-[#6B7280] text-sm">
                   Start scanning products to build your history
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
                 {snapHistory.map((item) => (
-                  <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E4E8ED] shadow-sm flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gradient-to-br from-[#A8F3C1] to-[#FFD3E8]">
+                  <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#D6F5E9]">
                       <img src={item.file_url} alt={item.title} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#2E2E38] mb-1 line-clamp-1">{item.title}</h3>
-                      <p className="text-xs text-[#60656F]">
+                      <h3 className="font-semibold text-[#1F2937] mb-1 line-clamp-1">{item.title}</h3>
+                      <p className="text-xs text-[#6B7280]">
                         {new Date(item.created_date).toLocaleDateString('en-US', { 
                           month: 'short', 
                           day: 'numeric',
@@ -217,7 +217,7 @@ export default function MyCart() {
                         })}
                       </p>
                     </div>
-                    <button className="text-[#60656F] hover:text-red-500">
+                    <button className="text-[#6B7280] hover:text-red-500">
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
@@ -232,7 +232,7 @@ export default function MyCart() {
       {showFolderModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold text-[#2E2E38] mb-4">Create New Folder</h3>
+            <h3 className="text-xl font-bold text-[#1F2937] mb-4">Create New Folder</h3>
             <Input
               placeholder="Folder name"
               value={newFolderName}
@@ -249,7 +249,7 @@ export default function MyCart() {
               </Button>
               <Button
                 onClick={handleAddFolder}
-                className="flex-1 rounded-2xl bg-[#5EE177] hover:bg-[#4dd068]"
+                className="flex-1 rounded-2xl bg-[#00A36C] hover:bg-[#007E52]"
               >
                 Create
               </Button>

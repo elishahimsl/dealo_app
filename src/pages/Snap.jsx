@@ -270,28 +270,28 @@ export default function Snap() {
 
         <div className="px-6 py-6 space-y-4">
           {/* First Tile - Product Info + Smart Summary + Subscores + Pros/Cons */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm relative">
+          <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-sm relative">
             {/* Save icon top right */}
             <button className="absolute top-4 right-4">
-              <Bookmark className="w-6 h-6 text-[#60656F]" />
+              <Bookmark className="w-6 h-6 text-[#6B7280]" />
             </button>
 
             {/* Product Name - smaller font to fit one line */}
-            <h1 className="text-lg font-bold text-[#2E2E38] mb-3 pr-10 line-clamp-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-lg font-bold text-[#1F2937] mb-3 pr-10 line-clamp-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {result.title}
             </h1>
 
             {/* Star rating, price, in stock - in a row with small icons */}
             <div className="flex items-center gap-2 mb-6">
               <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5 flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 text-[#FF8AC6] fill-[#FF8AC6]" />
-                <span className="text-sm font-semibold text-[#2E2E38]">{result.rating}</span>
+                <Star className="w-3.5 h-3.5 text-[#00A36C] fill-[#00A36C]" />
+                <span className="text-sm font-semibold text-[#1F2937]">{result.rating}</span>
               </div>
               <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5">
-                <span className="text-sm font-bold text-[#5EE177]">{result.price}</span>
+                <span className="text-sm font-bold text-[#00A36C]">{result.price}</span>
               </div>
-              <div className={`rounded-full px-3 py-1.5 ${result.in_stock ? 'bg-[#5EE177]/10' : 'bg-red-500/10'}`}>
-                <span className={`text-sm font-semibold ${result.in_stock ? 'text-[#5EE177]' : 'text-red-500'}`}>
+              <div className={`rounded-full px-3 py-1.5 ${result.in_stock ? 'bg-[#D6F5E9]' : 'bg-red-500/10'}`}>
+                <span className={`text-sm font-semibold ${result.in_stock ? 'text-[#00A36C]' : 'text-red-500'}`}>
                   {result.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
               </div>
@@ -300,15 +300,15 @@ export default function Snap() {
             {/* Smart Summary with Score */}
             <div className="mb-6">
               <div className="flex items-start justify-between gap-4 mb-3">
-                <h3 className="font-bold text-[#2E2E38] text-lg">Smart Summary</h3>
+                <h3 className="font-bold text-[#1F2937] text-lg">Smart Summary</h3>
                 <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full border-4 border-[#5EE177] flex items-center justify-center">
-                    <span className="text-xl font-bold text-[#2E2E38]">{result.overall_score}</span>
+                  <div className="w-16 h-16 rounded-full border-4 border-[#00A36C] flex items-center justify-center">
+                    <span className="text-xl font-bold text-[#1F2937]">{result.overall_score}</span>
                   </div>
-                  <span className="text-xs text-[#60656F] mt-1">out of 100</span>
+                  <span className="text-xs text-[#6B7280] mt-1">out of 100</span>
                 </div>
               </div>
-              <p className="text-[#60656F] text-sm leading-relaxed mb-4">
+              <p className="text-[#6B7280] text-sm leading-relaxed mb-4">
                 {result.smart_summary}
               </p>
 
@@ -316,28 +316,28 @@ export default function Snap() {
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => (
                   <div key={key} className="flex-shrink-0 bg-[#F9FAFB] rounded-xl px-4 py-2 flex flex-col items-center min-w-[80px]">
-                    <span className="text-lg font-bold text-[#5EE177]">{value}</span>
-                    <span className="text-xs text-[#60656F] capitalize mt-0.5">{key}</span>
+                    <span className="text-lg font-bold text-[#00A36C]">{value}</span>
+                    <span className="text-xs text-[#6B7280] capitalize mt-0.5">{key}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Separator */}
-            <div className="border-t border-[#E4E8ED] my-6" />
+            <div className="border-t border-[#E5E7EB] my-6" />
 
             {/* Pros and Cons */}
             <div className="grid grid-cols-2 gap-6">
               {/* Pros */}
               <div>
-                <h4 className="font-semibold text-[#2E2E38] mb-3 flex items-center gap-2">
-                  <Check className="w-5 h-5 text-[#5EE177]" />
+                <h4 className="font-semibold text-[#1F2937] mb-3 flex items-center gap-2">
+                  <Check className="w-5 h-5 text-[#00A36C]" />
                   Pros
                 </h4>
                 <ul className="space-y-2">
                   {result.pros?.map((pro, idx) => (
-                    <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#5EE177] flex-shrink-0 mt-0.5" />
+                    <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#00A36C] flex-shrink-0 mt-0.5" />
                       <span>{pro}</span>
                     </li>
                   ))}
@@ -346,13 +346,13 @@ export default function Snap() {
 
               {/* Cons */}
               <div>
-                <h4 className="font-semibold text-[#2E2E38] mb-3 flex items-center gap-2">
+                <h4 className="font-semibold text-[#1F2937] mb-3 flex items-center gap-2">
                   <XIcon className="w-5 h-5 text-red-500" />
                   Cons
                 </h4>
                 <ul className="space-y-2">
                   {result.cons?.map((con, idx) => (
-                    <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
+                    <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
                       <XIcon className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                       <span>{con}</span>
                     </li>
@@ -363,10 +363,10 @@ export default function Snap() {
           </div>
 
           {/* Second Tile - Price Comparison with product images */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
+          <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-[#2E2E38] text-lg">Price Comparison</h3>
-              <span className="text-sm font-semibold text-[#5EE177]">Online Deals</span>
+              <h3 className="font-bold text-[#1F2937] text-lg">Price Comparison</h3>
+              <span className="text-sm font-semibold text-[#00A36C]">Online Deals</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -375,12 +375,12 @@ export default function Snap() {
                   key={idx}
                   className={`rounded-2xl p-4 border-2 ${
                     deal.is_smart_buy
-                      ? 'border-[#5EE177] bg-[#5EE177]/10'
-                      : 'border-[#E4E8ED] bg-white'
+                      ? 'border-[#00A36C] bg-[#D6F5E9]'
+                      : 'border-[#E5E7EB] bg-white'
                   }`}
                 >
                   {deal.is_smart_buy && (
-                    <div className="bg-[#5EE177] text-white text-xs font-bold px-2 py-1 rounded-full inline-block mb-2">
+                    <div className="bg-[#00A36C] text-white text-xs font-bold px-2 py-1 rounded-full inline-block mb-2">
                       Smart Buy
                     </div>
                   )}
@@ -392,22 +392,22 @@ export default function Snap() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="text-sm font-semibold text-[#2E2E38] mb-2">{deal.store}</p>
-                  <p className="text-xl font-bold text-[#5EE177]">{deal.price}</p>
+                  <p className="text-sm font-semibold text-[#1F2937] mb-2">{deal.store}</p>
+                  <p className="text-xl font-bold text-[#00A36C]">{deal.price}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Full-width Scrollable Sections Bar */}
-          <div className="bg-white rounded-t-3xl border border-[#E4E8ED] sticky top-0 z-10 -mx-6">
+          <div className="bg-white rounded-t-3xl border border-[#E5E7EB] sticky top-0 z-10 -mx-6">
             <div className="flex px-6 py-3">
               <button
                 onClick={() => setActiveSection('overview')}
                 className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
                   activeSection === 'overview'
-                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
-                    : 'text-[#60656F]'
+                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
+                    : 'text-[#6B7280]'
                 }`}
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -417,8 +417,8 @@ export default function Snap() {
                 onClick={() => setActiveSection('alternatives')}
                 className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
                   activeSection === 'alternatives'
-                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
-                    : 'text-[#60656F]'
+                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
+                    : 'text-[#6B7280]'
                 }`}
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -428,8 +428,8 @@ export default function Snap() {
                 onClick={() => setActiveSection('smart-insights')}
                 className={`flex-1 text-sm font-semibold pb-2 transition-colors flex items-center justify-center gap-1 ${
                   activeSection === 'smart-insights'
-                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
-                    : 'text-[#60656F]'
+                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
+                    : 'text-[#6B7280]'
                 }`}
                 style={{ fontFamily: 'Poppins, sans-serif' }}
               >
@@ -440,16 +440,16 @@ export default function Snap() {
           </div>
 
           {/* Section Content */}
-          <div className="bg-white rounded-b-3xl border-x border-b border-[#E4E8ED] p-6 -mx-6">
+          <div className="bg-white rounded-b-3xl border-x border-b border-[#E5E7EB] p-6 -mx-6">
             {activeSection === 'overview' && (
               <div className="space-y-6">
                 {/* Basic Info Header */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
                       Basic Info
                     </h2>
-                    <button className="text-[#60656F]">
+                    <button className="text-[#6B7280]">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
                         <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
@@ -468,51 +468,51 @@ export default function Snap() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-[#2E2E38] mb-2">{result.title}</h3>
+                      <h3 className="font-bold text-[#1F2937] mb-2">{result.title}</h3>
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-3 h-3 ${i < Math.floor(result.rating || 0) ? 'text-[#FF8AC6] fill-[#FF8AC6]' : 'text-gray-300'}`}
+                            className={`w-3 h-3 ${i < Math.floor(result.rating || 0) ? 'text-[#00A36C] fill-[#00A36C]' : 'text-gray-300'}`}
                           />
                         ))}
-                        <span className="text-xs text-[#60656F] ml-1">{result.rating} stars</span>
+                        <span className="text-xs text-[#6B7280] ml-1">{result.rating} stars</span>
                       </div>
-                      <p className="text-xl font-bold text-[#5EE177] mb-2">{result.price}</p>
-                      <Button className="w-full bg-white border-2 border-[#5EE177] text-[#5EE177] hover:bg-[#5EE177] hover:text-white font-semibold rounded-2xl h-10 text-sm">
+                      <p className="text-xl font-bold text-[#00A36C] mb-2">{result.price}</p>
+                      <Button className="w-full bg-white border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white font-semibold rounded-2xl h-10 text-sm">
                         + Add to Favorites
                       </Button>
                     </div>
                   </div>
 
                   {/* Separator line */}
-                  <div className="border-t border-[#E4E8ED] my-6" />
+                  <div className="border-t border-[#E5E7EB] my-6" />
 
                   {/* Description */}
                   <div className="mb-6">
-                    <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Description</h3>
-                    <p className="text-[#60656F] text-sm leading-relaxed mb-3">
+                    <h3 className="font-bold text-[#1F2937] mb-3 text-lg">Description</h3>
+                    <p className="text-[#6B7280] text-sm leading-relaxed mb-3">
                       {result.description}
                     </p>
-                    <p className="text-xs text-[#60656F] mb-2">
+                    <p className="text-xs text-[#6B7280] mb-2">
                       <span className="font-semibold">Return Policy:</span> {result.return_policy || '30 days'}
                     </p>
-                    <button className="text-[#5EE177] text-sm font-semibold flex items-center gap-1">
+                    <button className="text-[#00A36C] text-sm font-semibold flex items-center gap-1">
                       Ask AI
                       <ChevronLeft className="w-4 h-4 rotate-180" />
                     </button>
                   </div>
 
                   {/* Separator line */}
-                  <div className="border-t border-[#E4E8ED] my-6" />
+                  <div className="border-t border-[#E5E7EB] my-6" />
 
                   {/* Key Features */}
                   <div>
-                    <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Key Features</h3>
+                    <h3 className="font-bold text-[#1F2937] mb-3 text-lg">Key Features</h3>
                     <ul className="space-y-2">
                       {result.features?.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
-                          <span className="text-[#5EE177] mt-1">•</span>
+                        <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
+                          <span className="text-[#00A36C] mt-1">•</span>
                           <span>{feature}</span>
                         </li>
                       ))}
@@ -521,13 +521,13 @@ export default function Snap() {
                 </div>
 
                 {/* Reviews section placeholder */}
-                <div className="border-t border-[#E4E8ED] pt-6">
+                <div className="border-t border-[#E5E7EB] pt-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-[#2E2E38] text-lg">Reviews</h3>
-                    <button className="text-[#5EE177] text-sm font-semibold">View</button>
+                    <h3 className="font-bold text-[#1F2937] text-lg">Reviews</h3>
+                    <button className="text-[#00A36C] text-sm font-semibold">View</button>
                   </div>
-                  <p className="text-[#60656F] text-sm italic">- Runs slightly small</p>
-                  <p className="text-[#60656F] text-sm italic">- Recommend size up</p>
+                  <p className="text-[#6B7280] text-sm italic">- Runs slightly small</p>
+                  <p className="text-[#6B7280] text-sm italic">- Recommend size up</p>
                 </div>
               </div>
             )}
@@ -537,10 +537,10 @@ export default function Snap() {
                 {/* Top Picks */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
                       Top Picks
                     </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
+                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {result.alternatives?.slice(0, 2).map((alt, idx) => (
@@ -552,9 +552,9 @@ export default function Snap() {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1 line-clamp-1">{alt.name}</h3>
-                        <p className="text-xs text-[#60656F] mb-2">{alt.store}</p>
-                        <p className="text-lg font-bold text-[#5EE177]">{alt.price}</p>
+                        <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-1">{alt.name}</h3>
+                        <p className="text-xs text-[#6B7280] mb-2">{alt.store}</p>
+                        <p className="text-lg font-bold text-[#00A36C]">{alt.price}</p>
                       </div>
                     ))}
                   </div>
@@ -563,10 +563,10 @@ export default function Snap() {
                 {/* Best Deals */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
                       Best Deals
                     </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
+                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {result.online_deals?.slice(0, 2).map((deal, idx) => (
@@ -578,9 +578,9 @@ export default function Snap() {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1">{deal.store}</h3>
-                        <p className="text-xs text-[#60656F] mb-2">{result.title}</p>
-                        <p className="text-lg font-bold text-[#5EE177]">{deal.price}</p>
+                        <h3 className="font-bold text-[#1F2937] text-sm mb-1">{deal.store}</h3>
+                        <p className="text-xs text-[#6B7280] mb-2">{result.title}</p>
+                        <p className="text-lg font-bold text-[#00A36C]">{deal.price}</p>
                       </div>
                     ))}
                   </div>
@@ -589,10 +589,10 @@ export default function Snap() {
                 {/* Best Matches */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
                       Best Matches
                     </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
+                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     {result.alternatives?.slice(2, 4).map((alt, idx) => (
@@ -604,9 +604,9 @@ export default function Snap() {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1 line-clamp-1">{alt.name}</h3>
-                        <p className="text-xs text-[#60656F] mb-2">{alt.store}</p>
-                        <p className="text-lg font-bold text-[#5EE177]">{alt.price}</p>
+                        <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-1">{alt.name}</h3>
+                        <p className="text-xs text-[#6B7280] mb-2">{alt.store}</p>
+                        <p className="text-lg font-bold text-[#00A36C]">{alt.price}</p>
                       </div>
                     ))}
                   </div>
@@ -616,14 +616,14 @@ export default function Snap() {
 
             {activeSection === 'smart-insights' && (
               <div className="flex flex-col items-center justify-center py-16">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-4">
+                <div className="w-20 h-20 rounded-full bg-[#00A36C] flex items-center justify-center mb-4">
                   <Lock className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-[#2E2E38] mb-2">Premium Feature</h3>
-                <p className="text-[#60656F] text-sm text-center mb-6">
+                <h3 className="text-xl font-bold text-[#1F2937] mb-2">Premium Feature</h3>
+                <p className="text-[#6B7280] text-sm text-center mb-6">
                   Unlock Smart Insights to get AI-powered recommendations
                 </p>
-                <Button className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] text-white font-bold rounded-2xl px-8 h-12">
+                <Button className="bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl px-8 h-12">
                   Upgrade to Premium
                 </Button>
               </div>
@@ -705,16 +705,16 @@ export default function Snap() {
       {scanning && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
           <div className="relative mb-6">
-            <div className="w-40 h-40 rounded-lg border-2 border-[#5EE177] relative overflow-hidden">
+            <div className="w-40 h-40 rounded-lg border-2 border-[#00A36C] relative overflow-hidden">
               <div 
-                className="absolute left-0 right-0 h-1 bg-[#5EE177] shadow-lg shadow-[#5EE177]"
+                className="absolute left-0 right-0 h-1 bg-[#00A36C] shadow-lg shadow-[#00A36C]"
                 style={{ animation: 'scan 2s ease-in-out infinite' }}
               />
-              <Scan className="w-full h-full text-[#5EE177] opacity-50 p-8" strokeWidth={1} />
+              <Scan className="w-full h-full text-[#00A36C] opacity-50 p-8" strokeWidth={1} />
             </div>
           </div>
           <p className="text-white text-xl font-semibold mb-2">Analyzing...</p>
-          <p className="text-[#5EE177] text-sm font-medium">{scanningPhrase}</p>
+          <p className="text-[#00A36C] text-sm font-medium">{scanningPhrase}</p>
         </div>
       )}
 
@@ -724,7 +724,7 @@ export default function Snap() {
             <button
               onClick={() => setMode('identify')}
               className={`text-sm font-semibold transition-colors ${
-                mode === 'identify' ? 'text-[#5EE177]' : 'text-white/70'
+                mode === 'identify' ? 'text-[#00A36C]' : 'text-white/70'
               }`}
             >
               Identify
@@ -732,7 +732,7 @@ export default function Snap() {
             <button
               onClick={() => setMode('scan')}
               className={`text-sm font-semibold transition-colors ${
-                mode === 'scan' ? 'text-[#5EE177]' : 'text-white/70'
+                mode === 'scan' ? 'text-[#00A36C]' : 'text-white/70'
               }`}
             >
               Scan
@@ -740,7 +740,7 @@ export default function Snap() {
             <button
               onClick={() => setMode('ar')}
               className={`text-sm font-semibold transition-colors ${
-                mode === 'ar' ? 'text-[#5EE177]' : 'text-white/70'
+                mode === 'ar' ? 'text-[#00A36C]' : 'text-white/70'
               }`}
             >
               AR Mode
@@ -764,11 +764,11 @@ export default function Snap() {
               </button>
 
               <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#5EE177] to-[#3ecf5e] blur-xl opacity-50" />
+                <div className="absolute inset-0 rounded-full bg-[#00A36C] blur-xl opacity-50" />
                 <button
                   onClick={capturePhoto}
                   disabled={!cameraReady}
-                  className="relative w-16 h-16 rounded-full bg-[#5EE177] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
+                  className="relative w-16 h-16 rounded-full bg-[#00A36C] border-4 border-white shadow-2xl transition-transform hover:scale-110 active:scale-95 disabled:opacity-50"
                 />
               </div>
             </div>

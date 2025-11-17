@@ -54,15 +54,15 @@ export default function Discover() {
       <div className="px-6 pt-8 mb-4">
         <div className="relative flex items-center gap-2">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#60656F]" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
             <Input
               placeholder="Search products, tools, or topics..."
-              className="pl-10 h-10 rounded-2xl border-[#E4E8ED] bg-white text-[#2E2E38] text-sm"
+              className="pl-10 h-10 rounded-2xl border-[#E5E7EB] bg-white text-[#1F2937] text-sm"
               style={{ fontFamily: 'Inter, sans-serif' }}
             />
           </div>
-          <button className="w-10 h-10 rounded-2xl bg-white border border-[#E4E8ED] flex items-center justify-center hover:bg-[#F9FAFB] transition-colors">
-            <Camera className="w-4 h-4 text-[#60656F]" />
+          <button className="w-10 h-10 rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:bg-[#F9FAFB] transition-colors">
+            <Camera className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function Discover() {
       {/* ShopSmart Tools */}
       <div className="px-6 mb-4">
         <div className="mb-2">
-          <h2 className="text-xs font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-xs font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             ShopSmart Tools
           </h2>
         </div>
@@ -81,12 +81,12 @@ export default function Discover() {
             return (
               <div 
                 key={tool.id}
-                className="bg-white rounded-xl p-2 border border-[#E4E8ED] shadow-sm flex flex-col items-center"
+                className="bg-white rounded-xl p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-1">
+                <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
                   <Icon className="w-4 h-4 text-white" strokeWidth={2} />
                 </div>
-                <span className="text-[9px] font-semibold text-[#2E2E38] text-center leading-tight">
+                <span className="text-[9px] font-semibold text-[#1F2937] text-center leading-tight">
                   {tool.name}
                 </span>
               </div>
@@ -98,10 +98,10 @@ export default function Discover() {
       {/* Search by Store - Horizontal Scroll with rectangular tiles */}
       <div className="mb-4">
         <div className="px-6 mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Search by Store
           </h2>
-          <button className="text-[#60656F]">
+          <button className="text-[#6B7280]">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -110,7 +110,7 @@ export default function Discover() {
           {stores.map((store) => (
             <button 
               key={store.id}
-              className="flex-shrink-0 rounded-2xl bg-white border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
+              className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
               style={{ width: '140px', height: '80px' }}
             >
               <img 
@@ -129,10 +129,10 @@ export default function Discover() {
       {/* Search by Brand - Horizontal Scroll with rectangular tiles */}
       <div className="mb-4">
         <div className="px-6 mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Search by Brand
           </h2>
-          <button className="text-[#60656F]">
+          <button className="text-[#6B7280]">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -141,7 +141,7 @@ export default function Discover() {
           {brands.map((brand) => (
             <button 
               key={brand.id}
-              className="flex-shrink-0 rounded-2xl bg-white border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
+              className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
               style={{ width: '140px', height: '80px' }}
             >
               <img 
@@ -160,14 +160,14 @@ export default function Discover() {
       {/* Browse Topics Section with big banner on top */}
       <div className="mb-4">
         <div className="px-6 mb-3">
-          <h2 className="text-base font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-base font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Browse Topics
           </h2>
         </div>
 
         {/* Big Rectangle Banner */}
         <div className="px-6 mb-3">
-          <div className="w-full h-32 rounded-2xl bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] shadow-lg flex items-center justify-center">
+          <div className="w-full h-32 rounded-2xl bg-[#00A36C] shadow-lg flex items-center justify-center">
             <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
               Discover Your Style
             </h3>
@@ -199,7 +199,7 @@ export default function Discover() {
           <Button
             onClick={() => setShowAllTopics(!showAllTopics)}
             variant="outline"
-            className="rounded-2xl border-2 border-[#5EE177] text-[#5EE177] hover:bg-[#5EE177] hover:text-white font-semibold"
+            className="rounded-2xl border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white font-semibold"
           >
             {showAllTopics ? 'Show Less' : 'More Topics'}
           </Button>
@@ -217,7 +217,7 @@ export default function Discover() {
                 rx="30"
                 ry="45"
                 transform="rotate(45 45 60)"
-                fill="#2E2E38"
+                fill="#1F2937"
                 opacity="0.9"
               />
               <ellipse
@@ -226,12 +226,12 @@ export default function Discover() {
                 rx="30"
                 ry="45"
                 transform="rotate(135 75 60)"
-                fill="#2E2E38"
+                fill="#1F2937"
                 opacity="0.9"
               />
             </svg>
           </div>
-          <p className="text-xs text-[#2E2E38] font-semibold">ShopSmart</p>
+          <p className="text-xs text-[#1F2937] font-semibold">ShopSmart</p>
         </div>
       </div>
 

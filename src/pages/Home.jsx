@@ -35,7 +35,7 @@ export default function Home() {
     <div className="min-h-screen bg-[#F9FAFB] pb-8">
       {/* Header */}
       <div className="px-6 pt-8 pb-4">
-        <h1 className="text-2xl font-bold text-[#2E2E38] mb-1 border-b-2 border-[#5EE177] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <h1 className="text-2xl font-bold text-[#1F2937] mb-1 border-b-2 border-[#00A36C] inline-block" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Home
         </h1>
       </div>
@@ -43,10 +43,10 @@ export default function Home() {
       {/* Search Bar */}
       <div className="px-6 mb-6">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#60656F]" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#6B7280]" />
           <Input
             placeholder="Search products"
-            className="pl-12 h-12 rounded-2xl border-[#E4E8ED] bg-white text-[#2E2E38]"
+            className="pl-12 h-12 rounded-2xl border-[#E5E7EB] bg-white text-[#1F2937]"
             style={{ fontFamily: 'Inter, sans-serif' }}
           />
         </div>
@@ -59,11 +59,11 @@ export default function Home() {
             const Icon = action.icon;
             return (
               <Link key={idx} to={createPageUrl(action.page)}>
-                <div className="bg-white rounded-2xl p-4 border border-[#E4E8ED] shadow-sm hover:shadow-md transition-all flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-2">
+                <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-[#00A36C] flex items-center justify-center mb-2">
                     <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
-                  <span className="text-xs font-semibold text-[#2E2E38]" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                  <span className="text-xs font-semibold text-[#1F2937]" style={{ fontFamily: 'Nunito, sans-serif' }}>
                     {action.label}
                   </span>
                 </div>
@@ -76,17 +76,17 @@ export default function Home() {
       {/* Trending Section - Modern minimal look with heart and price only */}
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Trending
           </h2>
-          <button className="text-[#5EE177] font-semibold text-sm flex items-center gap-1">
+          <button className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
             View All
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {trendingProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E4E8ED] shadow-sm relative">
+            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm relative">
               <div className="aspect-square relative">
                 <img 
                   src={product.image} 
@@ -95,12 +95,12 @@ export default function Home() {
                 />
                 {/* Heart icon - bottom right */}
                 <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-md">
-                  <Heart className="w-4 h-4 text-[#FF8AC6]" />
+                  <Heart className="w-4 h-4 text-[#6B7280]" />
                 </button>
               </div>
               {/* Price at bottom */}
               <div className="p-2 text-center">
-                <span className="text-sm font-bold text-[#2E2E38]">{product.price}</span>
+                <span className="text-sm font-bold text-[#1F2937]">{product.price}</span>
               </div>
             </div>
           ))}
@@ -110,10 +110,10 @@ export default function Home() {
       {/* Deals Near You - With stock images */}
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Deals Near You
           </h2>
-          <button className="text-[#5EE177] font-semibold text-sm flex items-center gap-1">
+          <button className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
             View All
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -134,7 +134,7 @@ export default function Home() {
                 <p className="text-white/90 text-lg font-semibold mb-4">
                   {deal.store}
                 </p>
-                <Button className="bg-white text-[#5EE177] hover:bg-white/90 font-semibold rounded-full">
+                <Button className="bg-white text-[#00A36C] hover:bg-white/90 font-semibold rounded-full">
                   View Deals
                 </Button>
               </div>
@@ -145,7 +145,7 @@ export default function Home() {
 
       {/* SnapSmart Landing Section */}
       <div className="px-6 pb-12 pt-8 text-center">
-        {/* Venn Diagram Logo Only */}
+        {/* Logo Only */}
         <div className="relative w-24 h-24 mx-auto mb-4">
           <svg viewBox="0 0 120 120" className="w-full h-full">
             <ellipse
@@ -154,7 +154,7 @@ export default function Home() {
               rx="30"
               ry="45"
               transform="rotate(45 45 60)"
-              fill="#5EE177"
+              fill="#00A36C"
               opacity="0.9"
             />
             <ellipse
@@ -163,21 +163,21 @@ export default function Home() {
               rx="30"
               ry="45"
               transform="rotate(135 75 60)"
-              fill="#FF8AC6"
+              fill="#007E52"
               opacity="0.9"
             />
           </svg>
         </div>
 
-        <p className="text-lg text-[#60656F] opacity-40 font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-lg text-[#6B7280] opacity-40 font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Lens of the Future
         </p>
-        <p className="text-sm text-[#60656F] opacity-60 mb-4">
+        <p className="text-sm text-[#6B7280] opacity-60 mb-4">
           Shop Smart. Save Big.
         </p>
         <a 
           href="#" 
-          className="text-sm font-semibold underline bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+          className="text-sm font-semibold text-[#00A36C] underline hover:opacity-80 transition-opacity"
         >
           Learn more about us
         </a>

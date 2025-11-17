@@ -57,11 +57,11 @@ export default function Profile() {
         <div className="px-6 pt-8 pb-4">
           <button 
             onClick={() => setShowSettings(false)}
-            className="flex items-center gap-2 mb-4 text-[#2E2E38] hover:text-[#5EE177]"
+            className="flex items-center gap-2 mb-4 text-[#1F2937] hover:text-[#00A36C]"
           >
             <span className="font-semibold">← Back</span>
           </button>
-          <h1 className="text-2xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-2xl font-bold text-[#1F2937] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Settings
           </h1>
         </div>
@@ -72,37 +72,37 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header Section - No "Profile" text */}
-      <div className="px-6 pt-8 pb-6 bg-white border-b border-[#E4E8ED]">
+      <div className="px-6 pt-8 pb-6 bg-white border-b border-[#E5E7EB]">
         <div className="flex items-center justify-end mb-6">
           <button 
             onClick={() => setShowSettings(true)}
-            className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E4E8ED] transition-colors"
+            className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
           >
-            <Settings className="w-5 h-5 text-[#2E2E38]" />
+            <Settings className="w-5 h-5 text-[#1F2937]" />
           </button>
         </div>
 
         {/* Profile Picture & Info - Centered */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E4E8ED] flex items-center justify-center shadow-sm mb-4">
-            <User className="w-12 h-12 text-[#60656F]" strokeWidth={2} />
+          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm mb-4">
+            <User className="w-12 h-12 text-[#6B7280]" strokeWidth={2} />
           </div>
-          <h2 className="text-xl font-bold text-[#2E2E38] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h2 className="text-xl font-bold text-[#1F2937] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             {user?.full_name || 'ElishaH'}
           </h2>
-          <p className="text-sm text-[#60656F]">
+          <p className="text-sm text-[#6B7280]">
             {user?.email || 'user@shopsmart.com'}
           </p>
         </div>
       </div>
 
       {/* Achievements Section with Arrow */}
-      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
+      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h3 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Achievements
           </h3>
-          <ChevronRight className="w-5 h-5 text-[#60656F]" />
+          <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
         <div className="grid grid-cols-4 gap-3">
@@ -113,10 +113,10 @@ export default function Profile() {
                 key={badge.id}
                 className="flex flex-col items-center gap-2"
               >
-                <div className="w-16 h-16 rounded-2xl bg-white border-2 border-[#E4E8ED] flex items-center justify-center shadow-sm">
-                  <Icon className="w-8 h-8 text-[#60656F]" strokeWidth={2} />
+                <div className="w-16 h-16 rounded-2xl bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm">
+                  <Icon className="w-8 h-8 text-[#00A36C]" strokeWidth={2} />
                 </div>
-                <span className="text-xs font-semibold text-[#2E2E38] text-center leading-tight">
+                <span className="text-xs font-semibold text-[#1F2937] text-center leading-tight">
                   {badge.label}
                 </span>
               </div>
@@ -126,8 +126,8 @@ export default function Profile() {
       </div>
 
       {/* Personal Insights Section - Rectangular tiles */}
-      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
-        <h3 className="text-lg font-bold text-[#2E2E38] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
+        <h3 className="text-lg font-bold text-[#1F2937] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Personal Insights
         </h3>
         
@@ -137,15 +137,15 @@ export default function Profile() {
             return (
               <div 
                 key={idx}
-                className="bg-white border border-[#E4E8ED] rounded-2xl p-4 shadow-sm"
+                className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-[#60656F]" />
+                <div className="w-10 h-10 rounded-full bg-[#D6F5E9] flex items-center justify-center mb-3">
+                  <Icon className="w-5 h-5 text-[#00A36C]" />
                 </div>
-                <p className="text-2xl font-bold text-[#2E2E38] mb-1">
+                <p className="text-2xl font-bold text-[#1F2937] mb-1">
                   {stat.value}
                 </p>
-                <p className="text-xs text-[#60656F]">
+                <p className="text-xs text-[#6B7280]">
                   {stat.label}
                 </p>
               </div>
@@ -155,19 +155,19 @@ export default function Profile() {
       </div>
 
       {/* Recently Viewed Section */}
-      <div className="px-6 py-6 bg-white border-b border-[#E4E8ED]">
+      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h3 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Recently Viewed
           </h3>
-          <ChevronRight className="w-5 h-5 text-[#60656F]" />
+          <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
         <div className="grid grid-cols-4 gap-3">
           {recentlyViewed.map((item) => (
             <div 
               key={item.id}
-              className="bg-white border border-[#E4E8ED] rounded-xl overflow-hidden shadow-sm relative"
+              className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden shadow-sm relative"
             >
               <div className="aspect-square relative">
                 <img 
@@ -177,11 +177,11 @@ export default function Profile() {
                 />
                 {/* Price - top left */}
                 <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span className="text-xs font-bold text-[#2E2E38]">{item.price}</span>
+                  <span className="text-xs font-bold text-[#1F2937]">{item.price}</span>
                 </div>
                 {/* Heart - bottom right */}
                 <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                  <Heart className="w-3 h-3 text-[#FF8AC6]" />
+                  <Heart className="w-3 h-3 text-[#6B7280]" />
                 </button>
               </div>
             </div>
@@ -191,21 +191,21 @@ export default function Profile() {
 
       {/* Invite Friends Card - Less wide */}
       <div className="px-6 py-6">
-        <div className="bg-white border border-[#E4E8ED] rounded-3xl p-6 shadow-sm max-w-sm mx-auto">
+        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-6 shadow-sm max-w-sm mx-auto">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-[#F9FAFB] flex items-center justify-center">
-              <UserPlus className="w-6 h-6 text-[#60656F]" />
+            <div className="w-12 h-12 rounded-full bg-[#D6F5E9] flex items-center justify-center">
+              <UserPlus className="w-6 h-6 text-[#00A36C]" />
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-[#2E2E38] text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              <h4 className="font-bold text-[#1F2937] text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
                 Invite Friends
               </h4>
-              <p className="text-[#60656F] text-sm">
+              <p className="text-[#6B7280] text-sm">
                 Share ShopSmart with friends
               </p>
             </div>
           </div>
-          <Button className="w-full bg-[#5EE177] text-white hover:bg-[#4dd068] font-bold rounded-2xl h-12">
+          <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-12">
             Invite Now
           </Button>
         </div>
@@ -213,7 +213,7 @@ export default function Profile() {
 
       {/* Footer Tagline - More faded */}
       <div className="px-6 pb-8">
-        <p className="text-center text-sm text-[#60656F] opacity-30 leading-relaxed font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <p className="text-center text-sm text-[#6B7280] opacity-30 leading-relaxed font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Lens of the Future
         </p>
       </div>

@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, X, Loader2, Sparkles, Bookmark, Share2, Image as ImageIcon, Zap, Scan, HelpCircle, Heart, ChevronRight, Star, Check, XIcon, ChevronLeft } from "lucide-react";
+import { Camera, X, Loader2, Sparkles, Bookmark, Send, Image as ImageIcon, Zap, Scan, HelpCircle, Star, Check, XIcon, ChevronLeft, Lock } from "lucide-react";
 
 export default function Snap() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function Snap() {
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState('identify');
   const [scanningPhrase, setScanningPhrase] = useState('Detecting your item...');
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeSection, setActiveSection] = useState('overview');
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -84,22 +84,25 @@ export default function Snap() {
         const { file_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
 
         const aiResult = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this product image and provide:
+          prompt: `Analyze this product image comprehensively and provide:
           1. Product name/title
           2. Brand
           3. Price (estimate)
-          4. Star rating (out of 5)
+          4. Star rating (out of 5, decimal like 4.6)
           5. In stock status (true/false)
-          6. Smart summary (2-3 sentences about the product)
+          6. Smart summary (2-3 detailed sentences about the product)
           7. Overall score out of 100
-          8. Subscores: Quality, Value, Features, Design (each out of 100)
-          9. 3-4 pros (good things about the product)
-          10. 3-4 cons (bad things about the product)
-          11. 3-5 online deals with store name, price, and link
-          12. Description for overview tab
-          13. Key features for overview tab
-          14. Alternative products
-          15. Best deals with availability`,
+          8. Subscores: Quality, Value, Features, Design, Durability (each out of 100)
+          9. 4-5 specific pros (positive aspects)
+          10. 4-5 specific cons (negative aspects)
+          11. 4-5 online deals with store name, price, and if it's the smart buy
+          12. Product description (3-4 sentences)
+          13. Key features (5-6 bullet points)
+          14. Return policy summary
+          15. 3-4 alternative products with name, price, store, image URL (use Unsplash)
+          16. URL to a high-quality product showcase image (use Unsplash or similar)
+          
+          Be specific and detailed. Generate realistic data.`,
           file_urls: file_url,
           response_json_schema: {
             type: "object",
@@ -117,7 +120,8 @@ export default function Snap() {
                   quality: { type: "number" },
                   value: { type: "number" },
                   features: { type: "number" },
-                  design: { type: "number" }
+                  design: { type: "number" },
+                  durability: { type: "number" }
                 }
               },
               pros: { type: "array", items: { type: "string" } },
@@ -129,7 +133,8 @@ export default function Snap() {
                   properties: {
                     store: { type: "string" },
                     price: { type: "string" },
-                    is_smart_buy: { type: "boolean" }
+                    is_smart_buy: { type: "boolean" },
+                    image_url: { type: "string" }
                   }
                 }
               },
@@ -143,21 +148,12 @@ export default function Snap() {
                   properties: {
                     name: { type: "string" },
                     price: { type: "string" },
-                    store: { type: "string" }
+                    store: { type: "string" },
+                    image_url: { type: "string" }
                   }
                 }
               },
-              best_deals: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    store: { type: "string" },
-                    price: { type: "string" },
-                    availability: { type: "string" }
-                  }
-                }
-              }
+              product_image_url: { type: "string" }
             }
           }
         });
@@ -183,7 +179,7 @@ export default function Snap() {
       const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
 
       const aiResult = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this product comprehensively with all details including scores, pros, cons, and deals.`,
+        prompt: `Analyze this product comprehensively with all details. Be specific and generate realistic data.`,
         file_urls: file_url,
         response_json_schema: {
           type: "object",
@@ -201,7 +197,8 @@ export default function Snap() {
                 quality: { type: "number" },
                 value: { type: "number" },
                 features: { type: "number" },
-                design: { type: "number" }
+                design: { type: "number" },
+                durability: { type: "number" }
               }
             },
             pros: { type: "array", items: { type: "string" } },
@@ -213,7 +210,8 @@ export default function Snap() {
                 properties: {
                   store: { type: "string" },
                   price: { type: "string" },
-                  is_smart_buy: { type: "boolean" }
+                  is_smart_buy: { type: "boolean" },
+                  image_url: { type: "string" }
                 }
               }
             },
@@ -227,21 +225,12 @@ export default function Snap() {
                 properties: {
                   name: { type: "string" },
                   price: { type: "string" },
-                  store: { type: "string" }
+                  store: { type: "string" },
+                  image_url: { type: "string" }
                 }
               }
             },
-            best_deals: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  store: { type: "string" },
-                  price: { type: "string" },
-                  availability: { type: "string" }
-                }
-              }
-            }
+            product_image_url: { type: "string" }
           }
         }
       });
@@ -258,12 +247,12 @@ export default function Snap() {
   // Result View - completely redesigned
   if (result) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB] pb-32">
+      <div className="min-h-screen bg-[#F9FAFB]">
         {/* Product Image at Top with Header */}
-        <div className="relative">
-          <div className="h-80 bg-white overflow-hidden">
+        <div className="relative bg-white">
+          <div className="h-80 overflow-hidden">
             <img
-              src={result.file_url}
+              src={result.product_image_url || result.file_url}
               alt={result.title}
               className="w-full h-full object-contain"
             />
@@ -274,39 +263,38 @@ export default function Snap() {
               <ChevronLeft className="w-6 h-6 text-white" />
             </button>
             <button>
-              <Share2 className="w-6 h-6 text-white" />
+              <Send className="w-6 h-6 text-white" />
             </button>
           </div>
         </div>
 
         <div className="px-6 py-6 space-y-4">
-          {/* First Tile - Product Info + Smart Summary + Pros/Cons */}
+          {/* First Tile - Product Info + Smart Summary + Subscores + Pros/Cons */}
           <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm relative">
             {/* Save icon top right */}
             <button className="absolute top-4 right-4">
               <Bookmark className="w-6 h-6 text-[#60656F]" />
             </button>
 
-            {/* Product Name */}
-            <h1 className="text-2xl font-bold text-[#2E2E38] mb-3 pr-8" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            {/* Product Name - smaller font to fit one line */}
+            <h1 className="text-lg font-bold text-[#2E2E38] mb-3 pr-10 line-clamp-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
               {result.title}
             </h1>
 
-            {/* Star rating, price, in stock */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-4 h-4 ${i < Math.floor(result.rating || 0) ? 'text-[#FF8AC6] fill-[#FF8AC6]' : 'text-gray-300'}`}
-                  />
-                ))}
-                <span className="text-sm text-[#60656F] ml-1">{result.rating}</span>
+            {/* Star rating, price, in stock - in a row with small icons */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 text-[#FF8AC6] fill-[#FF8AC6]" />
+                <span className="text-sm font-semibold text-[#2E2E38]">{result.rating}</span>
               </div>
-              <p className="text-2xl font-bold text-[#5EE177]">{result.price}</p>
-              <span className={`text-sm font-semibold ${result.in_stock ? 'text-[#5EE177]' : 'text-red-500'}`}>
-                {result.in_stock ? 'In Stock' : 'Out of Stock'}
-              </span>
+              <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5">
+                <span className="text-sm font-bold text-[#5EE177]">{result.price}</span>
+              </div>
+              <div className={`rounded-full px-3 py-1.5 ${result.in_stock ? 'bg-[#5EE177]/10' : 'bg-red-500/10'}`}>
+                <span className={`text-sm font-semibold ${result.in_stock ? 'text-[#5EE177]' : 'text-red-500'}`}>
+                  {result.in_stock ? 'In Stock' : 'Out of Stock'}
+                </span>
+              </div>
             </div>
 
             {/* Smart Summary with Score */}
@@ -324,12 +312,12 @@ export default function Snap() {
                 {result.smart_summary}
               </p>
 
-              {/* Subscores */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Subscores in a row */}
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between bg-[#F9FAFB] rounded-xl p-3">
-                    <span className="text-sm font-semibold text-[#2E2E38] capitalize">{key}</span>
-                    <span className="text-sm font-bold text-[#5EE177]">{value}/100</span>
+                  <div key={key} className="flex-shrink-0 bg-[#F9FAFB] rounded-xl px-4 py-2 flex flex-col items-center min-w-[80px]">
+                    <span className="text-lg font-bold text-[#5EE177]">{value}</span>
+                    <span className="text-xs text-[#60656F] capitalize mt-0.5">{key}</span>
                   </div>
                 ))}
               </div>
@@ -347,7 +335,7 @@ export default function Snap() {
                   Pros
                 </h4>
                 <ul className="space-y-2">
-                  {result.pros?.slice(0, 4).map((pro, idx) => (
+                  {result.pros?.map((pro, idx) => (
                     <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
                       <Check className="w-4 h-4 text-[#5EE177] flex-shrink-0 mt-0.5" />
                       <span>{pro}</span>
@@ -363,7 +351,7 @@ export default function Snap() {
                   Cons
                 </h4>
                 <ul className="space-y-2">
-                  {result.cons?.slice(0, 4).map((con, idx) => (
+                  {result.cons?.map((con, idx) => (
                     <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
                       <XIcon className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                       <span>{con}</span>
@@ -374,112 +362,270 @@ export default function Snap() {
             </div>
           </div>
 
-          {/* Second Tile - Price Comparison */}
+          {/* Second Tile - Price Comparison with product images */}
           <div className="bg-white rounded-3xl p-6 border border-[#E4E8ED] shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-[#2E2E38] text-lg">Price Comparison</h3>
               <span className="text-sm font-semibold text-[#5EE177]">Online Deals</span>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+            <div className="grid grid-cols-2 gap-3">
               {result.online_deals?.map((deal, idx) => (
                 <div
                   key={idx}
-                  className={`flex-shrink-0 rounded-2xl p-4 border-2 ${
+                  className={`rounded-2xl p-4 border-2 ${
                     deal.is_smart_buy
                       ? 'border-[#5EE177] bg-[#5EE177]/10'
                       : 'border-[#E4E8ED] bg-white'
                   }`}
-                  style={{ width: '160px' }}
                 >
                   {deal.is_smart_buy && (
                     <div className="bg-[#5EE177] text-white text-xs font-bold px-2 py-1 rounded-full inline-block mb-2">
                       Smart Buy
                     </div>
                   )}
+                  {/* Product image */}
+                  <div className="w-full h-24 bg-gray-100 rounded-xl mb-3 overflow-hidden">
+                    <img 
+                      src={deal.image_url || result.product_image_url || result.file_url} 
+                      alt={deal.store}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   <p className="text-sm font-semibold text-[#2E2E38] mb-2">{deal.store}</p>
                   <p className="text-xl font-bold text-[#5EE177]">{deal.price}</p>
                 </div>
               ))}
-              <div className="flex-shrink-0 w-12 flex items-center justify-center">
-                <ChevronRight className="w-6 h-6 text-[#60656F]" />
-              </div>
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="bg-white rounded-t-3xl border border-[#E4E8ED] sticky top-0 z-10">
-            <div className="flex gap-6 px-6 py-3">
-              {['overview', 'alternatives', 'smart insights'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`text-sm font-semibold pb-2 transition-colors capitalize ${
-                    activeTab === tab
-                      ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
-                      : 'text-[#60656F]'
-                  }`}
-                  style={{ fontFamily: 'Poppins, sans-serif' }}
-                >
-                  {tab}
-                </button>
-              ))}
+          {/* Full-width Scrollable Sections Bar */}
+          <div className="bg-white rounded-t-3xl border border-[#E4E8ED] sticky top-0 z-10 -mx-6">
+            <div className="flex px-6 py-3">
+              <button
+                onClick={() => setActiveSection('overview')}
+                className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
+                  activeSection === 'overview'
+                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
+                    : 'text-[#60656F]'
+                }`}
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveSection('alternatives')}
+                className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
+                  activeSection === 'alternatives'
+                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
+                    : 'text-[#60656F]'
+                }`}
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                Alternatives
+              </button>
+              <button
+                onClick={() => setActiveSection('smart-insights')}
+                className={`flex-1 text-sm font-semibold pb-2 transition-colors flex items-center justify-center gap-1 ${
+                  activeSection === 'smart-insights'
+                    ? 'text-[#2E2E38] border-b-2 border-[#5EE177]'
+                    : 'text-[#60656F]'
+                }`}
+                style={{ fontFamily: 'Poppins, sans-serif' }}
+              >
+                Smart Insights
+                <Lock className="w-3 h-3" />
+              </button>
             </div>
           </div>
 
-          {/* Tab Content */}
-          <div className="bg-white rounded-b-3xl border-x border-b border-[#E4E8ED] p-6">
-            {activeTab === 'overview' && (
+          {/* Section Content */}
+          <div className="bg-white rounded-b-3xl border-x border-b border-[#E4E8ED] p-6 -mx-6">
+            {activeSection === 'overview' && (
               <div className="space-y-6">
+                {/* Basic Info Header */}
                 <div>
-                  <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Description</h3>
-                  <p className="text-[#60656F] text-sm leading-relaxed">{result.description}</p>
-                </div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Basic Info
+                    </h2>
+                    <button className="text-[#60656F]">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                      </svg>
+                    </button>
+                  </div>
 
-                <div>
-                  <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Key Features</h3>
-                  <ul className="space-y-2">
-                    {result.features?.map((feature, idx) => (
-                      <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
-                        <span className="text-[#5EE177] mt-1">•</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'alternatives' && (
-              <div className="space-y-4">
-                {result.alternatives?.map((alt, idx) => (
-                  <div key={idx} className="flex items-center gap-4 p-4 border border-[#E4E8ED] rounded-2xl">
-                    <div className="w-16 h-16 rounded-xl bg-gray-100" />
-                    <div className="flex-1">
-                      <h3 className="font-bold text-[#2E2E38] text-sm mb-1">{alt.name}</h3>
-                      <p className="text-xs text-[#60656F] mb-1">{alt.store}</p>
-                      <p className="text-lg font-bold text-[#5EE177]">{alt.price}</p>
+                  {/* Product image and details in a box */}
+                  <div className="bg-[#F9FAFB] rounded-2xl p-4 flex gap-4 mb-6">
+                    <div className="w-24 h-24 bg-white rounded-xl overflow-hidden flex-shrink-0">
+                      <img 
+                        src={result.product_image_url || result.file_url} 
+                        alt={result.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#60656F]" />
+                    <div className="flex-1">
+                      <h3 className="font-bold text-[#2E2E38] mb-2">{result.title}</h3>
+                      <div className="flex items-center gap-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-3 h-3 ${i < Math.floor(result.rating || 0) ? 'text-[#FF8AC6] fill-[#FF8AC6]' : 'text-gray-300'}`}
+                          />
+                        ))}
+                        <span className="text-xs text-[#60656F] ml-1">{result.rating} stars</span>
+                      </div>
+                      <p className="text-xl font-bold text-[#5EE177] mb-2">{result.price}</p>
+                      <Button className="w-full bg-white border-2 border-[#5EE177] text-[#5EE177] hover:bg-[#5EE177] hover:text-white font-semibold rounded-2xl h-10 text-sm">
+                        + Add to Favorites
+                      </Button>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Separator line */}
+                  <div className="border-t border-[#E4E8ED] my-6" />
+
+                  {/* Description */}
+                  <div className="mb-6">
+                    <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Description</h3>
+                    <p className="text-[#60656F] text-sm leading-relaxed mb-3">
+                      {result.description}
+                    </p>
+                    <p className="text-xs text-[#60656F] mb-2">
+                      <span className="font-semibold">Return Policy:</span> {result.return_policy || '30 days'}
+                    </p>
+                    <button className="text-[#5EE177] text-sm font-semibold flex items-center gap-1">
+                      Ask AI
+                      <ChevronLeft className="w-4 h-4 rotate-180" />
+                    </button>
+                  </div>
+
+                  {/* Separator line */}
+                  <div className="border-t border-[#E4E8ED] my-6" />
+
+                  {/* Key Features */}
+                  <div>
+                    <h3 className="font-bold text-[#2E2E38] mb-3 text-lg">Key Features</h3>
+                    <ul className="space-y-2">
+                      {result.features?.map((feature, idx) => (
+                        <li key={idx} className="text-sm text-[#60656F] flex items-start gap-2">
+                          <span className="text-[#5EE177] mt-1">•</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Reviews section placeholder */}
+                <div className="border-t border-[#E4E8ED] pt-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-[#2E2E38] text-lg">Reviews</h3>
+                    <button className="text-[#5EE177] text-sm font-semibold">View</button>
+                  </div>
+                  <p className="text-[#60656F] text-sm italic">- Runs slightly small</p>
+                  <p className="text-[#60656F] text-sm italic">- Recommend size up</p>
+                </div>
               </div>
             )}
 
-            {activeTab === 'smart insights' && (
+            {activeSection === 'alternatives' && (
               <div className="space-y-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-white" />
+                {/* Top Picks */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Top Picks
+                    </h2>
+                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-[#2E2E38] mb-2">AI Recommendation</h3>
-                    <p className="text-[#60656F] text-sm leading-relaxed">
-                      Based on analysis, this product offers great value at {result.price}. 
-                      Consider checking {result.online_deals?.[0]?.store} for the best deal.
-                    </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {result.alternatives?.slice(0, 2).map((alt, idx) => (
+                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
+                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                          <img 
+                            src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'} 
+                            alt={alt.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1 line-clamp-1">{alt.name}</h3>
+                        <p className="text-xs text-[#60656F] mb-2">{alt.store}</p>
+                        <p className="text-lg font-bold text-[#5EE177]">{alt.price}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
+
+                {/* Best Deals */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Best Deals
+                    </h2>
+                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {result.online_deals?.slice(0, 2).map((deal, idx) => (
+                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
+                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                          <img 
+                            src={deal.image_url || result.product_image_url || result.file_url} 
+                            alt={deal.store}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1">{deal.store}</h3>
+                        <p className="text-xs text-[#60656F] mb-2">{result.title}</p>
+                        <p className="text-lg font-bold text-[#5EE177]">{deal.price}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Best Matches */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-[#2E2E38]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      Best Matches
+                    </h2>
+                    <ChevronLeft className="w-5 h-5 text-[#60656F] rotate-180" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {result.alternatives?.slice(2, 4).map((alt, idx) => (
+                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
+                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                          <img 
+                            src={alt.image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'} 
+                            alt={alt.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <h3 className="font-bold text-[#2E2E38] text-sm mb-1 line-clamp-1">{alt.name}</h3>
+                        <p className="text-xs text-[#60656F] mb-2">{alt.store}</p>
+                        <p className="text-lg font-bold text-[#5EE177]">{alt.price}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'smart-insights' && (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#5EE177] to-[#FF8AC6] flex items-center justify-center mb-4">
+                  <Lock className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-[#2E2E38] mb-2">Premium Feature</h3>
+                <p className="text-[#60656F] text-sm text-center mb-6">
+                  Unlock Smart Insights to get AI-powered recommendations
+                </p>
+                <Button className="bg-gradient-to-r from-[#5EE177] to-[#FF8AC6] text-white font-bold rounded-2xl px-8 h-12">
+                  Upgrade to Premium
+                </Button>
               </div>
             )}
           </div>

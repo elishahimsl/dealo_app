@@ -44,9 +44,14 @@ export default function Discover() {
     { id: 6, name: "Home", image: "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=400" },
     { id: 7, name: "Beauty", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400" },
     { id: 8, name: "Toys", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400" },
+    { id: 11, name: "Kids", image: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400" },
+    { id: 12, name: "Pets", image: "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=400" },
+    { id: 13, name: "Books", image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400" },
+    { id: 14, name: "Garden", image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" },
+    { id: 15, name: "Auto", image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400" },
   ];
 
-  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 8);
+  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 12);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
@@ -108,8 +113,11 @@ export default function Discover() {
 
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.map((store) => (
-            <button 
+            <a 
               key={store.id}
+              href={`https://${store.name.toLowerCase().replace(' ', '')}.com`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
               style={{ width: '140px', height: '80px' }}
             >
@@ -121,7 +129,7 @@ export default function Discover() {
                   e.target.style.display = 'none';
                 }}
               />
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -139,8 +147,11 @@ export default function Discover() {
 
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.map((brand) => (
-            <button 
+            <a 
               key={brand.id}
+              href={`https://${brand.name.toLowerCase()}.com`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all relative overflow-hidden flex items-center justify-center"
               style={{ width: '140px', height: '80px' }}
             >
@@ -152,7 +163,7 @@ export default function Discover() {
                   e.target.style.display = 'none';
                 }}
               />
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -165,11 +176,17 @@ export default function Discover() {
           </h2>
         </div>
 
-        {/* Big Rectangle Banner */}
+        {/* Offers Banner with Stock Image */}
         <div className="px-6 mb-3">
-          <div className="w-full h-32 rounded-2xl bg-[#00A36C] shadow-lg flex items-center justify-center">
-            <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Discover Your Style
+          <div className="w-full h-32 rounded-2xl shadow-lg overflow-hidden relative">
+            <img 
+              src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" 
+              alt="Offers"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+            <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Offers
             </h3>
           </div>
         </div>

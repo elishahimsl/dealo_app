@@ -84,8 +84,11 @@ export default function Profile() {
 
         {/* Profile Picture & Info - Centered */}
         <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm mb-4">
+          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm mb-2">
             <User className="w-12 h-12 text-[#6B7280]" strokeWidth={2} />
+          </div>
+          <div className="bg-[#D6F5E9] text-[#00A36C] text-xs font-bold px-3 py-1 rounded-full mb-3">
+            Free
           </div>
           <h2 className="text-xl font-bold text-[#1F2937] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
             {user?.full_name || 'ElishaH'}
@@ -131,23 +134,25 @@ export default function Profile() {
           Personal Insights
         </h3>
         
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-sm"
+                className="bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-sm flex items-center gap-4"
               >
-                <div className="w-10 h-10 rounded-full bg-[#D6F5E9] flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-[#D6F5E9] flex items-center justify-center flex-shrink-0">
                   <Icon className="w-5 h-5 text-[#00A36C]" />
                 </div>
-                <p className="text-2xl font-bold text-[#1F2937] mb-1">
-                  {stat.value}
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  {stat.label}
-                </p>
+                <div className="flex-1">
+                  <p className="text-xl font-bold text-[#1F2937]">
+                    {stat.value}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">
+                    {stat.label}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -163,52 +168,39 @@ export default function Profile() {
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {recentlyViewed.map((item) => (
             <div 
               key={item.id}
               className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden shadow-sm relative"
+              style={{ aspectRatio: '3/4' }}
             >
-              <div className="aspect-square relative">
-                <img 
-                  src={item.image} 
-                  alt="Product"
-                  className="w-full h-full object-cover"
-                />
-                {/* Price - top left */}
-                <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                  <span className="text-xs font-bold text-[#1F2937]">{item.price}</span>
-                </div>
-                {/* Heart - bottom right */}
-                <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
-                  <Heart className="w-3 h-3 text-[#6B7280]" />
-                </button>
+              <img 
+                src={item.image} 
+                alt="Product"
+                className="w-full h-full object-cover"
+              />
+              {/* Price - top left, smaller */}
+              <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+                <span className="text-[10px] font-bold text-[#1F2937]">{item.price}</span>
               </div>
+              {/* Heart - bottom right */}
+              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                <Heart className="w-3 h-3 text-[#6B7280]" />
+              </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Invite Friends Card - Less wide */}
+      {/* Invite Friends Button */}
       <div className="px-6 py-6">
-        <div className="bg-white border border-[#E5E7EB] rounded-3xl p-6 shadow-sm max-w-sm mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-full bg-[#D6F5E9] flex items-center justify-center">
-              <UserPlus className="w-6 h-6 text-[#00A36C]" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-bold text-[#1F2937] text-lg" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                Invite Friends
-              </h4>
-              <p className="text-[#6B7280] text-sm">
-                Share ShopSmart with friends
-              </p>
-            </div>
+        <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-14 text-base flex items-center justify-center gap-3">
+          <div className="w-6 h-6 border-2 border-white rounded flex items-center justify-center relative">
+            <Share2 className="w-3 h-3 text-white" />
           </div>
-          <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-12">
-            Invite Now
-          </Button>
-        </div>
+          Invite Friends
+        </Button>
       </div>
 
       {/* Footer Tagline - More faded */}

@@ -81,7 +81,7 @@ export default function Snap() {
       const capturedFile = new File([blob], `snap-${Date.now()}.jpg`, { type: 'image/jpeg' });
 
       try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
+        const { file_url: user_photo_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
 
         const aiResult = await base44.integrations.Core.InvokeLLM({
           prompt: `Analyze this product image comprehensively and provide:
@@ -95,15 +95,16 @@ export default function Snap() {
           8. Subscores: Quality, Value, Features, Design, Durability (each out of 100)
           9. 4-5 specific pros (positive aspects)
           10. 4-5 specific cons (negative aspects)
-          11. 4-5 online deals with store name, price, and if it's the smart buy
+          11. 4-5 online deals with store name, price, and if it's the smart buy, with product image URLs
           12. Product description (3-4 sentences)
           13. Key features (5-6 bullet points)
           14. Return policy summary
           15. 3-4 alternative products with name, price, store, image URL (use Unsplash)
-          16. URL to a high-quality product showcase image (use Unsplash or similar)
+          16. URL to a high-quality product showcase image from Unsplash (search for the specific product type)
           
+          IMPORTANT: For product_image_url, provide a high-quality Unsplash URL of the actual product type detected, not the user's photo.
           Be specific and detailed. Generate realistic data.`,
-          file_urls: file_url,
+          file_urls: user_photo_url,
           response_json_schema: {
             type: "object",
             properties: {
@@ -158,7 +159,17 @@ export default function Snap() {
           }
         });
 
-        setResult({ file_url, ...aiResult });
+        // Save to database with product showcase image
+        await base44.entities.Capture.create({
+          title: aiResult.title,
+          content_type: 'other',
+          file_url: aiResult.product_image_url || user_photo_url,
+          file_type: 'image',
+          ai_summary: aiResult.smart_summary,
+          keywords: [aiResult.brand, aiResult.title]
+        });
+
+        setResult({ file_url: user_photo_url, ...aiResult });
       } catch (error) {
         console.error("Error processing scan:", error);
         alert("Failed to process image. Please try again.");
@@ -176,11 +187,11 @@ export default function Snap() {
     stopCamera();
 
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
+      const { file_url: user_photo_url } = await base44.integrations.Core.UploadFile({ file: selectedFile });
 
       const aiResult = await base44.integrations.Core.InvokeLLM({
-        prompt: `Analyze this product comprehensively with all details. Be specific and generate realistic data.`,
-        file_urls: file_url,
+        prompt: `Analyze this product image comprehensively and provide all details including a high-quality product showcase image URL from Unsplash. For product_image_url, provide a URL of the actual product type detected, not the user's photo. Be specific and generate realistic data.`,
+        file_urls: user_photo_url,
         response_json_schema: {
           type: "object",
           properties: {
@@ -235,7 +246,17 @@ export default function Snap() {
         }
       });
 
-      setResult({ file_url, ...aiResult });
+      // Save to database with product showcase image
+      await base44.entities.Capture.create({
+        title: aiResult.title,
+        content_type: 'other',
+        file_url: aiResult.product_image_url || user_photo_url,
+        file_type: 'image',
+        ai_summary: aiResult.smart_summary,
+        keywords: [aiResult.brand, aiResult.title]
+      });
+
+      setResult({ file_url: user_photo_url, ...aiResult });
     } catch (error) {
       console.error("Error processing file:", error);
       alert("Failed to process file. Please try again.");

@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import Splash from './pages/Splash';
 import MyCart from './pages/MyCart';
 import More from './pages/More';
+import Achievements from './pages/Achievements';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +23,7 @@ export const PAGES = {
     "Splash": Splash,
     "MyCart": MyCart,
     "More": More,
+    "Achievements": Achievements,
 }
 
 export const pagesConfig = {

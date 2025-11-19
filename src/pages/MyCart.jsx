@@ -1,23 +1,21 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, Trash2, Search, MapPin, Star, FolderPlus, Folder, MoreVertical } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Heart, MoreVertical, Folder, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function MyCart() {
-  const [activeTab, setActiveTab] = useState("favorites");
-  const [sortBy, setSortBy] = useState("recent");
-  const [showFolderModal, setShowFolderModal] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [folders, setFolders] = useState([]);
+  const queryClient = useQueryClient();
+  const [showCreateCollection, setShowCreateCollection] = useState(false);
+  const [newCollectionName, setNewCollectionName] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState(null);
+
+  const { data: folders } = useQuery({
+    queryKey: ['folders'],
+    queryFn: () => base44.entities.Folder.list(),
+    initialData: [],
+  });
 
   const { data: captures } = useQuery({
     queryKey: ['allCaptures'],
@@ -25,235 +23,156 @@ export default function MyCart() {
     initialData: [],
   });
 
-  // Mock cart items
-  const cartItems = [
-    { 
-      id: 1, 
-      title: "7-Pod Pro", 
-      price: 299, 
-      quantity: 1, 
-      rating: 4.5,
-      store: "Target",
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200" 
+  const createFolderMutation = useMutation({
+    mutationFn: (folderData) => base44.entities.Folder.create(folderData),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['folders']);
+      setShowCreateCollection(false);
+      setNewCollectionName("");
+    }
+  });
+
+  const mockProducts = [
+    {
+      id: 1,
+      title: "Alphabete Athletics Nike Killer Pants",
+      price: "$32.44",
+      store: "Nike Store",
+      image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400"
     },
-    { 
-      id: 2, 
-      title: "Faith over Fear T-Shirt", 
-      price: 12, 
-      quantity: 1, 
-      rating: 3,
-      store: "Amazon",
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200" 
-    },
+    {
+      id: 2,
+      title: "Alphabete Athletic Black Backpack",
+      price: "$22.40",
+      store: "Nike Store",
+      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400"
+    }
   ];
 
-  const snapHistory = captures.slice(0, 10);
-
-  const handleAddFolder = () => {
-    if (newFolderName.trim()) {
-      setFolders([...folders, { id: Date.now(), name: newFolderName, itemCount: 0 }]);
-      setNewFolderName("");
-      setShowFolderModal(false);
+  const handleCreateCollection = () => {
+    if (newCollectionName.trim()) {
+      createFolderMutation.mutate({
+        name: newCollectionName,
+        type: "manual",
+        category: "custom",
+        color: "#00A36C",
+        icon: "Folder",
+        item_count: 0
+      });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Header with Tabs */}
+    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+      {/* Header */}
       <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E5E7EB]">
-        <div className="flex justify-center gap-12 mb-4">
-          <button
-            onClick={() => setActiveTab("favorites")}
-            className={`text-lg font-bold pb-2 transition-colors ${
-              activeTab === "favorites" 
-                ? "text-[#1F2937] border-b-2 border-[#00A36C]" 
-                : "text-[#6B7280]"
-            }`}
-            style={{ fontFamily: 'Poppins, sans-serif' }}
-          >
-            Favorites
-          </button>
-          <button
-            onClick={() => setActiveTab("history")}
-            className={`text-lg font-bold pb-2 transition-colors ${
-              activeTab === "history" 
-                ? "text-[#1F2937] border-b-2 border-[#00A36C]" 
-                : "text-[#6B7280]"
-            }`}
-            style={{ fontFamily: 'Poppins, sans-serif' }}
-          >
-            Snap History
-          </button>
+        <h1 className="text-2xl font-bold text-[#1F2937] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          Saved
+        </h1>
+      </div>
+
+      {/* Collections Section */}
+      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Collections
+          </h2>
         </div>
 
-        {/* Search Bar - Extended with only folder button */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#6B7280]" />
-            <Input
-              placeholder="Search favorites"
-              className="pl-12 h-14 rounded-2xl border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937] text-base"
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            />
-          </div>
-          
-          {/* Add Folder Icon - Working */}
-          <button 
-            onClick={() => setShowFolderModal(true)}
-            className="w-10 h-10 rounded-2xl bg-[#F9FAFB] border border-[#E5E7EB] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
+        {/* Scrollable Collections Bar */}
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
+          {/* Create Collection Button */}
+          <button
+            onClick={() => setShowCreateCollection(true)}
+            className="flex-shrink-0 w-24 h-24 rounded-2xl border-2 border-dashed border-[#00A36C] bg-[#D6F5E9] flex flex-col items-center justify-center gap-2 hover:bg-[#A8EFD4] transition-colors"
           >
-            <FolderPlus className="w-4 h-4 text-[#6B7280]" />
+            <Plus className="w-6 h-6 text-[#00A36C]" />
+            <span className="text-xs font-semibold text-[#00A36C]">Create</span>
           </button>
+
+          {/* Existing Collections */}
+          {folders.map((folder) => (
+            <button
+              key={folder.id}
+              onClick={() => setSelectedCollection(folder.id)}
+              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-white border-2 border-[#E5E7EB] shadow-sm hover:border-[#00A36C] transition-colors relative overflow-hidden"
+            >
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Folder className="w-10 h-10 text-[#00A36C]" />
+              </div>
+              <div className="absolute bottom-2 left-2 right-2">
+                <p className="text-xs font-semibold text-[#1F2937] truncate">{folder.name}</p>
+              </div>
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Sort By */}
-      {activeTab === "favorites" && (
-        <div className="px-6 py-4 flex items-center justify-between">
-          <p className="text-sm text-[#6B7280]">{cartItems.length} items</p>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#6B7280]">Sort by:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-28 h-9 rounded-xl border-[#E5E7EB]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recent">Recent</SelectItem>
-                <SelectItem value="price">Price</SelectItem>
-                <SelectItem value="rating">Rating</SelectItem>
-                <SelectItem value="location">Location</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="px-6 pb-32">
-        {activeTab === "favorites" ? (
-          <div className="space-y-4">
-            {/* Folders */}
-            {folders.map((folder) => (
-              <div key={folder.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-[#00A36C] flex items-center justify-center">
-                    <Folder className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-[#1F2937]">{folder.name}</h3>
-                    <p className="text-xs text-[#6B7280]">{folder.itemCount} items</p>
-                  </div>
-                  <button className="text-[#6B7280] hover:text-[#1F2937]">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+      {/* Products Grid */}
+      <div className="px-6 py-6">
+        <div className="grid grid-cols-2 gap-4">
+          {mockProducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm">
+              {/* Product Image */}
+              <div className="relative aspect-square">
+                <img 
+                  src={product.image} 
+                  alt={product.title}
+                  className="w-full h-full object-cover"
+                />
+                {/* Save Bg Badge */}
+                <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-xs font-bold px-2 py-1 rounded-md">
+                  Save Bg
                 </div>
-                {/* Placeholder boxes for items */}
-                <div className="grid grid-cols-4 gap-2 mt-4">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="aspect-square rounded-xl border-2 border-dashed border-[#E5E7EB] bg-[#F9FAFB]" />
-                  ))}
-                </div>
+                {/* Heart Icon */}
+                <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white border-2 border-[#00A36C] flex items-center justify-center">
+                  <Heart className="w-4 h-4 text-white fill-white" />
+                </button>
               </div>
-            ))}
 
-            {/* Regular items with 3 dots */}
-            {cartItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm">
-                <div className="flex gap-4 mb-3">
-                  <div className="w-24 h-24 rounded-2xl bg-[#D6F5E9] overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-[#1F2937] text-base mb-1">{item.title}</h3>
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          className={`w-3 h-3 ${i < item.rating ? 'text-[#00A36C] fill-[#00A36C]' : 'text-gray-300'}`} 
-                        />
-                      ))}
-                      <span className="text-xs text-[#6B7280] ml-1">{item.rating}</span>
-                    </div>
-                    <p className="text-xl font-bold text-[#00A36C] mb-2">${item.price}</p>
-                  </div>
-                  <button className="text-[#6B7280] hover:text-[#1F2937] self-start">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
-                </div>
+              {/* Product Info */}
+              <div className="p-3">
+                <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-2 leading-tight">
+                  {product.title}
+                </h3>
+                <p className="text-lg font-bold text-[#00A36C] mb-2">
+                  {product.price}
+                </p>
                 <Button 
-                  variant="outline" 
-                  className="w-full rounded-2xl border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white font-semibold"
+                  variant="outline"
+                  className="w-full h-8 text-xs rounded-xl border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white"
                 >
-                  <MapPin className="w-4 h-4 mr-2" />
-                  Visit {item.store} Store
+                  Visit Store
                 </Button>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div>
-            {snapHistory.length === 0 ? (
-              <div className="bg-white rounded-3xl p-12 text-center border border-[#E5E7EB] shadow-sm">
-                <ShoppingCart className="w-16 h-16 text-[#6B7280] mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-[#1F2937] mb-2">No Snap History Yet</h3>
-                <p className="text-[#6B7280] text-sm">
-                  Start scanning products to build your history
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {snapHistory.map((item) => (
-                  <div key={item.id} className="bg-white rounded-3xl p-4 border border-[#E5E7EB] shadow-sm flex items-center gap-4">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#D6F5E9]">
-                      <img src={item.file_url} alt={item.title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-[#1F2937] mb-1 line-clamp-1">{item.title}</h3>
-                      <p className="text-xs text-[#6B7280]">
-                        {new Date(item.created_date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </p>
-                    </div>
-                    <button className="text-[#6B7280] hover:text-red-500">
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Folder Modal */}
-      {showFolderModal && (
+      {/* Create Collection Modal */}
+      {showCreateCollection && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-            <h3 className="text-xl font-bold text-[#1F2937] mb-4">Create New Folder</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-[#1F2937]">Create Collection</h3>
+              <button onClick={() => setShowCreateCollection(false)}>
+                <X className="w-6 h-6 text-[#6B7280]" />
+              </button>
+            </div>
             <Input
-              placeholder="Folder name"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
+              placeholder="Collection name"
+              value={newCollectionName}
+              onChange={(e) => setNewCollectionName(e.target.value)}
               className="mb-4 h-12 rounded-2xl"
             />
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setShowFolderModal(false)}
-                className="flex-1 rounded-2xl"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddFolder}
-                className="flex-1 rounded-2xl bg-[#00A36C] hover:bg-[#007E52]"
-              >
-                Create
-              </Button>
-            </div>
+            <Button
+              onClick={handleCreateCollection}
+              disabled={!newCollectionName.trim()}
+              className="w-full rounded-2xl bg-[#00A36C] hover:bg-[#007E52] h-12"
+            >
+              Create
+            </Button>
           </div>
         </div>
       )}

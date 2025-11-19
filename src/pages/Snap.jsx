@@ -726,12 +726,15 @@ export default function Snap() {
       {scanning && (
         <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
           <div className="relative mb-6">
-            <div className="w-40 h-40 rounded-lg border-2 border-[#00A36C] relative overflow-hidden">
+            <div className="w-56 h-56 relative">
+              <Scan className="w-full h-full text-[#00A36C] opacity-40" strokeWidth={0.5} />
               <div 
-                className="absolute left-0 right-0 h-1 bg-[#00A36C] shadow-lg shadow-[#00A36C]"
-                style={{ animation: 'scan 2s ease-in-out infinite' }}
+                className="absolute left-8 right-8 h-1 bg-[#00A36C]"
+                style={{ 
+                  animation: 'scan 2s ease-in-out infinite',
+                  boxShadow: '0 0 20px 4px #00A36C, 0 0 40px 8px rgba(0, 163, 108, 0.5)'
+                }}
               />
-              <Scan className="w-full h-full text-[#00A36C] opacity-50 p-8" strokeWidth={1} />
             </div>
           </div>
           <p className="text-white text-xl font-semibold mb-2">Analyzing...</p>

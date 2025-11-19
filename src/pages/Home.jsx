@@ -73,7 +73,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section - Modern minimal look with heart and price only */}
+      {/* Trending Section - Full images with green price pills */}
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -86,22 +86,20 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-3 gap-3">
           {trendingProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm relative">
-              <div className="aspect-square relative">
-                <img 
-                  src={product.image} 
-                  alt="Product"
-                  className="w-full h-full object-cover"
-                />
-                {/* Heart icon - bottom right */}
-                <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-md">
-                  <Heart className="w-4 h-4 text-[#6B7280]" />
-                </button>
+            <div key={product.id} className="rounded-2xl overflow-hidden shadow-sm relative" style={{ aspectRatio: '3/4' }}>
+              <img 
+                src={product.image} 
+                alt="Product"
+                className="w-full h-full object-cover"
+              />
+              {/* Green price pill - top left */}
+              <div className="absolute top-2 left-2 bg-[#00A36C] rounded-full px-2.5 py-1 shadow-md">
+                <span className="text-xs font-bold text-white">{product.price}</span>
               </div>
-              {/* Price at bottom */}
-              <div className="p-2 text-center">
-                <span className="text-sm font-bold text-[#1F2937]">{product.price}</span>
-              </div>
+              {/* Heart icon - bottom right */}
+              <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border-2 border-[#6B7280] flex items-center justify-center hover:bg-white/30 transition-colors">
+                <Heart className="w-4 h-4 text-[#6B7280]" />
+              </button>
             </div>
           ))}
         </div>

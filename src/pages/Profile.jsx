@@ -61,9 +61,69 @@ export default function Profile() {
           >
             <span className="font-semibold">← Back</span>
           </button>
-          <h1 className="text-2xl font-bold text-[#1F2937] mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-2xl font-bold text-[#1F2937] mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Settings
           </h1>
+        </div>
+
+        <div className="px-6 space-y-3">
+          {/* Edit Profile */}
+          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#1F2937]">Edit Profile</h3>
+                <p className="text-sm text-[#6B7280]">Name, email, profile picture</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            </div>
+          </button>
+
+          {/* Change Password */}
+          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#1F2937]">Change Password</h3>
+                <p className="text-sm text-[#6B7280]">Update your password</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            </div>
+          </button>
+
+          {/* Notifications */}
+          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#1F2937]">Notifications</h3>
+                <p className="text-sm text-[#6B7280]">Manage your alerts</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            </div>
+          </button>
+
+          {/* Privacy */}
+          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-[#1F2937]">Privacy</h3>
+                <p className="text-sm text-[#6B7280]">Control your data</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            </div>
+          </button>
+
+          {/* Log Out */}
+          <button 
+            onClick={() => base44.auth.logout()}
+            className="w-full bg-white border-2 border-red-200 rounded-2xl p-4 text-left hover:bg-red-50"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-red-600">Log Out</h3>
+                <p className="text-sm text-[#6B7280]">Sign out of your account</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-red-600" />
+            </div>
+          </button>
         </div>
       </div>
     );
@@ -99,27 +159,30 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Achievements Section with Arrow */}
-      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Achievements Section - Compact */}
+      <div className="px-6 py-3 bg-white border-b border-[#E5E7EB]">
+        <button 
+          onClick={() => navigate(createPageUrl("Achievements"))}
+          className="flex items-center justify-between w-full mb-2"
+        >
+          <h3 className="text-base font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Achievements
           </h3>
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-        </div>
+        </button>
 
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           {badges.map((badge) => {
             const Icon = badge.icon;
             return (
               <div 
                 key={badge.id}
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-1"
               >
-                <div className="w-16 h-16 rounded-2xl bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm">
-                  <Icon className="w-8 h-8 text-[#00A36C]" strokeWidth={2} />
+                <div className="w-12 h-12 rounded-xl bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm">
+                  <Icon className="w-5 h-5 text-[#00A36C]" strokeWidth={2} />
                 </div>
-                <span className="text-xs font-semibold text-[#1F2937] text-center leading-tight">
+                <span className="text-[9px] font-semibold text-[#1F2937] text-center leading-tight">
                   {badge.label}
                 </span>
               </div>
@@ -128,64 +191,65 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* Personal Insights Section - Rectangular tiles */}
-      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
-        <h3 className="text-lg font-bold text-[#1F2937] mb-4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Personal Insights Section - 2x2 Grid */}
+      <div className="px-6 py-4 bg-white border-b border-[#E5E7EB]">
+        <h3 className="text-base font-bold text-[#1F2937] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Personal Insights
         </h3>
         
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-sm flex items-center gap-4"
+                className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-full bg-[#D6F5E9] flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-[#00A36C]" />
+                <div className="w-8 h-8 rounded-full bg-[#D6F5E9] flex items-center justify-center mb-2">
+                  <Icon className="w-4 h-4 text-[#00A36C]" />
                 </div>
-                <div className="flex-1">
-                  <p className="text-xl font-bold text-[#1F2937]">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-[#6B7280]">
-                    {stat.label}
-                  </p>
-                </div>
+                <p className="text-lg font-bold text-[#1F2937] mb-0.5">
+                  {stat.value}
+                </p>
+                <p className="text-[10px] text-[#6B7280] leading-tight">
+                  {stat.label}
+                </p>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* Recently Viewed Section */}
-      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Recently Viewed Section - Horizontal Scroll */}
+      <div className="py-4 bg-white border-b border-[#E5E7EB]">
+        <div className="px-6 flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Recently Viewed
           </h3>
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {recentlyViewed.map((item) => (
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+          {recentlyViewed.map((item, idx) => (
             <div 
               key={item.id}
-              className="bg-white border border-[#E5E7EB] rounded-xl overflow-hidden shadow-sm relative"
-              style={{ aspectRatio: '3/4' }}
+              className="flex-shrink-0 rounded-xl overflow-hidden shadow-sm relative"
+              style={{ width: '140px', height: '100px' }}
             >
               <img 
                 src={item.image} 
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Price - top left, smaller */}
-              <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-md px-1.5 py-0.5">
-                <span className="text-[10px] font-bold text-[#1F2937]">{item.price}</span>
+              {/* Green price pill - top left with varying shades */}
+              <div 
+                className="absolute top-2 left-2 rounded-md px-2 py-0.5"
+                style={{ backgroundColor: idx % 3 === 0 ? '#00A36C' : idx % 3 === 1 ? '#007E52' : '#00C97D' }}
+              >
+                <span className="text-[10px] font-bold text-white">{item.price}</span>
               </div>
               {/* Heart - bottom right */}
-              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm border-2 border-[#6B7280] flex items-center justify-center">
                 <Heart className="w-3 h-3 text-[#6B7280]" />
               </button>
             </div>

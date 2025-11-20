@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart, ArrowLeft } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, FileText } from "lucide-react";
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
@@ -61,7 +61,7 @@ export default function Profile() {
           >
             <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
-          <h1 className="text-lg font-semibold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>
+          <h1 className="text-xl font-normal text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>
             Settings
           </h1>
         </div>
@@ -85,35 +85,35 @@ export default function Profile() {
 
             {/* Notifications */}
             <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-              <span className="text-2xl mb-2 block">🔔</span>
+              <Bell className="w-6 h-6 text-[#1F2937] mb-2" />
               <h3 className="text-sm font-bold text-[#1F2937]">Notifications</h3>
               <p className="text-xs text-[#6B7280] mt-1">Alerts & Updates</p>
             </button>
 
             {/* Privacy */}
             <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-              <span className="text-2xl mb-2 block">🔒</span>
+              <Lock className="w-6 h-6 text-[#1F2937] mb-2" />
               <h3 className="text-sm font-bold text-[#1F2937]">Privacy</h3>
               <p className="text-xs text-[#6B7280] mt-1">Data & Sharing</p>
             </button>
 
             {/* Help */}
             <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-              <span className="text-2xl mb-2 block">❓</span>
+              <HelpCircle className="w-6 h-6 text-[#1F2937] mb-2" />
               <h3 className="text-sm font-bold text-[#1F2937]">Help</h3>
               <p className="text-xs text-[#6B7280] mt-1">Support Center</p>
             </button>
 
             {/* Terms */}
             <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-              <span className="text-2xl mb-2 block">📄</span>
+              <FileText className="w-6 h-6 text-[#1F2937] mb-2" />
               <h3 className="text-sm font-bold text-[#1F2937]">Terms</h3>
               <p className="text-xs text-[#6B7280] mt-1">Legal & Privacy</p>
             </button>
           </div>
 
           {/* Sign Out - Bottom Center */}
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-6">
             <button 
               onClick={() => base44.auth.logout()}
               className="flex items-center gap-2 text-red-600 hover:opacity-80 transition-opacity"
@@ -122,6 +122,11 @@ export default function Profile() {
               <span className="text-sm font-semibold">Sign out</span>
             </button>
           </div>
+
+          {/* Terms and Conditions */}
+          <p className="text-center text-xs text-[#6B7280]">
+            Terms and Conditions
+          </p>
         </div>
       </div>
     );
@@ -227,7 +232,7 @@ export default function Profile() {
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-6 px-6">
+        <div className="flex gap-3 overflow-x-scroll scrollbar-hide -mx-6 px-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {recentlyViewed.map((item, idx) => (
             <div 
               key={item.id}
@@ -268,6 +273,16 @@ export default function Profile() {
           Lens of the Future
         </p>
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

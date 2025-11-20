@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import { Camera, Plus, ArrowLeft, Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export default function Compare() {
@@ -12,6 +12,7 @@ export default function Compare() {
   const [item2, setItem2] = useState(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
+  const [showUploadOptions, setShowUploadOptions] = useState(null);
   const fileInput1Ref = useRef(null);
   const fileInput2Ref = useRef(null);
 
@@ -45,6 +46,7 @@ export default function Compare() {
       } else {
         setItem2(itemData);
       }
+      setShowUploadOptions(null);
     } catch (error) {
       console.error("Error processing file:", error);
     }
@@ -146,7 +148,7 @@ export default function Compare() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header */}
+      {/* Header - Centered */}
       <div className="px-6 pt-8 pb-4">
         <Button 
           variant="ghost" 
@@ -156,17 +158,17 @@ export default function Compare() {
         >
           <ArrowLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-2xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <h1 className="text-lg font-bold text-[#1F2937] text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Compare
         </h1>
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Item Slots */}
-        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB]">
-          <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Comparison Area - More Horizontal */}
+        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] relative" style={{ minHeight: '200px' }}>
+          <div className="flex items-center justify-center gap-6 mb-4">
             {/* Item 1 */}
-            <div>
+            <div className="flex-1">
               <input
                 type="file"
                 accept="image/*"
@@ -174,32 +176,32 @@ export default function Compare() {
                 ref={fileInput1Ref}
                 className="hidden"
               />
-              <button
-                onClick={() => fileInput1Ref.current?.click()}
-                className={`w-full aspect-square rounded-2xl border-2 border-dashed ${
-                  item1 ? 'border-[#00A36C]' : 'border-[#E5E7EB]'
-                } flex items-center justify-center overflow-hidden`}
+              <div
+                className={`w-full rounded-2xl bg-[#E5E7EB] flex items-center justify-center overflow-hidden transition-all ${
+                  item1 ? '' : 'hover:bg-[#D1D5DB]'
+                }`}
+                style={{ 
+                  height: '160px',
+                  transform: 'perspective(1000px) rotateY(5deg)'
+                }}
               >
                 {item1 ? (
                   <img src={item1.file_url} alt="Item 1" className="w-full h-full object-cover" />
                 ) : (
-                  <Plus className="w-12 h-12 text-[#6B7280]" />
+                  <div className="text-center">
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-[#6B7280] text-sm">Product 1</span>
+                    </div>
+                  </div>
                 )}
-              </button>
+              </div>
               {item1 && (
                 <p className="text-sm font-semibold text-[#1F2937] mt-2 text-center">{item1.price}</p>
               )}
             </div>
 
-            {/* VS Divider */}
-            <div className="flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-[#00A36C] flex items-center justify-center">
-                <span className="text-white font-bold text-lg">VS</span>
-              </div>
-            </div>
-
             {/* Item 2 */}
-            <div>
+            <div className="flex-1">
               <input
                 type="file"
                 accept="image/*"
@@ -207,49 +209,100 @@ export default function Compare() {
                 ref={fileInput2Ref}
                 className="hidden"
               />
-              <button
-                onClick={() => fileInput2Ref.current?.click()}
-                className={`w-full aspect-square rounded-2xl border-2 border-dashed ${
-                  item2 ? 'border-[#00A36C]' : 'border-[#E5E7EB]'
-                } flex items-center justify-center overflow-hidden`}
+              <div
+                className={`w-full rounded-2xl bg-[#E5E7EB] flex items-center justify-center overflow-hidden transition-all ${
+                  item2 ? '' : 'hover:bg-[#D1D5DB]'
+                }`}
+                style={{ 
+                  height: '160px',
+                  transform: 'perspective(1000px) rotateY(-5deg)'
+                }}
               >
                 {item2 ? (
                   <img src={item2.file_url} alt="Item 2" className="w-full h-full object-cover" />
                 ) : (
-                  <Plus className="w-12 h-12 text-[#6B7280]" />
+                  <div className="text-center">
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-[#6B7280] text-sm">Product 2</span>
+                    </div>
+                  </div>
                 )}
-              </button>
+              </div>
               {item2 && (
                 <p className="text-sm font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>
               )}
             </div>
           </div>
 
-          {/* Analyze Button */}
-          <Button
-            onClick={handleAnalyze}
-            disabled={!item1 || !item2 || analyzing}
-            className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50"
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Analyzing...
-              </>
-            ) : (
-              'Analyze'
-            )}
-          </Button>
-        </div>
-
-        {/* Your Preferences */}
-        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB]">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-[#1F2937]">Your Preferences</h3>
-            <span className="text-xs text-[#6B7280]">Set what matters to you</span>
+          {/* VS Badge - Bottom Center */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
+            <div className="w-12 h-12 rounded-full bg-[#00A36C] flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-sm">VS</span>
+            </div>
           </div>
 
-          <div className="space-y-6">
+          {/* Plus Button - Bottom Left */}
+          <button
+            onClick={() => setShowUploadOptions(!showUploadOptions)}
+            className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB] transition-colors"
+          >
+            <Plus className="w-5 h-5 text-[#6B7280]" />
+          </button>
+
+          {/* Upload Options Dropdown */}
+          {showUploadOptions && (
+            <div className="absolute bottom-14 left-4 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-2 z-10">
+              <button
+                onClick={() => fileInput1Ref.current?.click()}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
+              >
+                <Camera className="w-4 h-4 text-[#6B7280]" />
+                <span className="text-sm text-[#1F2937]">Scan</span>
+              </button>
+              <button
+                onClick={() => fileInput1Ref.current?.click()}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
+              >
+                <ImageIcon className="w-4 h-4 text-[#6B7280]" />
+                <span className="text-sm text-[#1F2937]">Pick from Photos</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Analyze Button - Outside */}
+        <Button
+          onClick={handleAnalyze}
+          disabled={!item1 || !item2 || analyzing}
+          className="w-full h-10 rounded-full bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 text-sm"
+        >
+          {analyzing ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            'Analyze'
+          )}
+        </Button>
+
+        {/* Your Preferences - Outside */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="font-bold text-[#1F2937] text-base mb-1">Your Preferences</h3>
+              <p className="text-xs text-[#6B7280]">Set what matters to you</p>
+            </div>
+            <Button
+              variant="outline"
+              className="rounded-full h-8 px-4 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white text-xs flex items-center gap-2"
+            >
+              <Sparkles className="w-3 h-3" />
+              Shop Sense
+            </Button>
+          </div>
+
+          <div className="space-y-4">
             {/* Price */}
             <div>
               <div className="flex items-center justify-between mb-2">

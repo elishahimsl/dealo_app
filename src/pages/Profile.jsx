@@ -241,16 +241,13 @@ export default function Profile() {
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Green price pill - top left with varying shades */}
-              <div 
-                className="absolute top-2 left-2 rounded-md px-2 py-0.5"
-                style={{ backgroundColor: idx % 3 === 0 ? '#00A36C' : idx % 3 === 1 ? '#007E52' : '#00C97D' }}
-              >
+              {/* Transparent black price - top left */}
+              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-2 py-1">
                 <span className="text-[10px] font-bold text-white">{item.price}</span>
               </div>
-              {/* Heart - bottom right */}
-              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm border-2 border-[#6B7280] flex items-center justify-center">
-                <Heart className="w-3 h-3 text-[#6B7280]" />
+              {/* Heart - bottom right - filled grey */}
+              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
+                <Heart className="w-3 h-3 text-[#6B7280] fill-[#6B7280]" />
               </button>
             </div>
           ))}

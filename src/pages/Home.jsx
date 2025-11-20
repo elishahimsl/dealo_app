@@ -97,8 +97,8 @@ export default function Home() {
                 <span className="text-xs font-bold text-white">{product.price}</span>
               </div>
               {/* Heart icon - bottom right */}
-              <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border-2 border-[#6B7280] flex items-center justify-center hover:bg-white/30 transition-colors">
-                <Heart className="w-4 h-4 text-[#6B7280]" />
+              <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#00A36C] transition-colors">
+                <Heart className="w-4 h-4 text-[#6B7280] fill-[#6B7280] hover:text-white hover:fill-white" />
               </button>
             </div>
           ))}

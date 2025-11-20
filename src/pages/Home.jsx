@@ -73,7 +73,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section - Full images with green price pills */}
+      {/* Trending Section - 2x2 Grid */}
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -84,21 +84,21 @@ export default function Home() {
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {trendingProducts.map((product) => (
-            <div key={product.id} className="rounded-2xl overflow-hidden shadow-sm relative" style={{ aspectRatio: '3/4' }}>
+        <div className="grid grid-cols-2 gap-3">
+          {trendingProducts.slice(0, 4).map((product) => (
+            <div key={product.id} className="rounded-2xl overflow-hidden shadow-sm relative aspect-square">
               <img 
                 src={product.image} 
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Transparent black price - top left */}
-              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-2 py-1">
-                <span className="text-xs font-bold text-white">{product.price}</span>
+              {/* Transparent black price - top left, smaller */}
+              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+                <span className="text-[9px] font-bold text-white">{product.price}</span>
               </div>
               {/* Heart icon - bottom right */}
-              <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#00A36C] transition-colors">
-                <Heart className="w-4 h-4 text-white fill-white" />
+              <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#6B7280]/40 border border-white flex items-center justify-center hover:bg-[#00A36C] transition-colors">
+                <Heart className="w-3 h-3 text-white" strokeWidth={2} />
               </button>
             </div>
           ))}

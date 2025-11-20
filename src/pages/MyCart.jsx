@@ -89,30 +89,30 @@ export default function MyCart() {
         <button
           onClick={() => setShowCreateCollection(true)}
           className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-3"
-          style={{ minHeight: '120px' }}
+          style={{ minHeight: '130px' }}
         >
-          {/* Centered Text */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          {/* Centered Text - Positioned Higher */}
+          <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
             <span className="text-sm font-semibold text-[#6B7280]">+ Create collection</span>
           </div>
           
-          {/* Book-like images at bottom */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end gap-1">
+          {/* Book-like images at bottom - Positioned Lower */}
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-end gap-1">
             <div 
-              className="w-16 h-20 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(-8deg) translateY(8px)' }}
+              className="w-14 h-20 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(-8deg) translateY(12px)' }}
             >
               <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
             </div>
             <div 
-              className="w-16 h-24 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(-3deg) translateY(4px)' }}
+              className="w-14 h-24 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(-3deg) translateY(8px)' }}
             >
               <img src={mockProducts[1].image} alt="" className="w-full h-full object-cover" />
             </div>
             <div 
-              className="w-16 h-20 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(8deg) translateY(8px)' }}
+              className="w-14 h-20 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(8deg) translateY(12px)' }}
             >
               <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
             </div>

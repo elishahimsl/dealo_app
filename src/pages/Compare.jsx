@@ -149,7 +149,15 @@ export default function Compare() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Header - Centered and at Top */}
-      <div className="px-6 pt-4 pb-2 text-center">
+      <div className="px-6 pt-4 pb-2 text-center relative">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => navigate(createPageUrl("Home"))}
+          className="absolute left-6 top-4 w-8 h-8 rounded-full"
+        >
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
         <h1 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Compare
         </h1>

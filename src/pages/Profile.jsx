@@ -53,87 +53,75 @@ export default function Profile() {
 
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="px-6 pt-8 pb-6">
+      <div className="min-h-screen bg-white pb-24">
+        <div className="px-6 pt-8 pb-6 text-center">
           <button 
             onClick={() => setShowSettings(false)}
-            className="mb-6"
+            className="absolute left-6 top-8"
           >
-            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
+            <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
-          <h1 className="text-3xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-lg font-semibold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 400 }}>
             Settings
           </h1>
         </div>
 
-        <div className="px-6 space-y-6">
-          {/* Account Section */}
-          <div>
-            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Account</h2>
-            <div className="space-y-2">
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Edit Profile</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Change Password</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-            </div>
+        <div className="px-6">
+          {/* Settings Grid - 2 Columns */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {/* Account */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <User className="w-6 h-6 text-[#00A36C] mb-2" />
+              <h3 className="text-sm font-bold text-[#1F2937]">Account</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Profile & Email</p>
+            </button>
+
+            {/* Security */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <Settings className="w-6 h-6 text-[#00A36C] mb-2" />
+              <h3 className="text-sm font-bold text-[#1F2937]">Security</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Password</p>
+            </button>
+
+            {/* Notifications */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <span className="text-2xl mb-2 block">🔔</span>
+              <h3 className="text-sm font-bold text-[#1F2937]">Notifications</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Alerts & Updates</p>
+            </button>
+
+            {/* Privacy */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <span className="text-2xl mb-2 block">🔒</span>
+              <h3 className="text-sm font-bold text-[#1F2937]">Privacy</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Data & Sharing</p>
+            </button>
+
+            {/* Help */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <span className="text-2xl mb-2 block">❓</span>
+              <h3 className="text-sm font-bold text-[#1F2937]">Help</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Support Center</p>
+            </button>
+
+            {/* Terms */}
+            <button className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <span className="text-2xl mb-2 block">📄</span>
+              <h3 className="text-sm font-bold text-[#1F2937]">Terms</h3>
+              <p className="text-xs text-[#6B7280] mt-1">Legal & Privacy</p>
+            </button>
           </div>
 
-          {/* Preferences Section */}
-          <div>
-            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Preferences</h2>
-            <div className="space-y-2">
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Notifications</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Privacy</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-            </div>
+          {/* Sign Out - Bottom Center */}
+          <div className="flex justify-center">
+            <button 
+              onClick={() => base44.auth.logout()}
+              className="flex items-center gap-2 text-red-600 hover:opacity-80 transition-opacity"
+            >
+              <span className="text-lg">🚪</span>
+              <span className="text-sm font-semibold">Sign out</span>
+            </button>
           </div>
-
-          {/* Support Section */}
-          <div>
-            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Support</h2>
-            <div className="space-y-2">
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Help Center</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#1F2937]">Terms & Privacy</span>
-                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Log Out */}
-          <button 
-            onClick={() => base44.auth.logout()}
-            className="w-full bg-red-50 rounded-xl p-4 text-left hover:bg-red-100 transition-colors"
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-red-600">Log Out</span>
-              <ChevronRight className="w-5 h-5 text-red-600" />
-            </div>
-          </button>
         </div>
       </div>
     );
@@ -239,7 +227,7 @@ export default function Profile() {
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide px-6">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-6 px-6">
           {recentlyViewed.map((item, idx) => (
             <div 
               key={item.id}
@@ -251,13 +239,13 @@ export default function Profile() {
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Transparent black price - top left */}
-              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-2 py-1">
-                <span className="text-[10px] font-bold text-white">{item.price}</span>
+              {/* Transparent black price - top left, smaller */}
+              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5">
+                <span className="text-[9px] font-bold text-white">{item.price}</span>
               </div>
-              {/* Heart - bottom right - filled grey */}
-              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
-                <Heart className="w-3 h-3 text-white fill-white" />
+              {/* Heart - bottom right */}
+              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/40 border border-white flex items-center justify-center">
+                <Heart className="w-3 h-3 text-white" strokeWidth={2} />
               </button>
             </div>
           ))}

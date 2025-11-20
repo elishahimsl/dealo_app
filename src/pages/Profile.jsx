@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart, ArrowLeft } from "lucide-react";
 
 export default function Profile() {
   const [showSettings, setShowSettings] = useState(false);
@@ -53,74 +53,84 @@ export default function Profile() {
 
   if (showSettings) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB]">
-        <div className="px-6 pt-8 pb-4">
+      <div className="min-h-screen bg-white">
+        <div className="px-6 pt-8 pb-6">
           <button 
             onClick={() => setShowSettings(false)}
-            className="flex items-center gap-2 mb-4 text-[#1F2937] hover:text-[#00A36C]"
+            className="mb-6"
           >
-            <span className="font-semibold">← Back</span>
+            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
           </button>
-          <h1 className="text-2xl font-bold text-[#1F2937] mb-6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <h1 className="text-3xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Settings
           </h1>
         </div>
 
-        <div className="px-6 space-y-3">
-          {/* Edit Profile */}
-          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-[#1F2937]">Edit Profile</h3>
-                <p className="text-sm text-[#6B7280]">Name, email, profile picture</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+        <div className="px-6 space-y-6">
+          {/* Account Section */}
+          <div>
+            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Account</h2>
+            <div className="space-y-2">
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Edit Profile</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Change Password</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
             </div>
-          </button>
+          </div>
 
-          {/* Change Password */}
-          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-[#1F2937]">Change Password</h3>
-                <p className="text-sm text-[#6B7280]">Update your password</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+          {/* Preferences Section */}
+          <div>
+            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Preferences</h2>
+            <div className="space-y-2">
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Notifications</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Privacy</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
             </div>
-          </button>
+          </div>
 
-          {/* Notifications */}
-          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-[#1F2937]">Notifications</h3>
-                <p className="text-sm text-[#6B7280]">Manage your alerts</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+          {/* Support Section */}
+          <div>
+            <h2 className="text-xs font-bold text-[#6B7280] uppercase tracking-wider mb-3">Support</h2>
+            <div className="space-y-2">
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Help Center</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
+              <button className="w-full bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-[#1F2937]">Terms & Privacy</span>
+                  <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+                </div>
+              </button>
             </div>
-          </button>
-
-          {/* Privacy */}
-          <button className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left hover:bg-[#F9FAFB]">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-[#1F2937]">Privacy</h3>
-                <p className="text-sm text-[#6B7280]">Control your data</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-            </div>
-          </button>
+          </div>
 
           {/* Log Out */}
           <button 
             onClick={() => base44.auth.logout()}
-            className="w-full bg-white border-2 border-red-200 rounded-2xl p-4 text-left hover:bg-red-50"
+            className="w-full bg-red-50 rounded-xl p-4 text-left hover:bg-red-100 transition-colors"
           >
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-red-600">Log Out</h3>
-                <p className="text-sm text-[#6B7280]">Sign out of your account</p>
-              </div>
+              <span className="font-semibold text-red-600">Log Out</span>
               <ChevronRight className="w-5 h-5 text-red-600" />
             </div>
           </button>
@@ -221,7 +231,7 @@ export default function Profile() {
       </div>
 
       {/* Recently Viewed Section - Horizontal Scroll */}
-      <div className="py-4 bg-white border-b border-[#E5E7EB]">
+      <div className="py-4 bg-white">
         <div className="px-6 flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Recently Viewed
@@ -229,7 +239,7 @@ export default function Profile() {
           <ChevronRight className="w-5 h-5 text-[#6B7280]" />
         </div>
 
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide px-6">
           {recentlyViewed.map((item, idx) => (
             <div 
               key={item.id}
@@ -247,7 +257,7 @@ export default function Profile() {
               </div>
               {/* Heart - bottom right - filled grey */}
               <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
-                <Heart className="w-3 h-3 text-[#6B7280] fill-[#6B7280]" />
+                <Heart className="w-3 h-3 text-white fill-white" />
               </button>
             </div>
           ))}

@@ -147,26 +147,18 @@ export default function Compare() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header - Centered */}
-      <div className="px-6 pt-8 pb-4">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => navigate(createPageUrl("Home"))}
-          className="rounded-full mb-4"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-lg font-bold text-[#1F2937] text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Header - Centered and at Top */}
+      <div className="px-6 pt-4 pb-2 text-center">
+        <h1 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Compare
         </h1>
       </div>
 
-      <div className="px-6 space-y-6">
-        {/* Comparison Area - More Horizontal */}
-        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] relative" style={{ minHeight: '200px' }}>
-          <div className="flex items-center justify-center gap-6 mb-4">
+      <div className="px-6 space-y-4">
+        {/* Comparison Area - Wider and Shorter */}
+        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] relative">
+          <div className="flex items-center justify-center gap-8">
             {/* Item 1 */}
             <div className="flex-1">
               <input
@@ -181,22 +173,16 @@ export default function Compare() {
                   item1 ? '' : 'hover:bg-[#D1D5DB]'
                 }`}
                 style={{ 
-                  height: '160px',
-                  transform: 'perspective(1000px) rotateY(5deg)'
+                  height: '140px',
+                  transform: 'perspective(800px) rotateY(8deg) rotateZ(2deg)'
                 }}
               >
                 {item1 ? (
-                  <img src={item1.file_url} alt="Item 1" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[#6B7280] text-sm">Product 1</span>
-                    </div>
-                  </div>
-                )}
+                  <img src={item1.file_url} alt="" className="w-full h-full object-cover" />
+                ) : null}
               </div>
               {item1 && (
-                <p className="text-sm font-semibold text-[#1F2937] mt-2 text-center">{item1.price}</p>
+                <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item1.price}</p>
               )}
             </div>
 
@@ -214,44 +200,38 @@ export default function Compare() {
                   item2 ? '' : 'hover:bg-[#D1D5DB]'
                 }`}
                 style={{ 
-                  height: '160px',
-                  transform: 'perspective(1000px) rotateY(-5deg)'
+                  height: '140px',
+                  transform: 'perspective(800px) rotateY(-8deg) rotateZ(-2deg)'
                 }}
               >
                 {item2 ? (
-                  <img src={item2.file_url} alt="Item 2" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-[#6B7280] text-sm">Product 2</span>
-                    </div>
-                  </div>
-                )}
+                  <img src={item2.file_url} alt="" className="w-full h-full object-cover" />
+                ) : null}
               </div>
               {item2 && (
-                <p className="text-sm font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>
+                <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>
               )}
             </div>
           </div>
 
-          {/* VS Badge - Bottom Center */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2">
-            <div className="w-12 h-12 rounded-full bg-[#00A36C] flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-sm">VS</span>
+          {/* VS Badge - Bottom Center, smaller */}
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
+            <div className="w-10 h-10 rounded-full bg-[#00A36C] flex items-center justify-center shadow-lg border-2 border-white">
+              <span className="text-white font-bold text-xs">VS</span>
             </div>
           </div>
 
-          {/* Plus Button - Bottom Left */}
+          {/* Plus Button - Bottom Right in Box */}
           <button
             onClick={() => setShowUploadOptions(!showUploadOptions)}
-            className="absolute bottom-4 left-4 w-8 h-8 rounded-full bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB] transition-colors"
+            className="absolute bottom-3 right-3 w-8 h-8 rounded-lg bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB] transition-colors"
           >
             <Plus className="w-5 h-5 text-[#6B7280]" />
           </button>
 
           {/* Upload Options Dropdown */}
           {showUploadOptions && (
-            <div className="absolute bottom-14 left-4 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-2 z-10">
+            <div className="absolute bottom-14 right-3 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-2 z-10">
               <button
                 onClick={() => fileInput1Ref.current?.click()}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
@@ -270,27 +250,29 @@ export default function Compare() {
           )}
         </div>
 
-        {/* Analyze Button - Outside */}
-        <Button
-          onClick={handleAnalyze}
-          disabled={!item1 || !item2 || analyzing}
-          className="w-full h-10 rounded-full bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 text-sm"
-        >
-          {analyzing ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Analyzing...
-            </>
-          ) : (
-            'Analyze'
-          )}
-        </Button>
+        {/* Analyze Button - Same width as Shop Sense */}
+        <div className="flex justify-center">
+          <Button
+            onClick={handleAnalyze}
+            disabled={!item1 || !item2 || analyzing}
+            className="h-8 rounded-full bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 text-xs px-6"
+          >
+            {analyzing ? (
+              <>
+                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              'Analyze'
+            )}
+          </Button>
+        </div>
 
         {/* Your Preferences - Outside */}
-        <div>
+        <div className="pt-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="font-bold text-[#1F2937] text-base mb-1">Your Preferences</h3>
+              <h3 className="font-bold text-[#1F2937] text-base">Your Preferences</h3>
               <p className="text-xs text-[#6B7280]">Set what matters to you</p>
             </div>
             <Button

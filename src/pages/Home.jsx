@@ -92,13 +92,13 @@ export default function Home() {
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Green price pill - top left */}
-              <div className="absolute top-2 left-2 bg-[#00A36C] rounded-full px-2.5 py-1 shadow-md">
+              {/* Transparent black price - top left */}
+              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-2 py-1">
                 <span className="text-xs font-bold text-white">{product.price}</span>
               </div>
               {/* Heart icon - bottom right */}
               <button className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#00A36C] transition-colors">
-                <Heart className="w-4 h-4 text-[#6B7280] fill-[#6B7280] hover:text-white hover:fill-white" />
+                <Heart className="w-4 h-4 text-white fill-white" />
               </button>
             </div>
           ))}

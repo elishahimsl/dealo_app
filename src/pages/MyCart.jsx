@@ -85,28 +85,37 @@ export default function MyCart() {
           Collections
         </h2>
 
-        {/* Create Collection Button - Full Width */}
+        {/* Create Collection Button - Full Width with Books */}
         <button
           onClick={() => setShowCreateCollection(true)}
-          className="w-full bg-[#E5E7EB] rounded-2xl p-4 mb-3 relative overflow-hidden"
+          className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-3"
           style={{ minHeight: '120px' }}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <Plus className="w-4 h-4 text-[#6B7280]" />
-            <span className="text-sm font-semibold text-[#6B7280]">Create collection</span>
+          {/* Centered Text */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-sm font-semibold text-[#6B7280]">+ Create collection</span>
           </div>
           
-          {/* Floating preview images at bottom */}
-          <div className="absolute bottom-3 left-4 flex gap-2">
-            {mockProducts.slice(0, 3).map((product, idx) => (
-              <div 
-                key={idx}
-                className="w-12 h-12 rounded-lg overflow-hidden border-2 border-white shadow-sm"
-                style={{ transform: `translateX(-${idx * 8}px)` }}
-              >
-                <img src={product.image} alt="" className="w-full h-full object-cover" />
-              </div>
-            ))}
+          {/* Book-like images at bottom */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end gap-1">
+            <div 
+              className="w-16 h-20 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(-8deg) translateY(8px)' }}
+            >
+              <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div 
+              className="w-16 h-24 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(-3deg) translateY(4px)' }}
+            >
+              <img src={mockProducts[1].image} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div 
+              className="w-16 h-20 rounded-t-lg overflow-hidden shadow-lg"
+              style={{ transform: 'rotate(8deg) translateY(8px)' }}
+            >
+              <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
+            </div>
           </div>
         </button>
 
@@ -133,9 +142,9 @@ export default function MyCart() {
       <div className="px-6 py-4">
         <div className="grid grid-cols-2 gap-4">
           {mockProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm">
-              {/* Product Image - Square */}
-              <div className="relative aspect-square">
+            <div key={product.id}>
+              {/* Product Image - Separate Square Tile */}
+              <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm mb-2 relative aspect-square">
                 <img 
                   src={product.image} 
                   alt={product.title}
@@ -143,7 +152,7 @@ export default function MyCart() {
                 />
                 {/* Savings Badge - Top Left */}
                 {product.savings && (
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-xs font-bold px-2 py-1 rounded-md">
+                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded-md">
                     Save {product.savings}
                   </div>
                 )}
@@ -153,20 +162,20 @@ export default function MyCart() {
                 </button>
               </div>
 
-              {/* Product Info */}
-              <div className="p-3">
-                <p className="text-xs text-[#6B7280] mb-1" style={{ fontWeight: 300 }}>
+              {/* Product Info - Text underneath */}
+              <div>
+                <p className="text-[10px] text-[#6B7280] mb-0.5" style={{ fontWeight: 300 }}>
                   {product.brand}
                 </p>
-                <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-2 leading-tight">
+                <h3 className="font-bold text-[#1F2937] text-xs mb-0.5 line-clamp-2 leading-tight">
                   {product.title}
                 </h3>
-                <p className="text-base font-bold text-[#1F2937] mb-2">
+                <p className="text-sm font-bold text-[#1F2937] mb-1">
                   {product.price}
                 </p>
-                <div className="flex items-center gap-2 text-xs">
+                <div className="flex items-center gap-2 text-[10px]">
                   {product.size && (
-                    <span className="text-[#6B7280]">Size: {product.size}</span>
+                    <span className="text-[#6B7280]">{product.size}</span>
                   )}
                   <a 
                     href={`https://${product.store.toLowerCase().replace(' ', '')}.com`}

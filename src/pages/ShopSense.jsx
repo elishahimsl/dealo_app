@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { X, Info } from "lucide-react";
@@ -59,26 +60,74 @@ export default function ShopSense() {
     );
   };
 
-  const handleSaveAndApply = () => {
-    navigate(createPageUrl("ComparisonResults"), {
-      state: {
-        item1,
-        item2,
-        result: null,
-        preferences: {
-          durability: durability[0],
-          brand: brandImportance[0],
-          price: priceSensitivity[0],
-          sustainability: sustainability[0],
-          maintenance: maintenance[0],
-          design: design[0]
-        },
-        shopSense: {
-          chips: selectedChips,
-          answers: selectedAnswers
+  const handleSaveAndApply = async () => {
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Compare these two products based on detailed user preferences:
+        
+        Item 1: ${item1.title} (${item1.price})
+        Item 2: ${item2.title} (${item2.price})
+        
+        User Preferences:
+        - Durability: ${durability[0]}%
+        - Brand: ${brandImportance[0]}%
+        - Price: ${priceSensitivity[0]}%
+        - Sustainability: ${sustainability[0]}%
+        - Maintenance: ${maintenance[0]}%
+        - Design: ${design[0]}%
+        
+        User Style: ${selectedChips.join(', ')}
+        
+        Provide: winner (1 or 2), detailed explanation (3 sentences), scores for each criterion (0-100).`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            winner: { type: "number" },
+            explanation: { type: "string" },
+            item1_scores: {
+              type: "object",
+              properties: {
+                price: { type: "number" },
+                quality: { type: "number" },
+                brand: { type: "number" },
+                durability: { type: "number" }
+              }
+            },
+            item2_scores: {
+              type: "object",
+              properties: {
+                price: { type: "number" },
+                quality: { type: "number" },
+                brand: { type: "number" },
+                durability: { type: "number" }
+              }
+            }
+          }
         }
-      }
-    });
+      });
+
+      navigate(createPageUrl("ComparisonResults"), {
+        state: {
+          item1,
+          item2,
+          result,
+          preferences: {
+            durability: durability[0],
+            brand: brandImportance[0],
+            price: priceSensitivity[0],
+            sustainability: sustainability[0],
+            maintenance: maintenance[0],
+            design: design[0]
+          },
+          shopSense: {
+            chips: selectedChips,
+            answers: selectedAnswers
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error analyzing:", error);
+    }
   };
 
   return (

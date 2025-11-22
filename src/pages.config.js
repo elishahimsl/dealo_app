@@ -18,6 +18,7 @@ import AllStores from './pages/AllStores';
 import AllBrands from './pages/AllBrands';
 import TrendingProducts from './pages/TrendingProducts';
 import DealsNearYou from './pages/DealsNearYou';
+import ComparisonResults from './pages/ComparisonResults';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "AllBrands": AllBrands,
     "TrendingProducts": TrendingProducts,
     "DealsNearYou": DealsNearYou,
+    "ComparisonResults": ComparisonResults,
 }
 
 export const pagesConfig = {

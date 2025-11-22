@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, ArrowLeft, Loader2, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Camera, Plus, ArrowLeft, Loader2, Sparkles, Image as ImageIcon, Search } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export default function Compare() {
@@ -69,7 +69,7 @@ export default function Compare() {
         - Brand importance: ${brandPreference[0]}%
         - Durability importance: ${durabilityPreference[0]}%
         
-        Provide: winner (1 or 2), detailed explanation (3 sentences), scores for each criterion.`,
+        Provide: winner (1 or 2), detailed explanation (3 sentences), scores for each criterion (0-100).`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -97,54 +97,26 @@ export default function Compare() {
         }
       });
 
-      setResult(result);
+      navigate(createPageUrl("ComparisonResults"), {
+        state: {
+          item1,
+          item2,
+          result,
+          preferences: {
+            price: pricePreference[0],
+            quality: qualityPreference[0],
+            brand: brandPreference[0],
+            durability: durabilityPreference[0]
+          }
+        }
+      });
     } catch (error) {
       console.error("Error analyzing:", error);
     }
     setAnalyzing(false);
   };
 
-  if (result) {
-    return (
-      <div className="min-h-screen bg-[#F9FAFB] pb-24">
-        <div className="px-6 pt-8 pb-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => { setResult(null); setItem1(null); setItem2(null); }}
-            className="rounded-full mb-4"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <h1 className="text-2xl font-bold text-[#1F2937]">Comparison Results</h1>
-        </div>
 
-        <div className="px-6 space-y-6">
-          {/* Winner Announcement */}
-          <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] rounded-3xl p-6 text-center">
-            <Sparkles className="w-12 h-12 text-white mx-auto mb-3" />
-            <h2 className="text-2xl font-bold text-white mb-2">
-              {result.winner === 1 ? item1.title : item2.title}
-            </h2>
-            <p className="text-white/90 text-sm">Winner based on your preferences</p>
-          </div>
-
-          {/* Explanation */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB]">
-            <h3 className="font-bold text-[#1F2937] mb-3">Why?</h3>
-            <p className="text-[#6B7280] text-sm leading-relaxed">{result.explanation}</p>
-          </div>
-
-          <Button
-            onClick={() => navigate(createPageUrl("Home"))}
-            className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52]"
-          >
-            Done
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
@@ -245,14 +217,18 @@ export default function Compare() {
                 className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
               >
                 <Camera className="w-4 h-4 text-[#6B7280]" />
-                <span className="text-sm text-[#1F2937]">Scan</span>
+                <span className="text-sm text-[#1F2937]">Camera</span>
               </button>
               <button
                 onClick={() => fileInput1Ref.current?.click()}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
               >
                 <ImageIcon className="w-4 h-4 text-[#6B7280]" />
-                <span className="text-sm text-[#1F2937]">Pick from Photos</span>
+                <span className="text-sm text-[#1F2937]">Upload Photo</span>
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left">
+                <Sparkles className="w-4 h-4 text-[#6B7280]" />
+                <span className="text-sm text-[#1F2937]">Search Products</span>
               </button>
             </div>
           )}

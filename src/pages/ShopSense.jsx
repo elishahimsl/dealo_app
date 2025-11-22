@@ -20,6 +20,7 @@ export default function ShopSense() {
   const [maintenance, setMaintenance] = useState([50]);
   const [design, setDesign] = useState([50]);
   const [savePreferences, setSavePreferences] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const chips = [
     "Value Hunter",
@@ -61,6 +62,12 @@ export default function ShopSense() {
   };
 
   const handleSaveAndApply = async () => {
+    if (!item1 || !item2) {
+      alert("Missing product data. Please go back and try again.");
+      return;
+    }
+
+    setIsAnalyzing(true);
     try {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `Compare these two products based on detailed user preferences:
@@ -76,7 +83,7 @@ export default function ShopSense() {
         - Maintenance: ${maintenance[0]}%
         - Design: ${design[0]}%
         
-        User Style: ${selectedChips.join(', ')}
+        User Style: ${selectedChips.join(', ') || 'Not specified'}
         
         Provide: winner (1 or 2), detailed explanation (3 sentences), scores for each criterion (0-100).`,
         response_json_schema: {
@@ -127,6 +134,8 @@ export default function ShopSense() {
       });
     } catch (error) {
       console.error("Error analyzing:", error);
+      alert("Failed to analyze. Please try again.");
+      setIsAnalyzing(false);
     }
   };
 
@@ -241,9 +250,10 @@ export default function ShopSense() {
           </div>
           <Button
             onClick={handleSaveAndApply}
-            className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] font-semibold"
+            disabled={isAnalyzing}
+            className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] font-semibold disabled:opacity-50"
           >
-            Save & Apply ShopSense
+            {isAnalyzing ? "Analyzing..." : "Save & Apply ShopSense"}
           </Button>
         </div>
       </div>

@@ -52,68 +52,12 @@ export default function Compare() {
     }
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!item1 || !item2) return;
-
-    setAnalyzing(true);
-    try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Compare these two products based on user preferences:
-        
-        Item 1: ${item1.title} (${item1.price})
-        Item 2: ${item2.title} (${item2.price})
-        
-        User Preferences:
-        - Price importance: ${pricePreference[0]}%
-        - Quality importance: ${qualityPreference[0]}%
-        - Brand importance: ${brandPreference[0]}%
-        - Durability importance: ${durabilityPreference[0]}%
-        
-        Provide: winner (1 or 2), detailed explanation (3 sentences), scores for each criterion (0-100).`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            winner: { type: "number" },
-            explanation: { type: "string" },
-            item1_scores: {
-              type: "object",
-              properties: {
-                price: { type: "number" },
-                quality: { type: "number" },
-                brand: { type: "number" },
-                durability: { type: "number" }
-              }
-            },
-            item2_scores: {
-              type: "object",
-              properties: {
-                price: { type: "number" },
-                quality: { type: "number" },
-                brand: { type: "number" },
-                durability: { type: "number" }
-              }
-            }
-          }
-        }
-      });
-
-      navigate(createPageUrl("ComparisonResults"), {
-        state: {
-          item1,
-          item2,
-          result,
-          preferences: {
-            price: pricePreference[0],
-            quality: qualityPreference[0],
-            brand: brandPreference[0],
-            durability: durabilityPreference[0]
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error analyzing:", error);
-    }
-    setAnalyzing(false);
+    
+    navigate(createPageUrl("ShopSense"), {
+      state: { item1, item2 }
+    });
   };
 
 
@@ -213,7 +157,7 @@ export default function Compare() {
           {showUploadOptions && (
             <div className="absolute bottom-14 right-3 bg-white rounded-2xl shadow-lg border border-[#E5E7EB] p-2 z-10">
               <button
-                onClick={() => fileInput1Ref.current?.click()}
+                onClick={() => navigate(createPageUrl("Snap"))}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
               >
                 <Camera className="w-4 h-4 text-[#6B7280]" />
@@ -226,8 +170,13 @@ export default function Compare() {
                 <ImageIcon className="w-4 h-4 text-[#6B7280]" />
                 <span className="text-sm text-[#1F2937]">Upload Photo</span>
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left">
-                <Sparkles className="w-4 h-4 text-[#6B7280]" />
+              <button
+                onClick={() => navigate(createPageUrl("SearchProducts"), { 
+                  state: { slot: !item1 ? 'item1' : 'item2' } 
+                })}
+                className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
+              >
+                <Search className="w-4 h-4 text-[#6B7280]" />
                 <span className="text-sm text-[#1F2937]">Search Products</span>
               </button>
             </div>

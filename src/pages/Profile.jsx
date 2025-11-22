@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, UserPlus, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, FileText, LogOut } from "lucide-react";
 
 export default function Profile() {
+  const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
 
   const { data: user } = useQuery({
@@ -61,7 +64,7 @@ export default function Profile() {
           >
             <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
-          <h1 className="text-xl font-normal text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <h1 className="text-2xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Settings
           </h1>
         </div>
@@ -116,9 +119,9 @@ export default function Profile() {
           <div className="flex justify-center mb-6">
             <button 
               onClick={() => base44.auth.logout()}
-              className="flex items-center gap-2 text-red-600 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 text-[#1F2937] hover:opacity-70 transition-opacity"
             >
-              <span className="text-lg">🚪</span>
+              <LogOut className="w-5 h-5" />
               <span className="text-sm font-semibold">Sign out</span>
             </button>
           </div>

@@ -79,10 +79,10 @@ export default function Home() {
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Trending
           </h2>
-          <button className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
+          <Link to={createPageUrl("TrendingProducts")} className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
             View All
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {trendingProducts.slice(0, 4).map((product) => (
@@ -111,10 +111,10 @@ export default function Home() {
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Deals Near You
           </h2>
-          <button className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
+          <Link to={createPageUrl("DealsNearYou")} className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
             View All
             <ChevronRight className="w-4 h-4" />
-          </button>
+          </Link>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
           {dealsNearYou.map((deal) => (

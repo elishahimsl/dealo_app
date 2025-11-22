@@ -1,18 +1,21 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, Zap, Award, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
+  const navigate = useNavigate();
   const [showAllTopics, setShowAllTopics] = useState(false);
 
   const specialTools = [
-    { id: 1, icon: Sparkles, name: "SmartFinder" },
-    { id: 2, icon: Scale, name: "SnapCompare" },
-    { id: 3, icon: ScanSearch, name: "DealScanner" },
-    { id: 4, icon: Leaf, name: "SmartReview" },
-    { id: 5, icon: Zap, name: "PriceDrop" },
-    { id: 6, icon: Award, name: "BestMatch" },
+    { id: 1, icon: Sparkles, name: "SmartFinder", page: "SmartFinder" },
+    { id: 2, icon: Scale, name: "SnapCompare", page: "Compare" },
+    { id: 3, icon: ScanSearch, name: "DealScanner", page: "DealScanner" },
+    { id: 4, icon: Leaf, name: "SmartReview", page: "SmartReview" },
+    { id: 5, icon: Zap, name: "PriceDrop", page: "PriceDrop" },
+    { id: 6, icon: Award, name: "BestMatch", page: "BestMatch" },
   ];
 
   const stores = [
@@ -84,9 +87,10 @@ export default function Discover() {
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <div 
+              <button
                 key={tool.id}
-                className="bg-white rounded-xl p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center"
+                onClick={() => navigate(createPageUrl(tool.page))}
+                className="bg-white rounded-xl p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center hover:border-[#00A36C] transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
                   <Icon className="w-4 h-4 text-white" strokeWidth={2} />
@@ -94,7 +98,7 @@ export default function Discover() {
                 <span className="text-[9px] font-semibold text-[#1F2937] text-center leading-tight">
                   {tool.name}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -106,7 +110,7 @@ export default function Discover() {
           <h2 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Search by Store
           </h2>
-          <button className="text-[#6B7280]">
+          <button onClick={() => navigate(createPageUrl("AllStores"))} className="text-[#6B7280]">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
@@ -140,7 +144,7 @@ export default function Discover() {
           <h2 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Search by Brand
           </h2>
-          <button className="text-[#6B7280]">
+          <button onClick={() => navigate(createPageUrl("AllBrands"))} className="text-[#6B7280]">
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>

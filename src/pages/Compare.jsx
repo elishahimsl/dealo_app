@@ -171,9 +171,12 @@ export default function Compare() {
                 <span className="text-sm text-[#1F2937]">Upload Photo</span>
               </button>
               <button
-                onClick={() => navigate(createPageUrl("SearchProducts"), { 
-                  state: { slot: !item1 ? 'item1' : 'item2' } 
-                })}
+                onClick={() => {
+                  const currentState = { item1, item2 };
+                  navigate(createPageUrl("SearchProducts") + `?returnState=${encodeURIComponent(JSON.stringify(currentState))}`, { 
+                    state: { slot: !item1 ? 'item1' : 'item2' } 
+                  });
+                }}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left"
               >
                 <Search className="w-4 h-4 text-[#6B7280]" />

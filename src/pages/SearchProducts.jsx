@@ -53,8 +53,12 @@ export default function SearchProducts() {
   };
 
   const handleSelectProduct = (product) => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const returnState = searchParams.get('returnState');
+    
     navigate(createPageUrl("Compare"), {
       state: {
+        ...(returnState ? JSON.parse(decodeURIComponent(returnState)) : {}),
         [slot]: {
           title: product.name,
           price: product.price,

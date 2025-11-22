@@ -9,6 +9,10 @@ export default function SmartReview() {
 
   const mockReview = {
     score: 8.5,
+    sentiment: "Positive",
+    sentimentDescription: "Most users are satisfied",
+    topPros: ["Excellent battery life", "Comfortable fit", "Great sound quality"],
+    topCons: ["Band durability issues", "Limited color options", "Expensive"],
     pros: ["Excellent battery life", "Comfortable fit", "Great sound quality"],
     cons: ["Band durability issues", "Limited color options", "Expensive"],
     summary: "Users say the battery life is strong and sound quality exceeds expectations, but the band durability is a common concern among long-term users.",
@@ -66,26 +70,41 @@ export default function SmartReview() {
                   <span className="text-3xl font-bold text-[#1F2937]">{mockReview.score}</span>
                 </div>
               </div>
+
+              {/* Sentiment Analysis */}
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                  mockReview.sentiment === "Positive" 
+                    ? "bg-green-100 text-green-800" 
+                    : mockReview.sentiment === "Neutral" 
+                    ? "bg-yellow-100 text-yellow-800" 
+                    : "bg-red-100 text-red-800"
+                }`}>
+                  Overall Sentiment: {mockReview.sentiment}
+                </div>
+              </div>
+              <p className="text-xs text-center text-[#6B7280] mb-1">{mockReview.sentimentDescription}</p>
+
               <p className="text-sm text-center text-[#6B7280] mb-4">{mockReview.summary}</p>
               
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
-                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Pros</h4>
+                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Top 3 Most Mentioned Pros</h4>
                   <ul className="space-y-1">
-                    {mockReview.pros.map((pro, idx) => (
+                    {mockReview.topPros.map((pro, idx) => (
                       <li key={idx} className="text-xs text-[#00A36C] flex items-start gap-1">
-                        <span>✓</span>
+                        <span className="font-bold">{idx + 1}.</span>
                         <span>{pro}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Cons</h4>
+                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Top 3 Most Mentioned Cons</h4>
                   <ul className="space-y-1">
-                    {mockReview.cons.map((con, idx) => (
+                    {mockReview.topCons.map((con, idx) => (
                       <li key={idx} className="text-xs text-red-500 flex items-start gap-1">
-                        <span>✗</span>
+                        <span className="font-bold">{idx + 1}.</span>
                         <span>{con}</span>
                       </li>
                     ))}

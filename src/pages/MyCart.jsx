@@ -295,8 +295,11 @@ export default function MyCart() {
 
       {/* Delete Modal Overlay */}
       {longPressFolder && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
-          <div className="relative px-6">
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center"
+          onClick={() => setLongPressFolder(null)}
+        >
+          <div className="relative px-6" onClick={(e) => e.stopPropagation()}>
             <div className="w-48 aspect-square rounded-2xl overflow-hidden bg-[#E5E7EB] mb-3 mx-auto">
               <div className="absolute inset-0 p-3 flex gap-2 justify-center items-center">
                 {getFolderProducts(longPressFolder.id).slice(0, 3).map((product, idx) => (

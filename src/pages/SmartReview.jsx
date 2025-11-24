@@ -51,19 +51,19 @@ export default function SmartReview() {
               onClick={() => setShowReview(true)}
               className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all"
             >
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
                 <Camera className="w-7 h-7 text-white" />
               </div>
               <span className="text-xs font-semibold text-[#1F2937]">Scan</span>
             </button>
             <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
                 <LinkIcon className="w-7 h-7 text-white" />
               </div>
               <span className="text-xs font-semibold text-[#1F2937]">Link</span>
             </button>
             <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
                 <Search className="w-7 h-7 text-white" />
               </div>
               <span className="text-xs font-semibold text-[#1F2937]">Search</span>

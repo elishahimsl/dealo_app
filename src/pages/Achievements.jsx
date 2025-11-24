@@ -1,94 +1,113 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, ShoppingCart, Scan, Award, Rocket, Star, TrendingUp, Heart, Target, Zap, Trophy, Crown, Gift, Sparkles } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Scan, Rocket, Award, Heart, Target, TrendingUp, Zap } from "lucide-react";
 
 export default function Achievements() {
   const navigate = useNavigate();
 
   const allBadges = [
-    { id: 1, icon: ShoppingCart, label: "Deal Hunter", description: "Find 10 great deals", earned: true },
-    { id: 2, icon: Scan, label: "Product Explorer", description: "Scan 25 products", earned: true },
-    { id: 3, icon: Rocket, label: "Early Adopter", description: "Join in the first month", earned: true },
-    { id: 4, icon: Award, label: "Shop Master", description: "Make 50 purchases", earned: true },
-    { id: 5, icon: Star, label: "5-Star Hunter", description: "Find 5 five-star products", earned: false },
-    { id: 6, icon: TrendingUp, label: "Trend Setter", description: "View 50 trending items", earned: false },
-    { id: 7, icon: Heart, label: "Favorite Collector", description: "Save 100 favorites", earned: false },
-    { id: 8, icon: Target, label: "Perfect Match", description: "Get 10 perfect product matches", earned: false },
-    { id: 9, icon: Zap, label: "Speed Shopper", description: "Complete 5 purchases in a day", earned: false },
-    { id: 10, icon: Trophy, label: "Champion Saver", description: "Save $500 with deals", earned: false },
-    { id: 11, icon: Crown, label: "VIP Member", description: "Upgrade to premium", earned: false },
-    { id: 12, icon: Gift, label: "Referral Master", description: "Invite 10 friends", earned: false },
-    { id: 13, icon: Sparkles, label: "AI Expert", description: "Use AI features 100 times", earned: false },
+    { id: 1, icon: ShoppingCart, label: "Deal Hunter", description: "Save $500 with deals", earned: true, color: "#00A36C" },
+    { id: 2, icon: Scan, label: "Product Explorer", description: "Scan 50 products", earned: true, color: "#6366F1" },
+    { id: 3, icon: Rocket, label: "Early Adopter", description: "Join ShopSmart", earned: true, color: "#EC4899" },
+    { id: 4, icon: Award, label: "Shop Master", description: "Complete 100 scans", earned: true, color: "#F59E0B" },
+    { id: 5, icon: Heart, label: "Favorite Collector", description: "Save 25 favorites", earned: false, color: "#EF4444" },
+    { id: 6, icon: Target, label: "Smart Shopper", description: "Compare 20 products", earned: false, color: "#8B5CF6" },
+    { id: 7, icon: TrendingUp, label: "Price Tracker", description: "Track 10 prices", earned: false, color: "#10B981" },
+    { id: 8, icon: Zap, label: "Quick Scanner", description: "Scan 5 items in a day", earned: false, color: "#F59E0B" },
+    { id: 9, icon: ShoppingCart, label: "Big Spender", description: "Save $1000 total", earned: false, color: "#00A36C" },
+    { id: 10, icon: Award, label: "Review Master", description: "Read 50 AI reviews", earned: false, color: "#6366F1" },
+    { id: 11, icon: Heart, label: "Collection King", description: "Create 5 collections", earned: false, color: "#EC4899" },
+    { id: 12, icon: Target, label: "Deal Finder Pro", description: "Find 30 deals", earned: false, color: "#F59E0B" },
+    { id: 13, icon: Rocket, label: "Legend", description: "Complete all achievements", earned: false, color: "#8B5CF6" }
   ];
 
+  const earnedCount = allBadges.filter(b => b.earned).length;
+  const progressPercent = (earnedCount / allBadges.length) * 100;
+
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
       {/* Header */}
-      <div className="px-6 pt-8 pb-4 bg-white border-b border-[#E5E7EB]">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => navigate(createPageUrl("Profile"))}
-          className="rounded-full mb-4"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-2xl font-bold text-[#1F2937] mb-2" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Achievements
-        </h1>
-        <p className="text-sm text-[#6B7280]">
-          Unlock badges by using ShopSmart
-        </p>
+      <div className="bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] px-6 pt-8 pb-8 shadow-lg">
+        <div className="flex items-center gap-3 mb-6">
+          <button onClick={() => navigate(createPageUrl("Profile"))} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <div>
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              Achievements
+            </h1>
+            <p className="text-white/80 text-sm">Your shopping journey</p>
+          </div>
+        </div>
+
+        {/* Progress Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-white/80 text-sm mb-1">Your Progress</p>
+              <p className="text-white text-2xl font-bold">{earnedCount}/{allBadges.length}</p>
+            </div>
+            <div className="w-20 h-20 rounded-full border-4 border-white/30 flex items-center justify-center">
+              <span className="text-white text-xl font-bold">{Math.round(progressPercent)}%</span>
+            </div>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
+            <div 
+              className="bg-white h-3 rounded-full transition-all duration-500 shadow-lg" 
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="px-6 py-6 bg-white border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-semibold text-[#1F2937]">Progress</span>
-          <span className="text-sm font-bold text-[#00A36C]">4/13</span>
-        </div>
-        <div className="w-full h-3 bg-[#E5E7EB] rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-[#00A36C] to-[#007E52] rounded-full"
-            style={{ width: '31%' }}
-          />
-        </div>
-      </div>
-
-      {/* Badges Grid */}
-      <div className="px-6 py-6">
-        <div className="grid grid-cols-3 gap-4">
-          {allBadges.map((badge) => {
+      <div className="px-6 pt-6">
+        {/* Earned Badges */}
+        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Unlocked ({earnedCount})</h2>
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          {allBadges.filter(b => b.earned).map((badge) => {
             const Icon = badge.icon;
             return (
-              <div 
+              <div
                 key={badge.id}
-                className={`flex flex-col items-center p-4 rounded-2xl border-2 ${
-                  badge.earned 
-                    ? 'border-[#00A36C] bg-[#D6F5E9]' 
-                    : 'border-[#E5E7EB] bg-white opacity-40'
-                }`}
+                className="bg-white rounded-2xl p-4 border-2 border-[#E5E7EB] shadow-lg flex flex-col items-center"
               >
                 <div 
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-3 ${
-                    badge.earned 
-                      ? 'bg-[#00A36C]' 
-                      : 'bg-[#E5E7EB]'
-                  }`}
+                  className="w-16 h-16 rounded-full flex items-center justify-center mb-3 shadow-lg"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${badge.color}, ${badge.color}dd)` 
+                  }}
                 >
-                  <Icon 
-                    className={`w-8 h-8 ${badge.earned ? 'text-white' : 'text-[#6B7280]'}`} 
-                    strokeWidth={2} 
-                  />
+                  <Icon className="w-8 h-8 text-white" strokeWidth={2} />
                 </div>
-                <h3 className={`font-bold text-xs text-center mb-1 ${
-                  badge.earned ? 'text-[#1F2937]' : 'text-[#6B7280]'
-                }`}>
+                <h3 className="font-bold text-xs text-[#1F2937] text-center mb-1 leading-tight">
                   {badge.label}
                 </h3>
                 <p className="text-[9px] text-[#6B7280] text-center leading-tight">
+                  {badge.description}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Locked Badges */}
+        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Locked ({allBadges.length - earnedCount})</h2>
+        <div className="grid grid-cols-3 gap-4">
+          {allBadges.filter(b => !b.earned).map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div
+                key={badge.id}
+                className="bg-white rounded-2xl p-4 border-2 border-dashed border-[#E5E7EB] opacity-60 flex flex-col items-center"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#E5E7EB] flex items-center justify-center mb-3">
+                  <Icon className="w-8 h-8 text-[#9CA3AF]" strokeWidth={2} />
+                </div>
+                <h3 className="font-bold text-xs text-[#6B7280] text-center mb-1 leading-tight">
+                  {badge.label}
+                </h3>
+                <p className="text-[9px] text-[#9CA3AF] text-center leading-tight">
                   {badge.description}
                 </p>
               </div>

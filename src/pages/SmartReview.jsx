@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Link as LinkIcon, Search, Star } from "lucide-react";
+import { ArrowLeft, Camera, Link as LinkIcon, Search, Star, ThumbsUp, ThumbsDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function SmartReview() {
@@ -11,10 +11,8 @@ export default function SmartReview() {
     score: 8.5,
     sentiment: "Positive",
     sentimentDescription: "Most users are satisfied",
-    topPros: ["Excellent battery life", "Comfortable fit", "Great sound quality"],
-    topCons: ["Band durability issues", "Limited color options", "Expensive"],
-    pros: ["Excellent battery life", "Comfortable fit", "Great sound quality"],
-    cons: ["Band durability issues", "Limited color options", "Expensive"],
+    topPros: ["Excellent battery life (mentioned 234 times)", "Comfortable fit (mentioned 189 times)", "Great sound quality (mentioned 156 times)"],
+    topCons: ["Band durability issues (mentioned 98 times)", "Limited color options (mentioned 67 times)", "Expensive (mentioned 54 times)"],
     summary: "Users say the battery life is strong and sound quality exceeds expectations, but the band durability is a common concern among long-term users.",
     features: {
       quality: 85,
@@ -30,82 +28,97 @@ export default function SmartReview() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      <div className="px-6 pt-8 pb-4">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
+    <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 pt-8 pb-6 shadow-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
               SmartReview
             </h1>
-            <p className="text-sm text-[#6B7280]">Clear, unbiased summaries from thousands of reviews</p>
+            <p className="text-white/80 text-sm">AI-powered review analysis</p>
           </div>
         </div>
+      </div>
 
+      <div className="px-6 pt-6">
         {!showReview ? (
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setShowReview(true)}
-              className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2"
+              className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all"
             >
-              <Camera className="w-8 h-8 text-[#00A36C]" />
-              <span className="text-xs font-semibold text-[#1F2937]">Scan Product</span>
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                <Camera className="w-7 h-7 text-white" />
+              </div>
+              <span className="text-xs font-semibold text-[#1F2937]">Scan</span>
             </button>
-            <button className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2">
-              <LinkIcon className="w-8 h-8 text-[#00A36C]" />
-              <span className="text-xs font-semibold text-[#1F2937]">Paste Link</span>
+            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                <LinkIcon className="w-7 h-7 text-white" />
+              </div>
+              <span className="text-xs font-semibold text-[#1F2937]">Link</span>
             </button>
-            <button className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2">
-              <Search className="w-8 h-8 text-[#00A36C]" />
+            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#6366F1] to-[#8B5CF6] flex items-center justify-center">
+                <Search className="w-7 h-7 text-white" />
+              </div>
               <span className="text-xs font-semibold text-[#1F2937]">Search</span>
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]">
-              <div className="flex items-center justify-center mb-4">
-                <div className="w-24 h-24 rounded-full border-4 border-[#00A36C] flex items-center justify-center">
-                  <span className="text-3xl font-bold text-[#1F2937]">{mockReview.score}</span>
+            {/* Score & Sentiment Card */}
+            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-20 h-20 rounded-full border-4 border-[#6366F1] flex items-center justify-center">
+                      <span className="text-3xl font-bold text-[#1F2937]">{mockReview.score}</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
+                          {mockReview.sentiment}
+                        </div>
+                        <TrendingUp className="w-4 h-4 text-green-600" />
+                      </div>
+                      <p className="text-xs text-[#6B7280]">{mockReview.sentimentDescription}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Sentiment Analysis */}
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <div className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                  mockReview.sentiment === "Positive" 
-                    ? "bg-green-100 text-green-800" 
-                    : mockReview.sentiment === "Neutral" 
-                    ? "bg-yellow-100 text-yellow-800" 
-                    : "bg-red-100 text-red-800"
-                }`}>
-                  Overall Sentiment: {mockReview.sentiment}
-                </div>
-              </div>
-              <p className="text-xs text-center text-[#6B7280] mb-1">{mockReview.sentimentDescription}</p>
+              <p className="text-sm text-[#6B7280] leading-relaxed mb-4">{mockReview.summary}</p>
 
-              <p className="text-sm text-center text-[#6B7280] mb-4">{mockReview.summary}</p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Top 3 Most Mentioned Pros</h4>
-                  <ul className="space-y-1">
+              {/* Top Pros & Cons */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-green-50 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ThumbsUp className="w-5 h-5 text-green-600" />
+                    <h4 className="font-bold text-sm text-green-800">Top Pros</h4>
+                  </div>
+                  <ul className="space-y-2">
                     {mockReview.topPros.map((pro, idx) => (
-                      <li key={idx} className="text-xs text-[#00A36C] flex items-start gap-1">
-                        <span className="font-bold">{idx + 1}.</span>
-                        <span>{pro}</span>
+                      <li key={idx} className="text-xs text-green-700 leading-relaxed">
+                        <span className="font-bold">{idx + 1}.</span> {pro}
                       </li>
                     ))}
                   </ul>
                 </div>
-                <div>
-                  <h4 className="font-semibold text-sm text-[#1F2937] mb-2">Top 3 Most Mentioned Cons</h4>
-                  <ul className="space-y-1">
+
+                <div className="bg-red-50 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ThumbsDown className="w-5 h-5 text-red-600" />
+                    <h4 className="font-bold text-sm text-red-800">Top Cons</h4>
+                  </div>
+                  <ul className="space-y-2">
                     {mockReview.topCons.map((con, idx) => (
-                      <li key={idx} className="text-xs text-red-500 flex items-start gap-1">
-                        <span className="font-bold">{idx + 1}.</span>
-                        <span>{con}</span>
+                      <li key={idx} className="text-xs text-red-700 leading-relaxed">
+                        <span className="font-bold">{idx + 1}.</span> {con}
                       </li>
                     ))}
                   </ul>
@@ -113,32 +126,37 @@ export default function SmartReview() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-4">Feature Breakdown</h3>
+            {/* Feature Breakdown */}
+            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
+              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">Feature Breakdown</h3>
               {Object.entries(mockReview.features).map(([key, value]) => (
-                <div key={key} className="mb-3">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs text-[#6B7280] capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                    <span className="text-xs font-bold text-[#00A36C]">{value}%</span>
+                <div key={key} className="mb-4">
+                  <div className="flex justify-between mb-2">
+                    <span className="text-sm text-[#1F2937] capitalize font-semibold">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                    <span className="text-sm font-bold text-[#6366F1]">{value}%</span>
                   </div>
-                  <div className="w-full bg-[#E5E7EB] rounded-full h-2">
-                    <div className="bg-[#00A36C] h-2 rounded-full" style={{ width: `${value}%` }} />
+                  <div className="w-full bg-[#E5E7EB] rounded-full h-3">
+                    <div 
+                      className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] h-3 rounded-full transition-all" 
+                      style={{ width: `${value}%` }} 
+                    />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-3">Similar & Better Reviewed</h3>
-              <div className="grid grid-cols-2 gap-3">
+            {/* Similar Products */}
+            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
+              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">Better Alternatives</h3>
+              <div className="grid grid-cols-2 gap-4">
                 {mockReview.similarProducts.map((product, idx) => (
-                  <div key={idx} className="border border-[#E5E7EB] rounded-xl overflow-hidden">
-                    <img src={product.image} alt={product.name} className="w-full h-24 object-cover" />
-                    <div className="p-2">
-                      <p className="text-xs font-semibold text-[#1F2937] mb-1">{product.name}</p>
+                  <div key={idx} className="border-2 border-[#6366F1] rounded-2xl overflow-hidden">
+                    <img src={product.image} alt={product.name} className="w-full h-28 object-cover" />
+                    <div className="p-3 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]">
+                      <p className="text-xs font-semibold text-white mb-1">{product.name}</p>
                       <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
-                        <span className="text-xs font-bold text-[#00A36C]">{product.score}</span>
+                        <Star className="w-4 h-4 text-white fill-white" />
+                        <span className="text-sm font-bold text-white">{product.score}</span>
                       </div>
                     </div>
                   </div>

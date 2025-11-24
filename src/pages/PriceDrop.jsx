@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Link as LinkIcon, Search, TrendingDown, TrendingUp } from "lucide-react";
+import { ArrowLeft, Camera, Link as LinkIcon, Search, TrendingDown, TrendingUp, Bell, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PriceDrop() {
@@ -19,118 +19,135 @@ export default function PriceDrop() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      <div className="px-6 pt-8 pb-4">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
+    <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#10B981] to-[#059669] px-6 pt-8 pb-6 shadow-lg">
+        <div className="flex items-center gap-3 mb-2">
+          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+            <ArrowLeft className="w-5 h-5 text-white" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
               PriceDrop
             </h1>
-            <p className="text-sm text-[#6B7280]">See past prices and predicted trends — instantly</p>
+            <p className="text-white/80 text-sm">Price history & predictions</p>
           </div>
         </div>
+      </div>
 
+      <div className="px-6 pt-6">
         {/* Best Buy Window - Always Visible */}
-        <div className="bg-[#00A36C] rounded-2xl p-4 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-white text-xs opacity-80 mb-1">Best Buy Window</p>
-              <p className="text-white text-sm font-bold">{mockData.bestBuyWindow}</p>
-            </div>
+        <div className="bg-gradient-to-r from-[#10B981] to-[#059669] rounded-3xl p-5 mb-6 shadow-xl">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                mockData.confidence === "High" 
-                  ? "bg-white text-[#00A36C]" 
-                  : mockData.confidence === "Medium" 
-                  ? "bg-yellow-100 text-yellow-800" 
-                  : "bg-red-100 text-red-800"
-              }`}>
-                {mockData.confidence}
-              </div>
+              <Calendar className="w-5 h-5 text-white" />
+              <h3 className="text-white font-bold text-sm">Best Buy Window</h3>
+            </div>
+            <div className="px-3 py-1 rounded-full text-xs font-bold bg-white text-[#10B981] shadow-md">
+              {mockData.confidence} Confidence
             </div>
           </div>
+          <p className="text-white text-lg font-bold mb-2">{mockData.bestBuyWindow}</p>
+          <Button className="w-full bg-white text-[#10B981] hover:bg-gray-100 font-semibold rounded-xl flex items-center justify-center gap-2">
+            <Bell className="w-4 h-4" />
+            Notify Me
+          </Button>
         </div>
 
         {!showAnalysis ? (
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setShowAnalysis(true)}
-              className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2"
+              className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all"
             >
-              <Camera className="w-8 h-8 text-[#00A36C]" />
-              <span className="text-xs font-semibold text-[#1F2937]">Scan Product</span>
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center">
+                <Camera className="w-7 h-7 text-white" />
+              </div>
+              <span className="text-xs font-semibold text-[#1F2937]">Scan</span>
             </button>
-            <button className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2">
-              <LinkIcon className="w-8 h-8 text-[#00A36C]" />
-              <span className="text-xs font-semibold text-[#1F2937]">Paste Link</span>
+            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center">
+                <LinkIcon className="w-7 h-7 text-white" />
+              </div>
+              <span className="text-xs font-semibold text-[#1F2937]">Link</span>
             </button>
-            <button className="bg-white rounded-xl p-4 border border-[#E5E7EB] flex flex-col items-center gap-2">
-              <Search className="w-8 h-8 text-[#00A36C]" />
+            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center">
+                <Search className="w-7 h-7 text-white" />
+              </div>
               <span className="text-xs font-semibold text-[#1F2937]">Search</span>
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-4">Price History (Last 12 Months)</h3>
-              <div className="relative h-40 mb-4">
+            {/* Price History */}
+            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
+              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">12-Month Price Trend</h3>
+              <div className="relative h-48 mb-6 bg-gradient-to-b from-[#10B981]/10 to-transparent rounded-2xl p-4">
                 <svg viewBox="0 0 300 100" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#10B981" />
+                      <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                  </defs>
                   <polyline
                     points={mockData.priceHistory.map((price, idx) => `${idx * 25},${100 - price}`).join(' ')}
                     fill="none"
-                    stroke="#00A36C"
-                    strokeWidth="2"
+                    stroke="url(#lineGradient)"
+                    strokeWidth="3"
                   />
+                  {mockData.priceHistory.map((price, idx) => (
+                    <circle
+                      key={idx}
+                      cx={idx * 25}
+                      cy={100 - price}
+                      r="3"
+                      fill="#10B981"
+                    />
+                  ))}
                 </svg>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div>
-                  <p className="text-xs text-[#6B7280]">Average</p>
-                  <p className="text-sm font-bold text-[#1F2937]">${mockData.avgPrice}</p>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-2xl p-3 text-center">
+                  <p className="text-xs text-[#6B7280] mb-1">Average</p>
+                  <p className="text-lg font-bold text-[#1F2937]">${mockData.avgPrice}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-[#6B7280]">Peak</p>
-                  <p className="text-sm font-bold text-red-500">${mockData.peakPrice}</p>
+                <div className="bg-gradient-to-br from-red-500/10 to-transparent rounded-2xl p-3 text-center">
+                  <p className="text-xs text-[#6B7280] mb-1">Peak</p>
+                  <p className="text-lg font-bold text-red-500">${mockData.peakPrice}</p>
                 </div>
-                <div>
-                  <p className="text-xs text-[#6B7280]">Lowest</p>
-                  <p className="text-sm font-bold text-[#00A36C]">${mockData.lowestPrice}</p>
+                <div className="bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-2xl p-3 text-center">
+                  <p className="text-xs text-[#6B7280] mb-1">Lowest</p>
+                  <p className="text-lg font-bold text-[#10B981]">${mockData.lowestPrice}</p>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-4">AI Prediction</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#6B7280]">Trend Direction</span>
-                  <div className="flex items-center gap-2">
-                    {mockData.trend === "drop" ? (
-                      <TrendingDown className="w-5 h-5 text-[#00A36C]" />
-                    ) : (
-                      <TrendingUp className="w-5 h-5 text-red-500" />
-                    )}
-                    <span className="text-sm font-bold text-[#1F2937]">Likely to {mockData.trend}</span>
-                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ml-2 ${
-                      mockData.confidence === "High" 
-                        ? "bg-green-100 text-green-800" 
-                        : mockData.confidence === "Medium" 
-                        ? "bg-yellow-100 text-yellow-800" 
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                      {mockData.confidence}
-                    </div>
+            {/* AI Prediction */}
+            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
+              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">AI Prediction</h3>
+              <div className="bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl p-4 mb-4">
+                <div className="flex items-center gap-3">
+                  {mockData.trend === "drop" ? (
+                    <TrendingDown className="w-8 h-8 text-white" />
+                  ) : (
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  )}
+                  <div>
+                    <p className="text-white font-bold text-lg">Likely to {mockData.trend}</p>
+                    <p className="text-white/80 text-sm">{mockData.confidence} confidence</p>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 rounded-xl">No</Button>
-              <Button className="flex-1 bg-[#00A36C] hover:bg-[#007E52] rounded-xl">Yes, Helpful</Button>
+              <div className="flex gap-3">
+                <Button variant="outline" className="flex-1 rounded-xl border-2">No</Button>
+                <Button className="flex-1 bg-gradient-to-r from-[#10B981] to-[#059669] hover:opacity-90 rounded-xl text-white">
+                  Helpful
+                </Button>
+              </div>
             </div>
           </div>
         )}

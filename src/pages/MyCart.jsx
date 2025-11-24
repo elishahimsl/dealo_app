@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Heart, Trash2, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Plus, Heart, Trash2, X, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function MyCart() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
@@ -148,42 +151,47 @@ export default function MyCart() {
 
       {/* Collections Section */}
       <div className="px-6 py-4">
-        <h2 className="text-sm font-semibold text-[#1F2937] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Collections
-        </h2>
-
-        {folders.length === 0 ? (
-          /* Create Collection Button with Leaning Books */
-          <div className="relative">
-            <button
-              onClick={() => setShowCreateCollection(true)}
-              className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden"
-              style={{ minHeight: '130px' }}
-            >
-              <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
-                <span className="text-sm font-semibold text-[#6B7280]">+ Create collection</span>
-              </div>
-              
-              {/* Leaning books - max 5 */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end justify-center gap-1">
-                {mockProducts.slice(0, 5).map((product, idx) => (
-                  <div 
-                    key={product.id}
-                    className="w-12 h-20 rounded-t-lg overflow-hidden shadow-lg"
-                    style={{ 
-                      transform: `rotate(${(idx - 2) * 8}deg) translateY(${Math.abs(idx - 2) * 4}px)`,
-                      zIndex: 5 - Math.abs(idx - 2)
-                    }}
-                  >
-                    <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  </div>
-                ))}
-              </div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            Collections
+          </h2>
+          {folders.length > 0 && (
+            <button onClick={() => navigate(createPageUrl("AllCollections"))}>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
             </button>
-          </div>
-        ) : (
-          /* Grid with Collections and Create Button */
-          <div className="grid grid-cols-2 gap-3">
+          )}
+        </div>
+
+        <div className="relative">
+          <button
+            onClick={() => setShowCreateCollection(true)}
+            className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-3"
+            style={{ minHeight: '130px' }}
+          >
+            <div className="absolute top-8 left-0 right-0 flex items-center justify-center">
+              <span className="text-xs font-semibold text-[#6B7280]">+ Create collection</span>
+            </div>
+            
+            {/* Leaning books - max 5, smaller */}
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-end justify-center gap-0.5">
+              {mockProducts.slice(0, Math.min(5, mockProducts.length)).map((product, idx) => (
+                <div 
+                  key={product.id}
+                  className="w-8 h-14 rounded-t-lg overflow-hidden shadow-md"
+                  style={{ 
+                    transform: `rotate(${(idx - 2) * 8}deg) translateY(${Math.abs(idx - 2) * 2}px)`,
+                    zIndex: 5 - Math.abs(idx - 2)
+                  }}
+                >
+                  <img src={product.image} alt="" className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+          </button>
+        </div>
+
+        {folders.length > 0 && (
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
             {folders.map((folder) => {
               const folderProducts = getFolderProducts(folder.id);
               return (
@@ -194,16 +202,17 @@ export default function MyCart() {
                   onMouseDown={() => handleLongPressStart(folder)}
                   onMouseUp={handleLongPressEnd}
                   onMouseLeave={handleLongPressEnd}
-                  className="relative rounded-2xl overflow-hidden bg-[#E5E7EB] aspect-square cursor-pointer"
+                  className="relative rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0 cursor-pointer"
+                  style={{ width: '140px', height: '140px' }}
                 >
                   {/* Floating product tiles inside */}
-                  <div className="absolute inset-0 p-2 flex flex-wrap gap-1 justify-center items-center">
-                    {folderProducts.map((product, idx) => (
+                  <div className="absolute inset-0 p-3 flex gap-2 justify-center items-center">
+                    {folderProducts.slice(0, 3).map((product, idx) => (
                       <div
                         key={product.id}
-                        className="w-[30%] aspect-square rounded-lg overflow-hidden shadow-md"
+                        className="w-[28%] aspect-square rounded-lg overflow-hidden shadow-md"
                         style={{
-                          transform: `rotate(${(idx - 1) * 8}deg) translateY(${idx * 2}px)`,
+                          transform: `rotate(${(idx - 1) * 6}deg)`,
                           zIndex: 3 - Math.abs(idx - 1)
                         }}
                       >
@@ -217,23 +226,12 @@ export default function MyCart() {
                   </div>
                   
                   {/* Collection name at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2">
-                    <p className="text-white text-xs font-semibold truncate text-center">{folder.name}</p>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[#1F2937] text-xs font-semibold truncate text-center">{folder.name}</p>
                   </div>
                 </div>
               );
             })}
-
-            {/* Create Collection Button - Product Tile Size */}
-            <button
-              onClick={() => setShowCreateCollection(true)}
-              className="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white flex flex-col items-center justify-center gap-2 hover:border-[#00A36C] transition-colors aspect-square"
-            >
-              <div className="w-12 h-12 rounded-full bg-[#F9FAFB] flex items-center justify-center">
-                <Plus className="w-6 h-6 text-[#00A36C]" />
-              </div>
-              <span className="text-xs font-semibold text-[#6B7280]">Create</span>
-            </button>
           </div>
         )}
       </div>
@@ -299,14 +297,14 @@ export default function MyCart() {
       {longPressFolder && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="relative px-6">
-            <div className="w-48 aspect-square rounded-2xl overflow-hidden bg-[#E5E7EB] mb-4 mx-auto">
-              <div className="absolute inset-0 p-2 flex flex-wrap gap-1 justify-center items-center">
-                {getFolderProducts(longPressFolder.id).map((product, idx) => (
+            <div className="w-48 aspect-square rounded-2xl overflow-hidden bg-[#E5E7EB] mb-3 mx-auto">
+              <div className="absolute inset-0 p-3 flex gap-2 justify-center items-center">
+                {getFolderProducts(longPressFolder.id).slice(0, 3).map((product, idx) => (
                   <div
                     key={product.id}
-                    className="w-[30%] aspect-square rounded-lg overflow-hidden shadow-md"
+                    className="w-[28%] aspect-square rounded-lg overflow-hidden shadow-md"
                     style={{
-                      transform: `rotate(${(idx - 1) * 8}deg) translateY(${idx * 2}px)`,
+                      transform: `rotate(${(idx - 1) * 6}deg)`,
                       zIndex: 3 - Math.abs(idx - 1)
                     }}
                   >
@@ -318,24 +316,13 @@ export default function MyCart() {
                   </div>
                 ))}
               </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2">
-                <p className="text-white text-xs font-semibold truncate text-center">{longPressFolder.name}</p>
-              </div>
             </div>
             
             <button
               onClick={handleDeleteFolder}
-              className="w-full bg-red-500 text-white py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
+              className="w-32 mx-auto bg-red-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-red-600 transition-colors flex items-center justify-center"
             >
-              <Trash2 className="w-5 h-5" />
-              Delete Collection
-            </button>
-            
-            <button
-              onClick={() => setLongPressFolder(null)}
-              className="w-full bg-white text-[#1F2937] py-3 rounded-2xl font-semibold mt-2 hover:bg-gray-100 transition-colors"
-            >
-              Cancel
+              Delete
             </button>
           </div>
         </div>

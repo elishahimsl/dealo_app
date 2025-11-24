@@ -63,7 +63,7 @@ export default function DealScanner() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#F59E0B] to-[#D97706] px-6 pt-8 pb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-6 shadow-lg">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -94,7 +94,7 @@ export default function DealScanner() {
               onClick={() => setActiveCategory(cat.toLowerCase().replace(" ", ""))}
               className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap shadow-sm transition-all ${
                 activeCategory === cat.toLowerCase().replace(" ", "")
-                  ? "bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white"
+                  ? "bg-gradient-to-r from-[#00A36C] to-[#007E52] text-white"
                   : "bg-white text-[#1F2937] border border-[#E5E7EB]"
               }`}
             >
@@ -107,19 +107,19 @@ export default function DealScanner() {
         {(preferences.categories.length > 0 || preferences.brands.length > 0) && (
           <>
             <div className="flex items-center gap-2 mb-4">
-              <Zap className="w-5 h-5 text-[#F59E0B]" />
+              <Zap className="w-5 h-5 text-[#00A36C]" />
               <h3 className="text-lg font-bold text-[#1F2937]">AI Recommended For You</h3>
             </div>
             <p className="text-xs text-[#6B7280] mb-4">Based on your preferences</p>
             <div className="space-y-4 mb-6">
               {aiRecommendedDeals.map((deal) => (
-                <div key={`ai-${deal.id}`} className="bg-white rounded-3xl overflow-hidden border-2 border-[#F59E0B] shadow-xl">
+                <div key={`ai-${deal.id}`} className="bg-white rounded-3xl overflow-hidden border-2 border-[#00A36C] shadow-xl">
                   <div className="relative h-56">
                     <img src={deal.image} alt={deal.store} className="w-full h-full object-cover" />
                     <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg">
                       {deal.discount}
                     </div>
-                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
+                    <div className="absolute top-4 right-4 bg-gradient-to-r from-[#00A36C] to-[#007E52] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1">
                       <Zap className="w-3 h-3" />
                       AI Pick
                     </div>
@@ -135,10 +135,10 @@ export default function DealScanner() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <span className="text-sm text-[#6B7280] line-through">{deal.originalPrice}</span>
-                        <span className="text-3xl font-bold text-[#F59E0B] ml-3">{deal.salePrice}</span>
+                        <span className="text-3xl font-bold text-[#00A36C] ml-3">{deal.salePrice}</span>
                       </div>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:opacity-90 rounded-2xl h-12 text-white font-bold">
+                    <Button className="w-full bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90 rounded-2xl h-12 text-white font-bold">
                       View Deal
                     </Button>
                   </div>
@@ -173,10 +173,10 @@ export default function DealScanner() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <span className="text-sm text-[#6B7280] line-through">{deal.originalPrice}</span>
-                    <span className="text-2xl font-bold text-[#F59E0B] ml-2">{deal.salePrice}</span>
+                    <span className="text-2xl font-bold text-[#00A36C] ml-2">{deal.salePrice}</span>
                   </div>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:opacity-90 rounded-xl">
+                <Button className="w-full bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90 rounded-xl">
                   View Deal
                 </Button>
               </div>
@@ -260,7 +260,7 @@ export default function DealScanner() {
 
               <Button 
                 onClick={() => setShowPreferences(false)}
-                className="w-full h-12 rounded-2xl bg-gradient-to-r from-[#F59E0B] to-[#D97706] hover:opacity-90"
+                className="w-full h-12 rounded-2xl bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90"
               >
                 Apply Preferences
               </Button>

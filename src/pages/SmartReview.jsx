@@ -30,7 +30,7 @@ export default function SmartReview() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] px-6 pt-8 pb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-6 shadow-lg">
         <div className="flex items-center gap-3 mb-2">
           <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -76,7 +76,7 @@ export default function SmartReview() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-20 h-20 rounded-full border-4 border-[#6366F1] flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full border-4 border-[#00A36C] flex items-center justify-center">
                       <span className="text-3xl font-bold text-[#1F2937]">{mockReview.score}</span>
                     </div>
                     <div>
@@ -133,11 +133,11 @@ export default function SmartReview() {
                 <div key={key} className="mb-4">
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-[#1F2937] capitalize font-semibold">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
-                    <span className="text-sm font-bold text-[#6366F1]">{value}%</span>
+                    <span className="text-sm font-bold text-[#00A36C]">{value}%</span>
                   </div>
                   <div className="w-full bg-[#E5E7EB] rounded-full h-3">
                     <div 
-                      className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] h-3 rounded-full transition-all" 
+                      className="bg-gradient-to-r from-[#00A36C] to-[#007E52] h-3 rounded-full transition-all" 
                       style={{ width: `${value}%` }} 
                     />
                   </div>
@@ -150,9 +150,9 @@ export default function SmartReview() {
               <h3 className="font-bold text-[#1F2937] mb-4 text-lg">Better Alternatives</h3>
               <div className="grid grid-cols-2 gap-4">
                 {mockReview.similarProducts.map((product, idx) => (
-                  <div key={idx} className="border-2 border-[#6366F1] rounded-2xl overflow-hidden">
+                  <div key={idx} className="border-2 border-[#00A36C] rounded-2xl overflow-hidden">
                     <img src={product.image} alt={product.name} className="w-full h-28 object-cover" />
-                    <div className="p-3 bg-gradient-to-br from-[#6366F1] to-[#8B5CF6]">
+                    <div className="p-3 bg-gradient-to-br from-[#00A36C] to-[#007E52]">
                       <p className="text-xs font-semibold text-white mb-1">{product.name}</p>
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-white fill-white" />

@@ -8,18 +8,18 @@ export default function Achievements() {
 
   const allBadges = [
     { id: 1, icon: ShoppingCart, label: "Deal Hunter", description: "Save $500 with deals", earned: true, color: "#00A36C" },
-    { id: 2, icon: Scan, label: "Product Explorer", description: "Scan 50 products", earned: true, color: "#6366F1" },
-    { id: 3, icon: Rocket, label: "Early Adopter", description: "Join ShopSmart", earned: true, color: "#EC4899" },
-    { id: 4, icon: Award, label: "Shop Master", description: "Complete 100 scans", earned: true, color: "#F59E0B" },
-    { id: 5, icon: Heart, label: "Favorite Collector", description: "Save 25 favorites", earned: false, color: "#EF4444" },
-    { id: 6, icon: Target, label: "Smart Shopper", description: "Compare 20 products", earned: false, color: "#8B5CF6" },
-    { id: 7, icon: TrendingUp, label: "Price Tracker", description: "Track 10 prices", earned: false, color: "#10B981" },
-    { id: 8, icon: Zap, label: "Quick Scanner", description: "Scan 5 items in a day", earned: false, color: "#F59E0B" },
+    { id: 2, icon: Scan, label: "Product Explorer", description: "Scan 50 products", earned: true, color: "#00A36C" },
+    { id: 3, icon: Rocket, label: "Early Adopter", description: "Join ShopSmart", earned: true, color: "#00A36C" },
+    { id: 4, icon: Award, label: "Shop Master", description: "Complete 100 scans", earned: true, color: "#00A36C" },
+    { id: 5, icon: Heart, label: "Favorite Collector", description: "Save 25 favorites", earned: false, color: "#00A36C" },
+    { id: 6, icon: Target, label: "Smart Shopper", description: "Compare 20 products", earned: false, color: "#00A36C" },
+    { id: 7, icon: TrendingUp, label: "Price Tracker", description: "Track 10 prices", earned: false, color: "#00A36C" },
+    { id: 8, icon: Zap, label: "Quick Scanner", description: "Scan 5 items in a day", earned: false, color: "#00A36C" },
     { id: 9, icon: ShoppingCart, label: "Big Spender", description: "Save $1000 total", earned: false, color: "#00A36C" },
-    { id: 10, icon: Award, label: "Review Master", description: "Read 50 AI reviews", earned: false, color: "#6366F1" },
-    { id: 11, icon: Heart, label: "Collection King", description: "Create 5 collections", earned: false, color: "#EC4899" },
-    { id: 12, icon: Target, label: "Deal Finder Pro", description: "Find 30 deals", earned: false, color: "#F59E0B" },
-    { id: 13, icon: Rocket, label: "Legend", description: "Complete all achievements", earned: false, color: "#8B5CF6" }
+    { id: 10, icon: Award, label: "Review Master", description: "Read 50 AI reviews", earned: false, color: "#00A36C" },
+    { id: 11, icon: Heart, label: "Collection King", description: "Create 5 collections", earned: false, color: "#00A36C" },
+    { id: 12, icon: Target, label: "Deal Finder Pro", description: "Find 30 deals", earned: false, color: "#00A36C" },
+    { id: 13, icon: Rocket, label: "Legend", description: "Complete all achievements", earned: false, color: "#00A36C" }
   ];
 
   const earnedCount = allBadges.filter(b => b.earned).length;
@@ -28,7 +28,7 @@ export default function Achievements() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#8B5CF6] to-[#6366F1] px-6 pt-8 pb-8 shadow-lg">
+      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-8 shadow-lg">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => navigate(createPageUrl("Profile"))} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />

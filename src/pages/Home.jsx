@@ -79,25 +79,28 @@ export default function Home() {
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Trending
           </h2>
-          <Link to={createPageUrl("TrendingProducts")} className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
-            View All
-            <ChevronRight className="w-4 h-4" />
+          <Link to={createPageUrl("TrendingProducts")}>
+            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {trendingProducts.slice(0, 4).map((product) => (
-            <div key={product.id} className="rounded-2xl overflow-hidden shadow-sm relative aspect-square">
+            <div key={product.id} className="rounded-xl overflow-hidden shadow-sm relative" style={{ height: '140px' }}>
               <img 
                 src={product.image} 
                 alt="Product"
                 className="w-full h-full object-cover"
               />
-              {/* Transparent black price - top left, smaller and narrower */}
-              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5">
-                <span className="text-[9px] font-bold text-white">{product.price}</span>
+              <div className="absolute top-1.5 left-1.5 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5">
+                <span className="text-[8px] font-bold text-white">{product.price}</span>
               </div>
-              {/* Heart icon - bottom right */}
-              <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#6B7280]/40 flex items-center justify-center hover:bg-[#00A36C] transition-colors">
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Save to favorites logic here
+                }}
+                className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full bg-[#6B7280]/40 flex items-center justify-center hover:bg-[#00A36C] transition-colors"
+              >
                 <Heart className="w-3 h-3 text-white" strokeWidth={2} />
               </button>
             </div>
@@ -111,9 +114,8 @@ export default function Home() {
           <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
             Deals Near You
           </h2>
-          <Link to={createPageUrl("DealsNearYou")} className="text-[#00A36C] font-semibold text-sm flex items-center gap-1">
-            View All
-            <ChevronRight className="w-4 h-4" />
+          <Link to={createPageUrl("DealsNearYou")}>
+            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
           </Link>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">

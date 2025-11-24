@@ -60,7 +60,7 @@ export default function BestMatch() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#EC4899] to-[#BE185D] px-6 pt-8 pb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-6 shadow-lg">
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -82,13 +82,13 @@ export default function BestMatch() {
               <div key={idx} className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[80%] rounded-3xl px-5 py-3 ${
                   msg.type === "user" 
-                    ? "bg-gradient-to-r from-[#EC4899] to-[#BE185D] text-white" 
+                    ? "bg-gradient-to-r from-[#00A36C] to-[#007E52] text-white" 
                     : "bg-white border border-[#E5E7EB] text-[#1F2937]"
                 }`}>
                   {msg.type === "ai" && (
                     <div className="flex items-center gap-2 mb-1">
-                      <Sparkles className="w-4 h-4 text-[#EC4899]" />
-                      <span className="text-xs font-bold text-[#EC4899]">AI Assistant</span>
+                      <Sparkles className="w-4 h-4 text-[#00A36C]" />
+                      <span className="text-xs font-bold text-[#00A36C]">AI Assistant</span>
                     </div>
                   )}
                   <p className="text-sm leading-relaxed">{msg.text}</p>
@@ -109,7 +109,7 @@ export default function BestMatch() {
               />
               <Button 
                 onClick={handleSend}
-                className="h-12 w-12 rounded-full bg-gradient-to-r from-[#EC4899] to-[#BE185D] hover:opacity-90"
+                className="h-12 w-12 rounded-full bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90"
               >
                 <Send className="w-5 h-5" />
               </Button>
@@ -119,7 +119,7 @@ export default function BestMatch() {
       ) : (
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {/* AI Intro */}
-          <div className="bg-gradient-to-r from-[#EC4899] to-[#BE185D] rounded-3xl p-6 mb-6 shadow-xl">
+          <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] rounded-3xl p-6 mb-6 shadow-xl">
             <div className="flex items-start gap-3">
               <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-6 h-6 text-white" />
@@ -150,16 +150,16 @@ export default function BestMatch() {
                       </span>
                     </div>
                     <h4 className="font-bold text-[#1F2937] text-base mb-1">{product.title}</h4>
-                    <p className="text-2xl font-bold text-[#EC4899] mb-2">{product.price}</p>
+                    <p className="text-2xl font-bold text-[#00A36C] mb-2">{product.price}</p>
                   </div>
                 </div>
-                <div className="bg-gradient-to-r from-[#EC4899]/10 to-[#BE185D]/10 px-4 py-3">
+                <div className="bg-gradient-to-r from-[#00A36C]/10 to-[#007E52]/10 px-4 py-3">
                   <p className="text-xs text-[#6B7280] leading-relaxed">
-                    <span className="font-bold text-[#EC4899]">Why this?</span> {product.reason}
+                    <span className="font-bold text-[#00A36C]">Why this?</span> {product.reason}
                   </p>
                 </div>
                 <div className="p-4">
-                  <Button className="w-full bg-gradient-to-r from-[#EC4899] to-[#BE185D] hover:opacity-90 rounded-2xl text-white font-semibold flex items-center justify-center gap-2">
+                  <Button className="w-full bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90 rounded-2xl text-white font-semibold flex items-center justify-center gap-2">
                     <ShoppingBag className="w-4 h-4" />
                     View Product
                   </Button>

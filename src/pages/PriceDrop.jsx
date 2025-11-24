@@ -21,7 +21,7 @@ export default function PriceDrop() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#10B981] to-[#059669] px-6 pt-8 pb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-6 shadow-lg">
         <div className="flex items-center gap-3 mb-2">
           <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -37,18 +37,18 @@ export default function PriceDrop() {
 
       <div className="px-6 pt-6">
         {/* Best Buy Window - Always Visible */}
-        <div className="bg-gradient-to-r from-[#10B981] to-[#059669] rounded-3xl p-5 mb-6 shadow-xl">
+        <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] rounded-3xl p-5 mb-6 shadow-xl">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-white" />
               <h3 className="text-white font-bold text-sm">Best Buy Window</h3>
             </div>
-            <div className="px-3 py-1 rounded-full text-xs font-bold bg-white text-[#10B981] shadow-md">
+            <div className="px-3 py-1 rounded-full text-xs font-bold bg-white text-[#00A36C] shadow-md">
               {mockData.confidence} Confidence
             </div>
           </div>
           <p className="text-white text-lg font-bold mb-2">{mockData.bestBuyWindow}</p>
-          <Button className="w-full bg-white text-[#10B981] hover:bg-gray-100 font-semibold rounded-xl flex items-center justify-center gap-2">
+          <Button className="w-full bg-white text-[#00A36C] hover:bg-gray-100 font-semibold rounded-xl flex items-center justify-center gap-2">
             <Bell className="w-4 h-4" />
             Notify Me
           </Button>
@@ -83,12 +83,12 @@ export default function PriceDrop() {
             {/* Price History */}
             <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
               <h3 className="font-bold text-[#1F2937] mb-4 text-lg">12-Month Price Trend</h3>
-              <div className="relative h-48 mb-6 bg-gradient-to-b from-[#10B981]/10 to-transparent rounded-2xl p-4">
+              <div className="relative h-48 mb-6 bg-gradient-to-b from-[#00A36C]/10 to-transparent rounded-2xl p-4">
                 <svg viewBox="0 0 300 100" className="w-full h-full">
                   <defs>
                     <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#10B981" />
-                      <stop offset="100%" stopColor="#059669" />
+                      <stop offset="0%" stopColor="#00A36C" />
+                      <stop offset="100%" stopColor="#007E52" />
                     </linearGradient>
                   </defs>
                   <polyline
@@ -103,7 +103,7 @@ export default function PriceDrop() {
                       cx={idx * 25}
                       cy={100 - price}
                       r="3"
-                      fill="#10B981"
+                      fill="#00A36C"
                     />
                   ))}
                 </svg>
@@ -120,7 +120,7 @@ export default function PriceDrop() {
                 </div>
                 <div className="bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-2xl p-3 text-center">
                   <p className="text-xs text-[#6B7280] mb-1">Lowest</p>
-                  <p className="text-lg font-bold text-[#10B981]">${mockData.lowestPrice}</p>
+                  <p className="text-lg font-bold text-[#00A36C]">${mockData.lowestPrice}</p>
                 </div>
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function PriceDrop() {
             {/* AI Prediction */}
             <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
               <h3 className="font-bold text-[#1F2937] mb-4 text-lg">AI Prediction</h3>
-              <div className="bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl p-4 mb-4">
+              <div className="bg-gradient-to-br from-[#00A36C] to-[#007E52] rounded-2xl p-4 mb-4">
                 <div className="flex items-center gap-3">
                   {mockData.trend === "drop" ? (
                     <TrendingDown className="w-8 h-8 text-white" />
@@ -144,7 +144,7 @@ export default function PriceDrop() {
 
               <div className="flex gap-3">
                 <Button variant="outline" className="flex-1 rounded-xl border-2">No</Button>
-                <Button className="flex-1 bg-gradient-to-r from-[#10B981] to-[#059669] hover:opacity-90 rounded-xl text-white">
+                <Button className="flex-1 bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90 rounded-xl text-white">
                   Helpful
                 </Button>
               </div>

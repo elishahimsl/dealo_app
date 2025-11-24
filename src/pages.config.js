@@ -21,6 +21,7 @@ import DealsNearYou from './pages/DealsNearYou';
 import ComparisonResults from './pages/ComparisonResults';
 import ShopSense from './pages/ShopSense';
 import SearchProducts from './pages/SearchProducts';
+import AllCollections from './pages/AllCollections';
 import __Layout from './Layout.jsx';
 
 
@@ -48,6 +49,7 @@ export const PAGES = {
     "ComparisonResults": ComparisonResults,
     "ShopSense": ShopSense,
     "SearchProducts": SearchProducts,
+    "AllCollections": AllCollections,
 }
 
 export const pagesConfig = {

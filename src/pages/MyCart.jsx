@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Heart, Folder, X } from "lucide-react";
+import { Plus, Heart, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -10,6 +10,8 @@ export default function MyCart() {
   const [showCreateCollection, setShowCreateCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
   const [selectedCollection, setSelectedCollection] = useState(null);
+  const [longPressFolder, setLongPressFolder] = useState(null);
+  const [longPressTimer, setLongPressTimer] = useState(null);
 
   const { data: folders } = useQuery({
     queryKey: ['folders'],
@@ -30,6 +32,14 @@ export default function MyCart() {
       setShowCreateCollection(false);
       setNewCollectionName("");
     }
+  });
+
+  const deleteFolderMutation = useMutation({
+    mutationFn: (folderId) => base44.entities.Folder.delete(folderId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['folders']);
+      setLongPressFolder(null);
+    },
   });
 
   const mockProducts = [
@@ -54,6 +64,39 @@ export default function MyCart() {
       size: null,
       store: "Nike Store",
       image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400"
+    },
+    {
+      id: 3,
+      brand: "Adidas",
+      title: "Sport Shoes Running Edition",
+      price: "$45.99",
+      originalPrice: "$89.99",
+      savings: "$44",
+      size: "L",
+      store: "Adidas",
+      image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400"
+    },
+    {
+      id: 4,
+      brand: "Puma",
+      title: "Training Jacket Premium",
+      price: "$55.00",
+      originalPrice: null,
+      savings: null,
+      size: "M",
+      store: "Puma Store",
+      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400"
+    },
+    {
+      id: 5,
+      brand: "Under Armour",
+      title: "Compression Shirt Tech",
+      price: "$28.50",
+      originalPrice: "$45.00",
+      savings: "$16.50",
+      size: "S",
+      store: "Under Armour",
+      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400"
     }
   ];
 
@@ -68,6 +111,30 @@ export default function MyCart() {
         item_count: 0
       });
     }
+  };
+
+  const handleLongPressStart = (folder) => {
+    const timer = setTimeout(() => {
+      setLongPressFolder(folder);
+    }, 500);
+    setLongPressTimer(timer);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer) {
+      clearTimeout(longPressTimer);
+      setLongPressTimer(null);
+    }
+  };
+
+  const handleDeleteFolder = () => {
+    if (longPressFolder) {
+      deleteFolderMutation.mutate(longPressFolder.id);
+    }
+  };
+
+  const getFolderProducts = (folderId) => {
+    return mockProducts.slice(0, 3);
   };
 
   return (
@@ -85,61 +152,97 @@ export default function MyCart() {
           Collections
         </h2>
 
-        {/* Create Collection Button - Full Width with Books */}
-        <button
-          onClick={() => setShowCreateCollection(true)}
-          className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-3"
-          style={{ minHeight: '130px' }}
-        >
-          {/* Centered Text - Positioned Higher */}
-          <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
-            <span className="text-sm font-semibold text-[#6B7280]">+ Create collection</span>
-          </div>
-          
-          {/* Book-like images at bottom - Positioned Lower */}
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-end gap-1">
-            <div 
-              className="w-14 h-20 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(-8deg) translateY(12px)' }}
-            >
-              <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
-            </div>
-            <div 
-              className="w-14 h-24 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(-3deg) translateY(8px)' }}
-            >
-              <img src={mockProducts[1].image} alt="" className="w-full h-full object-cover" />
-            </div>
-            <div 
-              className="w-14 h-20 rounded-t-lg overflow-hidden shadow-lg"
-              style={{ transform: 'rotate(8deg) translateY(12px)' }}
-            >
-              <img src={mockProducts[0].image} alt="" className="w-full h-full object-cover" />
-            </div>
-          </div>
-        </button>
-
-        {/* Existing Collections - Horizontal Scroll */}
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
-          {folders.map((folder) => (
+        {folders.length === 0 ? (
+          /* Create Collection Button with Leaning Books */
+          <div className="relative">
             <button
-              key={folder.id}
-              onClick={() => setSelectedCollection(folder.id)}
-              className="flex-shrink-0 w-24 h-24 rounded-2xl bg-white border-2 border-[#E5E7EB] shadow-sm hover:border-[#00A36C] transition-colors relative overflow-hidden"
+              onClick={() => setShowCreateCollection(true)}
+              className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden"
+              style={{ minHeight: '130px' }}
             >
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Folder className="w-10 h-10 text-[#00A36C]" />
+              <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
+                <span className="text-sm font-semibold text-[#6B7280]">+ Create collection</span>
               </div>
-              <div className="absolute bottom-2 left-2 right-2">
-                <p className="text-xs font-semibold text-[#1F2937] truncate">{folder.name}</p>
+              
+              {/* Leaning books - max 5 */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end justify-center gap-1">
+                {mockProducts.slice(0, 5).map((product, idx) => (
+                  <div 
+                    key={product.id}
+                    className="w-12 h-20 rounded-t-lg overflow-hidden shadow-lg"
+                    style={{ 
+                      transform: `rotate(${(idx - 2) * 8}deg) translateY(${Math.abs(idx - 2) * 4}px)`,
+                      zIndex: 5 - Math.abs(idx - 2)
+                    }}
+                  >
+                    <img src={product.image} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
               </div>
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          /* Grid with Collections and Create Button */
+          <div className="grid grid-cols-2 gap-3">
+            {folders.map((folder) => {
+              const folderProducts = getFolderProducts(folder.id);
+              return (
+                <div
+                  key={folder.id}
+                  onTouchStart={() => handleLongPressStart(folder)}
+                  onTouchEnd={handleLongPressEnd}
+                  onMouseDown={() => handleLongPressStart(folder)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  className="relative rounded-2xl overflow-hidden bg-[#E5E7EB] aspect-square cursor-pointer"
+                >
+                  {/* Floating product tiles inside */}
+                  <div className="absolute inset-0 p-2 flex flex-wrap gap-1 justify-center items-center">
+                    {folderProducts.map((product, idx) => (
+                      <div
+                        key={product.id}
+                        className="w-[30%] aspect-square rounded-lg overflow-hidden shadow-md"
+                        style={{
+                          transform: `rotate(${(idx - 1) * 8}deg) translateY(${idx * 2}px)`,
+                          zIndex: 3 - Math.abs(idx - 1)
+                        }}
+                      >
+                        <img 
+                          src={product.image} 
+                          alt="Product"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Collection name at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2">
+                    <p className="text-white text-xs font-semibold truncate text-center">{folder.name}</p>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Create Collection Button - Product Tile Size */}
+            <button
+              onClick={() => setShowCreateCollection(true)}
+              className="rounded-2xl border-2 border-dashed border-[#E5E7EB] bg-white flex flex-col items-center justify-center gap-2 hover:border-[#00A36C] transition-colors aspect-square"
+            >
+              <div className="w-12 h-12 rounded-full bg-[#F9FAFB] flex items-center justify-center">
+                <Plus className="w-6 h-6 text-[#00A36C]" />
+              </div>
+              <span className="text-xs font-semibold text-[#6B7280]">Create</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Products Grid */}
       <div className="px-6 py-4">
+        <h2 className="text-sm font-semibold text-[#1F2937] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          All Items
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           {mockProducts.map((product) => (
             <div key={product.id}>
@@ -191,6 +294,52 @@ export default function MyCart() {
           ))}
         </div>
       </div>
+
+      {/* Delete Modal Overlay */}
+      {longPressFolder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="relative px-6">
+            <div className="w-48 aspect-square rounded-2xl overflow-hidden bg-[#E5E7EB] mb-4 mx-auto">
+              <div className="absolute inset-0 p-2 flex flex-wrap gap-1 justify-center items-center">
+                {getFolderProducts(longPressFolder.id).map((product, idx) => (
+                  <div
+                    key={product.id}
+                    className="w-[30%] aspect-square rounded-lg overflow-hidden shadow-md"
+                    style={{
+                      transform: `rotate(${(idx - 1) * 8}deg) translateY(${idx * 2}px)`,
+                      zIndex: 3 - Math.abs(idx - 1)
+                    }}
+                  >
+                    <img 
+                      src={product.image} 
+                      alt="Product"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm p-2">
+                <p className="text-white text-xs font-semibold truncate text-center">{longPressFolder.name}</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={handleDeleteFolder}
+              className="w-full bg-red-500 text-white py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
+            >
+              <Trash2 className="w-5 h-5" />
+              Delete Collection
+            </button>
+            
+            <button
+              onClick={() => setLongPressFolder(null)}
+              className="w-full bg-white text-[#1F2937] py-3 rounded-2xl font-semibold mt-2 hover:bg-gray-100 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Create Collection Modal */}
       {showCreateCollection && (

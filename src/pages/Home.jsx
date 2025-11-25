@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Camera, Scale, Heart, Search, Plus, ChevronRight } from "lucide-react";
@@ -8,21 +8,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function Home() {
+  const queryClient = useQueryClient();
+  const [favorites, setFavorites] = useState([]);
+
   const quickActions = [
     { icon: Camera, label: "Identify", page: "Snap" },
     { icon: Scale, label: "Compare", page: "Compare" },
     { icon: Heart, label: "Favorites", page: "MyCart" }
   ];
 
-  // Mock trending products
   const trendingProducts = [
-    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" },
-    { id: 2, price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
-    { id: 3, price: "$59.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400" },
-    { id: 4, price: "$24.99", image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400" },
-    { id: 5, price: "$14.99", image: "https://images.unsplash.com/photo-1585419372611-f0ffebad6659?w=400" },
-    { id: 6, price: "$34.99", image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400" },
+    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", title: "Premium Headphones" },
+    { id: 2, price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400", title: "Smart Watch" },
+    { id: 3, price: "$59.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400", title: "Wireless Earbuds" },
+    { id: 4, price: "$24.99", image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400", title: "Phone Case" },
   ];
+
+  const saveFavoriteMutation = useMutation({
+    mutationFn: async (product) => {
+      return await base44.entities.Capture.create({
+        title: product.title,
+        content_type: 'other',
+        file_url: product.image,
+        file_type: 'image',
+        is_favorite: true
+      });
+    },
+    onSuccess: () => queryClient.invalidateQueries(['allCaptures'])
+  });
+
+  const toggleFavorite = (product) => {
+    if (favorites.includes(product.id)) {
+      setFavorites(favorites.filter(id => id !== product.id));
+    } else {
+      setFavorites([...favorites, product.id]);
+      saveFavoriteMutation.mutate(product);
+    }
+  };
 
   // Deals near you with stock images
   const dealsNearYou = [
@@ -84,24 +106,19 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          {trendingProducts.slice(0, 4).map((product) => (
-            <div key={product.id} className="rounded-xl overflow-hidden shadow-sm relative" style={{ height: '140px' }}>
-              <img 
-                src={product.image} 
-                alt="Product"
-                className="w-full h-full object-cover"
-              />
+          {trendingProducts.map((product) => (
+            <div key={product.id} className="rounded-xl overflow-hidden shadow-sm relative" style={{ height: '120px' }}>
+              <img src={product.image} alt="Product" className="w-full h-full object-cover" />
               <div className="absolute top-1.5 left-1.5 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5">
                 <span className="text-[8px] font-bold text-white">{product.price}</span>
               </div>
               <button 
-                onClick={(e) => {
-                  e.preventDefault();
-                  // Save to favorites logic here
-                }}
-                className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full bg-[#6B7280]/40 flex items-center justify-center hover:bg-[#00A36C] transition-colors"
+                onClick={(e) => { e.preventDefault(); toggleFavorite(product); }}
+                className={`absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
+                  favorites.includes(product.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/40 hover:bg-[#00A36C]'
+                }`}
               >
-                <Heart className="w-3 h-3 text-white" strokeWidth={2} />
+                <Heart className={`w-3 h-3 text-white ${favorites.includes(product.id) ? 'fill-white' : ''}`} strokeWidth={2} />
               </button>
             </div>
           ))}
@@ -143,44 +160,17 @@ export default function Home() {
         </div>
       </div>
 
-      {/* SnapSmart Landing Section */}
+      {/* DeaLo Landing Section */}
       <div className="px-6 pb-12 pt-8 text-center">
-        {/* Logo Only */}
         <div className="relative w-24 h-24 mx-auto mb-4">
           <svg viewBox="0 0 120 120" className="w-full h-full">
-            <ellipse
-              cx="45"
-              cy="60"
-              rx="30"
-              ry="45"
-              transform="rotate(45 45 60)"
-              fill="#00A36C"
-              opacity="0.9"
-            />
-            <ellipse
-              cx="75"
-              cy="60"
-              rx="30"
-              ry="45"
-              transform="rotate(135 75 60)"
-              fill="#007E52"
-              opacity="0.9"
-            />
+            <ellipse cx="45" cy="60" rx="30" ry="45" transform="rotate(45 45 60)" fill="#00A36C" opacity="0.9" />
+            <ellipse cx="75" cy="60" rx="30" ry="45" transform="rotate(135 75 60)" fill="#007E52" opacity="0.9" />
           </svg>
         </div>
-
-        <p className="text-lg text-[#6B7280] opacity-40 font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Lens of the Future
-        </p>
-        <p className="text-sm text-[#6B7280] opacity-60 mb-4">
-          Shop Smart. Save Big.
-        </p>
-        <a 
-          href="#" 
-          className="text-sm font-semibold text-[#00A36C] underline hover:opacity-80 transition-opacity"
-        >
-          Learn more about us
-        </a>
+        <p className="text-lg text-[#6B7280] opacity-40 font-semibold mb-1" style={{ fontFamily: 'Poppins, sans-serif' }}>DeaLo</p>
+        <p className="text-sm text-[#6B7280] opacity-60 mb-4">Shop Smart. Save Big.</p>
+        <a href="#" className="text-sm font-semibold text-[#00A36C] underline hover:opacity-80 transition-opacity">Learn more about us</a>
       </div>
 
       <style>{`

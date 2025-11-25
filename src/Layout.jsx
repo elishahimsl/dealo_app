@@ -6,8 +6,8 @@ import { Home, User, Camera, Compass, Heart } from "lucide-react";
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
 
-  // Hide nav on splash screen AND camera page
-  if (location.pathname === createPageUrl("Splash") || location.pathname === createPageUrl("Snap")) {
+  // Hide nav on splash screen, camera page, and search products
+  if (location.pathname === createPageUrl("Splash") || location.pathname === createPageUrl("Snap") || location.pathname === createPageUrl("SearchProducts")) {
     return <div className="min-h-screen">{children}</div>;
   }
 

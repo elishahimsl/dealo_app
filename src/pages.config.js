@@ -22,6 +22,7 @@ import ComparisonResults from './pages/ComparisonResults';
 import ShopSense from './pages/ShopSense';
 import SearchProducts from './pages/SearchProducts';
 import AllCollections from './pages/AllCollections';
+import ShopSenseTuner from './pages/ShopSenseTuner';
 import __Layout from './Layout.jsx';
 
 
@@ -50,6 +51,7 @@ export const PAGES = {
     "ShopSense": ShopSense,
     "SearchProducts": SearchProducts,
     "AllCollections": AllCollections,
+    "ShopSenseTuner": ShopSenseTuner,
 }
 
 export const pagesConfig = {

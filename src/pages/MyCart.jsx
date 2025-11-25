@@ -66,43 +66,30 @@ export default function MyCart() {
   };
 
   const handleLongPressStart = (folder) => {
-    const timer = setTimeout(() => {
-      setLongPressFolder(folder);
-    }, 500);
+    const timer = setTimeout(() => setLongPressFolder(folder), 500);
     setLongPressTimer(timer);
   };
 
   const handleLongPressEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
-    }
+    if (longPressTimer) { clearTimeout(longPressTimer); setLongPressTimer(null); }
   };
 
   const handleDeleteFolder = () => {
-    if (longPressFolder) {
-      deleteFolderMutation.mutate(longPressFolder.id);
-    }
+    if (longPressFolder) deleteFolderMutation.mutate(longPressFolder.id);
   };
 
   const getFolderProducts = () => mockProducts.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header */}
       <div className="px-6 pt-8 pb-4">
-        <h1 className="text-lg font-bold text-[#1F2937] text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Saved
-        </h1>
+        <h1 className="text-lg font-bold text-[#1F2937] text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>Saved</h1>
       </div>
 
-      {/* Collections Section */}
       <div className="px-6 py-4">
         {folders.length > 0 && (
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              Collections
-            </h2>
+            <h2 className="text-sm font-semibold text-[#1F2937]">Collections</h2>
             {folders.length >= 2 && (
               <button onClick={() => navigate(createPageUrl("AllCollections"))}>
                 <ChevronRight className="w-5 h-5 text-[#6B7280]" />
@@ -111,100 +98,115 @@ export default function MyCart() {
           </div>
         )}
 
-        {/* Collections Row - Horizontal Scroll */}
-        <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
-          {/* Existing Collections */}
-          {folders.map((folder) => {
-            const folderProducts = getFolderProducts();
-            return (
-              <div
-                key={folder.id}
-                onTouchStart={() => handleLongPressStart(folder)}
-                onTouchEnd={handleLongPressEnd}
-                onMouseDown={() => handleLongPressStart(folder)}
-                onMouseUp={handleLongPressEnd}
-                onMouseLeave={handleLongPressEnd}
-                className="relative rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0 cursor-pointer"
-                style={{ width: '120px', height: '120px' }}
-              >
-                <div className="absolute inset-0 p-3 flex gap-1 justify-center items-center">
-                  {folderProducts.slice(0, 3).map((product, idx) => (
-                    <div
-                      key={product.id}
-                      className="w-[26%] aspect-square rounded-lg overflow-hidden shadow-md"
-                      style={{
-                        transform: `rotate(${(idx - 1) * 5}deg)`,
-                        zIndex: 3 - Math.abs(idx - 1)
-                      }}
-                    >
-                      <img src={product.image} alt="Product" className="w-full h-full object-cover" />
-                    </div>
-                  ))}
-                </div>
-                <div className="absolute bottom-2 left-2 right-2">
-                  <p className="text-[#1F2937] text-[10px] font-semibold truncate text-center">{folder.name}</p>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Create Collection Tile - Same size as collection tiles */}
+        {folders.length === 0 ? (
+          /* Full-width Create Collection Tile when no collections */
           <button
             onClick={() => setShowCreateCollection(true)}
-            className="rounded-2xl bg-[#E5E7EB] flex-shrink-0 relative overflow-hidden"
-            style={{ width: '120px', height: '120px' }}
+            className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-4"
+            style={{ height: '130px' }}
           >
-            <div className="absolute top-4 left-0 right-0 flex items-center justify-center">
-              <span className="text-[10px] font-semibold text-[#6B7280]">+ Create collection</span>
+            <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
+              <span className="text-xs font-semibold text-[#6B7280]">+ Create collection</span>
             </div>
             
-            {/* Leaning books - spread across bottom, cropped */}
-            <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between px-1">
+            {/* Leaning books spread across bottom */}
+            <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-2 px-4">
               {mockProducts.slice(0, 5).map((product, idx) => (
                 <div 
                   key={product.id}
-                  className="w-5 h-12 rounded-t-sm overflow-hidden shadow-sm"
+                  className="rounded-t-sm overflow-hidden shadow-sm"
                   style={{ 
+                    width: '40px',
+                    height: '55px',
                     transform: `rotate(${(idx - 2) * 6}deg)`,
-                    marginBottom: '-4px'
+                    marginBottom: '-8px'
                   }}
                 >
-                  <img src={product.image} alt="" className="w-full h-full object-cover object-top" />
+                  <img src={product.image} alt="" className="w-full h-full object-cover object-center" />
                 </div>
               ))}
             </div>
           </button>
-        </div>
+        ) : (
+          /* Horizontal scroll when collections exist */
+          <div className="flex gap-3 overflow-x-auto pb-3 scrollbar-hide">
+            {folders.map((folder) => {
+              const folderProducts = getFolderProducts();
+              return (
+                <div
+                  key={folder.id}
+                  onTouchStart={() => handleLongPressStart(folder)}
+                  onTouchEnd={handleLongPressEnd}
+                  onMouseDown={() => handleLongPressStart(folder)}
+                  onMouseUp={handleLongPressEnd}
+                  onMouseLeave={handleLongPressEnd}
+                  className="relative rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0 cursor-pointer"
+                  style={{ width: '120px', height: '120px' }}
+                >
+                  <div className="absolute inset-0 p-3 flex gap-1 justify-center items-center">
+                    {folderProducts.slice(0, 3).map((product, idx) => (
+                      <div
+                        key={product.id}
+                        className="w-8 h-8 rounded-lg overflow-hidden shadow-md"
+                        style={{ transform: `rotate(${(idx - 1) * 5}deg)`, zIndex: 3 - Math.abs(idx - 1) }}
+                      >
+                        <img src={product.image} alt="Product" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="absolute bottom-2 left-2 right-2">
+                    <p className="text-[#1F2937] text-[10px] font-semibold truncate text-center">{folder.name}</p>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Small Create Collection Tile */}
+            <button
+              onClick={() => setShowCreateCollection(true)}
+              className="rounded-2xl bg-[#E5E7EB] flex-shrink-0 relative overflow-hidden"
+              style={{ width: '120px', height: '120px' }}
+            >
+              <div className="absolute top-4 left-0 right-0 flex items-center justify-center">
+                <span className="text-[9px] font-semibold text-[#6B7280]">+ Create</span>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-1 px-2">
+                {mockProducts.slice(0, 4).map((product, idx) => (
+                  <div 
+                    key={product.id}
+                    className="rounded-t-sm overflow-hidden shadow-sm"
+                    style={{ width: '22px', height: '35px', transform: `rotate(${(idx - 1.5) * 5}deg)`, marginBottom: '-6px' }}
+                  >
+                    <img src={product.image} alt="" className="w-full h-full object-cover object-center" />
+                  </div>
+                ))}
+              </div>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* Products Grid */}
       <div className="px-6 py-4">
-        <h2 className="text-sm font-semibold text-[#1F2937] mb-3" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          All Items
-        </h2>
+        <h2 className="text-sm font-semibold text-[#1F2937] mb-3">All Items</h2>
         <div className="grid grid-cols-2 gap-4">
           {mockProducts.map((product) => (
             <div key={product.id}>
               <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm mb-2 relative aspect-square">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
                 {product.savings && (
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded-md">
-                    Save {product.savings}
-                  </div>
+                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded-md">Save {product.savings}</div>
                 )}
                 <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#00A36C] flex items-center justify-center shadow-md">
                   <Heart className="w-4 h-4 text-white fill-white" />
                 </button>
               </div>
               <div>
-                <p className="text-[10px] text-[#6B7280] mb-0.5" style={{ fontWeight: 300 }}>{product.brand}</p>
+                <p className="text-[10px] text-[#6B7280] mb-0.5">{product.brand}</p>
                 <h3 className="font-bold text-[#1F2937] text-xs mb-0.5 line-clamp-2 leading-tight">{product.title}</h3>
                 <p className="text-sm font-bold text-[#1F2937] mb-1">{product.price}</p>
                 <div className="flex items-center gap-2 text-[10px]">
                   {product.size && <span className="text-[#6B7280]">{product.size}</span>}
-                  <a href={`https://${product.store.toLowerCase().replace(' ', '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[#00A36C] underline hover:opacity-80">
-                    Visit Store
-                  </a>
+                  <a href={`https://${product.store.toLowerCase().replace(' ', '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[#00A36C] underline">Visit Store</a>
                 </div>
               </div>
             </div>
@@ -212,27 +214,23 @@ export default function MyCart() {
         </div>
       </div>
 
-      {/* Delete Modal Overlay */}
       {longPressFolder && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" onClick={() => setLongPressFolder(null)}>
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <div className="w-32 h-32 rounded-2xl overflow-hidden bg-[#E5E7EB] mb-3 mx-auto relative">
               <div className="absolute inset-0 p-2 flex gap-1 justify-center items-center">
                 {getFolderProducts().slice(0, 3).map((product, idx) => (
-                  <div key={product.id} className="w-[26%] aspect-square rounded-lg overflow-hidden shadow-md" style={{ transform: `rotate(${(idx - 1) * 5}deg)`, zIndex: 3 - Math.abs(idx - 1) }}>
+                  <div key={product.id} className="w-8 h-8 rounded-lg overflow-hidden shadow-md" style={{ transform: `rotate(${(idx - 1) * 5}deg)` }}>
                     <img src={product.image} alt="Product" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
             </div>
-            <button onClick={handleDeleteFolder} className="w-20 mx-auto bg-red-500 text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-red-600 transition-colors flex items-center justify-center">
-              Delete
-            </button>
+            <button onClick={handleDeleteFolder} className="w-20 mx-auto bg-red-500 text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-red-600 flex items-center justify-center">Delete</button>
           </div>
         </div>
       )}
 
-      {/* Create Collection Modal */}
       {showCreateCollection && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">

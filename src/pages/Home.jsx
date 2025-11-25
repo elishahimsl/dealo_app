@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 
 export default function Home() {
   const queryClient = useQueryClient();
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('dealo_favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('dealo_favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
   const quickActions = [
     { icon: Camera, label: "Identify", page: "Snap" },

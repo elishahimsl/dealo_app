@@ -112,7 +112,8 @@ export default function Discover() {
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 8).map((store) => (
             <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
-              <span className="text-xs font-bold text-[#1F2937]">{store.name}</span>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[70%] max-h-[40%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
             </a>
           ))}
         </div>
@@ -127,7 +128,8 @@ export default function Discover() {
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 8).map((brand) => (
             <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
-              <span className="text-xs font-bold text-[#1F2937]">{brand.name}</span>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[70%] max-h-[40%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
             </a>
           ))}
         </div>

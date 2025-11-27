@@ -45,8 +45,9 @@ export default function AllBrands() {
 
       <div className="px-6 grid grid-cols-3 gap-3">
         {brands.map((brand) => (
-          <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors">
-            <span className="text-xs font-bold text-[#1F2937] text-center">{brand.name}</span>
+          <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors h-16">
+            <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[70%] max-h-[60%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+            <span className="text-xs font-bold text-[#1F2937] text-center hidden">{brand.name}</span>
           </a>
         ))}
       </div>

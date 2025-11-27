@@ -45,8 +45,9 @@ export default function AllStores() {
 
       <div className="px-6 grid grid-cols-3 gap-3">
         {stores.map((store) => (
-          <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors">
-            <span className="text-xs font-bold text-[#1F2937] text-center">{store.name}</span>
+          <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors h-16">
+            <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[70%] max-h-[60%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+            <span className="text-xs font-bold text-[#1F2937] text-center hidden">{store.name}</span>
           </a>
         ))}
       </div>

@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight, Sparkles, ScanSearch, Leaf, Zap, Award } from "lucide-react";
+import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -18,12 +18,9 @@ export default function Home() {
   }, [favorites]);
 
   const tools = [
-    { icon: Sparkles, name: "SmartFinder", page: "SmartFinder", gradient: true },
-    { icon: Scale, name: "Compare", page: "Compare", gradient: false },
-    { icon: ScanSearch, name: "DealScanner", page: "DealScanner", gradient: true },
-    { icon: Leaf, name: "SmartReview", page: "SmartReview", gradient: false },
-    { icon: Zap, name: "PriceDrop", page: "PriceDrop", gradient: true },
-    { icon: Award, name: "BestMatch", page: "BestMatch", gradient: false },
+    { icon: Camera, name: "Identify", page: "Snap" },
+    { icon: Scale, name: "Compare", page: "Compare" },
+    { icon: Heart, name: "Favorites", page: "MyCart" },
   ];
 
   const trendingProducts = [
@@ -110,17 +107,17 @@ export default function Home() {
       {/* Tools Section */}
       <div className="px-6 mb-6">
         <div className="bg-[#1F2937] rounded-2xl p-4">
-          <p className="text-white/70 text-xs font-light mb-3">get started</p>
-          <div className="grid grid-cols-3 gap-2">
+          <p className="text-white text-xs font-light mb-3">Get Started</p>
+          <div className="flex justify-center gap-3">
             {tools.map((tool, idx) => {
               const Icon = tool.icon;
               return (
                 <Link key={idx} to={createPageUrl(tool.page)}>
-                  <div className={`rounded-xl p-3 flex flex-col items-center ${tool.gradient ? 'bg-gradient-to-br from-[#00A36C] to-[#007E52]' : 'bg-white'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${tool.gradient ? 'bg-white/20' : 'bg-[#00A36C]'}`}>
-                      <Icon className={`w-4 h-4 ${tool.gradient ? 'text-white' : 'text-white'}`} />
+                  <div className="rounded-xl p-3 flex flex-col items-center bg-[#F5F5F5]" style={{ width: '80px' }}>
+                    <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
+                      <Icon className="w-4 h-4 text-white" />
                     </div>
-                    <span className={`text-[9px] font-semibold text-center ${tool.gradient ? 'text-white' : 'text-[#1F2937]'}`}>{tool.name}</span>
+                    <span className="text-[9px] font-semibold text-[#1F2937] text-center">{tool.name}</span>
                   </div>
                 </Link>
               );

@@ -6,53 +6,49 @@ export default function AllBrands() {
   const navigate = useNavigate();
 
   const brands = [
-    { id: 1, name: "Nike", logo: "https://logo.clearbit.com/nike.com" },
-    { id: 2, name: "Apple", logo: "https://logo.clearbit.com/apple.com" },
-    { id: 3, name: "Samsung", logo: "https://logo.clearbit.com/samsung.com" },
-    { id: 4, name: "Sony", logo: "https://logo.clearbit.com/sony.com" },
-    { id: 5, name: "Adidas", logo: "https://logo.clearbit.com/adidas.com" },
-    { id: 6, name: "Canon", logo: "https://logo.clearbit.com/canon.com" },
-    { id: 7, name: "Microsoft", logo: "https://logo.clearbit.com/microsoft.com" },
-    { id: 8, name: "Dell", logo: "https://logo.clearbit.com/dell.com" },
-    { id: 9, name: "HP", logo: "https://logo.clearbit.com/hp.com" },
-    { id: 10, name: "LG", logo: "https://logo.clearbit.com/lg.com" },
+    { id: 1, name: "Nike", url: "https://nike.com" },
+    { id: 2, name: "Apple", url: "https://apple.com" },
+    { id: 3, name: "Samsung", url: "https://samsung.com" },
+    { id: 4, name: "Sony", url: "https://sony.com" },
+    { id: 5, name: "Adidas", url: "https://adidas.com" },
+    { id: 6, name: "Canon", url: "https://canon.com" },
+    { id: 7, name: "Puma", url: "https://puma.com" },
+    { id: 8, name: "Under Armour", url: "https://underarmour.com" },
+    { id: 9, name: "Lululemon", url: "https://lululemon.com" },
+    { id: 10, name: "New Balance", url: "https://newbalance.com" },
+    { id: 11, name: "Dyson", url: "https://dyson.com" },
+    { id: 12, name: "Bose", url: "https://bose.com" },
+    { id: 13, name: "LG", url: "https://lg.com" },
+    { id: 14, name: "Dell", url: "https://dell.com" },
+    { id: 15, name: "HP", url: "https://hp.com" },
+    { id: 16, name: "Lenovo", url: "https://lenovo.com" },
+    { id: 17, name: "Asus", url: "https://asus.com" },
+    { id: 18, name: "Microsoft", url: "https://microsoft.com" },
+    { id: 19, name: "Google", url: "https://store.google.com" },
+    { id: 20, name: "Philips", url: "https://philips.com" },
+    { id: 21, name: "Panasonic", url: "https://panasonic.com" },
+    { id: 22, name: "JBL", url: "https://jbl.com" },
+    { id: 23, name: "Beats", url: "https://beatsbydre.com" },
+    { id: 24, name: "Fitbit", url: "https://fitbit.com" },
   ];
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      <div className="px-6 pt-8 pb-4">
-        <div className="flex items-center gap-3 mb-6">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-center relative">
+          <button onClick={() => navigate(-1)} className="absolute left-0">
+            <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
-          <h1 className="text-2xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            All Brands
-          </h1>
+          <h1 className="text-base text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>Brands</h1>
         </div>
       </div>
 
-      <div className="px-6">
-        <div className="grid grid-cols-2 gap-4">
-          {brands.map((brand) => (
-            <a
-              key={brand.id}
-              href={`https://${brand.name.toLowerCase()}.com`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white rounded-2xl p-6 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all flex items-center justify-center"
-              style={{ height: '120px' }}
-            >
-              <img
-                src={brand.logo}
-                alt={brand.name}
-                className="max-w-[80%] max-h-[60%] object-contain"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
-            </a>
-          ))}
-        </div>
+      <div className="px-6 grid grid-cols-3 gap-3">
+        {brands.map((brand) => (
+          <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors">
+            <span className="text-xs font-bold text-[#1F2937] text-center">{brand.name}</span>
+          </a>
+        ))}
       </div>
     </div>
   );

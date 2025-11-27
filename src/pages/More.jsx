@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Camera, Sparkles, Scale, ScanSearch, Leaf, Zap, Award, ChevronRight } from "lucide-react";
+import { Search, Sparkles, Scale, ScanSearch, Leaf, Zap, Award, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -18,33 +18,41 @@ export default function Discover() {
   ];
 
   const stores = [
-    { id: 1, name: "Target", logo: "https://logo.clearbit.com/target.com", url: "https://target.com" },
-    { id: 2, name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", url: "https://walmart.com" },
-    { id: 3, name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", url: "https://amazon.com" },
-    { id: 4, name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", url: "https://bestbuy.com" },
-    { id: 5, name: "Costco", logo: "https://logo.clearbit.com/costco.com", url: "https://costco.com" },
-    { id: 6, name: "CVS", logo: "https://logo.clearbit.com/cvs.com", url: "https://cvs.com" },
-    { id: 7, name: "Walgreens", logo: "https://logo.clearbit.com/walgreens.com", url: "https://walgreens.com" },
-    { id: 8, name: "Home Depot", logo: "https://logo.clearbit.com/homedepot.com", url: "https://homedepot.com" },
-    { id: 9, name: "Lowes", logo: "https://logo.clearbit.com/lowes.com", url: "https://lowes.com" },
-    { id: 10, name: "Macys", logo: "https://logo.clearbit.com/macys.com", url: "https://macys.com" },
-    { id: 11, name: "Nordstrom", logo: "https://logo.clearbit.com/nordstrom.com", url: "https://nordstrom.com" },
-    { id: 12, name: "Sephora", logo: "https://logo.clearbit.com/sephora.com", url: "https://sephora.com" },
+    { id: 1, name: "Target", url: "https://target.com" },
+    { id: 2, name: "Walmart", url: "https://walmart.com" },
+    { id: 3, name: "Amazon", url: "https://amazon.com" },
+    { id: 4, name: "Best Buy", url: "https://bestbuy.com" },
+    { id: 5, name: "Costco", url: "https://costco.com" },
+    { id: 6, name: "CVS", url: "https://cvs.com" },
+    { id: 7, name: "Walgreens", url: "https://walgreens.com" },
+    { id: 8, name: "Home Depot", url: "https://homedepot.com" },
+    { id: 9, name: "Lowes", url: "https://lowes.com" },
+    { id: 10, name: "Macys", url: "https://macys.com" },
+    { id: 11, name: "Nordstrom", url: "https://nordstrom.com" },
+    { id: 12, name: "Sephora", url: "https://sephora.com" },
+    { id: 13, name: "Ulta", url: "https://ulta.com" },
+    { id: 14, name: "Kohls", url: "https://kohls.com" },
+    { id: 15, name: "JCPenney", url: "https://jcpenney.com" },
+    { id: 16, name: "TJ Maxx", url: "https://tjmaxx.com" },
   ];
 
   const brands = [
-    { id: 1, name: "Nike", logo: "https://logo.clearbit.com/nike.com", url: "https://nike.com" },
-    { id: 2, name: "Apple", logo: "https://logo.clearbit.com/apple.com", url: "https://apple.com" },
-    { id: 3, name: "Samsung", logo: "https://logo.clearbit.com/samsung.com", url: "https://samsung.com" },
-    { id: 4, name: "Sony", logo: "https://logo.clearbit.com/sony.com", url: "https://sony.com" },
-    { id: 5, name: "Adidas", logo: "https://logo.clearbit.com/adidas.com", url: "https://adidas.com" },
-    { id: 6, name: "Canon", logo: "https://logo.clearbit.com/canon.com", url: "https://canon.com" },
-    { id: 7, name: "Puma", logo: "https://logo.clearbit.com/puma.com", url: "https://puma.com" },
-    { id: 8, name: "Under Armour", logo: "https://logo.clearbit.com/underarmour.com", url: "https://underarmour.com" },
-    { id: 9, name: "Lululemon", logo: "https://logo.clearbit.com/lululemon.com", url: "https://lululemon.com" },
-    { id: 10, name: "New Balance", logo: "https://logo.clearbit.com/newbalance.com", url: "https://newbalance.com" },
-    { id: 11, name: "Dyson", logo: "https://logo.clearbit.com/dyson.com", url: "https://dyson.com" },
-    { id: 12, name: "Bose", logo: "https://logo.clearbit.com/bose.com", url: "https://bose.com" },
+    { id: 1, name: "Nike", url: "https://nike.com" },
+    { id: 2, name: "Apple", url: "https://apple.com" },
+    { id: 3, name: "Samsung", url: "https://samsung.com" },
+    { id: 4, name: "Sony", url: "https://sony.com" },
+    { id: 5, name: "Adidas", url: "https://adidas.com" },
+    { id: 6, name: "Canon", url: "https://canon.com" },
+    { id: 7, name: "Puma", url: "https://puma.com" },
+    { id: 8, name: "Under Armour", url: "https://underarmour.com" },
+    { id: 9, name: "Lululemon", url: "https://lululemon.com" },
+    { id: 10, name: "New Balance", url: "https://newbalance.com" },
+    { id: 11, name: "Dyson", url: "https://dyson.com" },
+    { id: 12, name: "Bose", url: "https://bose.com" },
+    { id: 13, name: "LG", url: "https://lg.com" },
+    { id: 14, name: "Dell", url: "https://dell.com" },
+    { id: 15, name: "HP", url: "https://hp.com" },
+    { id: 16, name: "Lenovo", url: "https://lenovo.com" },
   ];
 
   const allTopics = [
@@ -71,10 +79,7 @@ export default function Discover() {
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Search Bar */}
       <div className="px-6 pt-8 mb-4">
-        <button 
-          onClick={() => navigate(createPageUrl("DiscoverSearch"))}
-          className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2"
-        >
+        <button onClick={() => navigate(createPageUrl("DiscoverSearch"))} className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
           <Search className="w-4 h-4 text-[#6B7280]" />
           <span className="text-sm text-[#6B7280]">Search</span>
         </button>
@@ -105,9 +110,9 @@ export default function Discover() {
           <button onClick={() => navigate(createPageUrl("AllStores"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-          {stores.map((store) => (
-            <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
-              <img src={store.logo} alt={store.name} className="max-w-[70%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span class="text-xs font-semibold text-[#1F2937]">${store.name}</span>`; }} />
+          {stores.slice(0, 8).map((store) => (
+            <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
+              <span className="text-xs font-bold text-[#1F2937]">{store.name}</span>
             </a>
           ))}
         </div>
@@ -120,9 +125,9 @@ export default function Discover() {
           <button onClick={() => navigate(createPageUrl("AllBrands"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-          {brands.map((brand) => (
-            <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-white border border-[#E5E7EB] shadow-sm hover:shadow-md flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
-              <img src={brand.logo} alt={brand.name} className="max-w-[70%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = `<span class="text-xs font-semibold text-[#1F2937]">${brand.name}</span>`; }} />
+          {brands.slice(0, 8).map((brand) => (
+            <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
+              <span className="text-xs font-bold text-[#1F2937]">{brand.name}</span>
             </a>
           ))}
         </div>
@@ -160,13 +165,9 @@ export default function Discover() {
       </div>
 
       <div className="px-6 pb-8 pt-4 flex flex-col items-center opacity-30">
-        <div className="relative w-16 h-16 mb-2">
-          <svg viewBox="0 0 120 120" className="w-full h-full">
-            <ellipse cx="45" cy="60" rx="30" ry="45" transform="rotate(45 45 60)" fill="#1F2937" opacity="0.9" />
-            <ellipse cx="75" cy="60" rx="30" ry="45" transform="rotate(135 75 60)" fill="#1F2937" opacity="0.9" />
-          </svg>
-        </div>
-        <p className="text-xs text-[#1F2937] font-semibold">DeaLo</p>
+        <p className="text-lg font-black tracking-tight">
+          <span className="text-[#1F2937]">Dea</span><span className="text-[#00A36C]">Lo</span>
+        </p>
       </div>
 
       <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; } .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }`}</style>

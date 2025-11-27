@@ -87,16 +87,14 @@ export default function MyCart() {
       </div>
 
       <div className="px-6 py-4">
-        {folders.length > 0 && (
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[#1F2937]">Collections</h2>
-            {folders.length >= 2 && (
-              <button onClick={() => navigate(createPageUrl("AllCollections"))}>
-                <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-              </button>
-            )}
-          </div>
-        )}
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-[#1F2937]">Collections</h2>
+          {folders.length >= 2 && (
+            <button onClick={() => navigate(createPageUrl("AllCollections"))}>
+              <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            </button>
+          )}
+        </div>
 
         {folders.length === 0 ? (
           /* Full-width Create Collection Tile when no collections */
@@ -105,7 +103,7 @@ export default function MyCart() {
             className="w-full bg-[#E5E7EB] rounded-2xl relative overflow-hidden mb-4"
             style={{ height: '130px' }}
           >
-            <div className="absolute top-6 left-0 right-0 flex items-center justify-center">
+            <div className="absolute top-1/3 left-0 right-0 flex items-center justify-center">
               <span className="text-xs font-semibold text-[#6B7280]">+ Create collection</span>
             </div>
             
@@ -167,7 +165,7 @@ export default function MyCart() {
               className="rounded-2xl bg-[#E5E7EB] flex-shrink-0 relative overflow-hidden"
               style={{ width: '120px', height: '120px' }}
             >
-              <div className="absolute top-4 left-0 right-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-[9px] font-semibold text-[#6B7280]">+ Create</span>
               </div>
               <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-1 px-2">

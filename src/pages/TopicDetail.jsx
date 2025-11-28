@@ -9,8 +9,20 @@ export default function TopicDetail() {
   const topicName = urlParams.get('topic') || 'Topic';
   const [showMoreBrands, setShowMoreBrands] = useState(false);
   const [showMoreCategories, setShowMoreCategories] = useState({});
+  const [showMoreClothing, setShowMoreClothing] = useState(false);
 
   const isMenOrWomen = topicName === 'Men' || topicName === 'Women';
+
+  const clothingCategories = [
+    { name: "Shirts & Tops", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
+    { name: "Shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
+    { name: "Pants", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
+    { name: "Socks", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=300" },
+    { name: "Active", image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=300" },
+    { name: "Shorts", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300" },
+    { name: "Underwear", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300" },
+    { name: "Sleepwear", image: "https://images.unsplash.com/photo-1631947430066-48c30d57b943?w=300" },
+  ];
 
   const topicBrands = {
     Men: [
@@ -108,8 +120,10 @@ export default function TopicDetail() {
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center justify-between mb-4">
           <button onClick={() => navigate(-1)}><ArrowLeft className="w-5 h-5 text-[#1F2937]" /></button>
+          <h1 className="text-base font-semibold text-[#1F2937]">{topicName}</h1>
+          <div className="w-5" />
         </div>
         
         {/* Search Bar */}
@@ -117,9 +131,6 @@ export default function TopicDetail() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
           <Input placeholder="Search" className="pl-10 h-9 rounded-xl bg-[#E5E7EB] border-0 text-sm" />
         </div>
-
-        {/* Topic Title */}
-        <h1 className="text-2xl text-[#1F2937] mb-6" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>{topicName}</h1>
       </div>
 
       {/* Featured Brands */}
@@ -127,23 +138,17 @@ export default function TopicDetail() {
         <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Brands</h2>
         <div className="grid grid-cols-2 gap-3">
           {visibleBrands.map((brand, idx) => (
-            <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm">
-              <div className="h-28 overflow-hidden">
+            <div key={idx}>
+              <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square">
                 <img src={brand.image} alt={brand.name} className="w-full h-full object-cover" />
               </div>
-              <div className="p-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-6 h-6 rounded bg-white border border-[#E5E7EB] flex items-center justify-center overflow-hidden">
-                    <img src={brand.logo} alt="" className="w-4 h-4 object-contain" />
-                  </div>
-                  <span className="text-xs font-semibold text-[#1F2937]">{brand.name}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs text-[#1F2937]">{brand.rating}</span>
-                  <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
-                  <span className="text-[10px] text-[#6B7280]">({brand.reviews.toLocaleString()})</span>
-                </div>
+              <p className="text-xs font-semibold text-[#1F2937]">{brand.name}</p>
+              <div className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
+                <span className="text-[10px] text-[#1F2937]">{brand.rating}</span>
+                <span className="text-[10px] text-[#6B7280]">({brand.reviews.toLocaleString()})</span>
               </div>
+              <a href={`https://${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#00A36C] underline">Visit Store</a>
             </div>
           ))}
         </div>
@@ -155,57 +160,59 @@ export default function TopicDetail() {
         )}
       </div>
 
-      {/* Categories */}
-      {isMenOrWomen ? (
-        <div className="px-6 space-y-6">
-          {categories.map((cat) => (
-            <div key={cat.name}>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-[#1F2937]">{cat.name}</h2>
-                <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+      {/* Clothing Categories - Only for Men/Women */}
+      {isMenOrWomen && (
+        <div className="px-6 mb-6">
+          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Categories</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {(showMoreClothing ? clothingCategories : clothingCategories.slice(0, 4)).map((cat, idx) => (
+              <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ height: '80px' }}>
+                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <p className="text-white text-sm font-semibold">{cat.name}</p>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                {(showMoreCategories[cat.name] ? cat.items : cat.items.slice(0, 4)).map((item, idx) => (
-                  <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm" style={{ aspectRatio: '4/3' }}>
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                      <p className="text-white text-xs font-semibold">{item.name}</p>
-                      <p className="text-white/80 text-[10px]">{item.price}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {cat.items.length > 4 && (
-                <button onClick={() => toggleCategory(cat.name)} className="w-full py-2 mt-2 text-center text-xs font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl">
-                  {showMoreCategories[cat.name] ? 'Less' : 'More'}
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="px-6 space-y-6">
-          {categories.map((cat) => (
-            <div key={cat.name}>
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-bold text-[#1F2937]">{cat.name}</h2>
-                <ChevronRight className="w-4 h-4 text-[#6B7280]" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                {cat.items.map((item, idx) => (
-                  <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ aspectRatio: '1/1' }}>
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                      <p className="text-white text-xs font-semibold">{item.name}</p>
-                      <p className="text-white/80 text-[10px]">{item.price}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          <button onClick={() => setShowMoreClothing(!showMoreClothing)} className="w-full py-2 mt-3 text-center text-sm font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl hover:bg-[#D6F5E9]">
+            {showMoreClothing ? 'Less' : 'More'}
+          </button>
         </div>
       )}
+
+      {/* Product Categories */}
+      <div className="px-6 space-y-6">
+        {categories.map((cat) => (
+          <div key={cat.name}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-[#1F2937]">{cat.name}</h2>
+              <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {(showMoreCategories[cat.name] ? cat.items : cat.items.slice(0, 4)).map((item, idx) => (
+                <div key={idx}>
+                  <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  </div>
+                  <p className="text-xs font-semibold text-[#1F2937]">{item.name}</p>
+                  <p className="text-xs text-[#1F2937] font-bold">{item.price}</p>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
+                    <span className="text-[10px] text-[#1F2937]">4.5</span>
+                    <span className="text-[10px] text-[#6B7280]">(120)</span>
+                  </div>
+                  <a href="#" className="text-[10px] text-[#00A36C] underline">Visit Store</a>
+                </div>
+              ))}
+            </div>
+            {cat.items.length > 4 && (
+              <button onClick={() => toggleCategory(cat.name)} className="w-full py-2 mt-2 text-center text-xs font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl">
+                {showMoreCategories[cat.name] ? 'Less' : 'More'}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

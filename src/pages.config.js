@@ -9,8 +9,6 @@ import Splash from './pages/Splash';
 import MyCart from './pages/MyCart';
 import More from './pages/More';
 import Achievements from './pages/Achievements';
-import SmartFinder from './pages/SmartFinder';
-import SmartReview from './pages/SmartReview';
 import PriceDrop from './pages/PriceDrop';
 import BestMatch from './pages/BestMatch';
 import DealScanner from './pages/DealScanner';
@@ -42,8 +40,6 @@ export const PAGES = {
     "MyCart": MyCart,
     "More": More,
     "Achievements": Achievements,
-    "SmartFinder": SmartFinder,
-    "SmartReview": SmartReview,
     "PriceDrop": PriceDrop,
     "BestMatch": BestMatch,
     "DealScanner": DealScanner,

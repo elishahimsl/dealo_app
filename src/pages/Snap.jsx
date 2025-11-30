@@ -198,11 +198,6 @@ Be specific and accurate. If you cannot identify the exact product, provide your
         });
 
         setResult({ file_url: user_photo_url, ...aiResult });
-      } catch (error) {
-        console.error("Error processing scan:", error);
-        alert("Failed to process image. Please try again.");
-      }
-
     } catch (error) {
       console.error("Error processing scan:", error);
       alert("Failed to process image. Please try again.");

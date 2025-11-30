@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight } from "lucide-react";
+import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -23,17 +23,39 @@ export default function Home() {
     { icon: Heart, name: "Favorites", page: "MyCart" },
   ];
 
+  const [trendingIndex, setTrendingIndex] = useState(0);
+
   const trendingProducts = [
-    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", title: "Wireless Headphones", badge: "Trending Now" },
-    { id: 2, price: "$249.99", image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400", title: "Gaming Chair" },
-    { id: 3, price: "$699.99", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400", title: "4K Smart TV" },
-    { id: 4, price: "$59.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400", title: "Bluetooth Speaker" },
+    { id: 1, price: "$219.99", originalPrice: "$349.99", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400", title: "VIZIO 4K Smart TV", store: "Target", storeLogo: "https://logo.clearbit.com/target.com", badge: "Bestseller" },
+    { id: 2, price: "$89.99", originalPrice: "$149.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", title: "Sony Wireless Headphones", store: "Best Buy", storeLogo: "https://logo.clearbit.com/bestbuy.com", badge: "Top Rated" },
+    { id: 3, price: "$249.99", originalPrice: "$399.99", image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400", title: "Gaming Chair Pro", store: "Amazon", storeLogo: "https://logo.clearbit.com/amazon.com", badge: "Deal" },
+    { id: 4, price: "$59.99", originalPrice: "$99.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400", title: "JBL Bluetooth Speaker", store: "Walmart", storeLogo: "https://logo.clearbit.com/walmart.com", badge: "Hot" },
+  ];
+
+  const todaysBestDeal = {
+    store: "Target",
+    storeLogo: "https://logo.clearbit.com/target.com",
+    storeRating: 4.5,
+    endsIn: "2 days",
+    discount: "50%",
+    brand: "All in Motion",
+    category: "Active Wear",
+    image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600",
+    products: [
+      { image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=200" },
+      { image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200" },
+    ]
+  };
+
+  const featuredProducts = [
+    { id: 1, price: "$199.00", originalPrice: "$349.00", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=400", title: "Running Socks Set", discount: "50% off", store: "Nike", left: null },
+    { id: 2, price: "$49.99", originalPrice: "$79.99", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400", title: "Athletic Shorts", discount: "37% off", store: "Adidas", left: "1 left" },
   ];
 
   const dealsForYou = [
-    { id: 1, store: "Target", discount: "Up to 40% OFF", image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800", url: "https://target.com/deals" },
-    { id: 2, store: "Best Buy", discount: "Tech Sale 30% OFF", image: "https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=800", url: "https://bestbuy.com/deals" },
-    { id: 3, store: "Amazon", discount: "Flash Deals", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800", url: "https://amazon.com/deals" },
+    { id: 1, store: "Walmart", storeLogo: "https://logo.clearbit.com/walmart.com", discount: "Up to 30% off", category: "Toys", image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=400", products: [{ image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=200" }] },
+    { id: 2, store: "Best Buy", storeLogo: "https://logo.clearbit.com/bestbuy.com", discount: "Huge Deals on TV", category: "Electronics", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400", products: [] },
+    { id: 3, store: "Amazon", storeLogo: "https://logo.clearbit.com/amazon.com", discount: "Up to 65% off", category: "Fashion", image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400", products: [] },
   ];
 
   const saveFavoriteMutation = useMutation({
@@ -126,42 +148,130 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Trending Section - New Design */}
+      {/* Trending Section - Carousel */}
       <div className="px-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#1F2937]">Trending</h2>
-          <Link to={createPageUrl("TrendingProducts")}>
-            <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-              <ChevronRight className="w-4 h-4 text-[#6B7280]" />
-            </div>
-          </Link>
-        </div>
+        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Trending</h2>
 
-        {/* Featured Product */}
-        <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] shadow-sm mb-3">
-          <div className="flex items-center gap-4">
-            <div className="w-28 h-28 rounded-xl bg-[#F3F4F6] flex items-center justify-center overflow-hidden">
-              <img src={trendingProducts[0].image} alt="" className="w-full h-full object-contain p-2" />
+        <div className="bg-white rounded-3xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+          {/* Store header */}
+          <div className="p-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <img src={trendingProducts[trendingIndex].storeLogo} alt="" className="w-6 h-6 rounded" />
+              <span className="text-sm font-semibold text-[#1F2937]">{trendingProducts[trendingIndex].store}</span>
             </div>
-            <div className="flex-1">
-              <h3 className="font-bold text-[#1F2937] text-lg mb-1">{trendingProducts[0].title}</h3>
-              <p className="text-xl font-bold text-[#1F2937] mb-2">{trendingProducts[0].price}</p>
-              <span className="inline-block px-3 py-1 rounded-full bg-[#00A36C] text-white text-xs font-semibold">
-                Trending Now
-              </span>
+            <button>
+              <Heart className="w-5 h-5 text-[#6B7280]" />
+            </button>
+          </div>
+
+          {/* Product Image */}
+          <div className="px-6 pb-4">
+            <div className="bg-[#F3F4F6] rounded-2xl h-48 flex items-center justify-center overflow-hidden">
+              <img src={trendingProducts[trendingIndex].image} alt="" className="h-full object-contain" />
             </div>
           </div>
-        </div>
 
-        {/* Grid Products */}
-        <div className="grid grid-cols-2 gap-3">
-          {trendingProducts.slice(1).map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl p-3 border border-[#E5E7EB] shadow-sm">
-              <div className="w-full h-24 rounded-xl bg-[#F3F4F6] flex items-center justify-center mb-2 overflow-hidden">
-                <img src={product.image} alt="" className="w-full h-full object-contain p-2" />
+          {/* Product Info */}
+          <div className="px-4 pb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="px-2 py-0.5 rounded bg-[#00A36C] text-white text-[10px] font-bold flex items-center gap-1">
+                ✓ {trendingProducts[trendingIndex].badge}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold text-[#1F2937]">{trendingProducts[trendingIndex].price}</span>
+                  <span className="text-sm text-[#6B7280] line-through">{trendingProducts[trendingIndex].originalPrice}</span>
+                </div>
+                <p className="text-sm text-[#1F2937]">{trendingProducts[trendingIndex].title}</p>
+                <a href="#" className="text-xs text-[#00A36C] underline">Visit Store</a>
               </div>
-              <h4 className="font-bold text-[#1F2937] text-sm text-center">{product.title}</h4>
-              <p className="text-[#1F2937] text-sm font-bold text-center">{product.price}</p>
+              <button onClick={() => toggleFavorite(trendingProducts[trendingIndex])}>
+                <Heart className={`w-6 h-6 ${favorites.includes(trendingProducts[trendingIndex].id) ? 'text-[#00A36C] fill-[#00A36C]' : 'text-[#6B7280]'}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Dots */}
+          <div className="flex justify-center gap-1.5 pb-4">
+            {trendingProducts.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setTrendingIndex(idx)}
+                className={`w-2 h-2 rounded-full transition-colors ${idx === trendingIndex ? 'bg-[#1F2937]' : 'bg-[#E5E7EB]'}`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Today's Best Deal */}
+      <div className="px-6 mb-6">
+        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Today's Best Deal</h2>
+
+        <div className="bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] rounded-3xl p-4 text-white relative overflow-hidden">
+          {/* Ends in badge */}
+          <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 w-fit mb-3">
+            <Clock className="w-3 h-3" />
+            <span className="text-xs font-semibold">Ends in {todaysBestDeal.endsIn}</span>
+          </div>
+
+          {/* Store info */}
+          <div className="flex items-center gap-2 mb-4">
+            <img src={todaysBestDeal.storeLogo} alt="" className="w-6 h-6 rounded bg-white" />
+            <span className="font-semibold">{todaysBestDeal.store}</span>
+            <span className="text-white/80 text-sm">★ {todaysBestDeal.storeRating}</span>
+          </div>
+
+          {/* Product images floating right */}
+          <div className="absolute right-4 top-16 flex gap-1">
+            {todaysBestDeal.products.map((p, idx) => (
+              <div key={idx} className="w-12 h-12 bg-white rounded-lg overflow-hidden">
+                <img src={p.image} alt="" className="w-full h-full object-cover" />
+              </div>
+            ))}
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center self-center">
+              <span className="text-xs font-bold">10</span>
+            </div>
+          </div>
+
+          {/* Deal info */}
+          <div className="mb-4">
+            <p className="text-4xl font-black mb-1">Up to {todaysBestDeal.discount}<span className="text-2xl">off</span></p>
+            <p className="text-white/90">{todaysBestDeal.brand}: {todaysBestDeal.category}</p>
+          </div>
+
+          <button className="bg-white text-[#1F2937] px-4 py-2 rounded-full text-sm font-semibold">
+            Shop Deal in Store
+          </button>
+        </div>
+      </div>
+
+      {/* Featured Products */}
+      <div className="px-6 mb-6">
+        <div className="grid grid-cols-2 gap-3">
+          {featuredProducts.map((product) => (
+            <div key={product.id} className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm overflow-hidden">
+              <div className="relative">
+                <div className="h-32 bg-[#F3F4F6] flex items-center justify-center">
+                  <img src={product.image} alt="" className="h-full object-contain" />
+                </div>
+                <button className="absolute top-2 right-2">
+                  <Heart className="w-5 h-5 text-[#6B7280]" />
+                </button>
+              </div>
+              <div className="p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-[#1F2937]">{product.price}</span>
+                  <span className="text-xs text-[#6B7280] line-through">{product.originalPrice}</span>
+                </div>
+                <p className="text-xs text-[#6B7280] mb-1">{product.store}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-[#00A36C] font-semibold">{product.discount}</span>
+                  {product.left && <span className="text-xs text-red-500 font-semibold">= {product.left} =</span>}
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -171,23 +281,46 @@ export default function Home() {
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-[#1F2937]">Deals For You</h2>
-          <Link to={createPageUrl("DealsNearYou")}>
+          <Link to={createPageUrl("AllDeals")}>
             <ChevronRight className="w-5 h-5 text-[#6B7280]" />
           </Link>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
-          {dealsForYou.map((deal) => (
-            <div key={deal.id} className="flex-shrink-0 w-72 rounded-3xl overflow-hidden shadow-lg relative">
-              <img src={deal.image} alt={deal.store} className="w-full h-48 object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-2xl font-bold text-white mb-2">{deal.discount}</h3>
-                <p className="text-white/90 text-lg font-semibold mb-4">{deal.store}</p>
-                <a href={deal.url} target="_blank" rel="noopener noreferrer">
-                  <Button className="bg-white text-[#00A36C] hover:bg-white/90 font-semibold rounded-full">
-                    View Deals
-                  </Button>
-                </a>
+
+        {/* Main deal card */}
+        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-4 mb-3">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <img src={dealsForYou[0].storeLogo} alt="" className="w-5 h-5 rounded" />
+                <span className="text-sm font-semibold text-[#1F2937]">{dealsForYou[0].store}</span>
+              </div>
+              <p className="text-lg font-bold text-[#1F2937] mb-1">{dealsForYou[0].discount}</p>
+              <p className="text-sm text-[#6B7280] mb-3">{dealsForYou[0].category}</p>
+              <button className="bg-[#1F2937] text-white px-4 py-1.5 rounded-full text-xs font-semibold">
+                Shop Now
+              </button>
+            </div>
+            <div className="w-24 h-24 bg-[#F3F4F6] rounded-xl overflow-hidden flex items-center justify-center">
+              <img src={dealsForYou[0].image} alt="" className="w-full h-full object-cover" />
+            </div>
+          </div>
+        </div>
+
+        {/* Small deal cards */}
+        <div className="grid grid-cols-2 gap-3">
+          {dealsForYou.slice(1, 3).map((deal) => (
+            <div key={deal.id} className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm p-3 relative">
+              <div className="flex items-center gap-1 mb-2">
+                <img src={deal.storeLogo} alt="" className="w-4 h-4 rounded" />
+                <span className="text-xs font-semibold text-[#1F2937]">{deal.store}</span>
+              </div>
+              <p className="text-sm font-bold text-[#1F2937] mb-1 line-clamp-2">{deal.discount}</p>
+              <button className="text-[10px] text-[#00A36C] font-semibold">Shop Now</button>
+              <div className="absolute right-2 bottom-2 w-12 h-12 bg-[#F3F4F6] rounded-lg overflow-hidden">
+                <img src={deal.image} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                <span className="text-[8px] text-[#6B7280]">: : Deal : :</span>
               </div>
             </div>
           ))}

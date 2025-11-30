@@ -66,44 +66,72 @@ export default function Snap() {
     }
   };
 
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [showFlash, setShowFlash] = useState(false);
+
   const capturePhoto = async () => {
     if (!videoRef.current || !cameraReady) return;
 
-    setScanning(true);
+    // Flash effect
+    setShowFlash(true);
+    setTimeout(() => setShowFlash(false), 150);
 
+    // Capture the image
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(videoRef.current, 0, 0);
 
-    canvas.toBlob(async (blob) => {
-      const capturedFile = new File([blob], `snap-${Date.now()}.jpg`, { type: 'image/jpeg' });
+    // Show preview first
+    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    setCapturedImage(imageDataUrl);
+    stopCamera();
+  };
 
-      try {
-        const { file_url: user_photo_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
+  const processCapture = async () => {
+    if (!capturedImage) return;
+    
+    setScanning(true);
+    setCapturedImage(null);
 
-        const aiResult = await base44.integrations.Core.InvokeLLM({
-          prompt: `Analyze this product image comprehensively and provide:
-          1. Product name/title
-          2. Brand
-          3. Price (estimate)
-          4. Star rating (out of 5, decimal like 4.6)
-          5. In stock status (true/false)
-          6. Smart summary (2-3 detailed sentences about the product)
-          7. Overall score out of 100
-          8. Subscores: Quality, Value, Features, Design, Durability (each out of 100)
-          9. 4-5 specific pros (positive aspects)
-          10. 4-5 specific cons (negative aspects)
-          11. 4-5 online deals with store name, price, and if it's the smart buy, with product image URLs
-          12. Product description (3-4 sentences)
-          13. Key features (5-6 bullet points)
-          14. Return policy summary
-          15. 3-4 alternative products with name, price, store, image URL (use Unsplash)
-          16. URL to a high-quality product showcase image from Unsplash (search for the specific product type)
-          
-          IMPORTANT: For product_image_url, provide a high-quality Unsplash URL of the actual product type detected, not the user's photo.
-          Be specific and detailed. Generate realistic data.`,
+    // Convert data URL to blob
+    const response = await fetch(capturedImage);
+    const blob = await response.blob();
+    const capturedFile = new File([blob], `snap-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+    try {
+      const { file_url: user_photo_url } = await base44.integrations.Core.UploadFile({ file: capturedFile });
+
+      const aiResult = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an expert product identifier. Analyze this image carefully and identify the EXACT product shown.
+
+IMPORTANT INSTRUCTIONS:
+1. Look at the image carefully and identify what product/item is shown
+2. If it's a branded product, identify the exact brand and model if possible
+3. If it's a generic item, describe it accurately
+4. Provide realistic pricing based on current market values
+5. Generate accurate product details
+
+Provide the following information:
+- Product name/title (be specific, include brand and model if visible)
+- Brand (identify from logos, text, or recognizable design)
+- Estimated retail price
+- Star rating (realistic, 3.5-4.9 range)
+- In stock status
+- Detailed smart summary (2-3 sentences describing the product)
+- Overall quality score out of 100
+- Subscores: Quality, Value, Features, Design, Durability (each out of 100)
+- 4-5 specific pros based on this type of product
+- 4-5 specific cons based on this type of product
+- 4-5 online deals with realistic store prices
+- Detailed product description
+- Key features (5-6 bullet points)
+- Return policy estimate
+- 3-4 alternative/competing products
+- A relevant Unsplash product image URL
+
+Be specific and accurate. If you cannot identify the exact product, provide your best educated guess based on visible characteristics.`,
           file_urls: user_photo_url,
           response_json_schema: {
             type: "object",
@@ -175,8 +203,17 @@ export default function Snap() {
         alert("Failed to process image. Please try again.");
       }
 
-      setScanning(false);
-    }, 'image/jpeg', 0.9);
+    } catch (error) {
+      console.error("Error processing scan:", error);
+      alert("Failed to process image. Please try again.");
+    }
+
+    setScanning(false);
+  };
+
+  const retakePhoto = () => {
+    setCapturedImage(null);
+    startCamera();
   };
 
   const handleFileSelect = async (e) => {
@@ -665,9 +702,57 @@ export default function Snap() {
     );
   }
 
+  // Captured Image Preview
+  if (capturedImage) {
+    return (
+      <div className="relative h-screen w-screen bg-black overflow-hidden">
+        <img src={capturedImage} alt="Captured" className="absolute inset-0 w-full h-full object-cover" />
+        
+        {/* Header */}
+        <div className="absolute top-0 left-0 right-0 z-20 pt-12 px-6 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={retakePhoto}
+            className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
+          >
+            <X className="w-5 h-5 text-white" />
+          </Button>
+          <span className="text-white font-semibold">Preview</span>
+          <div className="w-10" />
+        </div>
+
+        {/* Bottom controls */}
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          <div className="bg-gray-800/80 backdrop-blur-md py-6 px-8">
+            <div className="flex items-center justify-between max-w-lg mx-auto">
+              <button
+                onClick={retakePhoto}
+                className="text-white font-semibold"
+              >
+                Retake
+              </button>
+              <button
+                onClick={processCapture}
+                className="bg-[#00A36C] text-white px-8 py-3 rounded-full font-semibold"
+              >
+                Use Photo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Camera View
   return (
     <div className="relative h-screen w-screen bg-black overflow-hidden">
+      {/* Flash effect */}
+      {showFlash && (
+        <div className="absolute inset-0 bg-white z-50 animate-flash" />
+      )}
+      
       <video
         ref={videoRef}
         autoPlay
@@ -805,6 +890,13 @@ export default function Snap() {
           0% { top: 0; }
           50% { top: calc(100% - 4px); }
           100% { top: 0; }
+        }
+        @keyframes flash {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        .animate-flash {
+          animation: flash 0.15s ease-out;
         }
       `}</style>
     </div>

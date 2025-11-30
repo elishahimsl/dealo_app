@@ -25,6 +25,7 @@ import DiscoverSearch from './pages/DiscoverSearch';
 import TopicDetail from './pages/TopicDetail';
 import Customization from './pages/Customization';
 import Preferences from './pages/Preferences';
+import AllDeals from './pages/AllDeals';
 import __Layout from './Layout.jsx';
 
 
@@ -56,6 +57,7 @@ export const PAGES = {
     "TopicDetail": TopicDetail,
     "Customization": Customization,
     "Preferences": Preferences,
+    "AllDeals": AllDeals,
 }
 
 export const pagesConfig = {

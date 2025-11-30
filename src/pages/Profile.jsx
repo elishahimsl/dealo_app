@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, FileText, LogOut } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, LogOut, Palette, Info } from "lucide-react";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -152,12 +152,10 @@ export default function Profile() {
               <Button className="w-full rounded-2xl bg-[#00A36C] hover:bg-[#007E52]">Submit Report</Button>
             </div>
             <Button variant="outline" className="w-full rounded-2xl border-[#00A36C] text-[#00A36C]">Contact Support</Button>
-          </div>
-        )}
-
-        {settingsPage === 'Terms' && (
-          <div className="px-6">
-            <div className="flex gap-2 mb-4 sticky top-0 bg-[#F9FAFB] py-2">
+            
+            {/* Terms Section */}
+            <h3 className="text-sm font-bold text-[#1F2937] pt-4">Legal</h3>
+            <div className="flex gap-2 mb-4">
               <button className="flex-1 py-2 rounded-xl bg-[#00A36C] text-white text-sm font-semibold">Terms of Service</button>
               <button className="flex-1 py-2 rounded-xl bg-white text-[#1F2937] text-sm font-semibold border border-[#E5E7EB]">Privacy Policy</button>
             </div>
@@ -188,13 +186,13 @@ export default function Profile() {
           <div className="grid grid-cols-2 gap-3 mb-8">
             {[
               { icon: User, label: 'Account', desc: 'Profile & Email', color: '#00A36C' },
-              { icon: Settings, label: 'Security', desc: 'Password', color: '#00A36C' },
               { icon: Bell, label: 'Notifications', desc: 'Alerts & Updates', color: '#1F2937' },
+              { icon: Palette, label: 'Customization', desc: 'Preferences & Theme', color: '#00A36C', page: 'Customization' },
               { icon: Lock, label: 'Privacy', desc: 'Data & Sharing', color: '#1F2937' },
-              { icon: HelpCircle, label: 'Help', desc: 'Support Center', color: '#1F2937' },
-              { icon: FileText, label: 'Terms', desc: 'Legal & Privacy', color: '#1F2937' },
+              { icon: HelpCircle, label: 'Help', desc: 'Support & Terms', color: '#1F2937' },
+              { icon: Info, label: 'About', desc: 'App Info', color: '#1F2937' },
             ].map((item) => (
-              <button key={item.label} onClick={() => setSettingsPage(item.label)} className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
+              <button key={item.label} onClick={() => item.page ? navigate(createPageUrl(item.page)) : setSettingsPage(item.label)} className="bg-[#F9FAFB] rounded-2xl p-4 text-left hover:bg-[#E5E7EB] transition-colors">
                 <item.icon className="w-6 h-6 mb-2" style={{ color: item.color }} />
                 <h3 className="text-sm font-bold text-[#1F2937]">{item.label}</h3>
                 <p className="text-xs text-[#6B7280] mt-1">{item.desc}</p>

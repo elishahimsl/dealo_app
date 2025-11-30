@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Sparkles, Scale, ScanSearch, Leaf, Zap, Award, ChevronRight } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -9,12 +9,10 @@ export default function Discover() {
   const [showAllTopics, setShowAllTopics] = useState(false);
 
   const specialTools = [
-    { id: 1, icon: Sparkles, name: "SmartFinder", page: "SmartFinder" },
-    { id: 2, icon: Scale, name: "SnapCompare", page: "Compare" },
-    { id: 3, icon: ScanSearch, name: "DealScanner", page: "DealScanner" },
-    { id: 4, icon: Leaf, name: "SmartReview", page: "SmartReview" },
-    { id: 5, icon: Zap, name: "PriceDrop", page: "PriceDrop" },
-    { id: 6, icon: Award, name: "BestMatch", page: "BestMatch" },
+    { id: 1, icon: Scale, name: "SnapCompare", page: "Compare" },
+    { id: 2, icon: ScanSearch, name: "DealScanner", page: "DealScanner" },
+    { id: 3, icon: Zap, name: "PriceDrop", page: "PriceDrop" },
+    { id: 4, icon: Award, name: "BestMatch", page: "BestMatch" },
   ];
 
   const stores = [
@@ -88,7 +86,7 @@ export default function Discover() {
       {/* DeaLo Tools */}
       <div className="px-6 mb-4">
         <h2 className="text-xs font-bold text-[#1F2937] mb-2">DeaLo Tools</h2>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (

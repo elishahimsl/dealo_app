@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight, Bookmark, MoreHorizontal } from "lucide-react";
+import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight, Bookmark, MoreHorizontal, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -62,10 +62,9 @@ export default function Home() {
       storeColor: "#0071CE",
       image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400",
       products: [
-        { id: 201, price: "$24.99", title: "LEGO Set", discount: "25% off", image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=300" },
-        { id: 202, price: "$19.99", title: "Action Figure", discount: "30% off", image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=300" },
-        { id: 203, price: "$34.99", title: "Board Game", discount: "20% off", image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=300" },
-        { id: 204, price: "$15.99", title: "Stuffed Animal", discount: "35% off", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=300" },
+        { id: 201, price: "$24.99", title: "LEGO Set", discount: "25%", image: "https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=300" },
+        { id: 202, price: "$19.99", title: "Action Figure", discount: "30%", image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=300" },
+        { id: 203, price: "$34.99", title: "Board Game", discount: "20%", image: "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?w=300" },
       ]
     },
     { 
@@ -78,10 +77,10 @@ export default function Home() {
       storeColor: "#FF9900",
       image: "https://images.unsplash.com/photo-1564557287817-3785e38ec1f5?w=400",
       products: [
-        { id: 301, price: "$18.99", title: "White Shirt", discount: "18% off", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
-        { id: 302, price: "$24.99", title: "Pants", discount: "15% off", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
-        { id: 303, price: "$12.99", title: "Goggles", discount: "36% off", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
-        { id: 304, price: "$9.99", title: "Polo", discount: "86% off", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300" },
+        { id: 301, price: "$18.99", title: "White Shirt", discount: "18%", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
+        { id: 302, price: "$24.99", title: "Pants", discount: "15%", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
+        { id: 303, price: "$12.99", title: "Goggles", discount: "36%", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
+        { id: 304, price: "$9.99", title: "Polo", discount: "86%", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300" },
       ]
     },
   ];
@@ -131,32 +130,36 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Pill Buttons */}
-        <div className="flex gap-2">
-          <Link to={createPageUrl("DealsNearYou")}>
+        {/* Pill Buttons - Scrollable */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-1">
+          <Link to={createPageUrl("DealsNearYou")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Tag className="w-3 h-3 text-[#00A36C]" />
               Deals
             </button>
           </Link>
-          <Link to={createPageUrl("More")}>
+          <Link to={createPageUrl("More")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Grid3X3 className="w-3 h-3 text-[#00A36C]" />
               Categories
             </button>
           </Link>
-          <Link to={createPageUrl("DiscoverSearch")}>
+          <Link to={createPageUrl("DiscoverSearch")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Search className="w-3 h-3 text-[#00A36C]" />
               Search
             </button>
           </Link>
-          <Link to={createPageUrl("MyCart")}>
+          <Link to={createPageUrl("MyCart")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Bookmark className="w-3 h-3 text-[#00A36C]" />
               Saved
             </button>
           </Link>
+          <button className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
+            <Users className="w-3 h-3 text-[#00A36C]" />
+            Following
+          </button>
         </div>
       </div>
 
@@ -187,11 +190,11 @@ export default function Home() {
         <h2 className="text-lg font-bold text-[#1F2937] mb-4">Trending</h2>
 
         <div className="rounded-3xl overflow-hidden relative" style={{ height: '340px' }}>
-          {/* Gradient background - black at bottom to store color at top */}
+          {/* Gradient background - softer black at bottom to store color at top */}
           <div 
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(to top, #1a1a1a 0%, #1a1a1a 40%, ${trendingProducts[trendingIndex].storeColor}99 85%, ${trendingProducts[trendingIndex].storeColor}66 100%)`
+              background: `linear-gradient(to top, #2d2d2d 0%, #3a3a3a 40%, ${trendingProducts[trendingIndex].storeColor}99 85%, ${trendingProducts[trendingIndex].storeColor}66 100%)`
             }}
           />
           
@@ -411,27 +414,39 @@ export default function Home() {
 
         {/* Store Deal Sections */}
         <div className="space-y-6">
-          {dealsForYou.map((storeDeal) => (
+          {dealsForYou.map((storeDeal, storeIdx) => (
             <div key={storeDeal.id}>
-              {/* Store Banner with circular product cutout */}
-              <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '100px' }}>
+              {/* Store Banner with curved edge */}
+              <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '90px' }}>
                 {/* Store color gradient - left to right */}
                 <div 
                   className="absolute inset-0"
                   style={{
-                    background: `linear-gradient(to right, ${storeDeal.storeColor} 0%, ${storeDeal.storeColor}dd 50%, ${storeDeal.storeColor}99 70%, transparent 85%)`
+                    background: `linear-gradient(to right, ${storeDeal.storeColor} 0%, ${storeDeal.storeColor}ee 40%, ${storeDeal.storeColor}cc 60%, ${storeDeal.storeColor}88 75%, #2d2d2d 90%)`
                   }}
                 />
                 
-                {/* Circular cutout on right with product */}
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-[#1F2937] flex items-center justify-center overflow-hidden" style={{ marginRight: '-12px' }}>
-                  <img src={storeDeal.image} alt="" className="w-16 h-16 object-contain" />
+                {/* Curved edge with product - using SVG clip path effect */}
+                <div 
+                  className="absolute right-0 top-0 bottom-0 w-28 flex items-center justify-center"
+                  style={{
+                    background: `linear-gradient(to right, transparent 0%, #2d2d2d 30%)`,
+                    borderTopLeftRadius: '50%',
+                    borderBottomLeftRadius: '50%'
+                  }}
+                >
+                  {/* Stars around product */}
+                  <span className="absolute top-2 right-8 text-white/60 text-[8px]">✦</span>
+                  <span className="absolute top-4 right-3 text-white/40 text-[6px]">✦</span>
+                  <span className="absolute bottom-3 right-6 text-white/50 text-[7px]">✦</span>
+                  <span className="absolute bottom-5 right-2 text-white/30 text-[5px]">✦</span>
+                  <img src={storeDeal.image} alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
                 </div>
 
                 {/* Content */}
-                <div className="absolute inset-0 p-4 flex flex-col justify-center pr-28">
+                <div className="absolute inset-0 p-3 flex flex-col justify-center pr-32">
                   {/* Store logo and name */}
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-1.5 mb-1">
                     <img src={storeDeal.storeLogo} alt="" className="w-4 h-4 rounded" />
                     <span className="text-white text-[10px] font-medium">{storeDeal.store}</span>
                   </div>
@@ -453,55 +468,144 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Store Products Grid */}
-              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-3">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <img src={storeDeal.storeLogo} alt="" className="w-4 h-4 rounded" />
-                    <span className="text-xs font-semibold text-[#1F2937]">{storeDeal.store} Deals</span>
-                  </div>
-                  <button className="flex items-center justify-center">
-                    <MoreHorizontal className="w-5 h-5 text-[#6B7280]" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {storeDeal.products.map((product) => (
-                    <div key={product.id} className="rounded-xl overflow-hidden bg-[#F3F4F6]">
-                      {/* Product Image with gradient - all info inside */}
-                      <div className="relative" style={{ height: '100px' }}>
-                        <img src={product.image} alt="" className="w-full h-full object-contain p-2" />
-                        
-                        {/* Store color gradient from bottom - more opaque */}
-                        <div 
-                          className="absolute inset-0"
-                          style={{
-                            background: `linear-gradient(to top, ${storeDeal.storeColor}ee 0%, ${storeDeal.storeColor}cc 35%, ${storeDeal.storeColor}66 50%, transparent 60%)`
-                          }}
-                        />
-                        
-                        {/* Heart with ring - bottom right */}
-                        <button 
-                          onClick={() => toggleFavorite(product)}
-                          className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center border-2 ${
-                            favorites.includes(product.id) 
-                              ? 'bg-[#00A36C] border-[#00A36C]' 
-                              : 'bg-white/20 border-white'
-                          }`}
-                        >
-                          <Heart className={`w-3 h-3 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
-                        </button>
-
-                        {/* Product name and discount - bottom left inside tile */}
-                        <div className="absolute bottom-2 left-2">
-                          <span className="text-white text-[9px] font-bold block">{product.discount}</span>
-                          <span className="text-white text-[10px] font-medium">{product.title}</span>
+              {/* Walmart - Special 2+1 layout */}
+              {storeIdx === 0 ? (
+                <div className="flex gap-2">
+                  {/* Left: 2 stacked rectangular tiles */}
+                  <div className="flex-1 flex flex-col gap-2">
+                    {storeDeal.products.slice(0, 2).map((product) => (
+                      <div key={product.id} className="rounded-xl overflow-hidden border border-[#E5E7EB]" style={{ height: '70px' }}>
+                        <div className="relative h-full flex">
+                          {/* Left content */}
+                          <div className="flex-1 p-2 flex flex-col justify-between">
+                            <div>
+                              <span className="text-[9px] font-bold text-[#1F2937] block">{product.discount} off</span>
+                              <span className="text-[10px] font-medium text-[#1F2937]">{product.title}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <img src={storeDeal.storeLogo} alt="" className="w-3 h-3" />
+                              <span className="text-[8px] text-[#6B7280]">Deal</span>
+                            </div>
+                          </div>
+                          
+                          {/* Right: product image with gradient */}
+                          <div 
+                            className="w-20 relative"
+                            style={{
+                              background: `linear-gradient(to right, white 0%, ${storeDeal.storeColor}44 50%, ${storeDeal.storeColor}88 100%)`
+                            }}
+                          >
+                            <img src={product.image} alt="" className="absolute inset-0 w-full h-full object-contain p-1" />
+                            {/* Stars */}
+                            <span className="absolute top-1 right-1 text-white/70 text-[6px]">✦</span>
+                            <span className="absolute bottom-1 right-2 text-white/50 text-[5px]">✦</span>
+                            {/* Heart */}
+                            <button 
+                              onClick={() => toggleFavorite(product)}
+                              className={`absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center border ${
+                                favorites.includes(product.id) 
+                                  ? 'bg-[#00A36C] border-[#00A36C]' 
+                                  : 'bg-white/30 border-[#E5E7EB]'
+                              }`}
+                            >
+                              <Heart className={`w-2.5 h-2.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
+                            </button>
+                          </div>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                  
+                  {/* Right: 1 tall tile */}
+                  <div className="rounded-xl overflow-hidden border border-[#E5E7EB]" style={{ width: '140px', height: '148px' }}>
+                    <div className="relative h-full">
+                      {/* Top left content */}
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="text-[9px] font-bold text-[#1F2937] block">{storeDeal.products[2].discount} off</span>
+                        <span className="text-[10px] font-medium text-[#1F2937]">{storeDeal.products[2].title}</span>
+                      </div>
+                      
+                      {/* Bottom left: logo and deal */}
+                      <div className="absolute bottom-2 left-2 z-10 flex items-center gap-1">
+                        <img src={storeDeal.storeLogo} alt="" className="w-3 h-3" />
+                        <span className="text-[8px] text-[#6B7280]">Deal</span>
+                      </div>
+                      
+                      {/* Product image on right with gradient */}
+                      <div 
+                        className="absolute right-0 top-0 bottom-0 w-24"
+                        style={{
+                          background: `linear-gradient(to right, white 0%, ${storeDeal.storeColor}44 30%, ${storeDeal.storeColor}88 100%)`
+                        }}
+                      >
+                        <img src={storeDeal.products[2].image} alt="" className="absolute inset-0 w-full h-full object-contain p-2" />
+                        {/* Stars */}
+                        <span className="absolute top-2 right-2 text-white/70 text-[7px]">✦</span>
+                        <span className="absolute top-6 right-4 text-white/50 text-[5px]">✦</span>
+                        <span className="absolute bottom-4 right-3 text-white/60 text-[6px]">✦</span>
+                      </div>
+                      
+                      {/* Heart */}
+                      <button 
+                        onClick={() => toggleFavorite(storeDeal.products[2])}
+                        className={`absolute bottom-2 right-2 z-10 w-5 h-5 rounded-full flex items-center justify-center border ${
+                          favorites.includes(storeDeal.products[2].id) 
+                            ? 'bg-[#00A36C] border-[#00A36C]' 
+                            : 'bg-white/30 border-[#E5E7EB]'
+                        }`}
+                      >
+                        <Heart className={`w-2.5 h-2.5 ${favorites.includes(storeDeal.products[2].id) ? 'text-white fill-white' : 'text-white'}`} />
+                      </button>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* Amazon and others - Original 2x2 grid */
+                <div className="bg-white rounded-2xl border border-[#E5E7EB] p-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <img src={storeDeal.storeLogo} alt="" className="w-4 h-4 rounded" />
+                      <span className="text-xs font-semibold text-[#1F2937]">{storeDeal.store} Deals</span>
+                    </div>
+                    <button className="flex items-center justify-center">
+                      <MoreHorizontal className="w-5 h-5 text-[#6B7280]" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {storeDeal.products.map((product) => (
+                      <div key={product.id} className="rounded-xl overflow-hidden bg-[#F3F4F6]">
+                        <div className="relative" style={{ height: '100px' }}>
+                          <img src={product.image} alt="" className="w-full h-full object-contain p-2" />
+                          
+                          <div 
+                            className="absolute inset-0"
+                            style={{
+                              background: `linear-gradient(to top, ${storeDeal.storeColor}ee 0%, ${storeDeal.storeColor}cc 35%, ${storeDeal.storeColor}66 50%, transparent 60%)`
+                            }}
+                          />
+                          
+                          <button 
+                            onClick={() => toggleFavorite(product)}
+                            className={`absolute bottom-2 right-2 w-5 h-5 rounded-full flex items-center justify-center border ${
+                              favorites.includes(product.id) 
+                                ? 'bg-[#00A36C] border-[#00A36C]' 
+                                : 'bg-white/20 border-white'
+                            }`}
+                          >
+                            <Heart className={`w-2.5 h-2.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
+                          </button>
+
+                          <div className="absolute bottom-2 left-2">
+                            <span className="text-white text-[9px] font-bold block">{product.discount} off</span>
+                            <span className="text-white text-[10px] font-medium">{product.title}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

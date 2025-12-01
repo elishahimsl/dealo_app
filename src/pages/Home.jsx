@@ -36,15 +36,13 @@ export default function Home() {
     store: "Target",
     storeLogo: "https://logo.clearbit.com/target.com",
     storeRating: 4.5,
+    reviewCount: "17.5k",
     endsIn: "2 days",
     discount: "50%",
     brand: "All in Motion",
     category: "Active Wear",
-    image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=600",
-    products: [
-      { image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=200" },
-      { image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200" },
-    ]
+    storeColor: "#CC0000",
+    image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600"
   };
 
   const featuredProducts = [
@@ -206,45 +204,61 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Today's Best Deal */}
+      {/* Today's Best Deal - App Store Style */}
       <div className="px-6 mb-6">
         <h2 className="text-lg font-bold text-[#1F2937] mb-4">Today's Best Deal</h2>
 
-        <div className="bg-gradient-to-br from-[#FF6B6B] to-[#FF8E53] rounded-3xl p-4 text-white relative overflow-hidden">
-          {/* Ends in badge */}
-          <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 w-fit mb-3">
-            <Clock className="w-3 h-3" />
-            <span className="text-xs font-semibold">Ends in {todaysBestDeal.endsIn}</span>
+        <div className="rounded-3xl overflow-hidden relative" style={{ height: '280px' }}>
+          {/* Background Image - fitness items on right side */}
+          <div className="absolute inset-0">
+            <img 
+              src={todaysBestDeal.image} 
+              alt="" 
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Store info */}
-          <div className="flex items-center gap-2 mb-4">
-            <img src={todaysBestDeal.storeLogo} alt="" className="w-6 h-6 rounded bg-white" />
-            <span className="font-semibold">{todaysBestDeal.store}</span>
-            <span className="text-white/80 text-sm">★ {todaysBestDeal.storeRating}</span>
+          {/* Gradient overlay - store color from left */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(to right, ${todaysBestDeal.storeColor}ee 0%, ${todaysBestDeal.storeColor}cc 40%, ${todaysBestDeal.storeColor}66 60%, transparent 80%)`
+            }}
+          />
+
+          {/* Ends in badge - top right */}
+          <div className="absolute top-4 right-4 flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-3 py-1.5">
+            <Clock className="w-3 h-3 text-white" />
+            <span className="text-xs font-semibold text-white">Ends in {todaysBestDeal.endsIn}</span>
           </div>
 
-          {/* Product images floating right */}
-          <div className="absolute right-4 top-16 flex gap-1">
-            {todaysBestDeal.products.map((p, idx) => (
-              <div key={idx} className="w-12 h-12 bg-white rounded-lg overflow-hidden">
-                <img src={p.image} alt="" className="w-full h-full object-cover" />
+          {/* Content */}
+          <div className="absolute inset-0 p-5 flex flex-col">
+            {/* Store info - top left */}
+            <div className="flex items-start gap-2 mb-auto">
+              <img src={todaysBestDeal.storeLogo} alt="" className="w-10 h-10 rounded-xl bg-white p-1" />
+              <div>
+                <p className="text-white font-bold text-base">{todaysBestDeal.store}</p>
+                <div className="flex items-center gap-1">
+                  <span className="text-white/90 text-xs">{todaysBestDeal.storeRating}</span>
+                  <span className="text-yellow-300 text-xs">★</span>
+                  <span className="text-white/70 text-xs">({todaysBestDeal.reviewCount})</span>
+                </div>
               </div>
-            ))}
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center self-center">
-              <span className="text-xs font-bold">10</span>
+            </div>
+
+            {/* Deal text - bottom half */}
+            <div className="mt-auto">
+              <p className="text-white text-4xl font-black leading-none mb-1">
+                Up to {todaysBestDeal.discount}
+                <span className="text-2xl align-top">off</span>
+              </p>
+              <p className="text-white/90 text-base mb-3">{todaysBestDeal.brand}: {todaysBestDeal.category}</p>
+              <button className="bg-white/20 backdrop-blur-sm text-white border border-white/40 px-5 py-2 rounded-full text-sm font-semibold">
+                Shop Deal in Store
+              </button>
             </div>
           </div>
-
-          {/* Deal info */}
-          <div className="mb-4">
-            <p className="text-4xl font-black mb-1">Up to {todaysBestDeal.discount}<span className="text-2xl">off</span></p>
-            <p className="text-white/90">{todaysBestDeal.brand}: {todaysBestDeal.category}</p>
-          </div>
-
-          <button className="bg-white text-[#1F2937] px-4 py-2 rounded-full text-sm font-semibold">
-            Shop Deal in Store
-          </button>
         </div>
       </div>
 

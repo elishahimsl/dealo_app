@@ -27,6 +27,7 @@ import Customization from './pages/Customization';
 import Preferences from './pages/Preferences';
 import AllDeals from './pages/AllDeals';
 import StoreDetail from './pages/StoreDetail';
+import RecentlyViewed from './pages/RecentlyViewed';
 import __Layout from './Layout.jsx';
 
 
@@ -60,6 +61,7 @@ export const PAGES = {
     "Preferences": Preferences,
     "AllDeals": AllDeals,
     "StoreDetail": StoreDetail,
+    "RecentlyViewed": RecentlyViewed,
 }
 
 export const pagesConfig = {

@@ -267,22 +267,24 @@ export default function Profile() {
       <div className="py-4 bg-white">
         <div className="px-6 flex items-center justify-between mb-3">
           <h3 className="text-base font-bold text-[#1F2937]">Recently Viewed</h3>
-          <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+          <button onClick={() => navigate(createPageUrl("RecentlyViewed"))}>
+            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+          </button>
         </div>
-        <div className="flex gap-3 overflow-x-scroll scrollbar-hide -mx-6 px-6">
+        <div className="px-6 flex gap-2 overflow-x-scroll scrollbar-hide">
           {recentlyViewed.map((item) => (
-            <div key={item.id} className="flex-shrink-0 rounded-xl overflow-hidden shadow-sm relative" style={{ width: '140px', height: '100px' }}>
+            <div key={item.id} className="flex-shrink-0 rounded-xl overflow-hidden shadow-sm relative" style={{ width: '100px', height: '70px' }}>
               <img src={item.image} alt="Product" className="w-full h-full object-cover" />
-              <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5"><span className="text-[9px] font-bold text-white">{item.price}</span></div>
-              <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/40 flex items-center justify-center"><Heart className="w-3 h-3 text-white" strokeWidth={2} /></button>
+              <div className="absolute top-1 left-1 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5"><span className="text-[8px] font-bold text-white">{item.price}</span></div>
+              <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#6B7280]/40 flex items-center justify-center"><Heart className="w-2.5 h-2.5 text-white" strokeWidth={2} /></button>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="px-6 py-6">
-        <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-14 text-base flex items-center justify-center gap-3">
-          <div className="w-6 h-6 border-2 border-white rounded flex items-center justify-center"><Share2 className="w-3 h-3 text-white" /></div>
+      <div className="px-6 py-4">
+        <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-10 text-sm flex items-center justify-center gap-2">
+          <div className="w-5 h-5 border-2 border-white rounded flex items-center justify-center"><Share2 className="w-2.5 h-2.5 text-white" /></div>
           Invite Friends
         </Button>
       </div>

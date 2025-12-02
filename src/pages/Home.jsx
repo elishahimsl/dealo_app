@@ -138,16 +138,14 @@ export default function Home() {
               Deals
             </button>
           </Link>
+          <button className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
+            <Users className="w-3 h-3 text-[#00A36C]" />
+            Following
+          </button>
           <Link to={createPageUrl("More")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Grid3X3 className="w-3 h-3 text-[#00A36C]" />
               Categories
-            </button>
-          </Link>
-          <Link to={createPageUrl("DiscoverSearch")} className="flex-shrink-0">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
-              <Search className="w-3 h-3 text-[#00A36C]" />
-              Search
             </button>
           </Link>
           <Link to={createPageUrl("MyCart")} className="flex-shrink-0">
@@ -156,10 +154,6 @@ export default function Home() {
               Saved
             </button>
           </Link>
-          <button className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
-            <Users className="w-3 h-3 text-[#00A36C]" />
-            Following
-          </button>
         </div>
       </div>
 

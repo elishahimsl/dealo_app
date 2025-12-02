@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Scale, ScanSearch, Zap, Award, ChevronRight } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -69,25 +69,30 @@ export default function Discover() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Search Bar */}
-      <div className="px-6 pt-8 mb-4">
-        <button onClick={() => navigate(createPageUrl("DiscoverSearch"))} className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
-          <Search className="w-4 h-4 text-[#6B7280]" />
-          <span className="text-sm text-[#6B7280]">Search</span>
-        </button>
+      <div className="px-8 pt-8 mb-4">
+        <div className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
+          <button onClick={() => navigate(createPageUrl("DiscoverSearch"))} className="flex-1 flex items-center gap-2">
+            <Search className="w-4 h-4 text-[#6B7280]" />
+            <span className="text-sm text-[#6B7280]">Search</span>
+          </button>
+          <button onClick={() => navigate(createPageUrl("Snap"))}>
+            <Camera className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        </div>
       </div>
 
       {/* DeaLo Tools */}
       <div className="px-6 mb-4">
         <h2 className="text-xs font-bold text-[#1F2937] mb-2">DeaLo Tools</h2>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <button key={tool.id} onClick={() => navigate(createPageUrl(tool.page))} className="bg-white rounded-xl p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center hover:border-[#00A36C]">
-                <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
-                  <Icon className="w-4 h-4 text-white" strokeWidth={2} />
+              <button key={tool.id} onClick={() => navigate(createPageUrl(tool.page))} className="bg-white rounded-lg p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center hover:border-[#00A36C]">
+                <div className="w-6 h-6 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
+                  <Icon className="w-3 h-3 text-white" strokeWidth={2} />
                 </div>
-                <span className="text-[9px] font-semibold text-[#1F2937] text-center">{tool.name}</span>
+                <span className="text-[8px] font-semibold text-[#1F2937] text-center">{tool.name}</span>
               </button>
             );
           })}
@@ -102,10 +107,10 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[55%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
               <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
-            </a>
+            </button>
           ))}
         </div>
       </div>
@@ -118,10 +123,10 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[55%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
               <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
-            </a>
+            </button>
           ))}
         </div>
       </div>
@@ -129,20 +134,16 @@ export default function Discover() {
       {/* Topics */}
       <div className="mb-4">
         <div className="px-6 mb-3">
-          <h2 className="text-base font-bold text-[#1F2937]">Browse Topics</h2>
-        </div>
-
-        <div className="px-6 mb-3">
-          <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-32 rounded-2xl shadow-lg overflow-hidden relative">
+          <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-24 rounded-2xl shadow-lg overflow-hidden relative">
             <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Deals" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-            <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-bold text-white">Deals</h3>
+            <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-white">Deals</h3>
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-2 px-6">
           {visibleTopics.map((topic) => (
-            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ aspectRatio: '4/3' }}>
+            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ aspectRatio: '3/4' }}>
               <img src={topic.image} alt={topic.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <span className="absolute bottom-3 left-3 font-bold text-white text-base">{topic.name}</span>

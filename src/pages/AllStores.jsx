@@ -1,22 +1,23 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { ArrowLeft } from "lucide-react";
 
 export default function AllStores() {
   const navigate = useNavigate();
 
   const stores = [
-    { id: 1, name: "Amazon", url: "https://amazon.com" },
-    { id: 2, name: "Walmart", url: "https://walmart.com" },
-    { id: 3, name: "Target", url: "https://target.com" },
-    { id: 4, name: "Best Buy", url: "https://bestbuy.com" },
-    { id: 5, name: "Costco", url: "https://costco.com" },
-    { id: 6, name: "Sam's Club", url: "https://samsclub.com" },
-    { id: 7, name: "Home Depot", url: "https://homedepot.com" },
-    { id: 8, name: "Lowe's", url: "https://lowes.com" },
-    { id: 9, name: "IKEA", url: "https://ikea.com" },
-    { id: 10, name: "Macy's", url: "https://macys.com" },
-    { id: 11, name: "Kohl's", url: "https://kohls.com" },
+    { id: 1, name: "Amazon" },
+    { id: 2, name: "Walmart" },
+    { id: 3, name: "Target" },
+    { id: 4, name: "Best Buy" },
+    { id: 5, name: "Costco" },
+    { id: 6, name: "Sam's Club" },
+    { id: 7, name: "Home Depot" },
+    { id: 8, name: "Lowe's" },
+    { id: 9, name: "IKEA" },
+    { id: 10, name: "Macy's" },
+    { id: 11, name: "Kohl's" },
   ];
 
   return (
@@ -30,11 +31,9 @@ export default function AllStores() {
 
       <div className="px-6 grid grid-cols-2 gap-3">
         {stores.map((store) => (
-          <a 
+          <Link 
             key={store.id} 
-            href={store.url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+            to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}
             className="rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
             style={{ height: '100px' }}
           >
@@ -48,7 +47,7 @@ export default function AllStores() {
               }} 
             />
             <span className="text-sm font-bold text-[#1F2937] hidden">{store.name}</span>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

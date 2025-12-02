@@ -26,6 +26,7 @@ import TopicDetail from './pages/TopicDetail';
 import Customization from './pages/Customization';
 import Preferences from './pages/Preferences';
 import AllDeals from './pages/AllDeals';
+import StoreDetail from './pages/StoreDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -58,6 +59,7 @@ export const PAGES = {
     "Customization": Customization,
     "Preferences": Preferences,
     "AllDeals": AllDeals,
+    "StoreDetail": StoreDetail,
 }
 
 export const pagesConfig = {

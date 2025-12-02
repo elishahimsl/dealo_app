@@ -366,26 +366,23 @@ export default function Home() {
             <div key={product.id} className="rounded-2xl overflow-hidden">
               {/* Product Image with gradient and info */}
               <div className="relative" style={{ height: '140px' }}>
-                {/* Inner red border */}
-                <div className="absolute inset-0 rounded-t-2xl border-4 border-b-0 border-[#CC0000] z-20 pointer-events-none" />
-                
                 <img src={product.image} alt="" className="w-full h-full object-cover object-top" />
 
                 {/* Red gradient from bottom - more opaque */}
                 <div 
-                  className="absolute inset-0"
+                  className="absolute inset-0 rounded-t-2xl"
                   style={{
                     background: `linear-gradient(to top, ${todaysBestDeal.storeColor} 0%, ${todaysBestDeal.storeColor}f0 25%, ${todaysBestDeal.storeColor}88 45%, transparent 55%)`
                   }}
                 />
 
-                {/* Heart - top left with ring */}
+                {/* Heart - top left with grey background, green when clicked */}
                 <button 
                   onClick={() => toggleFavorite(product)}
-                  className={`absolute top-2 left-2 z-30 w-7 h-7 rounded-full flex items-center justify-center border-2 ${
+                  className={`absolute top-2 left-2 z-30 w-7 h-7 rounded-full flex items-center justify-center ${
                     favorites.includes(product.id) 
-                      ? 'bg-[#00A36C] border-[#00A36C]' 
-                      : 'bg-transparent border-white'
+                      ? 'bg-[#00A36C]' 
+                      : 'bg-[#6B7280]'
                   }`}
                 >
                   <Heart className={`w-3.5 h-3.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
@@ -405,7 +402,7 @@ export default function Home() {
               </div>
 
               {/* Bottom bar - App Store style */}
-              <div className="bg-[#F3F4F6] px-3 py-2 flex items-center justify-center border-2 border-t-0 border-[#E5E7EB] rounded-b-2xl">
+              <div className="bg-[#F3F4F6] px-3 py-2 flex items-center justify-center border border-[#E5E7EB] rounded-b-2xl">
                 {product.left ? (
                   <span className="text-[10px] font-bold text-[#CC0000]">· · · {product.left} · · ·</span>
                 ) : (
@@ -428,7 +425,7 @@ export default function Home() {
         <div className="space-y-6">
           {dealsForYou.map((storeDeal, storeIdx) => (
             <div key={storeDeal.id}>
-              {/* Store Banner with half-circle pin cutout */}
+              {/* Store Banner with curved edge like Target deal of day */}
               <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '90px' }}>
                 {/* Store color gradient - left to right, more muted */}
                 <div 
@@ -438,21 +435,23 @@ export default function Home() {
                   }}
                 />
                 
-                {/* Half-circle pin cutout on right with product */}
-                <div 
-                  className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center overflow-hidden"
-                >
-                  {/* The half-circle background */}
-                  <div 
-                    className="absolute right-0 w-20 h-20 rounded-full bg-[#2d2d2d] flex items-center justify-center"
-                    style={{ marginRight: '-10px' }}
-                  >
-                    {/* Stars around product */}
-                    <span className="absolute top-1 left-2 text-white/50 text-[6px]">✦</span>
-                    <span className="absolute top-3 right-2 text-white/40 text-[5px]">✦</span>
-                    <span className="absolute bottom-2 left-3 text-white/45 text-[5px]">✦</span>
-                    <img src={storeDeal.image} alt="" className="w-12 h-12 object-contain drop-shadow-lg" />
-                  </div>
+                {/* Curved divider line - half circle bulging into the bar */}
+                <div className="absolute right-16 top-0 bottom-0 w-12 overflow-visible">
+                  <svg viewBox="0 0 50 100" className="h-full w-full" preserveAspectRatio="none">
+                    <path 
+                      d="M50,0 L50,100 L25,100 Q0,50 25,0 Z" 
+                      fill="#2d2d2d"
+                    />
+                  </svg>
+                </div>
+                
+                {/* Product area on right */}
+                <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#2d2d2d] flex items-center justify-center">
+                  {/* Stars around product */}
+                  <span className="absolute top-2 right-8 text-white/50 text-[6px]">✦</span>
+                  <span className="absolute top-4 right-3 text-white/40 text-[5px]">✦</span>
+                  <span className="absolute bottom-3 right-6 text-white/45 text-[5px]">✦</span>
+                  <img src={storeDeal.image} alt="" className="w-12 h-12 object-contain drop-shadow-lg" />
                 </div>
 
                 {/* Content */}

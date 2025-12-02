@@ -112,7 +112,7 @@ export default function AllDeals() {
       <div className="px-6 py-4 space-y-6">
         {storeDeals.map((storeDeal, storeIdx) => (
           <div key={storeIdx}>
-            {/* Store Banner with half-circle pin cutout - wider */}
+            {/* Store Banner with curved edge - wider */}
             <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '110px' }}>
               {/* Store color gradient - left to right, muted */}
               <div 
@@ -122,17 +122,22 @@ export default function AllDeals() {
                 }}
               />
               
-              {/* Half-circle pin cutout on right with product */}
-              <div className="absolute right-0 top-0 bottom-0 w-28 flex items-center justify-center overflow-hidden">
-                <div 
-                  className="absolute right-0 w-24 h-24 rounded-full bg-[#2d2d2d] flex items-center justify-center"
-                  style={{ marginRight: '-12px' }}
-                >
-                  <span className="absolute top-1 left-2 text-white/50 text-[6px]">✦</span>
-                  <span className="absolute top-3 right-2 text-white/40 text-[5px]">✦</span>
-                  <span className="absolute bottom-2 left-3 text-white/45 text-[5px]">✦</span>
-                  <img src={storeDeal.image} alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
-                </div>
+              {/* Curved divider line */}
+              <div className="absolute right-20 top-0 bottom-0 w-12 overflow-visible">
+                <svg viewBox="0 0 50 100" className="h-full w-full" preserveAspectRatio="none">
+                  <path 
+                    d="M50,0 L50,100 L25,100 Q0,50 25,0 Z" 
+                    fill="#2d2d2d"
+                  />
+                </svg>
+              </div>
+              
+              {/* Product area on right */}
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-[#2d2d2d] flex items-center justify-center">
+                <span className="absolute top-2 right-10 text-white/50 text-[6px]">✦</span>
+                <span className="absolute top-4 right-4 text-white/40 text-[5px]">✦</span>
+                <span className="absolute bottom-3 right-8 text-white/45 text-[5px]">✦</span>
+                <img src={storeDeal.image} alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
               </div>
 
               {/* Content */}

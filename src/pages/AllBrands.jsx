@@ -1,25 +1,26 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { ArrowLeft } from "lucide-react";
 
 export default function AllBrands() {
   const navigate = useNavigate();
 
   const brands = [
-    { id: 1, name: "Apple", url: "https://apple.com" },
-    { id: 2, name: "Samsung", url: "https://samsung.com" },
-    { id: 3, name: "Nike", url: "https://nike.com" },
-    { id: 4, name: "Adidas", url: "https://adidas.com" },
-    { id: 5, name: "Sony", url: "https://sony.com" },
-    { id: 6, name: "Microsoft", url: "https://microsoft.com" },
-    { id: 7, name: "Levi's", url: "https://levis.com" },
-    { id: 8, name: "The North Face", url: "https://thenorthface.com" },
-    { id: 9, name: "Patagonia", url: "https://patagonia.com" },
-    { id: 10, name: "KitchenAid", url: "https://kitchenaid.com" },
-    { id: 11, name: "Dyson", url: "https://dyson.com" },
-    { id: 12, name: "Columbia", url: "https://columbia.com" },
-    { id: 13, name: "Ray-Ban", url: "https://ray-ban.com" },
-    { id: 14, name: "Coach", url: "https://coach.com" },
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Samsung" },
+    { id: 3, name: "Nike" },
+    { id: 4, name: "Adidas" },
+    { id: 5, name: "Sony" },
+    { id: 6, name: "Microsoft" },
+    { id: 7, name: "Levi's" },
+    { id: 8, name: "The North Face" },
+    { id: 9, name: "Patagonia" },
+    { id: 10, name: "KitchenAid" },
+    { id: 11, name: "Dyson" },
+    { id: 12, name: "Columbia" },
+    { id: 13, name: "Ray-Ban" },
+    { id: 14, name: "Coach" },
   ];
 
   return (
@@ -33,11 +34,9 @@ export default function AllBrands() {
 
       <div className="px-6 grid grid-cols-2 gap-3">
         {brands.map((brand) => (
-          <a 
+          <Link 
             key={brand.id} 
-            href={brand.url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+            to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`}
             className="rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
             style={{ height: '100px' }}
           >
@@ -51,7 +50,7 @@ export default function AllBrands() {
               }} 
             />
             <span className="text-sm font-bold text-[#1F2937] hidden">{brand.name}</span>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

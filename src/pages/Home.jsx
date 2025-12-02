@@ -198,16 +198,19 @@ export default function Home() {
             }}
           />
           
-          {/* Floating stars animation */}
+          {/* Floating stars animation - natural wind effect */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(8)].map((_, i) => (
+            {[...Array(12)].map((_, i) => (
               <div
                 key={i}
-                className="absolute text-white text-xs animate-float-down"
+                className="absolute text-white animate-float-wind"
                 style={{
-                  left: `${10 + i * 12}%`,
-                  animationDelay: `${i * 0.5}s`,
-                  animationDuration: `${3 + i * 0.3}s`
+                  left: `${Math.random() * 100}%`,
+                  top: `${-20 - Math.random() * 30}px`,
+                  fontSize: `${6 + Math.random() * 6}px`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  animationDuration: `${4 + Math.random() * 3}s`,
+                  opacity: 0.3 + Math.random() * 0.5
                 }}
               >
                 ✦
@@ -296,15 +299,26 @@ export default function Home() {
             }}
           />
 
-          {/* Product images - soccer ball and dumbbell on right */}
+          {/* Product images - soccer ball and dumbbell on right with floating dots */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-10">
             <img src={todaysBestDeal.soccerBall} alt="" className="w-16 h-16 object-contain drop-shadow-lg" />
             <img src={todaysBestDeal.dumbbell} alt="" className="w-20 h-16 object-contain drop-shadow-lg" />
-            {/* White dots underneath */}
-            <div className="flex gap-1 mt-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
-              <span className="w-1.5 h-1.5 rounded-full bg-white/60" />
+          </div>
+          
+          {/* Floating dots on red gradient - like snow/sand */}
+          <div className="absolute bottom-12 right-0 left-0 pointer-events-none z-5">
+            <div className="relative h-8">
+              {[...Array(15)].map((_, i) => (
+                <span 
+                  key={i}
+                  className="absolute w-1 h-1 rounded-full bg-white/40"
+                  style={{
+                    left: `${5 + i * 6 + Math.random() * 3}%`,
+                    bottom: `${Math.random() * 20}px`,
+                    opacity: 0.3 + Math.random() * 0.4
+                  }}
+                />
+              ))}
             </div>
           </div>
 
@@ -407,40 +421,38 @@ export default function Home() {
       <div className="px-6 mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-[#1F2937]">Deals For You</h2>
-          <Link to={createPageUrl("AllDeals")}>
-            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-          </Link>
+
         </div>
 
         {/* Store Deal Sections */}
         <div className="space-y-6">
           {dealsForYou.map((storeDeal, storeIdx) => (
             <div key={storeDeal.id}>
-              {/* Store Banner with curved edge */}
+              {/* Store Banner with half-circle pin cutout */}
               <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '90px' }}>
-                {/* Store color gradient - left to right */}
+                {/* Store color gradient - left to right, more muted */}
                 <div 
                   className="absolute inset-0"
                   style={{
-                    background: `linear-gradient(to right, ${storeDeal.storeColor} 0%, ${storeDeal.storeColor}ee 40%, ${storeDeal.storeColor}cc 60%, ${storeDeal.storeColor}88 75%, #2d2d2d 90%)`
+                    background: `linear-gradient(to right, ${storeDeal.storeColor}cc 0%, ${storeDeal.storeColor}aa 35%, ${storeDeal.storeColor}77 55%, #3a3a3a 70%, #2d2d2d 85%)`
                   }}
                 />
                 
-                {/* Curved edge with product - using SVG clip path effect */}
+                {/* Half-circle pin cutout on right with product */}
                 <div 
-                  className="absolute right-0 top-0 bottom-0 w-28 flex items-center justify-center"
-                  style={{
-                    background: `linear-gradient(to right, transparent 0%, #2d2d2d 30%)`,
-                    borderTopLeftRadius: '50%',
-                    borderBottomLeftRadius: '50%'
-                  }}
+                  className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center overflow-hidden"
                 >
-                  {/* Stars around product */}
-                  <span className="absolute top-2 right-8 text-white/60 text-[8px]">✦</span>
-                  <span className="absolute top-4 right-3 text-white/40 text-[6px]">✦</span>
-                  <span className="absolute bottom-3 right-6 text-white/50 text-[7px]">✦</span>
-                  <span className="absolute bottom-5 right-2 text-white/30 text-[5px]">✦</span>
-                  <img src={storeDeal.image} alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
+                  {/* The half-circle background */}
+                  <div 
+                    className="absolute right-0 w-20 h-20 rounded-full bg-[#2d2d2d] flex items-center justify-center"
+                    style={{ marginRight: '-10px' }}
+                  >
+                    {/* Stars around product */}
+                    <span className="absolute top-1 left-2 text-white/50 text-[6px]">✦</span>
+                    <span className="absolute top-3 right-2 text-white/40 text-[5px]">✦</span>
+                    <span className="absolute bottom-2 left-3 text-white/45 text-[5px]">✦</span>
+                    <img src={storeDeal.image} alt="" className="w-12 h-12 object-contain drop-shadow-lg" />
+                  </div>
                 </div>
 
                 {/* Content */}
@@ -622,13 +634,16 @@ export default function Home() {
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; } 
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes float-down {
-          0% { transform: translateY(-20px); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translateY(350px); opacity: 0; }
+        @keyframes float-wind {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          10% { opacity: 1; }
+          25% { transform: translateY(80px) translateX(15px); }
+          50% { transform: translateY(180px) translateX(-10px); }
+          75% { transform: translateY(280px) translateX(20px); }
+          100% { transform: translateY(380px) translateX(-5px); opacity: 0; }
         }
-        .animate-float-down {
-          animation: float-down 4s linear infinite;
+        .animate-float-wind {
+          animation: float-wind 6s ease-in-out infinite;
         }
       `}</style>
     </div>

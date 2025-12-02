@@ -6,48 +6,48 @@ export default function AllStores() {
   const navigate = useNavigate();
 
   const stores = [
-    { id: 1, name: "Target", url: "https://target.com" },
+    { id: 1, name: "Amazon", url: "https://amazon.com" },
     { id: 2, name: "Walmart", url: "https://walmart.com" },
-    { id: 3, name: "Amazon", url: "https://amazon.com" },
+    { id: 3, name: "Target", url: "https://target.com" },
     { id: 4, name: "Best Buy", url: "https://bestbuy.com" },
     { id: 5, name: "Costco", url: "https://costco.com" },
-    { id: 6, name: "CVS", url: "https://cvs.com" },
-    { id: 7, name: "Walgreens", url: "https://walgreens.com" },
-    { id: 8, name: "Home Depot", url: "https://homedepot.com" },
-    { id: 9, name: "Lowes", url: "https://lowes.com" },
-    { id: 10, name: "Macys", url: "https://macys.com" },
-    { id: 11, name: "Nordstrom", url: "https://nordstrom.com" },
-    { id: 12, name: "Sephora", url: "https://sephora.com" },
-    { id: 13, name: "Ulta", url: "https://ulta.com" },
-    { id: 14, name: "Kohls", url: "https://kohls.com" },
-    { id: 15, name: "JCPenney", url: "https://jcpenney.com" },
-    { id: 16, name: "TJ Maxx", url: "https://tjmaxx.com" },
-    { id: 17, name: "Ross", url: "https://rossstores.com" },
-    { id: 18, name: "Marshalls", url: "https://marshalls.com" },
-    { id: 19, name: "Dick's Sporting", url: "https://dickssportinggoods.com" },
-    { id: 20, name: "REI", url: "https://rei.com" },
-    { id: 21, name: "Trader Joes", url: "https://traderjoes.com" },
-    { id: 22, name: "Whole Foods", url: "https://wholefoodsmarket.com" },
-    { id: 23, name: "Kroger", url: "https://kroger.com" },
-    { id: 24, name: "Publix", url: "https://publix.com" },
+    { id: 6, name: "Sam's Club", url: "https://samsclub.com" },
+    { id: 7, name: "Home Depot", url: "https://homedepot.com" },
+    { id: 8, name: "Lowe's", url: "https://lowes.com" },
+    { id: 9, name: "IKEA", url: "https://ikea.com" },
+    { id: 10, name: "Macy's", url: "https://macys.com" },
+    { id: 11, name: "Kohl's", url: "https://kohls.com" },
   ];
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-center relative">
-          <button onClick={() => navigate(-1)} className="absolute left-0">
-            <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
-          </button>
-          <h1 className="text-base text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}>Stores</h1>
-        </div>
+      <div className="px-6 pt-6 pb-4 flex items-center gap-3">
+        <button onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
+        </button>
+        <h1 className="text-lg font-bold text-[#1F2937]">Stores</h1>
       </div>
 
-      <div className="px-6 grid grid-cols-3 gap-3">
+      <div className="px-6 grid grid-cols-2 gap-3">
         {stores.map((store) => (
-          <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl bg-[#E5E7EB] flex items-center justify-center py-4 hover:bg-[#D1D5DB] transition-colors h-16">
-            <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[70%] max-h-[60%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-            <span className="text-xs font-bold text-[#1F2937] text-center hidden">{store.name}</span>
+          <a 
+            key={store.id} 
+            href={store.url} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
+            style={{ height: '100px' }}
+          >
+            <img 
+              src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} 
+              alt={store.name} 
+              className="max-w-[60%] max-h-[50%] object-contain" 
+              onError={(e) => { 
+                e.target.style.display = 'none'; 
+                e.target.nextSibling.style.display = 'block'; 
+              }} 
+            />
+            <span className="text-sm font-bold text-[#1F2937] hidden">{store.name}</span>
           </a>
         ))}
       </div>

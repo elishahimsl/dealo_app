@@ -16,41 +16,34 @@ export default function Discover() {
   ];
 
   const stores = [
-    { id: 1, name: "Target", url: "https://target.com" },
+    { id: 1, name: "Amazon", url: "https://amazon.com" },
     { id: 2, name: "Walmart", url: "https://walmart.com" },
-    { id: 3, name: "Amazon", url: "https://amazon.com" },
+    { id: 3, name: "Target", url: "https://target.com" },
     { id: 4, name: "Best Buy", url: "https://bestbuy.com" },
     { id: 5, name: "Costco", url: "https://costco.com" },
-    { id: 6, name: "CVS", url: "https://cvs.com" },
-    { id: 7, name: "Walgreens", url: "https://walgreens.com" },
-    { id: 8, name: "Home Depot", url: "https://homedepot.com" },
-    { id: 9, name: "Lowes", url: "https://lowes.com" },
-    { id: 10, name: "Macys", url: "https://macys.com" },
-    { id: 11, name: "Nordstrom", url: "https://nordstrom.com" },
-    { id: 12, name: "Sephora", url: "https://sephora.com" },
-    { id: 13, name: "Ulta", url: "https://ulta.com" },
-    { id: 14, name: "Kohls", url: "https://kohls.com" },
-    { id: 15, name: "JCPenney", url: "https://jcpenney.com" },
-    { id: 16, name: "TJ Maxx", url: "https://tjmaxx.com" },
+    { id: 6, name: "Sam's Club", url: "https://samsclub.com" },
+    { id: 7, name: "Home Depot", url: "https://homedepot.com" },
+    { id: 8, name: "Lowe's", url: "https://lowes.com" },
+    { id: 9, name: "IKEA", url: "https://ikea.com" },
+    { id: 10, name: "Macy's", url: "https://macys.com" },
+    { id: 11, name: "Kohl's", url: "https://kohls.com" },
   ];
 
   const brands = [
-    { id: 1, name: "Nike", url: "https://nike.com" },
-    { id: 2, name: "Apple", url: "https://apple.com" },
-    { id: 3, name: "Samsung", url: "https://samsung.com" },
-    { id: 4, name: "Sony", url: "https://sony.com" },
-    { id: 5, name: "Adidas", url: "https://adidas.com" },
-    { id: 6, name: "Canon", url: "https://canon.com" },
-    { id: 7, name: "Puma", url: "https://puma.com" },
-    { id: 8, name: "Under Armour", url: "https://underarmour.com" },
-    { id: 9, name: "Lululemon", url: "https://lululemon.com" },
-    { id: 10, name: "New Balance", url: "https://newbalance.com" },
+    { id: 1, name: "Apple", url: "https://apple.com" },
+    { id: 2, name: "Samsung", url: "https://samsung.com" },
+    { id: 3, name: "Nike", url: "https://nike.com" },
+    { id: 4, name: "Adidas", url: "https://adidas.com" },
+    { id: 5, name: "Sony", url: "https://sony.com" },
+    { id: 6, name: "Microsoft", url: "https://microsoft.com" },
+    { id: 7, name: "Levi's", url: "https://levis.com" },
+    { id: 8, name: "The North Face", url: "https://thenorthface.com" },
+    { id: 9, name: "Patagonia", url: "https://patagonia.com" },
+    { id: 10, name: "KitchenAid", url: "https://kitchenaid.com" },
     { id: 11, name: "Dyson", url: "https://dyson.com" },
-    { id: 12, name: "Bose", url: "https://bose.com" },
-    { id: 13, name: "LG", url: "https://lg.com" },
-    { id: 14, name: "Dell", url: "https://dell.com" },
-    { id: 15, name: "HP", url: "https://hp.com" },
-    { id: 16, name: "Lenovo", url: "https://lenovo.com" },
+    { id: 12, name: "Columbia", url: "https://columbia.com" },
+    { id: 13, name: "Ray-Ban", url: "https://ray-ban.com" },
+    { id: 14, name: "Coach", url: "https://coach.com" },
   ];
 
   const allTopics = [
@@ -71,7 +64,7 @@ export default function Discover() {
     { id: 15, name: "Auto", image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400" },
   ];
 
-  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 12);
+  const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
@@ -108,9 +101,9 @@ export default function Discover() {
           <button onClick={() => navigate(createPageUrl("AllStores"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-          {stores.slice(0, 8).map((store) => (
-            <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[70%] max-h-[40%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+          {stores.slice(0, 6).map((store) => (
+            <a key={store.id} href={store.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
               <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
             </a>
           ))}
@@ -124,9 +117,9 @@ export default function Discover() {
           <button onClick={() => navigate(createPageUrl("AllBrands"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-          {brands.slice(0, 8).map((brand) => (
-            <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '100px', height: '60px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[70%] max-h-[40%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+          {brands.slice(0, 6).map((brand) => (
+            <a key={brand.id} href={brand.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 rounded-2xl bg-[#E5E7EB] flex items-center justify-center" style={{ width: '120px', height: '70px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[50%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
               <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
             </a>
           ))}
@@ -140,16 +133,16 @@ export default function Discover() {
         </div>
 
         <div className="px-6 mb-3">
-          <div className="w-full h-32 rounded-2xl shadow-lg overflow-hidden relative">
-            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Offers" className="w-full h-full object-cover" />
+          <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-32 rounded-2xl shadow-lg overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Deals" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-            <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-bold text-white">Offers</h3>
-          </div>
+            <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-3xl font-bold text-white">Deals</h3>
+          </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 px-6">
+        <div className="grid grid-cols-2 gap-2 px-6">
           {visibleTopics.map((topic) => (
-            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ aspectRatio: '3/4' }}>
+            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ aspectRatio: '4/3' }}>
               <img src={topic.image} alt={topic.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <span className="absolute bottom-3 left-3 font-bold text-white text-base">{topic.name}</span>

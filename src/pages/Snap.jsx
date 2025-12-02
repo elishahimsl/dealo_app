@@ -415,40 +415,58 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             </div>
           </div>
 
-          {/* Second Tile - Price Comparison with product images */}
+          {/* Second Tile - Price Comparison - 3 in a row, swipeable */}
           <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-[#1F2937] text-lg">Price Comparison</h3>
               <span className="text-sm font-semibold text-[#00A36C]">Online Deals</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              {result.online_deals?.map((deal, idx) => (
-                <div
-                  key={idx}
-                  className={`rounded-2xl p-4 border-2 ${
-                    deal.is_smart_buy
-                      ? 'border-[#00A36C] bg-[#D6F5E9]'
-                      : 'border-[#E5E7EB] bg-white'
-                  }`}
-                >
-                  {deal.is_smart_buy && (
-                    <div className="bg-[#00A36C] text-white text-xs font-bold px-2 py-1 rounded-full inline-block mb-2">
-                      Smart Buy
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+              {result.online_deals?.map((deal, idx) => {
+                // Find cheapest price to mark as smart buy
+                const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
+                const minPrice = Math.min(...prices);
+                const currentPrice = parseFloat(deal.price.replace(/[^0-9.]/g, ''));
+                const isSmartBuy = currentPrice === minPrice && idx === prices.indexOf(minPrice);
+                
+                return (
+                  <div
+                    key={idx}
+                    className={`flex-shrink-0 rounded-2xl p-3 border-2 ${
+                      isSmartBuy
+                        ? 'border-[#00A36C] bg-[#D6F5E9]'
+                        : 'border-[#E5E7EB] bg-white'
+                    }`}
+                    style={{ width: '110px' }}
+                  >
+                    {isSmartBuy && (
+                      <div className="bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2">
+                        Smart Buy
+                      </div>
+                    )}
+                    {/* Square product image */}
+                    <div className="w-full aspect-square bg-gray-100 rounded-xl mb-2 overflow-hidden">
+                      <img 
+                        src={deal.image_url || result.product_image_url || result.file_url} 
+                        alt={deal.store}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  )}
-                  {/* Product image */}
-                  <div className="w-full h-24 bg-gray-100 rounded-xl mb-3 overflow-hidden">
-                    <img 
-                      src={deal.image_url || result.product_image_url || result.file_url} 
-                      alt={deal.store}
-                      className="w-full h-full object-cover"
-                    />
+                    {/* Store logo */}
+                    <div className="flex items-center gap-1 mb-1">
+                      <img 
+                        src={`https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
+                        alt=""
+                        className="w-4 h-4 rounded"
+                        onError={(e) => e.target.style.display = 'none'}
+                      />
+                      <p className="text-[10px] font-semibold text-[#1F2937] truncate">{deal.store}</p>
+                    </div>
+                    <p className="text-sm font-bold text-[#00A36C]">{deal.price}</p>
                   </div>
-                  <p className="text-sm font-semibold text-[#1F2937] mb-2">{deal.store}</p>
-                  <p className="text-xl font-bold text-[#00A36C]">{deal.price}</p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -502,11 +520,11 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                     <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
                       Basic Info
                     </h2>
-                    <button className="text-[#6B7280]">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
-                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+                    <button className="text-[#6B7280] flex items-center gap-1">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                        <circle cx="4" cy="10" r="1.5"/>
+                        <circle cx="10" cy="10" r="1.5"/>
+                        <circle cx="16" cy="10" r="1.5"/>
                       </svg>
                     </button>
                   </div>
@@ -559,6 +577,63 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                   {/* Separator line */}
                   <div className="border-t border-[#E5E7EB] my-6" />
 
+                  {/* Reviews - moved above key features */}
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-bold text-[#1F2937] text-lg">Reviews</h3>
+                      <button className="text-[#00A36C] text-sm font-semibold">View All</button>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-[#F9FAFB] rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`w-3 h-3 ${i < 5 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                            ))}
+                          </div>
+                          <span className="text-xs text-[#6B7280]">John D.</span>
+                        </div>
+                        <p className="text-sm text-[#1F2937]">"Great quality, exactly as described. Fast shipping!"</p>
+                      </div>
+                      <div className="bg-[#F9FAFB] rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                            ))}
+                          </div>
+                          <span className="text-xs text-[#6B7280]">Sarah M.</span>
+                        </div>
+                        <p className="text-sm text-[#1F2937]">"Runs slightly small, recommend sizing up."</p>
+                      </div>
+                      <div className="bg-[#F9FAFB] rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`w-3 h-3 ${i < 5 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                            ))}
+                          </div>
+                          <span className="text-xs text-[#6B7280]">Mike T.</span>
+                        </div>
+                        <p className="text-sm text-[#1F2937]">"Best purchase I've made this year. Highly recommend!"</p>
+                      </div>
+                      <div className="bg-[#F9FAFB] rounded-xl p-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                            ))}
+                          </div>
+                          <span className="text-xs text-[#6B7280]">Lisa K.</span>
+                        </div>
+                        <p className="text-sm text-[#1F2937]">"Good value for the price. Works as expected."</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Separator line */}
+                  <div className="border-t border-[#E5E7EB] my-6" />
+
                   {/* Key Features */}
                   <div>
                     <h3 className="font-bold text-[#1F2937] mb-3 text-lg">Key Features</h3>
@@ -572,94 +647,84 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                     </ul>
                   </div>
                 </div>
-
-                {/* Reviews section placeholder */}
-                <div className="border-t border-[#E5E7EB] pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-[#1F2937] text-lg">Reviews</h3>
-                    <button className="text-[#00A36C] text-sm font-semibold">View</button>
-                  </div>
-                  <p className="text-[#6B7280] text-sm italic">- Runs slightly small</p>
-                  <p className="text-[#6B7280] text-sm italic">- Recommend size up</p>
-                </div>
               </div>
             )}
 
             {activeSection === 'alternatives' && (
               <div className="space-y-6">
-                {/* Top Picks */}
+                {/* Top Picks - horizontal scroll with rectangular tiles */}
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      Top Picks
-                    </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className="text-sm font-bold text-[#1F2937]">Top Picks</h2>
+                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {result.alternatives?.slice(0, 2).map((alt, idx) => (
-                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
-                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+                    {result.alternatives?.map((alt, idx) => (
+                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
+                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
                           <img 
-                            src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'} 
+                            src={alt.image_url || result.file_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'} 
                             alt={alt.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-1">{alt.name}</h3>
-                        <p className="text-xs text-[#6B7280] mb-2">{alt.store}</p>
-                        <p className="text-lg font-bold text-[#00A36C]">{alt.price}</p>
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{alt.name}</h3>
+                          <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
+                          <p className="text-sm font-bold text-[#00A36C]">{alt.price}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Best Deals */}
+                {/* Best Deals - horizontal scroll with rectangular tiles */}
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      Best Deals
-                    </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className="text-sm font-bold text-[#1F2937]">Best Deals</h2>
+                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {result.online_deals?.slice(0, 2).map((deal, idx) => (
-                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
-                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+                    {result.online_deals?.map((deal, idx) => (
+                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
+                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
                           <img 
                             src={deal.image_url || result.product_image_url || result.file_url} 
                             alt={deal.store}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#1F2937] text-sm mb-1">{deal.store}</h3>
-                        <p className="text-xs text-[#6B7280] mb-2">{result.title}</p>
-                        <p className="text-lg font-bold text-[#00A36C]">{deal.price}</p>
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{result.title}</h3>
+                          <p className="text-[10px] text-[#6B7280]">{deal.store}</p>
+                          <p className="text-sm font-bold text-[#00A36C]">{deal.price}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Best Matches */}
+                {/* Best Matches - horizontal scroll with rectangular tiles */}
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      Best Matches
-                    </h2>
-                    <ChevronLeft className="w-5 h-5 text-[#6B7280] rotate-180" />
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className="text-sm font-bold text-[#1F2937]">Best Matches</h2>
+                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    {result.alternatives?.slice(2, 4).map((alt, idx) => (
-                      <div key={idx} className="bg-[#F9FAFB] rounded-2xl p-4">
-                        <div className="w-full h-32 bg-white rounded-xl mb-3 overflow-hidden">
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
+                    {result.alternatives?.map((alt, idx) => (
+                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
+                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
                           <img 
-                            src={alt.image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'} 
+                            src={alt.image_url || result.file_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'} 
                             alt={alt.name}
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-bold text-[#1F2937] text-sm mb-1 line-clamp-1">{alt.name}</h3>
-                        <p className="text-xs text-[#6B7280] mb-2">{alt.store}</p>
-                        <p className="text-lg font-bold text-[#00A36C]">{alt.price}</p>
+                        <div className="flex-1 flex flex-col justify-between py-1">
+                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{alt.name}</h3>
+                          <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
+                          <p className="text-sm font-bold text-[#00A36C]">{alt.price}</p>
+                        </div>
                       </div>
                     ))}
                   </div>

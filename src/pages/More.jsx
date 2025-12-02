@@ -84,15 +84,15 @@ export default function Discover() {
       {/* DeaLo Tools */}
       <div className="px-6 mb-4">
         <h2 className="text-xs font-bold text-[#1F2937] mb-2">DeaLo Tools</h2>
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {specialTools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <button key={tool.id} onClick={() => navigate(createPageUrl(tool.page))} className="bg-white rounded-lg p-2 border border-[#E5E7EB] shadow-sm flex flex-col items-center hover:border-[#00A36C]">
-                <div className="w-6 h-6 rounded-full bg-[#00A36C] flex items-center justify-center mb-1">
+              <button key={tool.id} onClick={() => navigate(createPageUrl(tool.page))} className="bg-white rounded-lg px-3 py-2 border border-[#E5E7EB] shadow-sm flex items-center gap-2 hover:border-[#00A36C]">
+                <div className="w-6 h-6 rounded-full bg-[#00A36C] flex items-center justify-center flex-shrink-0">
                   <Icon className="w-3 h-3 text-white" strokeWidth={2} />
                 </div>
-                <span className="text-[8px] font-semibold text-[#1F2937] text-center">{tool.name}</span>
+                <span className="text-[9px] font-semibold text-[#1F2937]">{tool.name}</span>
               </button>
             );
           })}
@@ -143,10 +143,10 @@ export default function Discover() {
 
         <div className="grid grid-cols-2 gap-2 px-6">
           {visibleTopics.map((topic) => (
-            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ aspectRatio: '3/4' }}>
+            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ height: '80px' }}>
               <img src={topic.image} alt={topic.name} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <span className="absolute bottom-3 left-3 font-bold text-white text-base">{topic.name}</span>
+              <span className="absolute bottom-2 left-3 font-bold text-white text-sm">{topic.name}</span>
             </button>
           ))}
         </div>

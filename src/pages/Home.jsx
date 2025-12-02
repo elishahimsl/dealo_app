@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Scale, Heart, Tag, Grid3X3, Search, Bell, User, ChevronRight, Bookmark, MoreHorizontal, Users } from "lucide-react";
+import { Camera, Scale, Heart, Tag, Grid3X3, Bell, User, ChevronRight, Bookmark, MoreHorizontal, Users, X, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -12,6 +12,7 @@ export default function Home() {
     const saved = localStorage.getItem('dealo_favorites');
     return saved ? JSON.parse(saved) : [];
   });
+  const [showStoreModal, setShowStoreModal] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('dealo_favorites', JSON.stringify(favorites));
@@ -113,9 +114,14 @@ export default function Home() {
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-4">
           {/* DeaLo Logo */}
-          <h1 className="text-2xl font-black tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
-            <span className="text-[#1F2937]">Dea</span><span className="text-[#00A36C]">Lo</span>
-          </h1>
+          <div className="flex items-center gap-1.5">
+            <div className="w-7 h-7 rounded-lg bg-[#00A36C] flex items-center justify-center">
+              <Tag className="w-4 h-4 text-white" />
+            </div>
+            <h1 className="text-xl font-bold" style={{ fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' }}>
+              <span className="text-[#1F2937]">deal</span><span className="text-[#00A36C]">o</span>
+            </h1>
+          </div>
           
           {/* Profile & Notifications */}
           <div className="flex items-center gap-2">
@@ -138,10 +144,12 @@ export default function Home() {
               Deals
             </button>
           </Link>
-          <button className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
-            <Users className="w-3 h-3 text-[#00A36C]" />
-            Following
-          </button>
+          <Link to={createPageUrl("Following")} className="flex-shrink-0">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
+              <Users className="w-3 h-3 text-[#00A36C]" />
+              Following
+            </button>
+          </Link>
           <Link to={createPageUrl("More")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
               <Grid3X3 className="w-3 h-3 text-[#00A36C]" />
@@ -419,33 +427,34 @@ export default function Home() {
         <div className="space-y-6">
           {dealsForYou.map((storeDeal, storeIdx) => (
             <div key={storeDeal.id}>
-              {/* Store Banner with curved edge like Target deal of day */}
+              {/* Store Banner with double line divider */}
               <div className="rounded-2xl overflow-hidden relative mb-3" style={{ height: '90px' }}>
-                {/* Store color gradient - left to right, more muted */}
+                {/* Left side with store color */}
                 <div 
-                  className="absolute inset-0"
+                  className="absolute left-0 top-0 bottom-0"
                   style={{
-                    background: `linear-gradient(to right, ${storeDeal.storeColor}cc 0%, ${storeDeal.storeColor}aa 35%, ${storeDeal.storeColor}77 55%, #3a3a3a 70%, #2d2d2d 85%)`
+                    width: 'calc(100% - 100px)',
+                    background: `${storeDeal.storeColor}cc`
                   }}
                 />
                 
-                {/* Curved divider line - half circle bulging into the bar */}
-                <div className="absolute right-16 top-0 bottom-0 w-12 overflow-visible">
-                  <svg viewBox="0 0 50 100" className="h-full w-full" preserveAspectRatio="none">
-                    <path 
-                      d="M50,0 L50,100 L25,100 Q0,50 25,0 Z" 
-                      fill="#2d2d2d"
-                    />
-                  </svg>
+                {/* Right side dark for product */}
+                <div className="absolute right-0 top-0 bottom-0 w-[100px] bg-[#2d2d2d]" />
+                
+                {/* Double line divider */}
+                <div className="absolute top-0 bottom-0" style={{ right: '96px' }}>
+                  <div className="h-full w-[3px] bg-white/30" />
+                </div>
+                <div className="absolute top-0 bottom-0" style={{ right: '100px' }}>
+                  <div className="h-full w-[3px] bg-[#2d2d2d]" />
                 </div>
                 
                 {/* Product area on right */}
-                <div className="absolute right-0 top-0 bottom-0 w-20 bg-[#2d2d2d] flex items-center justify-center">
-                  {/* Stars around product */}
+                <div className="absolute right-0 top-0 bottom-0 w-[96px] flex items-center justify-center">
                   <span className="absolute top-2 right-8 text-white/50 text-[6px]">✦</span>
                   <span className="absolute top-4 right-3 text-white/40 text-[5px]">✦</span>
                   <span className="absolute bottom-3 right-6 text-white/45 text-[5px]">✦</span>
-                  <img src={storeDeal.image} alt="" className="w-12 h-12 object-contain drop-shadow-lg" />
+                  <img src={storeDeal.image} alt="" className="w-14 h-14 object-contain drop-shadow-lg" />
                 </div>
 
                 {/* Content */}
@@ -484,8 +493,8 @@ export default function Home() {
                           {/* Left content */}
                           <div className="flex-1 p-2 flex flex-col justify-between">
                             <div>
-                              <span className="text-[9px] font-bold text-[#1F2937] block">{product.discount} off</span>
-                              <span className="text-[10px] font-medium text-[#1F2937]">{product.title}</span>
+                              <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">{product.discount} off</span>
+                              <span className="text-[10px] font-medium text-[#1F2937] block mt-0.5">{product.title}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <img src={storeDeal.storeLogo} alt="" className="w-3 h-3" />
@@ -501,16 +510,14 @@ export default function Home() {
                             }}
                           >
                             <img src={product.image} alt="" className="absolute inset-0 w-full h-full object-contain p-1" />
-                            {/* Stars */}
                             <span className="absolute top-1 right-1 text-white/70 text-[6px]">✦</span>
                             <span className="absolute bottom-1 right-2 text-white/50 text-[5px]">✦</span>
-                            {/* Heart */}
                             <button 
                               onClick={() => toggleFavorite(product)}
-                              className={`absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center border ${
+                              className={`absolute bottom-1 right-1 w-5 h-5 rounded-full flex items-center justify-center ${
                                 favorites.includes(product.id) 
-                                  ? 'bg-[#00A36C] border-[#00A36C]' 
-                                  : 'bg-white/30 border-[#E5E7EB]'
+                                  ? 'bg-[#00A36C]' 
+                                  : 'bg-[#6B7280]'
                               }`}
                             >
                               <Heart className={`w-2.5 h-2.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
@@ -524,19 +531,16 @@ export default function Home() {
                   {/* Right: 1 tall tile */}
                   <div className="rounded-xl overflow-hidden border border-[#E5E7EB]" style={{ width: '140px', height: '148px' }}>
                     <div className="relative h-full">
-                      {/* Top left content */}
                       <div className="absolute top-2 left-2 z-10">
-                        <span className="text-[9px] font-bold text-[#1F2937] block">{storeDeal.products[2].discount} off</span>
-                        <span className="text-[10px] font-medium text-[#1F2937]">{storeDeal.products[2].title}</span>
+                        <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">{storeDeal.products[2].discount} off</span>
+                        <span className="text-[10px] font-medium text-[#1F2937] block mt-0.5">{storeDeal.products[2].title}</span>
                       </div>
                       
-                      {/* Bottom left: logo and deal */}
                       <div className="absolute bottom-2 left-2 z-10 flex items-center gap-1">
                         <img src={storeDeal.storeLogo} alt="" className="w-3 h-3" />
                         <span className="text-[8px] text-[#6B7280]">Deal</span>
                       </div>
                       
-                      {/* Product image on right with gradient */}
                       <div 
                         className="absolute right-0 top-0 bottom-0 w-24"
                         style={{
@@ -544,19 +548,17 @@ export default function Home() {
                         }}
                       >
                         <img src={storeDeal.products[2].image} alt="" className="absolute inset-0 w-full h-full object-contain p-2" />
-                        {/* Stars */}
                         <span className="absolute top-2 right-2 text-white/70 text-[7px]">✦</span>
                         <span className="absolute top-6 right-4 text-white/50 text-[5px]">✦</span>
                         <span className="absolute bottom-4 right-3 text-white/60 text-[6px]">✦</span>
                       </div>
                       
-                      {/* Heart */}
                       <button 
                         onClick={() => toggleFavorite(storeDeal.products[2])}
-                        className={`absolute bottom-2 right-2 z-10 w-5 h-5 rounded-full flex items-center justify-center border ${
+                        className={`absolute bottom-2 right-2 z-10 w-5 h-5 rounded-full flex items-center justify-center ${
                           favorites.includes(storeDeal.products[2].id) 
-                            ? 'bg-[#00A36C] border-[#00A36C]' 
-                            : 'bg-white/30 border-[#E5E7EB]'
+                            ? 'bg-[#00A36C]' 
+                            : 'bg-[#6B7280]'
                         }`}
                       >
                         <Heart className={`w-2.5 h-2.5 ${favorites.includes(storeDeal.products[2].id) ? 'text-white fill-white' : 'text-white'}`} />
@@ -565,14 +567,14 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                /* Amazon and others - Original 2x2 grid */
+                /* Amazon and others - 2x2 grid with orange gradient under discount */
                 <div className="bg-white rounded-2xl border border-[#E5E7EB] p-3">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <img src={storeDeal.storeLogo} alt="" className="w-4 h-4 rounded" />
                       <span className="text-xs font-semibold text-[#1F2937]">{storeDeal.store} Deals</span>
                     </div>
-                    <button className="flex items-center justify-center">
+                    <button onClick={() => setShowStoreModal(storeDeal)} className="flex items-center justify-center">
                       <MoreHorizontal className="w-5 h-5 text-[#6B7280]" />
                     </button>
                   </div>
@@ -583,27 +585,29 @@ export default function Home() {
                         <div className="relative" style={{ height: '100px' }}>
                           <img src={product.image} alt="" className="w-full h-full object-contain p-2" />
                           
+                          {/* Orange gradient sitting under the discount badge */}
                           <div 
-                            className="absolute inset-0"
+                            className="absolute bottom-0 left-0 right-0"
                             style={{
-                              background: `linear-gradient(to top, ${storeDeal.storeColor}ee 0%, ${storeDeal.storeColor}cc 35%, ${storeDeal.storeColor}66 50%, transparent 60%)`
+                              height: '45px',
+                              background: `linear-gradient(to top, ${storeDeal.storeColor}dd 0%, ${storeDeal.storeColor}99 60%, transparent 100%)`
                             }}
                           />
                           
                           <button 
                             onClick={() => toggleFavorite(product)}
-                            className={`absolute bottom-2 right-2 w-5 h-5 rounded-full flex items-center justify-center border ${
+                            className={`absolute bottom-2 right-2 w-5 h-5 rounded-full flex items-center justify-center ${
                               favorites.includes(product.id) 
-                                ? 'bg-[#00A36C] border-[#00A36C]' 
-                                : 'bg-white/20 border-white'
+                                ? 'bg-[#00A36C]' 
+                                : 'bg-[#6B7280]'
                             }`}
                           >
                             <Heart className={`w-2.5 h-2.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
                           </button>
 
                           <div className="absolute bottom-2 left-2">
-                            <span className="text-white text-[9px] font-bold block">{product.discount} off</span>
-                            <span className="text-white text-[10px] font-medium">{product.title}</span>
+                            <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">{product.discount} off</span>
+                            <span className="text-white text-[10px] font-medium block mt-0.5">{product.title}</span>
                           </div>
                         </div>
                       </div>
@@ -618,11 +622,59 @@ export default function Home() {
 
       {/* Footer */}
       <div className="px-6 pb-12 pt-4 text-center">
-        <p className="text-lg font-black tracking-tight opacity-20">
-          <span className="text-[#1F2937]">Dea</span><span className="text-[#00A36C]">Lo</span>
-        </p>
+        <div className="flex items-center justify-center gap-1 opacity-20">
+          <div className="w-5 h-5 rounded bg-[#00A36C] flex items-center justify-center">
+            <Tag className="w-3 h-3 text-white" />
+          </div>
+          <p className="text-base font-bold">
+            <span className="text-[#1F2937]">deal</span><span className="text-[#00A36C]">o</span>
+          </p>
+        </div>
         <p className="text-xs text-[#6B7280] opacity-40">Shop Smart. Save Big.</p>
       </div>
+
+      {/* Store Modal */}
+      {showStoreModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowStoreModal(null)}>
+          <div className="bg-white w-full rounded-t-3xl p-6 pb-10" onClick={e => e.stopPropagation()}>
+            {/* Close button */}
+            <button onClick={() => setShowStoreModal(null)} className="absolute top-4 right-4">
+              <X className="w-5 h-5 text-[#6B7280]" />
+            </button>
+            
+            {/* Store info */}
+            <div className="flex items-center gap-3 mb-4">
+              <img src={showStoreModal.storeLogo} alt="" className="w-12 h-12 rounded-xl object-contain" />
+              <div>
+                <h3 className="text-lg font-bold text-[#1F2937]">{showStoreModal.store}</h3>
+                <div className="flex items-center gap-1">
+                  <div className="flex">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className={`w-3 h-3 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                    ))}
+                  </div>
+                  <span className="text-xs text-[#6B7280]">4.5 (2.3k reviews)</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Options */}
+            <div className="space-y-2">
+              <Link to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(showStoreModal.store)}`} onClick={() => setShowStoreModal(null)}>
+                <button className="w-full p-3 rounded-xl bg-[#F3F4F6] text-left text-sm font-medium text-[#1F2937]">
+                  Visit Shop
+                </button>
+              </Link>
+              <button className="w-full p-3 rounded-xl bg-[#F3F4F6] text-left text-sm font-medium text-[#1F2937]">
+                Follow
+              </button>
+              <button className="w-full p-3 rounded-xl bg-[#F3F4F6] text-left text-sm font-medium text-[#6B7280]">
+                Not Interested
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; } 

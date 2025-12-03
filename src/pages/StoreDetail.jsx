@@ -171,7 +171,7 @@ export default function StoreDetail() {
           <p className="text-[10px] text-[#6B7280] italic mt-2">{store.tagline}</p>
         </div>
 
-      {/* Featured Categories */}
+        {/* Featured Categories */}
       <div className="px-6 mt-4">
         <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
         <div className="flex gap-3">
@@ -292,6 +292,7 @@ export default function StoreDetail() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

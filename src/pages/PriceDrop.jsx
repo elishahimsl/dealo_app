@@ -9,6 +9,7 @@ export default function PriceDrop() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [timeRange, setTimeRange] = useState("30 days");
+  const [trendingIndex, setTrendingIndex] = useState(0);
 
   const recentlyViewed = [
     { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300", title: "Wireless Headphones" },
@@ -24,15 +25,11 @@ export default function PriceDrop() {
     { id: 104, name: "iPad Air", price: "$499", originalPrice: "$599", discount: "-17%", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300", brand: "Apple" },
   ];
 
-  const trendingProduct = {
-    price: "$219.99",
-    originalPrice: "$349.99",
-    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
-    title: "4K Smart TV",
-    store: "Target",
-    storeLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png",
-    badge: "Price Drop"
-  };
+  const trendingProducts = [
+    { price: "$219.99", originalPrice: "$349.99", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400", title: "4K Smart TV", store: "Target", storeLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png" },
+    { price: "$89.99", originalPrice: "$149.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400", title: "Wireless Headphones", store: "Amazon", storeLogo: "https://logo.clearbit.com/amazon.com" },
+    { price: "$249.99", originalPrice: "$399.99", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", title: "Running Shoes", store: "Nike", storeLogo: "https://logo.clearbit.com/nike.com" },
+  ];
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
@@ -133,10 +130,10 @@ export default function PriceDrop() {
             </div>
           </div>
 
-          {/* Next Drop Prediction */}
-          <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
+          {/* Next Drop Prediction - Header outside tile */}
+          <div>
             <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Next Drop</h3>
-            <div className="bg-[#F9FAFB] rounded-xl p-4">
+            <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
               <p className="text-2xl font-bold text-[#1F2937] mb-2">$30 - $35</p>
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-sm text-[#6B7280]">Moderate Confidence</span>
@@ -151,19 +148,20 @@ export default function PriceDrop() {
             </div>
           </div>
 
-          {/* Cheapest Stores */}
+          {/* Cheapest Stores - Like saved product tiles */}
           <div>
             <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Cheapest</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {cheapestStores.map((s, idx) => (
-                <div key={idx} className="flex-shrink-0 bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden" style={{ width: '130px' }}>
-                  <div className="aspect-square bg-[#F3F4F6] relative p-3">
-                    <img src={selectedProduct.image} alt="" className="w-full h-full object-contain" />
-                    {/* Price badge */}
-                    <div className="absolute top-2 left-2 bg-black rounded px-1.5 py-0.5">
-                      <span className="text-[10px] font-bold text-white">{s.price}</span>
+                <div key={idx} className="flex-shrink-0" style={{ width: '110px' }}>
+                  {/* Product tile with full image */}
+                  <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
+                    <img src={selectedProduct.image} alt="" className="w-full h-full object-cover" />
+                    {/* Price badge - semi-transparent, tight fit */}
+                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded px-1 py-0.5">
+                      <span className="text-[9px] font-bold text-white leading-none">{s.price}</span>
                     </div>
-                    {/* Heart */}
+                    {/* Heart bottom right */}
                     <button 
                       onClick={() => toggleFavorite(s.store)}
                       className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -173,13 +171,13 @@ export default function PriceDrop() {
                       <Heart className={`w-3 h-3 ${favorites.includes(s.store) ? 'text-white fill-white' : 'text-white'}`} />
                     </button>
                   </div>
-                  <div className="p-2">
-                    <div className="flex items-center gap-1 mb-1">
-                      <img src={s.logo} alt="" className="w-3 h-3 object-contain" />
-                      <span className="text-[10px] font-medium text-[#1F2937]">{s.store}</span>
-                    </div>
-                    <button className="text-[9px] text-[#00A36C] font-medium">Visit Store</button>
+                  {/* Brand with logo underneath */}
+                  <div className="flex items-center gap-1 mb-0.5">
+                    <img src={s.logo} alt="" className="w-3 h-3 object-contain" />
+                    <span className="text-[10px] font-medium text-[#1F2937]">{s.store}</span>
                   </div>
+                  {/* Visit store link */}
+                  <button className="text-[9px] text-[#00A36C] font-medium">Visit Store</button>
                 </div>
               ))}
             </div>
@@ -220,59 +218,74 @@ export default function PriceDrop() {
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Trending Banner - Compact */}
-        <div className="rounded-2xl overflow-hidden relative" style={{ height: '160px' }}>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1F2937] via-[#1F2937]/80 to-transparent" />
-          <img src={trendingProduct.image} alt="" className="w-full h-full object-cover" />
-          
-          {/* Store logo top left */}
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-            <img src={trendingProduct.storeLogo} alt="" className="w-4 h-4 object-contain" />
-            <span className="text-[10px] font-medium text-[#1F2937]">{trendingProduct.store}</span>
+        {/* Trending Carousel - Swipeable with dots */}
+        <div>
+          <div className="rounded-2xl overflow-hidden relative" style={{ height: '140px' }}>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1F2937] via-[#1F2937]/60 to-transparent z-10" />
+            <img src={trendingProducts[trendingIndex].image} alt="" className="w-full h-full object-cover" />
+            
+            {/* Trending badge top right */}
+            <div className="absolute top-3 right-3 z-20">
+              <span className="bg-[#00A36C] text-white text-[9px] font-bold px-2 py-0.5 rounded">
+                Trending
+              </span>
+            </div>
+            
+            {/* Bottom info */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 z-20">
+              {/* Store logo and name */}
+              <div className="flex items-center gap-1.5 mb-1">
+                <img src={trendingProducts[trendingIndex].storeLogo} alt="" className="w-4 h-4 object-contain" />
+                <span className="text-white/90 text-[10px] font-medium">{trendingProducts[trendingIndex].store}</span>
+              </div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-white text-sm font-bold">{trendingProducts[trendingIndex].price}</span>
+                <span className="text-white/60 text-xs line-through">{trendingProducts[trendingIndex].originalPrice}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-white/90 text-xs">{trendingProducts[trendingIndex].title}</p>
+                <Button 
+                  onClick={() => setSelectedProduct(trendingProducts[trendingIndex])}
+                  className="bg-[#00A36C] hover:bg-[#007E52] text-white text-[10px] px-3 py-1 h-auto rounded-full"
+                >
+                  Analyze
+                </Button>
+              </div>
+            </div>
           </div>
           
-          {/* Badge */}
-          <div className="absolute top-3 right-3">
-            <span className="bg-[#00A36C] text-white text-[9px] font-bold px-2 py-0.5 rounded">
-              {trendingProduct.badge}
-            </span>
-          </div>
-          
-          {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-white text-sm font-bold">{trendingProduct.price}</span>
-              <span className="text-white/60 text-xs line-through">{trendingProduct.originalPrice}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <p className="text-white/90 text-xs">{trendingProduct.title}</p>
-              <Button 
-                onClick={() => setSelectedProduct(trendingProduct)}
-                className="bg-[#00A36C] hover:bg-[#007E52] text-white text-[10px] px-3 py-1 h-auto rounded-full"
-              >
-                Analyze
-              </Button>
-            </div>
+          {/* Dots */}
+          <div className="flex justify-center gap-1.5 mt-2">
+            {trendingProducts.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setTrendingIndex(idx)}
+                className={`w-1.5 h-1.5 rounded-full transition-colors ${idx === trendingIndex ? 'bg-[#1F2937]' : 'bg-[#D1D5DB]'}`}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Recently Viewed */}
+        {/* Recently Viewed - Smaller tiles */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-bold text-[#1F2937]">Recently Viewed</h2>
-            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+            <div className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+              <ChevronRight className="w-3 h-3 text-[#6B7280]" />
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            {recentlyViewed.slice(0, 2).map((item) => (
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {recentlyViewed.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setSelectedProduct(item)}
-                className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden"
+                className="flex-shrink-0 rounded-xl overflow-hidden bg-[#F3F4F6]"
+                style={{ width: '80px', height: '80px' }}
               >
-                <div className="aspect-square bg-[#F3F4F6] relative p-4">
-                  <img src={item.image} alt="" className="w-full h-full object-contain" />
-                  <div className="absolute top-2 left-2 bg-black rounded px-1.5 py-0.5">
-                    <span className="text-[10px] font-bold text-white">{item.price}</span>
+                <div className="w-full h-full relative">
+                  <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute top-1 left-1 bg-black/50 backdrop-blur-sm rounded px-1 py-0.5">
+                    <span className="text-[8px] font-bold text-white leading-none">{item.price}</span>
                   </div>
                 </div>
               </button>
@@ -280,43 +293,44 @@ export default function PriceDrop() {
           </div>
         </div>
 
-        {/* Recently Dropped */}
+        {/* Recently Dropped - Like saved product tiles */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-bold text-[#1F2937]">Recently Dropped</h2>
-            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+            <div className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+              <ChevronRight className="w-3 h-3 text-[#6B7280]" />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            {recentlyDropped.slice(0, 2).map((item) => (
+            {recentlyDropped.slice(0, 4).map((item) => (
               <button
                 key={item.id}
                 onClick={() => setSelectedProduct(item)}
-                className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden text-left"
+                className="text-left"
               >
-                <div className="aspect-square bg-[#F3F4F6] relative p-4">
-                  <img src={item.image} alt="" className="w-full h-full object-contain" />
-                  <div className="absolute top-2 left-2 flex items-center gap-1">
-                    <img src={`https://logo.clearbit.com/${item.brand.toLowerCase()}.com`} alt="" className="w-4 h-4 rounded" />
+                {/* Product tile - full image */}
+                <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
+                  <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  {/* Price badge - semi-transparent, tight fit */}
+                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1 py-0.5">
+                    <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
                   </div>
+                  {/* Heart bottom right */}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
+                    className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                      favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
+                  >
+                    <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
                 </div>
-                <div className="p-3">
-                  <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
-                  <p className="text-xs font-medium text-[#1F2937] line-clamp-1 mb-1">{item.name}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-[#1F2937]">{item.price}</span>
-                    <span className="bg-[#00A36C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">{item.discount}</span>
-                  </div>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
-                      className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                        favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'
-                      }`}
-                    >
-                      <Heart className={`w-2.5 h-2.5 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-[#6B7280]'}`} />
-                    </button>
-                  </div>
+                {/* Info underneath - no tile */}
+                <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
+                <p className="text-xs font-medium text-[#1F2937] line-clamp-1 mb-1">{item.name}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
+                  <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{item.discount}</span>
                 </div>
               </button>
             ))}

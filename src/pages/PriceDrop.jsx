@@ -1,157 +1,333 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Camera, Link as LinkIcon, Search, TrendingDown, TrendingUp, Bell, Calendar } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { ArrowLeft, Camera, Search, Heart, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PriceDrop() {
   const navigate = useNavigate();
-  const [showAnalysis, setShowAnalysis] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [favorites, setFavorites] = useState([]);
+  const [timeRange, setTimeRange] = useState("30 days");
 
-  const mockData = {
-    currentPrice: 89.99,
-    avgPrice: 94.50,
-    peakPrice: 119.99,
-    lowestPrice: 79.99,
-    trend: "drop",
-    confidence: "High",
-    bestBuyWindow: "Best price expected in 2-3 weeks",
-    priceHistory: [95, 98, 92, 89, 94, 97, 91, 88, 90, 93, 89, 85]
+  const recentlyViewed = [
+    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300", title: "Wireless Headphones" },
+    { id: 2, price: "$59.99", image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300", title: "Bluetooth Speaker" },
+    { id: 3, price: "$149.99", image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=300", title: "Smart Watch" },
+    { id: 4, price: "$79.99", image: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=300", title: "Sneakers" },
+  ];
+
+  const recentlyDropped = [
+    { id: 101, name: "Apple MacBook Pro", price: "$1,799", originalPrice: "$2,149", discount: "-16%", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300", brand: "Apple" },
+    { id: 102, name: "iPhone 13 Pro", price: "$899", originalPrice: "$1,100", discount: "-20%", image: "https://images.unsplash.com/photo-1632661674596-df8be59a5ed3?w=300", brand: "Apple" },
+    { id: 103, name: "Sony WH-1000XM4", price: "$248", originalPrice: "$349", discount: "-29%", image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=300", brand: "Sony" },
+    { id: 104, name: "iPad Air", price: "$499", originalPrice: "$599", discount: "-17%", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300", brand: "Apple" },
+  ];
+
+  const trendingProduct = {
+    price: "$219.99",
+    originalPrice: "$349.99",
+    image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
+    title: "4K Smart TV",
+    store: "Target",
+    storeLogo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png",
+    badge: "Price Drop"
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F9FAFB] to-[#E5E7EB] pb-24">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] px-6 pt-8 pb-6 shadow-lg">
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <ArrowLeft className="w-5 h-5 text-white" />
+  const toggleFavorite = (id) => {
+    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
+
+  // Product Analysis View
+  if (selectedProduct) {
+    const priceHistory = [100, 95, 92, 88, 94, 90, 85, 82, 78, 75];
+    const cheapestStores = [
+      { store: "Amazon", price: "$34.99", logo: "https://logo.clearbit.com/amazon.com" },
+      { store: "Target", price: "$39.99", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png" },
+      { store: "Walmart", price: "$37.99", logo: "https://logo.clearbit.com/walmart.com" },
+    ];
+
+    return (
+      <div className="min-h-screen bg-[#F9FAFB] pb-24">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white border-b border-[#E5E7EB]">
+          <button onClick={() => setSelectedProduct(null)}>
+            <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
+          <h1 className="text-base font-bold text-[#1F2937]">Track Price</h1>
+          <button className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center">
+            <Bell className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        </div>
+
+        <div className="px-6 py-6 space-y-6">
+          {/* Product Info */}
+          <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] flex gap-4">
+            <div className="w-20 h-20 rounded-xl bg-[#F3F4F6] overflow-hidden flex-shrink-0">
+              <img src={selectedProduct.image} alt="" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1">
+              <h2 className="font-bold text-[#1F2937] text-sm mb-1">{selectedProduct.name || selectedProduct.title}</h2>
+              <p className="text-lg font-bold text-[#00A36C]">{selectedProduct.price}</p>
+              <p className="text-xs text-[#00A36C]">6% below avg price</p>
+            </div>
+          </div>
+
+          {/* Time Range Tabs */}
+          <div className="flex gap-2">
+            {["30 days", "90 days", "1 year"].map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`flex-1 py-2 rounded-xl text-xs font-semibold ${
+                  timeRange === range
+                    ? 'bg-[#1F2937] text-white'
+                    : 'bg-white border border-[#E5E7EB] text-[#6B7280]'
+                }`}
+              >
+                {range}
+              </button>
+            ))}
+          </div>
+
+          {/* Price Chart - Apple Stock Style */}
+          <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
+            <div className="relative h-40">
+              <svg viewBox="0 0 300 100" className="w-full h-full" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="glowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#00A36C" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#00A36C" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {/* Glow area under line */}
+                <path
+                  d={`M0,${100 - priceHistory[0]} ${priceHistory.map((p, i) => `L${i * 33},${100 - p}`).join(' ')} L${(priceHistory.length - 1) * 33},100 L0,100 Z`}
+                  fill="url(#glowGradient)"
+                />
+                {/* Line */}
+                <polyline
+                  points={priceHistory.map((p, i) => `${i * 33},${100 - p}`).join(' ')}
+                  fill="none"
+                  stroke="#00A36C"
+                  strokeWidth="2"
+                />
+                {/* Current point */}
+                <circle cx={(priceHistory.length - 1) * 33} cy={100 - priceHistory[priceHistory.length - 1]} r="4" fill="#00A36C" />
+              </svg>
+              
+              {/* Price labels on right */}
+              <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[10px] text-[#6B7280]">
+                <span>$100</span>
+                <span>$30</span>
+              </div>
+            </div>
+            
+            {/* Date labels */}
+            <div className="flex justify-between mt-2 text-[10px] text-[#6B7280]">
+              <span>30</span>
+              <span>10</span>
+              <span>17</span>
+              <span>24</span>
+              <span>30</span>
+            </div>
+          </div>
+
+          {/* Next Drop Prediction */}
+          <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
+            <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Next Drop</h3>
+            <div className="bg-[#F9FAFB] rounded-xl p-4">
+              <p className="text-2xl font-bold text-[#1F2937] mb-2">$30 - $35</p>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm text-[#6B7280]">Moderate Confidence</span>
+                <div className="w-8 h-8 rounded-full border-2 border-[#00A36C] flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-[#00A36C]">65%</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-[#6B7280]">Timing</span>
+                <span className="bg-[#1F2937] text-white text-xs px-2 py-1 rounded">2-6 months</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cheapest Stores */}
           <div>
-            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              PriceDrop
-            </h1>
-            <p className="text-white/80 text-sm">Price history & predictions</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-6 pt-6">
-        {/* Best Buy Window - Always Visible */}
-        <div className="bg-gradient-to-r from-[#00A36C] to-[#007E52] rounded-3xl p-5 mb-6 shadow-xl">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-white" />
-              <h3 className="text-white font-bold text-sm">Best Buy Window</h3>
-            </div>
-            <div className="px-3 py-1 rounded-full text-xs font-bold bg-white text-[#00A36C] shadow-md">
-              {mockData.confidence} Confidence
-            </div>
-          </div>
-          <p className="text-white text-lg font-bold mb-2">{mockData.bestBuyWindow}</p>
-          <Button className="w-full bg-white text-[#00A36C] hover:bg-gray-100 font-semibold rounded-xl flex items-center justify-center gap-2">
-            <Bell className="w-4 h-4" />
-            Notify Me
-          </Button>
-        </div>
-
-        {!showAnalysis ? (
-          <div className="grid grid-cols-3 gap-3">
-            <button
-              onClick={() => setShowAnalysis(true)}
-              className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all"
-            >
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
-                <Camera className="w-7 h-7 text-white" />
-              </div>
-              <span className="text-xs font-semibold text-[#1F2937]">Scan</span>
-            </button>
-            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
-                <LinkIcon className="w-7 h-7 text-white" />
-              </div>
-              <span className="text-xs font-semibold text-[#1F2937]">Link</span>
-            </button>
-            <button className="bg-white rounded-2xl p-6 border border-[#E5E7EB] flex flex-col items-center gap-3 shadow-sm hover:shadow-lg transition-all">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
-                <Search className="w-7 h-7 text-white" />
-              </div>
-              <span className="text-xs font-semibold text-[#1F2937]">Search</span>
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* Price History */}
-            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
-              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">12-Month Price Trend</h3>
-              <div className="relative h-48 mb-6 bg-gradient-to-b from-[#00A36C]/10 to-transparent rounded-2xl p-4">
-                <svg viewBox="0 0 300 100" className="w-full h-full">
-                  <defs>
-                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#00A36C" />
-                      <stop offset="100%" stopColor="#007E52" />
-                    </linearGradient>
-                  </defs>
-                  <polyline
-                    points={mockData.priceHistory.map((price, idx) => `${idx * 25},${100 - price}`).join(' ')}
-                    fill="none"
-                    stroke="url(#lineGradient)"
-                    strokeWidth="3"
-                  />
-                  {mockData.priceHistory.map((price, idx) => (
-                    <circle
-                      key={idx}
-                      cx={idx * 25}
-                      cy={100 - price}
-                      r="3"
-                      fill="#00A36C"
-                    />
-                  ))}
-                </svg>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div className="bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-2xl p-3 text-center">
-                  <p className="text-xs text-[#6B7280] mb-1">Average</p>
-                  <p className="text-lg font-bold text-[#1F2937]">${mockData.avgPrice}</p>
-                </div>
-                <div className="bg-gradient-to-br from-red-500/10 to-transparent rounded-2xl p-3 text-center">
-                  <p className="text-xs text-[#6B7280] mb-1">Peak</p>
-                  <p className="text-lg font-bold text-red-500">${mockData.peakPrice}</p>
-                </div>
-                <div className="bg-gradient-to-br from-[#10B981]/10 to-transparent rounded-2xl p-3 text-center">
-                  <p className="text-xs text-[#6B7280] mb-1">Lowest</p>
-                  <p className="text-lg font-bold text-[#00A36C]">${mockData.lowestPrice}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* AI Prediction */}
-            <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-lg">
-              <h3 className="font-bold text-[#1F2937] mb-4 text-lg">AI Prediction</h3>
-              <div className="bg-gradient-to-br from-[#00A36C] to-[#007E52] rounded-2xl p-4 mb-4">
-                <div className="flex items-center gap-3">
-                  {mockData.trend === "drop" ? (
-                    <TrendingDown className="w-8 h-8 text-white" />
-                  ) : (
-                    <TrendingUp className="w-8 h-8 text-white" />
-                  )}
-                  <div>
-                    <p className="text-white font-bold text-lg">Likely to {mockData.trend}</p>
-                    <p className="text-white/80 text-sm">{mockData.confidence} confidence</p>
+            <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Cheapest</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {cheapestStores.map((s, idx) => (
+                <div key={idx} className="flex-shrink-0 bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden" style={{ width: '130px' }}>
+                  <div className="aspect-square bg-[#F3F4F6] relative p-3">
+                    <img src={selectedProduct.image} alt="" className="w-full h-full object-contain" />
+                    {/* Price badge */}
+                    <div className="absolute top-2 left-2 bg-black rounded px-1.5 py-0.5">
+                      <span className="text-[10px] font-bold text-white">{s.price}</span>
+                    </div>
+                    {/* Heart */}
+                    <button 
+                      onClick={() => toggleFavorite(s.store)}
+                      className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                        favorites.includes(s.store) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                      }`}
+                    >
+                      <Heart className={`w-3 h-3 ${favorites.includes(s.store) ? 'text-white fill-white' : 'text-white'}`} />
+                    </button>
+                  </div>
+                  <div className="p-2">
+                    <div className="flex items-center gap-1 mb-1">
+                      <img src={s.logo} alt="" className="w-3 h-3 object-contain" />
+                      <span className="text-[10px] font-medium text-[#1F2937]">{s.store}</span>
+                    </div>
+                    <button className="text-[9px] text-[#00A36C] font-medium">Visit Store</button>
                   </div>
                 </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button variant="outline" className="flex-1 rounded-xl border-2">No</Button>
-                <Button className="flex-1 bg-gradient-to-r from-[#00A36C] to-[#007E52] hover:opacity-90 rounded-xl text-white">
-                  Helpful
-                </Button>
-              </div>
+              ))}
             </div>
           </div>
-        )}
+        </div>
+
+        <style>{`
+          .scrollbar-hide::-webkit-scrollbar { display: none; }
+          .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
       </div>
+    );
+  }
+
+  // Main PriceDrop Page
+  return (
+    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4 flex items-center gap-3">
+        <button onClick={() => navigate(-1)}>
+          <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
+        </button>
+        <h1 className="text-base font-bold text-[#1F2937]">PriceDrop</h1>
+      </div>
+
+      {/* Search Bar */}
+      <div className="px-6 mb-6">
+        <div className="flex items-center gap-2 bg-[#E5E7EB] rounded-2xl px-4 py-3">
+          <Search className="w-4 h-4 text-[#6B7280]" />
+          <input
+            placeholder="Search products..."
+            className="flex-1 bg-transparent text-sm outline-none placeholder:text-[#6B7280]"
+          />
+          <button>
+            <Camera className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        </div>
+      </div>
+
+      <div className="px-6 space-y-6">
+        {/* Trending Banner - Compact */}
+        <div className="rounded-2xl overflow-hidden relative" style={{ height: '160px' }}>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#1F2937] via-[#1F2937]/80 to-transparent" />
+          <img src={trendingProduct.image} alt="" className="w-full h-full object-cover" />
+          
+          {/* Store logo top left */}
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
+            <img src={trendingProduct.storeLogo} alt="" className="w-4 h-4 object-contain" />
+            <span className="text-[10px] font-medium text-[#1F2937]">{trendingProduct.store}</span>
+          </div>
+          
+          {/* Badge */}
+          <div className="absolute top-3 right-3">
+            <span className="bg-[#00A36C] text-white text-[9px] font-bold px-2 py-0.5 rounded">
+              {trendingProduct.badge}
+            </span>
+          </div>
+          
+          {/* Bottom info */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-white text-sm font-bold">{trendingProduct.price}</span>
+              <span className="text-white/60 text-xs line-through">{trendingProduct.originalPrice}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-white/90 text-xs">{trendingProduct.title}</p>
+              <Button 
+                onClick={() => setSelectedProduct(trendingProduct)}
+                className="bg-[#00A36C] hover:bg-[#007E52] text-white text-[10px] px-3 py-1 h-auto rounded-full"
+              >
+                Analyze
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Recently Viewed */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-[#1F2937]">Recently Viewed</h2>
+            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {recentlyViewed.slice(0, 2).map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setSelectedProduct(item)}
+                className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden"
+              >
+                <div className="aspect-square bg-[#F3F4F6] relative p-4">
+                  <img src={item.image} alt="" className="w-full h-full object-contain" />
+                  <div className="absolute top-2 left-2 bg-black rounded px-1.5 py-0.5">
+                    <span className="text-[10px] font-bold text-white">{item.price}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Recently Dropped */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-[#1F2937]">Recently Dropped</h2>
+            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {recentlyDropped.slice(0, 2).map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setSelectedProduct(item)}
+                className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden text-left"
+              >
+                <div className="aspect-square bg-[#F3F4F6] relative p-4">
+                  <img src={item.image} alt="" className="w-full h-full object-contain" />
+                  <div className="absolute top-2 left-2 flex items-center gap-1">
+                    <img src={`https://logo.clearbit.com/${item.brand.toLowerCase()}.com`} alt="" className="w-4 h-4 rounded" />
+                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
+                  <p className="text-xs font-medium text-[#1F2937] line-clamp-1 mb-1">{item.name}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#1F2937]">{item.price}</span>
+                    <span className="bg-[#00A36C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">{item.discount}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(item.id); }}
+                      className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                        favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'
+                      }`}
+                    >
+                      <Heart className={`w-2.5 h-2.5 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-[#6B7280]'}`} />
+                    </button>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }

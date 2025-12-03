@@ -37,24 +37,17 @@ export default function PriceDrop() {
 
   // Product Analysis View
   if (selectedProduct) {
-    const priceHistory = [65, 70, 68, 72, 75, 70, 68, 65, 60, 55];
-    const priceLabels = ["$90", "$75", "$60", "$45", "$30"];
-    const dateLabels = ["3", "10", "17", "24", "30"];
+    const priceHistory = [100, 95, 92, 88, 94, 90, 85, 82, 78, 75];
     const cheapestStores = [
       { store: "Amazon", price: "$34.99", logo: "https://logo.clearbit.com/amazon.com" },
       { store: "Target", price: "$39.99", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png" },
       { store: "Walmart", price: "$37.99", logo: "https://logo.clearbit.com/walmart.com" },
     ];
-    
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragIndex, setDragIndex] = useState(null);
-    const dragPrices = ["$72.50", "$70.00", "$68.25", "$72.00", "$75.50", "$70.25", "$68.00", "$65.50", "$60.00", "$55.99"];
-    const dragDates = ["Nov 3, 2024", "Nov 10, 2024", "Nov 17, 2024", "Nov 24, 2024", "Nov 30, 2024", "Dec 3, 2024", "Dec 10, 2024", "Dec 17, 2024", "Dec 24, 2024", "Dec 30, 2024"];
 
     return (
       <div className="min-h-screen bg-[#F9FAFB] pb-24">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white border-b border-[#E5E7EB]">
           <button onClick={() => setSelectedProduct(null)}>
             <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
           </button>
@@ -64,156 +57,105 @@ export default function PriceDrop() {
           </button>
         </div>
 
-        <div className="px-6 space-y-6">
-          {/* Product Info - No tile, just image and text */}
+        <div className="px-6 py-6 space-y-6">
+          {/* Product Info - No tile */}
           <div className="flex gap-4">
             <div className="w-24 h-28 rounded-xl bg-[#F3F4F6] overflow-hidden flex-shrink-0">
               <img src={selectedProduct.image} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 py-1">
-              <h2 className="font-bold text-[#1F2937] text-sm mb-2">{selectedProduct.name || selectedProduct.title}</h2>
-              <p className="text-lg font-bold text-[#1F2937] mb-1">{selectedProduct.price}</p>
+              <h2 className="font-bold text-[#1F2937] text-sm mb-1">{selectedProduct.name || selectedProduct.title}</h2>
+              <p className="text-lg font-bold text-[#4B5563] mb-0.5">{selectedProduct.price}</p>
               <div className="flex items-center gap-1">
                 <span className="text-xs text-[#00A36C] font-medium">↓ 6%</span>
-                <span className="text-xs text-[#6B7280]">(avg. $74.99)</span>
+                <span className="text-xs text-[#6B7280]">(avg. $95)</span>
               </div>
             </div>
           </div>
 
           {/* Price Chart - No tile, with grid */}
-          <div className="relative">
-            {/* Time range header with indicator line */}
-            <div className="relative h-6 mb-2">
-              {isDragging && dragIndex !== null ? (
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-[#1F2937]">{dragDates[dragIndex]}</span>
-                  <span className="text-xs font-bold text-[#00A36C]">{dragPrices[dragIndex]}</span>
-                </div>
-              ) : (
-                <div className="relative flex items-center">
-                  <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[#E5E7EB]" />
-                  <div 
-                    className="absolute top-1/2 h-0.5 bg-[#00A36C] transition-all"
-                    style={{ 
-                      left: timeRange === "30 days" ? "0%" : timeRange === "90 days" ? "33%" : "66%",
-                      width: "33%"
-                    }}
-                  />
-                  <div className="relative flex justify-between w-full">
-                    <button 
-                      onClick={() => setTimeRange("30 days")}
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded ${timeRange === "30 days" ? 'text-[#00A36C]' : 'text-[#6B7280]'}`}
-                    >
-                      30 days
-                    </button>
-                    <button 
-                      onClick={() => setTimeRange("90 days")}
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded ${timeRange === "90 days" ? 'text-[#00A36C]' : 'text-[#6B7280]'}`}
-                    >
-                      90 days
-                    </button>
-                    <button 
-                      onClick={() => setTimeRange("1 year")}
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded ${timeRange === "1 year" ? 'text-[#00A36C]' : 'text-[#6B7280]'}`}
-                    >
-                      1 year
-                    </button>
-                  </div>
-                </div>
-              )}
+          <div className="relative mt-2">
+            {/* Time range on top line */}
+            <div className="flex items-center mb-3">
+              <div className="flex-1 h-0.5 bg-[#E5E7EB] relative">
+                <div 
+                  className="absolute top-0 h-0.5 bg-[#00A36C] transition-all"
+                  style={{ 
+                    left: timeRange === "30 days" ? '0%' : timeRange === "90 days" ? '33%' : '66%',
+                    width: '33%'
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex justify-between mb-2 -mt-1">
+              {["30 days", "90 days", "1 year"].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`text-[10px] font-medium ${timeRange === range ? 'text-[#00A36C]' : 'text-[#9CA3AF]'}`}
+                >
+                  {range}
+                </button>
+              ))}
             </div>
 
             {/* Chart with grid */}
-            <div className="relative h-44">
+            <div className="relative h-36">
               {/* Y-axis labels */}
-              <div className="absolute left-0 top-0 bottom-6 w-8 flex flex-col justify-between text-[9px] text-[#6B7280]">
-                {priceLabels.map((label, i) => (
-                  <span key={i}>{label}</span>
-                ))}
+              <div className="absolute left-0 top-0 bottom-4 flex flex-col justify-between text-[9px] text-[#9CA3AF] w-7">
+                <span>$100</span>
+                <span>$85</span>
+                <span>$70</span>
+                <span>$55</span>
+                <span>$40</span>
               </div>
 
               {/* Chart area */}
-              <div 
-                className="absolute left-10 right-0 top-0 bottom-6"
-                onMouseDown={(e) => {
-                  setIsDragging(true);
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = (e.clientX - rect.left) / rect.width;
-                  setDragIndex(Math.min(Math.floor(x * 10), 9));
-                }}
-                onMouseMove={(e) => {
-                  if (isDragging) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width;
-                    setDragIndex(Math.max(0, Math.min(Math.floor(x * 10), 9)));
-                  }
-                }}
-                onMouseUp={() => setIsDragging(false)}
-                onMouseLeave={() => setIsDragging(false)}
-                onTouchStart={(e) => {
-                  setIsDragging(true);
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  const x = (e.touches[0].clientX - rect.left) / rect.width;
-                  setDragIndex(Math.min(Math.floor(x * 10), 9));
-                }}
-                onTouchMove={(e) => {
-                  if (isDragging) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = (e.touches[0].clientX - rect.left) / rect.width;
-                    setDragIndex(Math.max(0, Math.min(Math.floor(x * 10), 9)));
-                  }
-                }}
-                onTouchEnd={() => setIsDragging(false)}
-              >
-                <svg viewBox="0 0 300 120" className="w-full h-full" preserveAspectRatio="none">
+              <div className="ml-8 h-full relative">
+                <svg viewBox="0 0 300 100" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="glowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#00A36C" stopOpacity="0.3" />
+                      <stop offset="0%" stopColor="#00A36C" stopOpacity="0.25" />
                       <stop offset="100%" stopColor="#00A36C" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                   
-                  {/* Grid lines - horizontal */}
-                  {[0, 30, 60, 90, 120].map((y, i) => (
-                    <line key={`h${i}`} x1="0" y1={y} x2="300" y2={y} stroke="#E5E7EB" strokeWidth="0.5" />
+                  {/* Horizontal grid lines */}
+                  {[0, 25, 50, 75, 100].map((y) => (
+                    <line key={y} x1="0" y1={y} x2="300" y2={y} stroke="#E5E7EB" strokeWidth="0.5" />
                   ))}
                   
-                  {/* Grid lines - vertical */}
-                  {[0, 60, 120, 180, 240, 300].map((x, i) => (
-                    <line key={`v${i}`} x1={x} y1="0" x2={x} y2="120" stroke="#E5E7EB" strokeWidth="0.5" />
+                  {/* Vertical grid lines */}
+                  {[0, 60, 120, 180, 240, 300].map((x) => (
+                    <line key={x} x1={x} y1="0" x2={x} y2="100" stroke="#E5E7EB" strokeWidth="0.5" />
                   ))}
                   
-                  {/* Glow area under line */}
+                  {/* Glow area */}
                   <path
-                    d={`M0,${priceHistory[0]} ${priceHistory.map((p, i) => `L${i * 33},${p}`).join(' ')} L${(priceHistory.length - 1) * 33},120 L0,120 Z`}
+                    d={`M0,${100 - priceHistory[0]} ${priceHistory.map((p, i) => `L${i * 33},${100 - p}`).join(' ')} L${(priceHistory.length - 1) * 33},100 L0,100 Z`}
                     fill="url(#glowGradient)"
                   />
                   
                   {/* Price line */}
                   <polyline
-                    points={priceHistory.map((p, i) => `${i * 33},${p}`).join(' ')}
+                    points={priceHistory.map((p, i) => `${i * 33},${100 - p}`).join(' ')}
                     fill="none"
                     stroke="#00A36C"
                     strokeWidth="2"
                   />
                   
-                  {/* Current point or drag point */}
-                  {isDragging && dragIndex !== null ? (
-                    <>
-                      <line x1={dragIndex * 33} y1="0" x2={dragIndex * 33} y2="120" stroke="#00A36C" strokeWidth="1" strokeDasharray="4,2" />
-                      <circle cx={dragIndex * 33} cy={priceHistory[dragIndex]} r="6" fill="#00A36C" />
-                    </>
-                  ) : (
-                    <circle cx={(priceHistory.length - 1) * 33} cy={priceHistory[priceHistory.length - 1]} r="4" fill="#00A36C" />
-                  )}
+                  {/* Current point */}
+                  <circle cx={(priceHistory.length - 1) * 33} cy={100 - priceHistory[priceHistory.length - 1]} r="5" fill="#00A36C" />
                 </svg>
               </div>
-
+              
               {/* X-axis labels */}
-              <div className="absolute left-10 right-0 bottom-0 flex justify-between text-[9px] text-[#6B7280]">
-                {dateLabels.map((label, i) => (
-                  <span key={i}>{label}</span>
-                ))}
+              <div className="ml-8 flex justify-between text-[9px] text-[#9CA3AF] mt-1">
+                <span>3</span>
+                <span>10</span>
+                <span>17</span>
+                <span>24</span>
+                <span>30</span>
               </div>
             </div>
           </div>
@@ -246,7 +188,7 @@ export default function PriceDrop() {
                   <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                     <img src={selectedProduct.image} alt="" className="w-full h-full object-cover" />
                     {/* Price badge - semi-transparent, tight fit */}
-                    <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded px-1 py-0.5">
+                    <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-sm rounded px-1 py-0.5">
                       <span className="text-[9px] font-bold text-white leading-none">{s.price}</span>
                     </div>
                     {/* Heart bottom right */}
@@ -363,7 +305,7 @@ export default function PriceDrop() {
               <ChevronRight className="w-3 h-3 text-[#6B7280]" />
             </div>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {recentlyViewed.slice(0, 3).map((item) => (
               <button
                 key={item.id}

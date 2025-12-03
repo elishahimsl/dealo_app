@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Star, Filter, Tag, Award, Sparkles } from "lucide-react";
+import { ArrowLeft, Heart, Star, SlidersHorizontal, Tag, Award, Sparkles } from "lucide-react";
 
 export default function StoreDetail() {
   const navigate = useNavigate();
@@ -124,58 +124,52 @@ export default function StoreDetail() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header with store color gradient */}
-      <div className="relative" style={{ height: '180px' }}>
-        {/* Gradient background with store color */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to bottom, ${store.color}cc 0%, ${store.color}99 50%, ${store.color}44 80%, transparent 100%)`
-          }}
-        />
-        
-        {/* Back button */}
-        <button 
-          onClick={() => navigate(-1)} 
-          className="absolute top-6 left-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center z-10"
-        >
-          <ArrowLeft className="w-4 h-4 text-white" />
-        </button>
+      {/* Store color header band */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-20 z-0"
+        style={{ backgroundColor: store.color }}
+      />
 
-        {/* Logo centered */}
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center z-10">
-          <img src={store.logo} alt={store.name} className="w-12 h-12 object-contain" />
-        </div>
-      </div>
+      {/* Back button on color band */}
+      <button 
+        onClick={() => navigate(-1)} 
+        className="fixed top-6 left-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center z-30"
+      >
+        <ArrowLeft className="w-4 h-4 text-white" />
+      </button>
 
-      {/* Store Info */}
-      <div className="px-6 -mt-8 relative z-10">
-        <div className="bg-white rounded-2xl shadow-sm p-4 text-center">
-          <h1 className="text-xl font-bold text-[#1F2937] mb-1">{store.name}</h1>
-          
-          {/* Rating */}
-          <div className="flex items-center justify-center gap-1 mb-2">
-            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
-            <span className="text-sm text-[#6B7280]">· {store.reviews} Reviews</span>
+      {/* Main content slides over color */}
+      <div className="relative z-10 mt-14 bg-[#F9FAFB] rounded-t-3xl min-h-screen pt-4">
+        {/* Store Info */}
+        <div className="px-6 pb-4">
+          <div className="flex items-center gap-3">
+            {/* Logo */}
+            <div className="w-14 h-14 rounded-xl bg-white shadow-md flex items-center justify-center border border-[#E5E7EB]">
+              <img src={store.logo} alt={store.name} className="w-9 h-9 object-contain" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-base font-bold text-[#1F2937] mb-0.5">{store.name}</h1>
+              {/* Rating */}
+              <div className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                <span className="text-xs font-semibold text-[#1F2937]">{store.rating}</span>
+                <span className="text-xs text-[#6B7280]">· {store.reviews}</span>
+              </div>
+            </div>
+            {/* Follow button */}
+            <button 
+              onClick={() => setIsFollowing(!isFollowing)}
+              className={`px-4 py-1.5 rounded-full text-xs font-semibold ${
+                isFollowing 
+                  ? 'bg-[#E5E7EB] text-[#1F2937]' 
+                  : 'bg-[#1F2937] text-white'
+              }`}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </button>
           </div>
-
-          {/* Follow button */}
-          <button 
-            onClick={() => setIsFollowing(!isFollowing)}
-            className={`px-6 py-1.5 rounded-full text-sm font-semibold mb-2 ${
-              isFollowing 
-                ? 'bg-[#E5E7EB] text-[#1F2937]' 
-                : 'bg-[#1F2937] text-white'
-            }`}
-          >
-            {isFollowing ? 'Following' : 'Follow'}
-          </button>
-
-          {/* Tagline */}
-          <p className="text-xs text-[#6B7280] italic">{store.tagline}</p>
+          <p className="text-[10px] text-[#6B7280] italic mt-2">{store.tagline}</p>
         </div>
-      </div>
 
       {/* Featured Categories */}
       <div className="px-6 mt-4">
@@ -207,63 +201,61 @@ export default function StoreDetail() {
             onClick={() => setShowFilter(true)}
             className="w-8 h-8 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center"
           >
-            <Filter className="w-4 h-4 text-[#6B7280]" />
+            <SlidersHorizontal className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
 
-        {/* Products Grid - 2 per row */}
+        {/* Products Grid - saved-style tiles */}
         <div className="grid grid-cols-2 gap-3">
           {sortedProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB]">
-              {/* Product Image */}
-              <div className="relative" style={{ height: '120px' }}>
+            <div key={product.id}>
+              {/* Product Image Tile */}
+              <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
                 
-                {/* Badge */}
+                {/* Badge - bottom left */}
                 {product.badge && (
-                  <div className="absolute top-2 left-2 bg-[#1F2937] text-white text-[8px] font-bold px-2 py-0.5 rounded">
+                  <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-[8px] font-bold px-2 py-0.5 rounded">
                     {product.badge}
                   </div>
                 )}
 
-                {/* Discount badge - top right */}
-                <div className="absolute top-2 right-2 bg-[#00A36C] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                  {product.discount} off
+                {/* Price badge - top left, semi-transparent */}
+                <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded px-1 py-0.5">
+                  <span className="text-[9px] font-bold text-white leading-none">{product.price}</span>
                 </div>
 
                 {/* Heart - bottom right */}
                 <button 
                   onClick={() => toggleFavorite(product.id)}
-                  className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center ${
+                  className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
                     favorites.includes(product.id) 
                       ? 'bg-[#00A36C]' 
-                      : 'bg-[#6B7280]'
+                      : 'bg-[#6B7280]/60'
                   }`}
                 >
-                  <Heart className={`w-3.5 h-3.5 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  <Heart className={`w-3 h-3 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
                 </button>
               </div>
 
-              {/* Product Info */}
-              <div className="p-2">
-                <h3 className="text-xs font-semibold text-[#1F2937] mb-1 truncate">{product.title}</h3>
-                
-                {/* Rating */}
-                <div className="flex items-center gap-0.5 mb-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={`w-2.5 h-2.5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                    />
-                  ))}
-                  <span className="text-[9px] text-[#6B7280] ml-0.5">({product.reviews})</span>
-                </div>
+              {/* Product Info underneath - no tile */}
+              <h3 className="text-xs font-semibold text-[#1F2937] mb-0.5 truncate">{product.title}</h3>
+              
+              {/* Rating */}
+              <div className="flex items-center gap-0.5 mb-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`w-2.5 h-2.5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                  />
+                ))}
+                <span className="text-[9px] text-[#6B7280] ml-0.5">({product.reviews})</span>
+              </div>
 
-                {/* Price */}
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-bold text-[#1F2937]">{product.price}</span>
-                  <span className="text-[10px] text-[#6B7280] line-through">{product.originalPrice}</span>
-                </div>
+              {/* Price */}
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] text-[#6B7280] line-through">{product.originalPrice}</span>
+                <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{product.discount} off</span>
               </div>
             </div>
           ))}

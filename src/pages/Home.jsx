@@ -152,7 +152,12 @@ export default function Home() {
           </Link>
           <Link to={createPageUrl("More")} className="flex-shrink-0">
             <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-xs font-medium text-[#1F2937]">
-              <Grid3X3 className="w-3 h-3 text-[#00A36C]" />
+              <svg className="w-3 h-3 text-[#00A36C]" viewBox="0 0 12 12" fill="currentColor">
+                    <rect x="0" y="0" width="5" height="5" rx="1" />
+                    <rect x="7" y="0" width="5" height="5" rx="1" />
+                    <rect x="0" y="7" width="5" height="5" rx="1" />
+                    <rect x="7" y="7" width="5" height="5" rx="1" />
+                  </svg>
               Categories
             </button>
           </Link>

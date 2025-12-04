@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Heart, ChevronRight, MoreHorizontal, Star } from "lucide-react";
+import { Heart, ArrowRight, MoreHorizontal, Star } from "lucide-react";
 
 export default function Following() {
   const navigate = useNavigate();
@@ -63,37 +63,45 @@ export default function Following() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+    <div className="min-h-screen bg-[#EDEEF0] pb-24">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        <button onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
-        </button>
-        <h1 className="text-base font-bold text-[#1F2937]">Following</h1>
-        <button className="text-xs font-medium text-[#6B7280]">Manage</button>
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center">
+        <h1 className="text-base font-light text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>Following</h1>
       </div>
 
       {/* Store Cards */}
-      <div className="px-6 space-y-4">
+      <div className="px-6 space-y-5">
         {followedStores.map((store) => (
-          <div key={store.id} className="overflow-hidden">
+          <div key={store.id} className="relative">
+            {/* Stacked card effect - Deal tile underneath */}
+            <div 
+              className="absolute -bottom-2 left-2 right-2 h-16 rounded-2xl"
+              style={{
+                background: 'linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)'
+              }}
+            />
+            
+            {/* Deal content in bottom tile */}
+            <div className="absolute -bottom-2 left-2 right-2 h-16 rounded-2xl flex items-center justify-center gap-2 z-0">
+              <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
+              <span className="text-white text-[11px] font-light">{store.dealText}</span>
+            </div>
+
             {/* Top Card - Products */}
-            <div className="bg-white rounded-t-3xl border border-[#E5E7EB] border-b-0 p-4">
+            <div className="bg-white rounded-2xl p-4 relative z-10 shadow-sm mb-4">
               {/* Store Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  {/* Logo in green bordered box */}
-                  <div className="w-8 h-8 rounded-lg border-2 border-[#00A36C] flex items-center justify-center bg-white p-1">
+                  {/* Logo - no border */}
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                     <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <span className="text-sm font-semibold text-[#1F2937]">{store.name}</span>
                     <div className="flex items-center gap-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`w-2.5 h-2.5 ${i < Math.floor(store.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                        ))}
-                      </div>
+                      <span className="text-[10px] font-medium text-[#1F2937]">{store.rating}</span>
+                      <Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
                       <span className="text-[10px] text-[#6B7280]">({store.reviews})</span>
                     </div>
                   </div>
@@ -110,8 +118,8 @@ export default function Following() {
                     <div className="aspect-square relative">
                       <img src={product.image} alt="" className="w-full h-full object-cover" />
                       
-                      {/* Price badge - black bg, white text, tight fit */}
-                      <div className="absolute top-1.5 left-1.5 bg-black rounded px-1.5 py-0.5">
+                      {/* Price badge - more transparent, centered text */}
+                      <div className="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-1 flex items-center justify-center">
                         <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
                       </div>
 
@@ -133,23 +141,17 @@ export default function Following() {
 
               {/* New Items + Arrow row */}
               <div className="flex items-center justify-between mt-3">
-                <div className="text-[10px] text-[#6B7280]">
-                  <span className="font-semibold text-[#1F2937]">{store.newItems} New</span>
+                <div className="leading-tight">
+                  <span className="text-xs font-bold text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>{store.newItems} New</span>
                   <br />
-                  <span>Items Added</span>
+                  <span className="text-[10px] text-[#9CA3AF]">Items Added</span>
                 </div>
                 <Link to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}>
-                  <div className="w-8 h-8 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-                    <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+                  <div className="w-6 h-6 rounded-full bg-[#1F2937] flex items-center justify-center">
+                    <ArrowRight className="w-3 h-3 text-white" />
                   </div>
                 </Link>
               </div>
-            </div>
-
-            {/* Bottom Card - Deal Banner */}
-            <div className="bg-gradient-to-r from-[#3a3a3a] to-[#4a4a4a] rounded-b-3xl px-4 py-3 flex items-center justify-center gap-2">
-              <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-0.5 rounded">{store.deal}</span>
-              <span className="text-white text-[11px] font-light">{store.dealText}</span>
             </div>
           </div>
         ))}

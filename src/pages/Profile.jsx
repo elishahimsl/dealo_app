@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, Bell, Lock, HelpCircle, LogOut, Palette, Info } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, Bell, Lock, HelpCircle, LogOut, Palette, Info, Bookmark, List, BellRing, Star, Clock, Sparkles, Pencil } from "lucide-react";
 
 export default function Profile() {
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsPage, setSettingsPage] = useState(null);
+  const [usePreferences, setUsePreferences] = useState(true);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -23,30 +24,29 @@ export default function Profile() {
   });
 
   const totalScans = captures.length;
-  const moneySaved = 213;
-  const storesVisited = 9;
-  const topCategory = "Tech";
+  const savedItems = 24;
+  const savedLists = 5;
 
-  const badges = [
-    { id: 1, icon: ShoppingCart, label: "Deal Hunter" },
-    { id: 2, icon: Scan, label: "Product Explorer" },
-    { id: 3, icon: Rocket, label: "Early Adopter" },
-    { id: 4, icon: Award, label: "Shop Master" },
+  // Collections data
+  const collections = [
+    { id: 1, icon: Bookmark, label: "Saved Products", count: 24, color: "#00A36C" },
+    { id: 2, icon: List, label: "Saved Lists", count: 5, color: "#1F2937" },
+    { id: 3, icon: BellRing, label: "Price Alerts", count: 8, color: "#F59E0B" },
+    { id: 4, icon: Star, label: "Your Brands", count: 12, color: "#8B5CF6" },
+    { id: 5, icon: Store, label: "Your Stores", count: 6, color: "#EC4899" },
   ];
 
-  const stats = [
-    { icon: Scan, value: totalScans, label: "Items Scanned" },
-    { icon: DollarSign, value: `$${moneySaved}`, label: "Saved from Deals" },
-    { icon: Store, value: storesVisited, label: "Stores Visited" },
-    { icon: Tag, value: topCategory, label: "Top Category" },
+  // Recent activity
+  const recentActivity = [
+    { id: 1, type: "saved", title: "Nike Air Max 90", brand: "Nike", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200", time: "2h ago" },
+    { id: 2, type: "alert", title: "Price drop alert set", brand: "Sony WH-1000XM5", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200", time: "5h ago" },
+    { id: 3, type: "liked", title: "Smart Watch", brand: "Apple", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200", time: "1d ago" },
   ];
 
-  const recentlyViewed = [
-    { id: 1, price: "$89.99", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200" },
-    { id: 2, price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200" },
-    { id: 3, price: "$59.99", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=200" },
-    { id: 4, price: "$24.99", image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200" },
-  ];
+  // Preferences
+  const likedBrands = ["Nike", "Apple", "Sony", "Target", "Uniqlo"];
+  const likedStores = ["Amazon", "Target", "Best Buy"];
+  const likedCategories = ["Tech", "Fashion", "Home"];
 
   // Settings sub-pages
   if (settingsPage) {
@@ -102,11 +102,6 @@ export default function Profile() {
                 </div>
               ))}
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-2">Two-Factor Authentication</h3>
-              <p className="text-xs text-[#6B7280] mb-3">Add an extra layer of security</p>
-              <Button variant="outline" className="w-full rounded-2xl border-[#00A36C] text-[#00A36C]">Setup 2FA</Button>
-            </div>
           </div>
         )}
 
@@ -124,16 +119,12 @@ export default function Profile() {
         {settingsPage === 'Privacy' && (
           <div className="px-6 space-y-4">
             <h3 className="text-sm font-bold text-[#1F2937]">Data Permissions</h3>
-            {[{ title: 'Camera Access', desc: 'Required for scanning products' }, { title: 'Photo Library', desc: 'Upload photos for comparison' }, { title: 'Microphone', desc: 'Voice search functionality' }].map((item) => (
+            {[{ title: 'Camera Access', desc: 'Required for scanning products' }, { title: 'Photo Library', desc: 'Upload photos for comparison' }].map((item) => (
               <div key={item.title} className="bg-white rounded-2xl p-4 border border-[#E5E7EB] flex items-center justify-between">
                 <div><p className="text-sm font-semibold text-[#1F2937]">{item.title}</p><p className="text-xs text-[#6B7280]">{item.desc}</p></div>
                 <div className="w-12 h-7 rounded-full bg-[#00A36C] p-1 cursor-pointer flex justify-end"><div className="w-5 h-5 rounded-full bg-white shadow" /></div>
               </div>
             ))}
-            <div className="bg-[#F9FAFB] rounded-2xl p-4 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-2">AI Personalization Data</h3>
-              <p className="text-xs text-[#6B7280]">We use your preferences to improve recommendations. Your data is never sold to third parties.</p>
-            </div>
             <Button className="w-full rounded-2xl bg-red-500 hover:bg-red-600 text-white mt-4">Clear My Data</Button>
           </div>
         )}
@@ -149,27 +140,7 @@ export default function Profile() {
                 <p className="text-sm font-semibold text-[#1F2937]">{q}</p>
               </div>
             ))}
-            <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB]">
-              <h3 className="font-bold text-[#1F2937] mb-3">Report an Issue</h3>
-              <textarea placeholder="Describe your issue..." className="w-full h-24 rounded-xl border border-[#E5E7EB] p-3 text-sm resize-none mb-3" />
-              <Button className="w-full rounded-2xl bg-[#00A36C] hover:bg-[#007E52]">Submit Report</Button>
-            </div>
             <Button variant="outline" className="w-full rounded-2xl border-[#00A36C] text-[#00A36C]">Contact Support</Button>
-            
-            {/* Terms Section */}
-            <h3 className="text-sm font-bold text-[#1F2937] pt-4">Legal</h3>
-            <div className="flex gap-2 mb-4">
-              <button className="flex-1 py-2 rounded-xl bg-[#00A36C] text-white text-sm font-semibold">Terms of Service</button>
-              <button className="flex-1 py-2 rounded-xl bg-white text-[#1F2937] text-sm font-semibold border border-[#E5E7EB]">Privacy Policy</button>
-            </div>
-            <div className="bg-white rounded-2xl p-6 border border-[#E5E7EB]" style={{ fontFamily: 'Georgia, serif' }}>
-              <h2 className="text-lg font-bold mb-4">Terms of Service</h2>
-              <p className="text-sm text-[#6B7280] leading-relaxed mb-4">Welcome to DeaLo. By using our app, you agree to these terms...</p>
-              <h3 className="font-bold text-[#1F2937] mb-2">1. Acceptance of Terms</h3>
-              <p className="text-sm text-[#6B7280] leading-relaxed mb-4">By accessing or using DeaLo, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
-              <h3 className="font-bold text-[#1F2937] mb-2">2. Use of Service</h3>
-              <p className="text-sm text-[#6B7280] leading-relaxed">You may use our service for personal, non-commercial purposes only...</p>
-            </div>
           </div>
         )}
 
@@ -218,88 +189,232 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      <div className="px-6 pt-8 pb-6 bg-white border-b border-[#E5E7EB]">
-        <div className="flex items-center justify-end mb-6">
-          <button onClick={() => setShowSettings(true)} className="w-10 h-10 rounded-full bg-[#F9FAFB] flex items-center justify-center hover:bg-[#E5E7EB]">
-            <Settings className="w-5 h-5 text-[#1F2937]" />
-          </button>
-        </div>
-        <div className="flex flex-col items-center text-center">
-          <div className="w-24 h-24 rounded-full bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm mb-2">
-            <User className="w-12 h-12 text-[#6B7280]" strokeWidth={2} />
-          </div>
-          <div className="bg-[#D6F5E9] text-[#00A36C] text-xs font-bold px-3 py-1 rounded-full mb-3">Free</div>
-          <h2 className="text-xl font-bold text-[#1F2937] mb-1">{user?.full_name || 'ElishaH'}</h2>
-          <p className="text-sm text-[#6B7280]">{user?.email || 'user@dealo.com'}</p>
-        </div>
-      </div>
-
-      <div className="px-6 py-3 bg-white border-b border-[#E5E7EB]">
-        <button onClick={() => navigate(createPageUrl("Achievements"))} className="flex items-center justify-between w-full mb-2">
-          <h3 className="text-base font-bold text-[#1F2937]">Achievements</h3>
-          <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+      {/* Header */}
+      <div className="px-6 pt-6 pb-2 flex items-center justify-between">
+        <p className="text-xs text-[#9CA3AF]">Profile</p>
+        <button onClick={() => setShowSettings(true)} className="w-8 h-8 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center">
+          <Pencil className="w-4 h-4 text-[#6B7280]" />
         </button>
-        <div className="grid grid-cols-4 gap-2">
-          {badges.map((badge) => {
-            const Icon = badge.icon;
-            return (
-              <div key={badge.id} className="flex flex-col items-center gap-1">
-                <div className="w-12 h-12 rounded-xl bg-white border-2 border-[#E5E7EB] flex items-center justify-center shadow-sm">
-                  <Icon className="w-5 h-5 text-[#00A36C]" strokeWidth={2} />
-                </div>
-                <span className="text-[9px] font-semibold text-[#1F2937] text-center leading-tight">{badge.label}</span>
-              </div>
-            );
-          })}
-        </div>
       </div>
 
-      <div className="px-6 py-4 bg-white border-b border-[#E5E7EB]">
-        <h3 className="text-base font-bold text-[#1F2937] mb-3">Personal Insights</h3>
-        <div className="grid grid-cols-2 gap-3">
-          {stats.map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
-                <div className="w-8 h-8 rounded-full bg-[#D6F5E9] flex items-center justify-center mb-2"><Icon className="w-4 h-4 text-[#00A36C]" /></div>
-                <p className="text-lg font-bold text-[#1F2937] mb-0.5">{stat.value}</p>
-                <p className="text-[10px] text-[#6B7280] leading-tight">{stat.label}</p>
+      {/* Profile Card */}
+      <div className="px-6 mb-6">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#E5E7EB]">
+          <div className="flex items-start gap-4">
+            {/* Avatar */}
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center shadow-lg">
+                {user?.full_name ? (
+                  <span className="text-2xl font-bold text-white">{user.full_name.charAt(0).toUpperCase()}</span>
+                ) : (
+                  <User className="w-10 h-10 text-white" />
+                )}
               </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="py-4 bg-white">
-        <div className="px-6 flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-[#1F2937]">Recently Viewed</h3>
-          <button onClick={() => navigate(createPageUrl("RecentlyViewed"))}>
-            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-          </button>
-        </div>
-        <div className="px-6 flex gap-2 overflow-x-scroll scrollbar-hide">
-          {recentlyViewed.map((item) => (
-            <div key={item.id} className="flex-shrink-0 rounded-xl overflow-hidden shadow-sm relative" style={{ width: '100px', height: '70px' }}>
-              <img src={item.image} alt="Product" className="w-full h-full object-cover" />
-              <div className="absolute top-1 left-1 bg-black/60 backdrop-blur-sm rounded-md px-1 py-0.5"><span className="text-[8px] font-bold text-white">{item.price}</span></div>
-              <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#6B7280]/40 flex items-center justify-center"><Heart className="w-2.5 h-2.5 text-white" strokeWidth={2} /></button>
             </div>
+
+            {/* Name & Tagline */}
+            <div className="flex-1 pt-1">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-0.5">{user?.full_name || 'ElishaH'}</h2>
+              <p className="text-xs text-[#6B7280] mb-2">{user?.email || 'user@dealo.com'}</p>
+              <div className="inline-flex items-center gap-1 bg-[#D6F5E9] text-[#00A36C] text-[10px] font-semibold px-2 py-1 rounded-full">
+                <Sparkles className="w-3 h-3" />
+                Smart Shopper
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="flex items-center justify-around mt-5 pt-4 border-t border-[#E5E7EB]">
+            <Link to={createPageUrl("MyCart")} className="text-center">
+              <p className="text-lg font-bold text-[#1F2937]">{savedItems}</p>
+              <p className="text-[10px] text-[#6B7280]">Saved Items</p>
+            </Link>
+            <div className="w-px h-8 bg-[#E5E7EB]" />
+            <Link to={createPageUrl("MyCart")} className="text-center">
+              <p className="text-lg font-bold text-[#1F2937]">{savedLists}</p>
+              <p className="text-[10px] text-[#6B7280]">Saved Lists</p>
+            </Link>
+            <div className="w-px h-8 bg-[#E5E7EB]" />
+            <button className="text-center">
+              <p className="text-lg font-bold text-[#1F2937]">{totalScans}</p>
+              <p className="text-[10px] text-[#6B7280]">Scans</p>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Your Collections */}
+      <div className="mb-6">
+        <h3 className="px-6 text-sm font-bold text-[#1F2937] mb-3">Your Collections</h3>
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+          {collections.map((col) => {
+            const Icon = col.icon;
+            return (
+              <button 
+                key={col.id}
+                onClick={() => navigate(createPageUrl("MyCart"))}
+                className="flex-shrink-0 bg-white rounded-2xl p-4 border border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow"
+                style={{ width: '120px' }}
+              >
+                <div 
+                  className="w-10 h-10 rounded-xl flex items-center justify-center mb-2"
+                  style={{ backgroundColor: `${col.color}15` }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: col.color }} />
+                </div>
+                <p className="text-xs font-semibold text-[#1F2937] mb-0.5 text-left">{col.label}</p>
+                <p className="text-[10px] text-[#6B7280] text-left">{col.count} items</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="px-6 mb-6">
+        <h3 className="text-sm font-bold text-[#1F2937] mb-3">Recent Activity</h3>
+        <div className="space-y-2">
+          {recentActivity.map((item) => (
+            <button 
+              key={item.id}
+              className="w-full bg-white rounded-2xl p-3 border border-[#E5E7EB] flex items-center gap-3 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
+                <img src={item.image} alt="" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
+                <p className="text-[10px] text-[#6B7280]">{item.brand}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#9CA3AF]">{item.time}</span>
+                <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
+              </div>
+            </button>
           ))}
         </div>
       </div>
 
-      <div className="px-6 py-4">
-        <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-10 text-sm flex items-center justify-center gap-2">
-          <div className="w-5 h-5 border-2 border-white rounded flex items-center justify-center"><Share2 className="w-2.5 h-2.5 text-white" /></div>
+      {/* Your Preferences */}
+      <div className="px-6 mb-6">
+        <h3 className="text-sm font-bold text-[#1F2937] mb-3">Your Preferences</h3>
+        <div className="bg-white rounded-2xl p-4 border border-[#E5E7EB] shadow-sm space-y-4">
+          {/* Brands */}
+          <div>
+            <p className="text-[10px] font-medium text-[#6B7280] mb-2">Brands You Like</p>
+            <div className="flex flex-wrap gap-2">
+              {likedBrands.map((brand) => (
+                <span key={brand} className="px-3 py-1 rounded-full bg-[#F3F4F6] text-xs font-medium text-[#1F2937]">
+                  {brand}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Stores */}
+          <div>
+            <p className="text-[10px] font-medium text-[#6B7280] mb-2">Stores You Shop At</p>
+            <div className="flex flex-wrap gap-2">
+              {likedStores.map((store) => (
+                <span key={store} className="px-3 py-1 rounded-full bg-[#D6F5E9] text-xs font-medium text-[#00A36C]">
+                  {store}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div>
+            <p className="text-[10px] font-medium text-[#6B7280] mb-2">Categories You Follow</p>
+            <div className="flex flex-wrap gap-2">
+              {likedCategories.map((cat) => (
+                <span key={cat} className="px-3 py-1 rounded-full bg-[#F3F4F6] text-xs font-medium text-[#1F2937]">
+                  {cat}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Preferences Toggle */}
+          <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-[#1F2937]">Smart Suggestion Influence</p>
+              <p className="text-[10px] text-[#6B7280]">Use my preferences to improve recommendations</p>
+            </div>
+            <button 
+              onClick={() => setUsePreferences(!usePreferences)}
+              className={`w-12 h-7 rounded-full p-1 transition-colors ${usePreferences ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'}`}
+            >
+              <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${usePreferences ? 'translate-x-5' : ''}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Account & Settings */}
+      <div className="px-6 mb-6">
+        <h3 className="text-sm font-bold text-[#1F2937] mb-3">Account & Settings</h3>
+        <div className="space-y-2">
+          {[
+            { icon: Sparkles, label: "Your DeaLo AI Activity", desc: "Chats, searches, generations" },
+            { icon: HelpCircle, label: "Help / Support", desc: "FAQ and contact" },
+            { icon: Info, label: "About DeaLo", desc: "Version 1.0.0" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <button 
+                key={item.label}
+                onClick={() => setSettingsPage('Help')}
+                className="w-full bg-white rounded-2xl p-3 border border-[#E5E7EB] flex items-center gap-3 shadow-sm"
+              >
+                <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-[#6B7280]" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="text-xs font-semibold text-[#1F2937]">{item.label}</p>
+                  <p className="text-[10px] text-[#6B7280]">{item.desc}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Invite Friends */}
+      <div className="px-6 mb-6">
+        <Button className="w-full bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl h-12 text-sm flex items-center justify-center gap-2">
+          <Share2 className="w-4 h-4" />
           Invite Friends
         </Button>
       </div>
 
-      <div className="px-6 pb-8">
-        <p className="text-center text-sm text-[#6B7280] opacity-30 font-semibold">DeaLo</p>
+      {/* Sign Out */}
+      <div className="px-6 mb-8">
+        <button 
+          onClick={() => base44.auth.logout()} 
+          className="w-full text-center text-xs text-[#6B7280] hover:text-[#1F2937]"
+        >
+          Sign Out
+        </button>
       </div>
 
-      <style>{`.scrollbar-hide::-webkit-scrollbar { display: none; } .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+      {/* Footer */}
+      <div className="px-6 pb-8 text-center">
+        <div className="flex items-center justify-center gap-1 opacity-20">
+          <div className="w-4 h-4 rounded bg-[#00A36C] flex items-center justify-center">
+            <Tag className="w-2.5 h-2.5 text-white" />
+          </div>
+          <p className="text-sm font-bold">
+            <span className="text-[#1F2937]">deal</span><span className="text-[#00A36C]">o</span>
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; } 
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }

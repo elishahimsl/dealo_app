@@ -136,7 +136,8 @@ export default function Home() {
     <div className="min-h-screen bg-[#F9FAFB] pb-8">
       {/* Header */}
       <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between mb-4">
+        {/* Top Row - Logo, Notifications, Profile */}
+        <div className="flex items-center justify-between mb-3">
           {/* DeaLo Logo */}
           <div className="flex items-center gap-1.5">
             <div className="w-7 h-7 rounded-lg bg-[#00A36C] flex items-center justify-center">
@@ -146,30 +147,30 @@ export default function Home() {
               <span className="text-[#1F2937]">deal</span><span className="text-[#00A36C]">o</span>
             </h1>
           </div>
-
-          {/* Search Bar - in the middle */}
-          <Link to={createPageUrl("DiscoverSearch")} className="flex-1 mx-4">
-            <div className="bg-[#E5E7EB] rounded-2xl px-4 py-2 flex items-center gap-2">
-              <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span className="text-sm text-[#6B7280]">Search Product</span>
-              <Camera className="w-4 h-4 text-[#6B7280] ml-auto" />
-            </div>
-          </Link>
           
-          {/* Profile & Notifications */}
+          {/* Notifications & Profile */}
           <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center">
+            <button className="w-9 h-9 rounded-full bg-[#F3F4F6] flex items-center justify-center">
               <Bell className="w-4 h-4 text-[#6B7280]" />
             </button>
             <Link to={createPageUrl("Profile")}>
-              <div className="w-8 h-8 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center">
                 <User className="w-4 h-4 text-[#6B7280]" />
               </div>
             </Link>
           </div>
         </div>
+
+        {/* Search Bar - Full Width */}
+        <Link to={createPageUrl("DiscoverSearch")} className="block mb-4">
+          <div className="w-full bg-[#E5E7EB] rounded-full px-4 py-3 flex items-center gap-3">
+            <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="text-sm text-[#6B7280] flex-1">Search Product</span>
+            <Camera className="w-4 h-4 text-[#6B7280]" />
+          </div>
+        </Link>
 
         {/* Pill Buttons */}
         <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-1">

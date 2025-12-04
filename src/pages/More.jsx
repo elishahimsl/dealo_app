@@ -12,7 +12,7 @@ export default function Discover() {
     { id: 1, icon: Scale, name: "SnapCompare", page: "Compare" },
     { id: 2, icon: ScanSearch, name: "DealScanner", page: "DealScanner" },
     { id: 3, icon: Zap, name: "PriceDrop", page: "PriceDrop" },
-    { id: 4, icon: Award, name: "BestMatch", page: "BestMatch" },
+    { id: 4, icon: Award, name: "DeaLo AI", page: "BestMatch" },
   ];
 
   const stores = [

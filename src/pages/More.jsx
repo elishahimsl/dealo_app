@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -68,17 +68,8 @@ export default function Discover() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header with back button */}
-      <div className="px-6 pt-6 pb-2 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="relative flex items-center justify-center group">
-          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
-        </button>
-        <h1 className="text-base font-medium text-[#1F2937]">Discover</h1>
-        <div className="w-5" />
-      </div>
-
       {/* Search Bar */}
-      <div className="px-6 pt-2 mb-4">
+      <div className="px-6 pt-6 mb-4">
         <div className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
           <button onClick={() => navigate(createPageUrl("DiscoverSearch"))} className="flex-1 flex items-center gap-2">
             <Search className="w-4 h-4 text-[#6B7280]" />

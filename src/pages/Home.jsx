@@ -14,6 +14,9 @@ export default function Home() {
   const [likedProducts, setLikedProducts] = useState([]);
   const [dislikedProducts, setDislikedProducts] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [startX, setStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('dealo_favorites', JSON.stringify(favorites));
@@ -29,6 +32,49 @@ export default function Home() {
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  };
+
+  // Touch/drag handlers for swipe
+  const handleTouchStart = (e) => {
+    setStartX(e.touches[0].clientX);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+    const currentX = e.touches[0].clientX;
+    setDragOffset(currentX - startX);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (Math.abs(dragOffset) > 80) {
+      handleSwipe(dragOffset > 0 ? 'right' : 'left');
+    }
+    setDragOffset(0);
+  };
+
+  const handleMouseDown = (e) => {
+    setStartX(e.clientX);
+    setIsDragging(true);
+    
+    const handleMouseMove = (e) => {
+      if (!isDragging) return;
+      setDragOffset(e.clientX - startX);
+    };
+    
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      if (Math.abs(dragOffset) > 80) {
+        handleSwipe(dragOffset > 0 ? 'right' : 'left');
+      }
+      setDragOffset(0);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   const trendingProducts = [
@@ -258,92 +304,108 @@ export default function Home() {
           <p className="text-xs text-[#6B7280] mb-4">Swipe to help us learn your style</p>
 
           {/* Swipe Card Stack */}
-          <div className="relative" style={{ height: '400px' }}>
-            {/* Background cards (stack effect) */}
+          <div className="relative flex justify-center" style={{ height: '220px' }}>
+            {/* Background gradient hint of other cards */}
+            {swipeIndex < swipeCards.length - 2 && (
+              <div 
+                className="absolute rounded-2xl bg-[#D1D5DB]"
+                style={{ 
+                  width: '140px', 
+                  height: '140px',
+                  top: '8px',
+                  transform: 'scale(0.9)',
+                  opacity: 0.4
+                }}
+              />
+            )}
             {swipeIndex < swipeCards.length - 1 && (
               <div 
-                className="absolute inset-x-4 top-4 bottom-4 rounded-3xl bg-[#E5E7EB] opacity-50"
-                style={{ transform: 'scale(0.95)' }}
+                className="absolute rounded-2xl bg-[#E5E7EB]"
+                style={{ 
+                  width: '140px', 
+                  height: '140px',
+                  top: '4px',
+                  transform: 'scale(0.95)',
+                  opacity: 0.6
+                }}
               />
             )}
 
             {/* Current card */}
             {swipeIndex < swipeCards.length && (
               <div 
-                className={`absolute inset-0 rounded-3xl overflow-hidden bg-white shadow-2xl transition-all duration-300 ${
-                  swipeDirection === 'right' ? 'translate-x-full rotate-12 opacity-0' :
-                  swipeDirection === 'left' ? '-translate-x-full -rotate-12 opacity-0' : ''
-                }`}
+                className="relative"
+                style={{
+                  transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.05}deg)`,
+                  transition: swipeDirection ? 'all 0.3s ease-out' : 'none'
+                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
               >
-                <img 
-                  src={swipeCards[swipeIndex].image} 
-                  alt="" 
-                  className="w-full h-3/4 object-cover"
-                />
-                
-                {/* Badge */}
-                <div className="absolute top-4 left-4 bg-[#00A36C] text-white text-xs font-bold px-3 py-1 rounded-full">
-                  {swipeCards[swipeIndex].badge}
+                {/* Image tile */}
+                <div 
+                  className="rounded-2xl overflow-hidden bg-[#F3F4F6] relative"
+                  style={{ width: '160px', height: '160px' }}
+                >
+                  <img 
+                    src={swipeCards[swipeIndex].image} 
+                    alt="" 
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Badge */}
+                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[8px] font-bold px-2 py-0.5 rounded">
+                    {swipeCards[swipeIndex].badge}
+                  </div>
+
+                  {/* Heart button */}
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(swipeCards[swipeIndex].id); }}
+                    className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center ${
+                      favorites.includes(swipeCards[swipeIndex].id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
+                  >
+                    <Heart className={`w-3.5 h-3.5 ${favorites.includes(swipeCards[swipeIndex].id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
+
+                  {/* Like overlay - appears on left when swiping right */}
+                  {dragOffset > 20 && (
+                    <div 
+                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center"
+                      style={{ 
+                        width: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
+                        height: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
+                        opacity: Math.min(1, dragOffset / 100)
+                      }}
+                    >
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                  )}
+
+                  {/* Dislike overlay - appears on right when swiping left */}
+                  {dragOffset < -20 && (
+                    <div 
+                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center"
+                      style={{ 
+                        width: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
+                        height: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
+                        opacity: Math.min(1, Math.abs(dragOffset) / 100)
+                      }}
+                    >
+                      <X className="w-5 h-5 text-white" />
+                    </div>
+                  )}
                 </div>
 
-                {/* Swipe overlays */}
-                {swipeDirection === 'right' && (
-                  <div className="absolute inset-0 bg-green-500/30 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center">
-                      <Check className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                )}
-                {swipeDirection === 'left' && (
-                  <div className="absolute inset-0 bg-red-500/30 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-red-500 flex items-center justify-center">
-                      <X className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                )}
-
-                {/* Card info */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-bold text-[#1F2937]">{swipeCards[swipeIndex].title}</h3>
-                    <span className="text-lg font-bold text-[#00A36C]">{swipeCards[swipeIndex].price}</span>
-                  </div>
-                  <p className="text-sm text-[#6B7280]">{swipeCards[swipeIndex].brand}</p>
-
-                  {/* Swipe buttons */}
-                  <div className="flex items-center justify-center gap-8 mt-4">
-                    <button 
-                      onClick={() => handleSwipe('left')}
-                      className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center hover:bg-red-200 transition-colors"
-                    >
-                      <X className="w-7 h-7 text-red-500" />
-                    </button>
-                    <button 
-                      onClick={() => toggleFavorite(swipeCards[swipeIndex].id)}
-                      className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center"
-                    >
-                      <Bookmark className={`w-5 h-5 ${favorites.includes(swipeCards[swipeIndex].id) ? 'text-[#00A36C] fill-[#00A36C]' : 'text-[#6B7280]'}`} />
-                    </button>
-                    <button 
-                      onClick={() => handleSwipe('right')}
-                      className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center hover:bg-green-200 transition-colors"
-                    >
-                      <Check className="w-7 h-7 text-green-500" />
-                    </button>
-                  </div>
+                {/* Text underneath - moves with tile */}
+                <div className="mt-2 text-center">
+                  <p className="text-xs font-semibold text-[#1F2937]">{swipeCards[swipeIndex].title}</p>
+                  <p className="text-[10px] text-[#6B7280]">{swipeCards[swipeIndex].brand}</p>
                 </div>
               </div>
             )}
-
-            {/* Progress dots */}
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-              {swipeCards.map((_, idx) => (
-                <div 
-                  key={idx} 
-                  className={`w-2 h-2 rounded-full ${idx <= swipeIndex ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'}`} 
-                />
-              ))}
-            </div>
           </div>
         </div>
       ) : (

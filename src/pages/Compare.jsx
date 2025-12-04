@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, ArrowLeft, Loader2, Sparkles, Image as ImageIcon, Search, X, Check, Trash2 } from "lucide-react";
+import { Camera, Plus, Tag, Loader2, Sparkles, Image as ImageIcon, Search, X, Check, Trash2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export default function Compare() {
@@ -72,11 +72,12 @@ export default function Compare() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Header */}
-      <div className="px-6 pt-4 pb-2 text-center relative">
-        <Button variant="ghost" size="icon" onClick={() => navigate(createPageUrl("Home"))} className="absolute left-6 top-4 w-8 h-8 rounded-full">
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <h1 className="text-sm font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>Compare</h1>
+      <div className="px-6 pt-6 pb-2 flex items-center justify-between">
+        <button onClick={() => navigate(createPageUrl("Home"))} className="relative flex items-center justify-center group">
+          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
+        </button>
+        <h1 className="text-base font-medium text-[#1F2937]">Compare</h1>
+        <div className="w-5" />
       </div>
 
       <div className="px-6 space-y-4">

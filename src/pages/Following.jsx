@@ -96,7 +96,7 @@ export default function Following() {
           <div key={store.id} className="relative pt-1">
             {/* Stacked card effect - Deal tile underneath - much more visible */}
             <div 
-              className="absolute -bottom-5 left-1 right-1 h-24 rounded-2xl"
+              className="absolute -bottom-8 left-1 right-1 h-28 rounded-2xl"
               style={{
                 background: 'linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%)',
                 boxShadow: '0 6px 25px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
@@ -104,14 +104,14 @@ export default function Following() {
             />
             
             {/* Deal content in bottom tile - positioned to be fully visible */}
-            <div className="absolute -bottom-5 left-1 right-1 h-24 rounded-2xl flex items-end justify-center gap-2 z-0 pb-3">
+            <div className="absolute -bottom-8 left-1 right-1 h-28 rounded-2xl flex items-end justify-center gap-2 z-0 pb-4">
               <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
               <span className="text-white text-[11px] font-light">{store.dealText}</span>
             </div>
 
             {/* Top Card - Products with gradient border effect */}
             <div 
-              className="rounded-2xl p-[2px] relative z-10 mb-7"
+              className="rounded-2xl p-[2px] relative z-10 mb-10"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.4) 50%, rgba(150,150,150,0.3) 100%)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
@@ -175,8 +175,8 @@ export default function Following() {
                   <span className="text-[10px] text-[#9CA3AF]">Items Added</span>
                 </div>
                 <Link to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}>
-                  <div className="w-6 h-6 rounded-full bg-[#1F2937]/60 flex items-center justify-center">
-                    <ArrowRight className="w-3 h-3 text-white" />
+                  <div className="w-7 h-7 rounded-full bg-[#1F2937] flex items-center justify-center">
+                    <ArrowRight className="w-3.5 h-3.5 text-white" />
                   </div>
                 </Link>
               </div>

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, Camera, Search, Heart, ChevronRight, Bell } from "lucide-react";
+import { Tag, Camera, Search, Heart, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PriceDrop() {
@@ -48,10 +48,10 @@ export default function PriceDrop() {
       <div className="min-h-screen bg-[#F9FAFB] pb-24">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white border-b border-[#E5E7EB]">
-          <button onClick={() => setSelectedProduct(null)}>
-            <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
+          <button onClick={() => setSelectedProduct(null)} className="relative flex items-center justify-center group">
+            <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
           </button>
-          <h1 className="text-base font-bold text-[#1F2937]">Track Price</h1>
+          <h1 className="text-base font-medium text-[#1F2937]">Track Price</h1>
           <button className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center">
             <Bell className="w-4 h-4 text-[#6B7280]" />
           </button>
@@ -227,10 +227,10 @@ export default function PriceDrop() {
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        <button onClick={() => navigate(-1)}>
-          <ArrowLeft className="w-5 h-5 text-[#1F2937]" />
+        <button onClick={() => navigate(-1)} className="relative flex items-center justify-center group">
+          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
         </button>
-        <h1 className="text-base font-bold text-[#1F2937]">PriceDrop</h1>
+        <h1 className="text-base font-medium text-[#1F2937]">PriceDrop</h1>
         <div className="w-5" />
       </div>
 

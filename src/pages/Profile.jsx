@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, ArrowLeft, Bell, Lock, HelpCircle, LogOut, Palette, Info } from "lucide-react";
+import { User, Scan, DollarSign, Store, Tag, Settings, Award, ShoppingCart, Rocket, Share2, ChevronRight, Heart, Bell, Lock, HelpCircle, LogOut, Palette, Info } from "lucide-react";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -52,9 +52,12 @@ export default function Profile() {
   if (settingsPage) {
     return (
       <div className="min-h-screen bg-[#F9FAFB] pb-24 animate-slide-in">
-        <div className="px-6 pt-6 pb-4 flex items-center gap-3">
-          <button onClick={() => setSettingsPage(null)}><ArrowLeft className="w-5 h-5 text-[#1F2937]" /></button>
-          <h1 className="text-base font-bold text-[#1F2937]">{settingsPage}</h1>
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+          <button onClick={() => setSettingsPage(null)} className="relative flex items-center justify-center group">
+            <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
+          </button>
+          <h1 className="text-base font-medium text-[#1F2937]">{settingsPage}</h1>
+          <div className="w-5" />
         </div>
         
         {settingsPage === 'Account' && (
@@ -178,9 +181,12 @@ export default function Profile() {
   if (showSettings) {
     return (
       <div className="min-h-screen bg-white pb-24">
-        <div className="px-6 pt-6 pb-4 flex items-center gap-3">
-          <button onClick={() => setShowSettings(false)}><ArrowLeft className="w-5 h-5 text-[#1F2937]" /></button>
-          <h1 className="text-base font-bold text-[#1F2937]">Settings</h1>
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+          <button onClick={() => setShowSettings(false)} className="relative flex items-center justify-center group">
+            <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
+          </button>
+          <h1 className="text-base font-medium text-[#1F2937]">Settings</h1>
+          <div className="w-5" />
         </div>
         <div className="px-6">
           <div className="grid grid-cols-2 gap-3 mb-8">

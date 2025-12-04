@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Heart, Star, SlidersHorizontal, Tag, Award, Sparkles } from "lucide-react";
+import { Heart, Star, SlidersHorizontal, Tag, Award, Sparkles } from "lucide-react";
 
 export default function StoreDetail() {
   const navigate = useNavigate();
@@ -130,12 +130,12 @@ export default function StoreDetail() {
         style={{ backgroundColor: store.color }}
       />
 
-      {/* Back button on color band */}
+      {/* Back button on color band - animated tag */}
       <button 
         onClick={() => navigate(-1)} 
-        className="fixed top-6 left-4 w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center z-30"
+        className="fixed top-6 left-4 flex items-center justify-center z-30 group"
       >
-        <ArrowLeft className="w-4 h-4 text-white" />
+        <Tag className="w-5 h-5 text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
       </button>
 
       {/* Main content slides over color */}

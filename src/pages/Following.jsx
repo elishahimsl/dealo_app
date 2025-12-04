@@ -7,7 +7,9 @@ export default function Following() {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [showNotifModal, setShowNotifModal] = useState(null);
+  const [showManageModal, setShowManageModal] = useState(false);
   const [notifications, setNotifications] = useState({});
+  const [unfollowed, setUnfollowed] = useState([]);
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
@@ -78,40 +80,38 @@ export default function Following() {
     <div className="min-h-screen bg-[#EDEEF0] pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        {/* Animated back/deal icon */}
-        <button onClick={() => navigate(-1)} className="relative w-8 h-8 flex items-center justify-center group">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] opacity-90 group-hover:opacity-100 transition-opacity" />
-          <div className="absolute inset-0 rounded-full animate-ping-slow bg-[#00A36C] opacity-20" />
-          <Tag className="w-4 h-4 text-white relative z-10 transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+        {/* Animated back/deal icon - no circle */}
+        <button onClick={() => navigate(-1)} className="relative flex items-center justify-center group">
+          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
         </button>
         
         <h1 className="text-base font-medium text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>Following</h1>
         
-        <button className="text-xs font-medium text-[#6B7280]">Manage</button>
+        <button onClick={() => setShowManageModal(true)} className="text-xs font-medium text-[#6B7280]">Manage</button>
       </div>
 
       {/* Store Cards */}
       <div className="px-6 space-y-6">
         {followedStores.map((store) => (
           <div key={store.id} className="relative pt-1">
-            {/* Stacked card effect - Deal tile underneath - more visible */}
+            {/* Stacked card effect - Deal tile underneath - much more visible */}
             <div 
-              className="absolute -bottom-3 left-1 right-1 h-20 rounded-2xl"
+              className="absolute -bottom-5 left-1 right-1 h-24 rounded-2xl"
               style={{
                 background: 'linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%)',
                 boxShadow: '0 6px 25px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
               }}
             />
             
-            {/* Deal content in bottom tile - positioned to be visible */}
-            <div className="absolute -bottom-3 left-1 right-1 h-20 rounded-2xl flex items-end justify-center gap-2 z-0 pb-2">
+            {/* Deal content in bottom tile - positioned to be fully visible */}
+            <div className="absolute -bottom-5 left-1 right-1 h-24 rounded-2xl flex items-end justify-center gap-2 z-0 pb-3">
               <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
               <span className="text-white text-[11px] font-light">{store.dealText}</span>
             </div>
 
             {/* Top Card - Products with gradient border effect */}
             <div 
-              className="rounded-2xl p-[2px] relative z-10 mb-5"
+              className="rounded-2xl p-[2px] relative z-10 mb-7"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.4) 50%, rgba(150,150,150,0.3) 100%)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
@@ -185,6 +185,62 @@ export default function Following() {
           </div>
         ))}
       </div>
+
+      {/* Manage Modal */}
+      {showManageModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowManageModal(false)}>
+          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => setShowManageModal(false)} className="relative flex items-center justify-center group">
+                <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+              </button>
+              <h3 className="text-base font-bold text-[#1F2937]">Following List</h3>
+              <button onClick={() => setShowManageModal(false)}>
+                <X className="w-5 h-5 text-[#6B7280]" />
+              </button>
+            </div>
+
+            {/* Following List */}
+            <div className="space-y-3">
+              {followedStores.filter(s => !unfollowed.includes(s.id)).map((store) => (
+                <div key={store.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center p-1">
+                      <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-sm font-medium text-[#1F2937]">{store.name}</span>
+                  </div>
+                  <button 
+                    onClick={() => setUnfollowed(prev => [...prev, store.id])}
+                    className="px-4 py-1.5 rounded-lg bg-[#F3F4F6] text-xs font-medium text-[#6B7280]"
+                  >
+                    Following
+                  </button>
+                </div>
+              ))}
+              
+              {/* Unfollowed stores */}
+              {followedStores.filter(s => unfollowed.includes(s.id)).map((store) => (
+                <div key={store.id} className="flex items-center justify-between opacity-60">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center p-1">
+                      <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="text-sm font-medium text-[#1F2937]">{store.name}</span>
+                  </div>
+                  <button 
+                    onClick={() => setUnfollowed(prev => prev.filter(id => id !== store.id))}
+                    className="px-4 py-1.5 rounded-lg bg-[#1F2937] text-xs font-medium text-white"
+                  >
+                    Follow
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Notification Modal */}
       {showNotifModal && (

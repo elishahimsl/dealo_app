@@ -122,32 +122,46 @@ export default function StoreDetail() {
     { id: 3, name: "New Arrivals", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300", label: "New Arrivals" },
   ];
 
+  // Darker color for header
+  const headerColor = store.name === "Target" ? "#AA0000" : store.color;
+
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Store color header band - lighter */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-32 z-0"
-        style={{ backgroundColor: `${store.color}30` }}
-      />
+      {/* Store color header with curved ends and bump over logo */}
+      <svg 
+        className="absolute top-0 left-0 right-0 z-0" 
+        viewBox="0 0 400 140" 
+        preserveAspectRatio="none"
+        style={{ width: '100%', height: '140px' }}
+      >
+        <path 
+          d={`M0,0 L0,90 Q30,90 50,85 L150,85 Q200,85 200,50 Q200,85 250,85 L350,85 Q370,90 400,90 L400,0 Z`}
+          fill={`${headerColor}40`}
+        />
+      </svg>
 
-      {/* Back button - on the header band, left side */}
+      {/* Back button - white circle with green deal tag arrow */}
       <button 
         onClick={() => navigate(-1)} 
-        className="absolute top-20 left-4 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center z-20"
+        className="absolute top-24 left-4 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center z-20"
       >
-        <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
+        <ChevronLeft className="w-5 h-5 text-[#00A36C]" />
       </button>
 
-      {/* Menu button - on the header band, right side */}
+      {/* Menu button - white circle with 3 black lines */}
       <button 
-        className="absolute top-20 right-4 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center z-20"
+        className="absolute top-24 right-4 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center z-20"
       >
-        <Menu className="w-5 h-5 text-[#6B7280]" />
+        <div className="flex flex-col gap-1">
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
+        </div>
       </button>
 
-      {/* Logo - centered, overlapping the header band */}
-      <div className="relative z-10 flex justify-center pt-16">
-        <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center border-4 border-white">
+      {/* Logo - centered at the bump */}
+      <div className="relative z-10 flex justify-center pt-8">
+        <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden">
           <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
         </div>
       </div>

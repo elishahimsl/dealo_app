@@ -107,9 +107,9 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[55%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center cursor-pointer" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[55%] object-contain pointer-events-none" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden pointer-events-none">{store.name}</span>
             </button>
           ))}
         </div>
@@ -123,9 +123,9 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[55%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 rounded-lg bg-[#E5E7EB] flex items-center justify-center cursor-pointer" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[55%] object-contain pointer-events-none" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden pointer-events-none">{brand.name}</span>
             </button>
           ))}
         </div>

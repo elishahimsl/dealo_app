@@ -286,12 +286,12 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Bottom card - Snap a picture (flush width, sticks out on bottom) */}
+            {/* Bottom card - Snap a picture (starts at camera height, sticks out on bottom) */}
             <div 
-              className="rounded-2xl bg-[#374151] flex items-end justify-center py-4 px-4 shadow-lg -mt-4 relative z-0"
-              style={{ height: '180px' }}
+              className="rounded-2xl bg-[#374151] flex items-center justify-center px-4 shadow-lg relative z-0"
+              style={{ height: '80px', marginTop: '-20px' }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-4">
                 <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center">
                   <Camera className="w-4 h-4 text-white" />
                 </div>

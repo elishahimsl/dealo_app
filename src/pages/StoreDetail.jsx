@@ -123,7 +123,7 @@ export default function StoreDetail() {
   ];
 
   // Same color as logo but transparent
-  const bgColor = store.name === "Target" ? "rgba(204, 0, 0, 0.3)" : `${store.color}40`;
+  const bgColor = store.name === "Target" ? "rgba(204, 0, 0, 0.5)" : `${store.color}60`;
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -154,7 +154,7 @@ export default function StoreDetail() {
           {/* Logo - centered, smaller circle, overlapping the top */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
             <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-white">
-              <img src={store.logo} alt={store.name} className="w-12 h-12 object-contain" />
+              <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
             </div>
           </div>
 

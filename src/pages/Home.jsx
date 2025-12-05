@@ -99,14 +99,26 @@ export default function Home() {
     brandsYouLiked: [
       { id: 201, brand: "Uniqlo", price: "$24.99", title: "Joggers", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
       { id: 202, brand: "Nike", price: "$30.99", title: "Active Shorts", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400" },
+      { id: 203, brand: "Adidas", price: "$45.00", title: "Track Jacket", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400" },
+      { id: 204, brand: "Levi's", price: "$59.99", title: "Denim Jacket", image: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=400" },
+      { id: 205, brand: "H&M", price: "$19.99", title: "Basic Tee", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
+      { id: 206, brand: "Zara", price: "$35.00", title: "Chinos", image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400" },
     ],
     storesYouLiked: [
       { id: 301, store: "Target", brand: "Xbox", price: "$500.99", title: "Xbox One", image: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=400" },
       { id: 302, store: "Walmart", price: "$1,200", title: "TV 75\"", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400" },
+      { id: 303, store: "Best Buy", price: "$299", title: "Headphones", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400" },
+      { id: 304, store: "Amazon", price: "$89.99", title: "Echo Dot", image: "https://images.unsplash.com/photo-1543512214-318c7553f230?w=400" },
+      { id: 305, store: "Costco", price: "$149", title: "Air Fryer", image: "https://images.unsplash.com/photo-1585515320310-259814833e62?w=400" },
+      { id: 306, store: "Target", price: "$34.99", title: "Throw Blanket", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400" },
     ],
     similarToLiked: [
       { id: 401, badge: "New", price: "$25.99", title: "Black T-Shirt", store: "Amazon", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
       { id: 402, price: "$40.99", title: "Jeans", store: "Amazon", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
+      { id: 403, price: "$65.00", title: "Sneakers", store: "Nike", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" },
+      { id: 404, price: "$29.99", title: "Backpack", store: "Target", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400" },
+      { id: 405, price: "$18.99", title: "Watch", store: "Amazon", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
+      { id: 406, price: "$55.00", title: "Sunglasses", store: "Walmart", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400" },
     ],
   };
 
@@ -254,35 +266,33 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Deal Tag flying like rocket */}
+                  {/* Deal Tag flying like rocket - NO green bg */}
                   <div className="relative ml-2 transform rotate-[30deg]">
-                    {/* The tag */}
-                    <div className="w-14 h-14 rounded-xl bg-[#00A36C] flex items-center justify-center shadow-2xl">
-                      <Tag className="w-8 h-8 text-white" />
-                    </div>
+                    {/* The tag icon only */}
+                    <Tag className="w-12 h-12 text-[#00A36C] drop-shadow-lg" />
 
                     {/* Rocket fire/boosters below the tag */}
-                    <div className="absolute -bottom-5 left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)' }}>
-                      <div className="w-3 h-5 bg-gradient-to-b from-[#00A36C] to-yellow-400 rounded-b-full" />
-                      <div className="w-2 h-4 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-b-full -mt-1" />
-                      <div className="w-1 h-3 bg-gradient-to-b from-orange-500 to-red-500 rounded-b-full -mt-0.5 animate-pulse" />
+                    <div className="absolute -bottom-4 left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)' }}>
+                      <div className="w-2 h-4 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-b-full" />
+                      <div className="w-1.5 h-3 bg-gradient-to-b from-orange-500 to-red-500 rounded-b-full -mt-1" />
+                      <div className="w-1 h-2 bg-gradient-to-b from-red-500 to-red-600 rounded-b-full -mt-0.5 animate-pulse" />
                     </div>
 
                     {/* Sparkle trail */}
-                    <div className="absolute -bottom-8 -left-2 text-yellow-300 text-sm animate-pulse">✦</div>
-                    <div className="absolute -bottom-6 -left-4 text-orange-400/60 text-xs">✧</div>
+                    <div className="absolute -bottom-6 -left-2 text-yellow-300 text-sm animate-pulse">✦</div>
+                    <div className="absolute -bottom-4 -left-4 text-orange-400/60 text-xs">✧</div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom card - Snap a picture (green bg, sticking out) */}
+            {/* Bottom card - Snap a picture (gray bg, sticking out) */}
             <div 
-              className="rounded-2xl bg-[#00A36C] flex items-center justify-center py-5 px-4 shadow-lg -mt-3 relative z-0"
+              className="rounded-2xl bg-[#374151] flex items-center justify-center py-5 px-4 shadow-lg -mt-3 relative z-0"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                  <Tag className="w-5 h-5 text-[#00A36C]" />
+                  <Camera className="w-5 h-5 text-[#374151]" />
                 </div>
                 <span className="text-white text-base font-semibold">Snap a picture to get started</span>
               </div>
@@ -328,7 +338,29 @@ export default function Home() {
 
           {/* Swipe Card Stack */}
           <div className="relative flex justify-center" style={{ height: '280px' }}>
-            {/* Phantom gradient background cards - sticking out on sides */}
+            {/* Phantom gradient background cards - sticking out on multiple sides */}
+            <div 
+              className="absolute rounded-2xl"
+              style={{ 
+                width: '200px', 
+                height: '190px',
+                top: '20px',
+                background: 'linear-gradient(145deg, #C4C7CC 0%, #B0B3B8 100%)',
+                transform: 'scale(0.82) rotate(-6deg) translateX(-15px)',
+                opacity: 0.25
+              }}
+            />
+            <div 
+              className="absolute rounded-2xl"
+              style={{ 
+                width: '200px', 
+                height: '190px',
+                top: '18px',
+                background: 'linear-gradient(145deg, #D1D5DB 0%, #C4C7CC 100%)',
+                transform: 'scale(0.85) rotate(5deg) translateX(12px)',
+                opacity: 0.3
+              }}
+            />
             <div 
               className="absolute rounded-2xl"
               style={{ 
@@ -336,8 +368,8 @@ export default function Home() {
                 height: '190px',
                 top: '14px',
                 background: 'linear-gradient(145deg, #D1D5DB 0%, #C4C7CC 100%)',
-                transform: 'scale(0.88) rotate(-3deg)',
-                opacity: 0.35
+                transform: 'scale(0.88) rotate(-3deg) translateX(-8px)',
+                opacity: 0.4
               }}
             />
             <div 
@@ -347,7 +379,7 @@ export default function Home() {
                 height: '185px',
                 top: '8px',
                 background: 'linear-gradient(145deg, #E5E7EB 0%, #D1D5DB 100%)',
-                transform: 'scale(0.94) rotate(2deg)',
+                transform: 'scale(0.94) rotate(2deg) translateX(5px)',
                 opacity: 0.55
               }}
             />
@@ -449,11 +481,11 @@ export default function Home() {
             <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Brands You Liked</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.brandsYouLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                   <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
-                      <span className="text-[9px] font-bold text-white">{item.price}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
+                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
                     </div>
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />
@@ -471,11 +503,11 @@ export default function Home() {
             <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Stores You Liked</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.storesYouLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                   <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
-                      <span className="text-[9px] font-bold text-white">{item.price}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
+                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
                     </div>
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />
@@ -493,11 +525,11 @@ export default function Home() {
             <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">Similar to What You Liked</h3>
             <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.similarToLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                   <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
-                      <span className="text-[9px] font-bold text-white">{item.price}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
+                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
                     </div>
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />

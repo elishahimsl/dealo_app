@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Camera, Tag, Bell, User, Bookmark, Users, Heart, X, Check, Tag as TagIcon } from "lucide-react";
+import { Camera, Tag, Bell, User, Bookmark, Users, Heart, X, Check } from "lucide-react";
 
 export default function Home() {
   const [favorites, setFavorites] = useState(() => {

@@ -153,8 +153,8 @@ export default function StoreDetail() {
         <div className="bg-white rounded-t-3xl min-h-screen pt-10 relative">
           {/* Logo - centered, smaller circle, overlapping the top */}
           <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
-            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-white">
-              <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
+            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-white p-2">
+              <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
             </div>
           </div>
 

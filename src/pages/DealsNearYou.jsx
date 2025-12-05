@@ -82,14 +82,17 @@ export default function DealsNearYou() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-center">
+      {/* Header with back arrow tag */}
+      <div className="px-6 pt-6 pb-4 flex items-center">
+        <button onClick={() => navigate(-1)} className="mr-3 group">
+          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+        </button>
         <h1 className="text-base font-semibold text-[#1F2937]">Deals</h1>
       </div>
 
       <div className="px-6 space-y-4">
-        {/* Search Bar */}
-        <div className="flex items-center gap-2 bg-[#E5E7EB] rounded-2xl px-4 py-3">
+        {/* Search Bar - Thinner */}
+        <div className="flex items-center gap-2 bg-[#E5E7EB] rounded-full px-4 py-2">
           <Search className="w-4 h-4 text-[#6B7280]" />
           <input
             placeholder="Search Product"

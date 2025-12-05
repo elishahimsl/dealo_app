@@ -161,9 +161,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Search Bar - Full Width */}
+        {/* Search Bar - Full Width Thinner */}
         <Link to={createPageUrl("DiscoverSearch")} className="block mb-4">
-          <div className="w-full bg-[#E5E7EB] rounded-full px-4 py-3 flex items-center gap-3">
+          <div className="w-full bg-[#E5E7EB] rounded-full px-4 py-2 flex items-center gap-3">
             <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -208,65 +208,64 @@ export default function Home() {
 
       {/* Identify with Camera Tile */}
       <div className="px-6 mb-6">
-        <Link to={createPageUrl("Snap")}>
-          <div className="rounded-3xl overflow-hidden shadow-lg" style={{ height: '200px' }}>
-            {/* Art background */}
-            <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-              {/* Animated stars/sparkles */}
-              <div className="absolute inset-0 overflow-hidden">
-                {[...Array(20)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute text-white animate-twinkle"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 70}%`,
-                      fontSize: `${4 + Math.random() * 6}px`,
-                      animationDelay: `${Math.random() * 3}s`,
-                      opacity: 0.3 + Math.random() * 0.5
-                    }}
-                  >
-                    ✦
-                  </div>
-                ))}
+      <Link to={createPageUrl("Snap")}>
+        <div className="rounded-3xl overflow-hidden shadow-lg" style={{ height: '200px' }}>
+          {/* Art background */}
+          <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
+            {/* Animated stars/sparkles */}
+            <div className="absolute inset-0 overflow-hidden">
+              {[...Array(20)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute text-white animate-twinkle"
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 70}%`,
+                    fontSize: `${4 + Math.random() * 6}px`,
+                    animationDelay: `${Math.random() * 3}s`,
+                    opacity: 0.3 + Math.random() * 0.5
+                  }}
+                >
+                  ✦
+                </div>
+              ))}
+            </div>
+
+            {/* Deal tag flying like rocket - just the tag */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
+              {/* Motion lines behind tag */}
+              <div className="absolute -left-20 top-1/2 -translate-y-1/2 flex flex-col gap-1.5">
+                <div className="w-10 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/50 rounded-full" />
+                <div className="w-16 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/70 rounded-full" />
+                <div className="w-12 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/60 rounded-full" />
+                <div className="w-8 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/40 rounded-full" />
               </div>
 
-              {/* Deal tag flying like rocket */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-                {/* Motion lines */}
-                <div className="absolute -left-16 top-1/2 -translate-y-1/2 flex flex-col gap-1">
-                  <div className="w-8 h-0.5 bg-gradient-to-r from-transparent to-[#00A36C]/60 rounded-full" />
-                  <div className="w-12 h-0.5 bg-gradient-to-r from-transparent to-[#00A36C]/80 rounded-full" />
-                  <div className="w-6 h-0.5 bg-gradient-to-r from-transparent to-[#00A36C]/40 rounded-full" />
+              {/* Flying tag - rocket style */}
+              <div className="relative">
+                <div className="w-16 h-16 rounded-xl bg-[#00A36C] shadow-2xl flex items-center justify-center transform rotate-[30deg]">
+                  <Tag className="w-9 h-9 text-white" />
                 </div>
-                
-                {/* Camera illustration */}
-                <div className="relative z-10 mr-4">
-                  <div className="w-16 h-14 rounded-xl bg-white/90 shadow-xl flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-[#1F2937] flex items-center justify-center">
-                      <div className="w-4 h-4 rounded-full bg-[#00A36C]" />
-                    </div>
-                  </div>
-                  {/* Flash burst */}
-                  <div className="absolute -top-2 -right-2 w-4 h-4 text-yellow-300 animate-pulse">✧</div>
-                </div>
-
-                {/* Flying tag */}
-                <div className="w-14 h-14 rounded-xl bg-[#00A36C] shadow-2xl flex items-center justify-center transform rotate-12">
-                  <Tag className="w-8 h-8 text-white" />
-                </div>
-              </div>
-
-              {/* Bottom CTA Row */}
-              <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20 px-4 py-3 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#00A36C] flex items-center justify-center shadow-lg">
-                  <Camera className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-white text-sm font-medium">Snap a picture to get started</span>
+                {/* Sparkle trail */}
+                <div className="absolute -bottom-3 -left-3 text-yellow-300 text-lg animate-pulse">✦</div>
+                <div className="absolute -bottom-1 -left-6 text-white/60 text-sm">✧</div>
               </div>
             </div>
+
+            {/* Bottom CTA Row */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20 px-4 py-3 flex items-center gap-3">
+              {/* Camera icon - more realistic */}
+              <div className="w-10 h-10 rounded-xl bg-[#00A36C] flex items-center justify-center shadow-lg relative">
+                <div className="w-5 h-4 rounded-sm bg-white/90 relative">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#1F2937] border-2 border-white/50" />
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-1 rounded-t bg-white/90" />
+                </div>
+              </div>
+              <span className="text-white text-sm font-medium">Snap a picture to get started</span>
+            </div>
           </div>
-        </Link>
+        </div>
+      </Link>
       </div>
 
       {/* Trending Products Section */}
@@ -274,27 +273,27 @@ export default function Home() {
         <h2 className="text-sm font-bold text-[#1F2937] mb-3">Trending Products</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
           {trendingProducts.map((product) => (
-            <div key={product.id} className="flex-shrink-0" style={{ width: '120px' }}>
-              <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
-                <img src={product.image} alt="" className="w-full h-full object-cover" />
-                {/* Price badge */}
-                <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded px-1.5 py-0.5">
-                  <span className="text-[10px] font-bold text-white">{product.price}</span>
+              <div key={product.id} className="flex-shrink-0" style={{ width: '120px' }}>
+                <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
+                  <img src={product.image} alt="" className="w-full h-full object-cover" />
+                  {/* Price badge - centered text */}
+                  <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded flex items-center justify-center px-1.5 py-0.5">
+                    <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
+                  </div>
+                  {/* Heart */}
+                  <button 
+                    onClick={() => toggleFavorite(product.id)}
+                    className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                      favorites.includes(product.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
+                  >
+                    <Heart className={`w-3 h-3 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
                 </div>
-                {/* Heart */}
-                <button 
-                  onClick={() => toggleFavorite(product.id)}
-                  className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
-                    favorites.includes(product.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
-                  }`}
-                >
-                  <Heart className={`w-3 h-3 ${favorites.includes(product.id) ? 'text-white fill-white' : 'text-white'}`} />
-                </button>
+                <p className="text-xs font-medium text-[#1F2937] mb-0.5">{product.title}</p>
+                <p className="text-[10px] text-[#6B7280]">{product.store}</p>
               </div>
-              <p className="text-xs font-medium text-[#1F2937] mb-0.5">{product.title}</p>
-              <p className="text-[10px] text-[#6B7280]">{product.store}</p>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
@@ -305,37 +304,63 @@ export default function Home() {
           <p className="text-xs text-[#6B7280] mb-4">Swipe to help us learn your style</p>
 
           {/* Swipe Card Stack */}
-          <div className="relative flex justify-center" style={{ height: '220px' }}>
-            {/* Background gradient hint of other cards */}
-            {swipeIndex < swipeCards.length - 2 && (
+          <div className="relative flex justify-center" style={{ height: '280px' }}>
+            {/* Phantom gradient background cards */}
+            <div 
+              className="absolute rounded-2xl"
+              style={{ 
+                width: '180px', 
+                height: '180px',
+                top: '12px',
+                background: 'linear-gradient(145deg, #E5E7EB 0%, #D1D5DB 100%)',
+                transform: 'scale(0.85)',
+                opacity: 0.3
+              }}
+            />
+            <div 
+              className="absolute rounded-2xl"
+              style={{ 
+                width: '180px', 
+                height: '180px',
+                top: '6px',
+                background: 'linear-gradient(145deg, #F3F4F6 0%, #E5E7EB 100%)',
+                transform: 'scale(0.92)',
+                opacity: 0.5
+              }}
+            />
+
+            {/* Check mark on screen - right side */}
+            {dragOffset > 20 && (
               <div 
-                className="absolute rounded-2xl bg-[#D1D5DB]"
+                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center z-20"
                 style={{ 
-                  width: '140px', 
-                  height: '140px',
-                  top: '8px',
-                  transform: 'scale(0.9)',
-                  opacity: 0.4
+                  width: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
+                  height: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
+                  opacity: Math.min(1, dragOffset / 80)
                 }}
-              />
+              >
+                <Check className="text-white" style={{ width: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px`, height: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px` }} />
+              </div>
             )}
-            {swipeIndex < swipeCards.length - 1 && (
+
+            {/* X mark on screen - left side */}
+            {dragOffset < -20 && (
               <div 
-                className="absolute rounded-2xl bg-[#E5E7EB]"
+                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center z-20"
                 style={{ 
-                  width: '140px', 
-                  height: '140px',
-                  top: '4px',
-                  transform: 'scale(0.95)',
-                  opacity: 0.6
+                  width: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
+                  height: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
+                  opacity: Math.min(1, Math.abs(dragOffset) / 80)
                 }}
-              />
+              >
+                <X className="text-white" style={{ width: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px`, height: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px` }} />
+              </div>
             )}
 
             {/* Current card */}
             {swipeIndex < swipeCards.length && (
               <div 
-                className="relative"
+                className="relative z-10"
                 style={{
                   transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.05}deg)`,
                   transition: swipeDirection ? 'all 0.3s ease-out' : 'none'
@@ -345,65 +370,46 @@ export default function Home() {
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={handleMouseDown}
               >
-                {/* Image tile */}
+                {/* Gradient border wrapper */}
                 <div 
-                  className="rounded-2xl overflow-hidden bg-[#F3F4F6] relative"
-                  style={{ width: '160px', height: '160px' }}
+                  className="rounded-2xl p-[3px]"
+                  style={{
+                    background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(229,231,235,0.6) 50%, rgba(209,213,219,0.4) 100%)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                  }}
                 >
-                  <img 
-                    src={swipeCards[swipeIndex].image} 
-                    alt="" 
-                    className="w-full h-full object-cover"
-                  />
-                  
-                  {/* Badge */}
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                    {swipeCards[swipeIndex].badge}
-                  </div>
-
-                  {/* Heart button */}
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); toggleFavorite(swipeCards[swipeIndex].id); }}
-                    className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center ${
-                      favorites.includes(swipeCards[swipeIndex].id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
-                    }`}
+                  {/* Image tile */}
+                  <div 
+                    className="rounded-xl overflow-hidden bg-[#F3F4F6] relative"
+                    style={{ width: '180px', height: '180px' }}
                   >
-                    <Heart className={`w-3.5 h-3.5 ${favorites.includes(swipeCards[swipeIndex].id) ? 'text-white fill-white' : 'text-white'}`} />
-                  </button>
-
-                  {/* Like overlay - appears on left when swiping right */}
-                  {dragOffset > 20 && (
-                    <div 
-                      className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center"
-                      style={{ 
-                        width: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
-                        height: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
-                        opacity: Math.min(1, dragOffset / 100)
-                      }}
-                    >
-                      <Check className="w-5 h-5 text-white" />
+                    <img 
+                      src={swipeCards[swipeIndex].image} 
+                      alt="" 
+                      className="w-full h-full object-cover"
+                    />
+                    
+                    {/* Badge */}
+                    <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[8px] font-bold px-2 py-0.5 rounded">
+                      {swipeCards[swipeIndex].badge}
                     </div>
-                  )}
 
-                  {/* Dislike overlay - appears on right when swiping left */}
-                  {dragOffset < -20 && (
-                    <div 
-                      className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center"
-                      style={{ 
-                        width: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
-                        height: `${Math.min(40, 20 + Math.abs(dragOffset) * 0.3)}px`,
-                        opacity: Math.min(1, Math.abs(dragOffset) / 100)
-                      }}
+                    {/* Heart button */}
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite(swipeCards[swipeIndex].id); }}
+                      className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center ${
+                        favorites.includes(swipeCards[swipeIndex].id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                      }`}
                     >
-                      <X className="w-5 h-5 text-white" />
-                    </div>
-                  )}
+                      <Heart className={`w-4 h-4 ${favorites.includes(swipeCards[swipeIndex].id) ? 'text-white fill-white' : 'text-white'}`} />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Text underneath - moves with tile */}
-                <div className="mt-2 text-center">
-                  <p className="text-xs font-semibold text-[#1F2937]">{swipeCards[swipeIndex].title}</p>
-                  <p className="text-[10px] text-[#6B7280]">{swipeCards[swipeIndex].brand}</p>
+                <div className="mt-3 text-center">
+                  <p className="text-sm font-semibold text-[#1F2937]">{swipeCards[swipeIndex].title}</p>
+                  <p className="text-xs text-[#6B7280]">{swipeCards[swipeIndex].brand}</p>
                 </div>
               </div>
             )}

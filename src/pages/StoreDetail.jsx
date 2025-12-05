@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Heart, Star, SlidersHorizontal, Tag, Award, Sparkles } from "lucide-react";
+import { Heart, Star, SlidersHorizontal, ChevronLeft, Menu, ShoppingBag } from "lucide-react";
 
 export default function StoreDetail() {
   const navigate = useNavigate();
@@ -117,81 +117,91 @@ export default function StoreDetail() {
   });
 
   const featuredCategories = [
-    { id: 1, name: "Deals", icon: Tag, label: "Top Deals" },
-    { id: 2, name: "Best Sellers", icon: Award, label: "Best Sellers" },
-    { id: 3, name: "New Arrivals", icon: Sparkles, label: "New" },
+    { id: 1, name: "Deals", image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300", label: "Top Deals" },
+    { id: 2, name: "Best Sellers", image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300", label: "Best Sellers" },
+    { id: 3, name: "New Arrivals", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300", label: "New Arrivals" },
   ];
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Store color header band */}
+      {/* Store color header band - lighter/more transparent */}
       <div 
-        className="fixed top-0 left-0 right-0 h-20 z-0"
-        style={{ backgroundColor: store.color }}
+        className="fixed top-0 left-0 right-0 h-48 z-0"
+        style={{ backgroundColor: `${store.color}40` }}
       />
 
-      {/* Back button on color band - animated tag */}
+      {/* Back button - white circle with green arrow */}
       <button 
         onClick={() => navigate(-1)} 
-        className="fixed top-6 left-4 flex items-center justify-center z-30 group"
+        className="fixed top-6 left-4 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center z-30"
       >
-        <Tag className="w-5 h-5 text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
+        <ChevronLeft className="w-5 h-5 text-[#00A36C]" />
       </button>
 
-      {/* Main content slides over color */}
-      <div className="relative z-10 mt-14 bg-[#F9FAFB] rounded-t-3xl min-h-screen pt-4">
-        {/* Store Info */}
-        <div className="px-6 pb-4">
-          <div className="flex items-center gap-3">
-            {/* Logo */}
-            <div className="w-14 h-14 rounded-xl bg-white shadow-md flex items-center justify-center border border-[#E5E7EB]">
-              <img src={store.logo} alt={store.name} className="w-9 h-9 object-contain" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-base font-bold text-[#1F2937] mb-0.5">{store.name}</h1>
-              {/* Rating */}
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                <span className="text-xs font-semibold text-[#1F2937]">{store.rating}</span>
-                <span className="text-xs text-[#6B7280]">· {store.reviews}</span>
-              </div>
-            </div>
-            {/* Follow button */}
-            <button 
-              onClick={() => setIsFollowing(!isFollowing)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold ${
-                isFollowing 
-                  ? 'bg-[#E5E7EB] text-[#1F2937]' 
-                  : 'bg-[#1F2937] text-white'
-              }`}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </button>
-          </div>
-          <p className="text-[10px] text-[#6B7280] italic mt-2">{store.tagline}</p>
-        </div>
+      {/* Menu button - top right */}
+      <button 
+        className="fixed top-6 right-4 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center z-30"
+      >
+        <Menu className="w-5 h-5 text-[#6B7280]" />
+      </button>
 
-        {/* Featured Categories */}
-      <div className="px-6 mt-4">
-        <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
-        <div className="flex gap-3">
-          {featuredCategories.map((cat) => {
-            const Icon = cat.icon;
-            return (
+      {/* Store Info - centered */}
+      <div className="relative z-10 pt-16 pb-4 flex flex-col items-center">
+        {/* Logo */}
+        <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center border border-[#E5E7EB] mb-3">
+          <img src={store.logo} alt={store.name} className="w-14 h-14 object-contain" />
+        </div>
+        
+        {/* Store Name */}
+        <h1 className="text-lg font-bold text-[#1F2937] mb-1">{store.name}</h1>
+        
+        {/* Rating */}
+        <div className="flex items-center gap-1 mb-3">
+          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
+          <span className="text-sm text-[#6B7280]">· {store.reviews} reviews</span>
+        </div>
+        
+        {/* Follow button */}
+        <button 
+          onClick={() => setIsFollowing(!isFollowing)}
+          className={`px-6 py-2 rounded-full text-sm font-semibold ${
+            isFollowing 
+              ? 'bg-[#E5E7EB] text-[#1F2937]' 
+              : 'bg-[#1F2937] text-white'
+          }`}
+        >
+          {isFollowing ? 'Following' : 'Follow'}
+        </button>
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 bg-[#F9FAFB] rounded-t-3xl min-h-screen pt-4 -mt-2">
+
+        {/* Featured Categories - Rectangle tiles with images */}
+        <div className="px-6 mt-4">
+          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            {featuredCategories.map((cat) => (
               <button 
                 key={cat.id}
-                className="flex-1 bg-white rounded-xl p-3 border border-[#E5E7EB] flex flex-col items-center"
+                className="flex-shrink-0 rounded-xl overflow-hidden relative"
+                style={{ width: '140px', height: '80px' }}
               >
-                <div className="w-10 h-10 rounded-lg bg-[#F3F4F6] flex items-center justify-center mb-1">
-                  <Icon className="w-5 h-5 text-[#1F2937]" />
-                </div>
-                <span className="text-[10px] font-semibold text-[#1F2937]">{cat.name}</span>
-                <span className="text-[9px] text-[#6B7280]">{cat.label}</span>
+                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40" />
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">
+                  {cat.name}
+                </span>
               </button>
-            );
-          })}
+            ))}
+          </div>
+          {/* Top Deals label underneath */}
+          <div className="flex items-center gap-1.5 mt-2">
+            <ShoppingBag className="w-3.5 h-3.5 text-[#6B7280]" />
+            <span className="text-xs text-[#6B7280]">Top Deals</span>
+          </div>
         </div>
-      </div>
 
       {/* Products Section */}
       <div className="px-6 mt-4">
@@ -293,6 +303,11 @@ export default function StoreDetail() {
         </div>
       )}
       </div>
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 }

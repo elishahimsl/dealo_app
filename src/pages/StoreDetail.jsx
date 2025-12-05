@@ -122,118 +122,116 @@ export default function StoreDetail() {
     { id: 3, name: "New Arrivals", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300", label: "New Arrivals" },
   ];
 
-  // Darker color for header
-  const headerColor = store.name === "Target" ? "#AA0000" : store.color;
+  // Darker color for background
+  const bgColor = store.name === "Target" ? "#8B0000" : store.color;
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Store color header with curved ends and bump over logo */}
-      <svg 
-        className="absolute top-0 left-0 right-0 z-0" 
-        viewBox="0 0 400 140" 
-        preserveAspectRatio="none"
-        style={{ width: '100%', height: '140px' }}
-      >
-        <path 
-          d={`M0,0 L0,90 Q30,90 50,85 L150,85 Q200,85 200,50 Q200,85 250,85 L350,85 Q370,90 400,90 L400,0 Z`}
-          fill={`${headerColor}40`}
-        />
-      </svg>
-
-      {/* Back button - white circle with green deal tag arrow */}
-      <button 
-        onClick={() => navigate(-1)} 
-        className="absolute top-24 left-4 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center z-20"
-      >
-        <ChevronLeft className="w-5 h-5 text-[#00A36C]" />
-      </button>
-
-      {/* Menu button - white circle with 3 black lines */}
-      <button 
-        className="absolute top-24 right-4 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center z-20"
-      >
-        <div className="flex flex-col gap-1">
-          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
-          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
-          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
-        </div>
-      </button>
-
-      {/* Logo - centered at the bump */}
-      <div className="relative z-10 flex justify-center pt-8">
-        <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden">
-          <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
-        </div>
-      </div>
-
-      {/* Store Info - centered below logo */}
-      <div className="relative z-10 flex flex-col items-center pt-3 pb-4">
-        <h1 className="text-xl font-bold text-[#1F2937] mb-1">{store.name}</h1>
-        <div className="flex items-center gap-1 mb-2">
-          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-          <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
-          <span className="text-sm text-[#6B7280]">· {store.reviews} reviews</span>
-        </div>
+    <div className="min-h-screen pb-24" style={{ backgroundColor: bgColor }}>
+      {/* White card pulled up on top of colored background */}
+      <div className="relative pt-16">
+        {/* Back button - deal tag style */}
         <button 
-          onClick={() => setIsFollowing(!isFollowing)}
-          className={`px-6 py-1.5 rounded-full text-sm font-semibold mb-2 ${
-            isFollowing 
-              ? 'bg-[#E5E7EB] text-[#1F2937]' 
-              : 'bg-[#1F2937] text-white'
-          }`}
+          onClick={() => navigate(-1)} 
+          className="absolute top-6 left-4 z-30 flex items-center gap-1"
         >
-          {isFollowing ? 'Following' : 'Follow'}
+          <div className="w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center">
+            <ChevronLeft className="w-5 h-5 text-[#00A36C]" />
+          </div>
         </button>
-        <p className="text-xs text-[#6B7280] italic">{store.tagline}</p>
-      </div>
 
-      {/* Main content */}
-      <div className="relative z-10 bg-[#F9FAFB] min-h-screen pt-2">
+        {/* Menu button */}
+        <button 
+          className="absolute top-6 right-4 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center z-30"
+        >
+          <div className="flex flex-col gap-1">
+            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
+            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
+            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
+          </div>
+        </button>
 
-        {/* Featured Categories - Horizontal row with labels underneath */}
-        <div className="px-6 mt-2">
-          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
-          <div className="flex gap-3">
-            {/* Deals tile */}
-            <div className="flex-1">
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
-                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300" alt="Deals" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">Deals</span>
-              </button>
-              <div className="flex items-center gap-1 mt-1.5">
-                <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
-                <span className="text-[10px] text-[#6B7280]">Top Deals</span>
-              </div>
+        {/* White page card */}
+        <div className="bg-white rounded-t-3xl min-h-screen pt-14 relative">
+          {/* Logo - centered, overlapping the top of the card */}
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20">
+            <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center border-4 border-white">
+              <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
             </div>
-            
-            {/* Best Sellers tile */}
-            <div className="flex-1">
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
-                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300" alt="Best Sellers" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">Best Sellers</span>
-              </button>
-              <div className="flex items-center gap-1 mt-1.5">
-                <Star className="w-3 h-3 text-[#6B7280]" />
-                <span className="text-[10px] text-[#6B7280]">Best Sellers</span>
-              </div>
+          </div>
+
+          {/* Store Info - centered below logo, no store name text */}
+          <div className="flex flex-col items-center pb-4">
+            <div className="flex items-center gap-1 mb-2">
+              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
+              <span className="text-sm text-[#6B7280]">· {store.reviews} reviews</span>
             </div>
-            
-            {/* New Arrivals tile */}
-            <div className="flex-1">
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
-                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300" alt="New Arrivals" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">New Arrivals</span>
-              </button>
-              <div className="flex items-center gap-1 mt-1.5">
-                <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
-                <span className="text-[10px] text-[#6B7280]">New</span>
+            <button 
+              onClick={() => setIsFollowing(!isFollowing)}
+              className={`px-6 py-1.5 rounded-full text-sm font-semibold mb-2 ${
+                isFollowing 
+                  ? 'bg-[#E5E7EB] text-[#1F2937]' 
+                  : 'bg-[#1F2937] text-white'
+              }`}
+            >
+              {isFollowing ? 'Following' : 'Follow'}
+            </button>
+            <p className="text-xs text-[#6B7280] italic">{store.tagline}</p>
+          </div>
+
+          {/* Featured Categories - White bg with product image behind text */}
+          <div className="px-6 mt-2">
+            <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
+            <div className="flex gap-3">
+              {/* Deals tile */}
+              <div className="flex-1">
+                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=200" 
+                    alt="" 
+                    className="absolute right-0 bottom-0 w-14 h-14 object-contain opacity-40"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-[#1F2937] font-bold text-sm z-10">Deals</span>
+                </button>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
+                  <span className="text-[10px] text-[#6B7280]">Top Deals</span>
+                </div>
+              </div>
+              
+              {/* Best Sellers tile */}
+              <div className="flex-1">
+                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=200" 
+                    alt="" 
+                    className="absolute right-0 bottom-0 w-14 h-14 object-contain opacity-40"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-[#1F2937] font-bold text-sm z-10">Best Sellers</span>
+                </button>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <Star className="w-3 h-3 text-[#6B7280]" />
+                  <span className="text-[10px] text-[#6B7280]">Best Sellers</span>
+                </div>
+              </div>
+              
+              {/* New Arrivals tile */}
+              <div className="flex-1">
+                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                  <img 
+                    src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200" 
+                    alt="" 
+                    className="absolute right-0 bottom-0 w-14 h-14 object-contain opacity-40"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center text-[#1F2937] font-bold text-sm z-10">New Arrivals</span>
+                </button>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
+                  <span className="text-[10px] text-[#6B7280]">New</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
       {/* Products Section */}
       <div className="px-6 mt-4">
@@ -262,9 +260,9 @@ export default function StoreDetail() {
                   </div>
                 )}
 
-                {/* Price badge - top left, semi-transparent */}
-                <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded px-1 py-0.5">
-                  <span className="text-[9px] font-bold text-white leading-none">{product.price}</span>
+                {/* Price badge - centered, fitted to text */}
+                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5 inline-flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
                 </div>
 
                 {/* Heart - bottom right */}
@@ -304,36 +302,37 @@ export default function StoreDetail() {
         </div>
       </div>
 
-      {/* Filter Modal */}
-      {showFilter && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowFilter(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-[#1F2937] mb-4">Sort & Filter</h3>
-            
-            <div className="space-y-2">
-              {[
-                { value: "featured", label: "Featured" },
-                { value: "price-low", label: "Price: Low to High" },
-                { value: "price-high", label: "Price: High to Low" },
-                { value: "rating", label: "Highest Rated" },
-                { value: "discount", label: "Biggest Discount" },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => { setSortBy(option.value); setShowFilter(false); }}
-                  className={`w-full p-3 rounded-xl text-left text-sm font-medium ${
-                    sortBy === option.value 
-                      ? 'bg-[#00A36C] text-white' 
-                      : 'bg-[#F3F4F6] text-[#1F2937]'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
+        {/* Filter Modal */}
+        {showFilter && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowFilter(false)}>
+            <div className="bg-white w-full rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
+              <h3 className="text-lg font-bold text-[#1F2937] mb-4">Sort & Filter</h3>
+              
+              <div className="space-y-2">
+                {[
+                  { value: "featured", label: "Featured" },
+                  { value: "price-low", label: "Price: Low to High" },
+                  { value: "price-high", label: "Price: High to Low" },
+                  { value: "rating", label: "Highest Rated" },
+                  { value: "discount", label: "Biggest Discount" },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => { setSortBy(option.value); setShowFilter(false); }}
+                    className={`w-full p-3 rounded-xl text-left text-sm font-medium ${
+                      sortBy === option.value 
+                        ? 'bg-[#00A36C] text-white' 
+                        : 'bg-[#F3F4F6] text-[#1F2937]'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+        )}
         </div>
-      )}
       </div>
 
       <style>{`

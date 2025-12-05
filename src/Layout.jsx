@@ -16,7 +16,7 @@ export default function Layout({ children, currentPageName }) {
     { name: "Compare", icon: Scale, path: createPageUrl("Compare") },
     { name: "Scan", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
     { name: "Discover", icon: Compass, path: createPageUrl("More") },
-    { name: "Profile", icon: User, path: createPageUrl("Profile") },
+    { name: "Account", icon: User, path: createPageUrl("Profile") },
   ];
 
   const isActive = (path) => location.pathname === path;

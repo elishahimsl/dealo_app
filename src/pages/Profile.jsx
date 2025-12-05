@@ -6,11 +6,12 @@ import { createPageUrl } from "@/utils";
 import { 
   User, Settings, ChevronRight, Bookmark, Scale, Star, Tag, 
   Bell, BellRing, Clock, Camera, LogOut, HelpCircle, Info, 
-  Lock, Globe, Shield
+  Lock, Globe, DollarSign, Store, TrendingUp, Scan
 } from "lucide-react";
 
 export default function Profile() {
   const navigate = useNavigate();
+  const [showSettings, setShowSettings] = useState(false);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -25,10 +26,18 @@ export default function Profile() {
 
   // Your Stuff cards
   const yourStuff = [
-    { id: 1, icon: Bookmark, label: "Saved Products", count: 24 },
-    { id: 2, icon: Scale, label: "Saved Comparisons", count: 8 },
-    { id: 3, icon: Star, label: "Favorite Brands", count: 12 },
-    { id: 4, icon: Tag, label: "Favorite Categories", count: 6 },
+    { id: 1, icon: Bookmark, label: "Saved Products", count: 24, page: "MyCart" },
+    { id: 2, icon: Scale, label: "Saved Comparisons", count: 8, page: "Compare" },
+    { id: 3, icon: Star, label: "Favorite Brands", count: 12, page: "AllBrands" },
+    { id: 4, icon: Tag, label: "Favorite Categories", count: 6, page: "More" },
+  ];
+
+  // Stats
+  const stats = [
+    { icon: DollarSign, value: "$213", label: "Saved from Deals", color: "#00A36C" },
+    { icon: Store, value: "9", label: "Stores Visited", color: "#8B5CF6" },
+    { icon: Scan, value: captures.length.toString(), label: "Items Scanned", color: "#F59E0B" },
+    { icon: TrendingUp, value: "47", label: "Deals Found", color: "#EC4899" },
   ];
 
   // Tracking toggles
@@ -40,32 +49,73 @@ export default function Profile() {
 
   // Activity rows
   const activityRows = [
-    { icon: Clock, label: "Recent Searches" },
-    { icon: Camera, label: "Scan History" },
-    { icon: Scale, label: "Compare History" },
+    { icon: Clock, label: "Recent Searches", page: "DiscoverSearch" },
+    { icon: Camera, label: "Scan History", page: "RecentlyViewed" },
+    { icon: Scale, label: "Compare History", page: "Compare" },
   ];
 
-  // Settings rows
-  const settingsRows = [
-    { icon: Bell, label: "Notifications" },
-    { icon: Lock, label: "Privacy" },
-    { icon: Globe, label: "Language" },
-    { icon: HelpCircle, label: "Help Center" },
-    { icon: Info, label: "About" },
-  ];
+  // Settings Modal
+  if (showSettings) {
+    return (
+      <div className="min-h-screen bg-[#F7F8FA] pb-24">
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between">
+          <button onClick={() => setShowSettings(false)} className="group">
+            <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+          </button>
+          <h1 className="text-base font-semibold text-[#1F2937]">Settings</h1>
+          <div className="w-5" />
+        </div>
+
+        <div className="px-6">
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
+            {[
+              { icon: Bell, label: "Notifications", page: null },
+              { icon: Lock, label: "Privacy", page: null },
+              { icon: Globe, label: "Language", page: null },
+              { icon: HelpCircle, label: "Help Center", page: null },
+              { icon: Info, label: "About", page: null },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <button 
+                  key={item.label}
+                  className={`w-full flex items-center gap-4 p-4 text-left hover:bg-[#F9FAFB] transition-colors ${idx < 4 ? 'border-b border-[#F3F4F6]' : ''}`}
+                >
+                  <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
+                  <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
+                  <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
+                </button>
+              );
+            })}
+          </div>
+
+          <button 
+            onClick={() => base44.auth.logout()}
+            className="w-full flex items-center justify-center gap-2 py-3 text-red-500 hover:text-red-600 transition-colors"
+          >
+            <LogOut className="w-4 h-4" strokeWidth={1.5} />
+            <span className="text-sm font-medium">Log Out</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F7F8FA] pb-32">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-[#1F2937]">Account</h1>
-        <button className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors">
+        <button 
+          onClick={() => setShowSettings(true)}
+          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
+        >
           <Settings className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
         </button>
       </div>
 
       {/* Profile Card */}
-      <div className="px-6 mb-8">
+      <div className="px-6 mb-6">
         <button 
           onClick={() => navigate(createPageUrl("Customization"))}
           className="w-full bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4"
@@ -101,6 +151,30 @@ export default function Profile() {
         </button>
       </div>
 
+      {/* Stats Row */}
+      <div className="px-6 mb-8">
+        <div className="grid grid-cols-4 gap-2">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div 
+                key={idx}
+                className="bg-white rounded-2xl p-3 shadow-sm text-center"
+              >
+                <div 
+                  className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: `${stat.color}15` }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: stat.color }} />
+                </div>
+                <p className="text-base font-bold text-[#1F2937]">{stat.value}</p>
+                <p className="text-[9px] text-[#6B7280] leading-tight">{stat.label}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Your Stuff Section */}
       <div className="px-6 mb-8">
         <h2 className="text-lg font-bold text-[#1F2937] mb-4">Your Stuff</h2>
@@ -110,7 +184,7 @@ export default function Profile() {
             return (
               <button 
                 key={item.id}
-                onClick={() => navigate(createPageUrl("MyCart"))}
+                onClick={() => navigate(createPageUrl(item.page))}
                 className="bg-white rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
                 style={{ height: '100px' }}
               >
@@ -162,6 +236,7 @@ export default function Profile() {
             return (
               <button 
                 key={item.label}
+                onClick={() => navigate(createPageUrl(item.page))}
                 className={`w-full flex items-center gap-4 p-4 text-left hover:bg-[#F9FAFB] transition-colors ${idx < activityRows.length - 1 ? 'border-b border-[#F3F4F6]' : ''}`}
               >
                 <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
@@ -171,37 +246,6 @@ export default function Profile() {
             );
           })}
         </div>
-      </div>
-
-      {/* Settings Section */}
-      <div className="px-6 mb-8">
-        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Settings</h2>
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {settingsRows.map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <button 
-                key={item.label}
-                className={`w-full flex items-center gap-4 p-4 text-left hover:bg-[#F9FAFB] transition-colors ${idx < settingsRows.length - 1 ? 'border-b border-[#F3F4F6]' : ''}`}
-              >
-                <Icon className="w-5 h-5 text-[#9CA3AF]" strokeWidth={1.5} />
-                <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
-                <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Log Out */}
-      <div className="px-6 mb-8">
-        <button 
-          onClick={() => base44.auth.logout()}
-          className="w-full flex items-center justify-center gap-2 py-3 text-red-500 hover:text-red-600 transition-colors"
-        >
-          <LogOut className="w-4 h-4" strokeWidth={1.5} />
-          <span className="text-sm font-medium">Log Out</span>
-        </button>
       </div>
 
       {/* Footer Padding */}

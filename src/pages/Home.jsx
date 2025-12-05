@@ -207,89 +207,89 @@ export default function Home() {
       </div>
 
       {/* Identify with Camera Tile - Stacked cards */}
-      <div className="px-6 mb-6">
-      <Link to={createPageUrl("Snap")}>
-        <div className="relative">
-          {/* Bottom card - Snap a picture (dark bg, sticking out underneath) */}
-          <div 
-            className="absolute -bottom-4 left-0 right-0 rounded-2xl bg-[#2D3748] flex items-end pb-4 pt-16 px-4 shadow-lg"
-            style={{ zIndex: 0 }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                <Camera className="w-5 h-5 text-[#1F2937]" />
-              </div>
-              <span className="text-white text-sm font-medium">Snap a picture to get started</span>
-            </div>
-          </div>
+      <div className="px-6 mb-8">
+        <Link to={createPageUrl("Snap")}>
+          <div className="relative">
+            {/* Top card - Art */}
+            <div className="rounded-2xl overflow-hidden shadow-lg relative z-10" style={{ height: '150px' }}>
+              {/* Art background - starry night */}
+              <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
+                {/* Animated stars/sparkles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  {[...Array(25)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute text-white animate-twinkle"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                        fontSize: `${3 + Math.random() * 5}px`,
+                        animationDelay: `${Math.random() * 3}s`,
+                        opacity: 0.3 + Math.random() * 0.5
+                      }}
+                    >
+                      ✦
+                    </div>
+                  ))}
+                </div>
 
-          {/* Top card - Art */}
-          <div className="rounded-2xl overflow-hidden shadow-lg relative z-10" style={{ height: '160px' }}>
-            {/* Art background - starry night */}
-            <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-              {/* Animated stars/sparkles */}
-              <div className="absolute inset-0 overflow-hidden">
-                {[...Array(25)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="absolute text-white animate-twinkle"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      fontSize: `${3 + Math.random() * 5}px`,
-                      animationDelay: `${Math.random() * 3}s`,
-                      opacity: 0.3 + Math.random() * 0.5
-                    }}
-                  >
-                    ✦
-                  </div>
-                ))}
-              </div>
-
-              {/* Camera on left, Tag flying on right with fire below */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                {/* Camera - larger, taking picture */}
-                <div className="relative mr-6">
-                  {/* Camera body */}
-                  <div className="w-20 h-16 rounded-xl bg-[#374151] flex items-center justify-center shadow-2xl border-2 border-[#4B5563]">
-                    {/* Lens */}
-                    <div className="w-10 h-10 rounded-full bg-[#1F2937] border-4 border-[#6B7280] flex items-center justify-center">
-                      <div className="w-5 h-5 rounded-full bg-[#00A36C]" />
+                {/* Camera pointing at Tag */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Camera - angled to point at tag */}
+                  <div className="relative mr-4 transform rotate-[15deg]">
+                    {/* Camera body */}
+                    <div className="w-20 h-16 rounded-xl bg-[#374151] flex items-center justify-center shadow-2xl border-2 border-[#4B5563]">
+                      {/* Lens */}
+                      <div className="w-10 h-10 rounded-full bg-[#1F2937] border-4 border-[#6B7280] flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-[#00A36C]" />
+                      </div>
+                    </div>
+                    {/* Viewfinder */}
+                    <div className="absolute -top-2 left-3 w-4 h-3 rounded-sm bg-[#374151] border border-[#4B5563]" />
+                    {/* Flash lines going toward tag */}
+                    <div className="absolute top-1/2 -right-3 -translate-y-1/2 flex flex-col gap-1">
+                      <div className="w-4 h-0.5 bg-yellow-300/80 rounded-full" />
+                      <div className="w-6 h-0.5 bg-yellow-300 rounded-full" />
+                      <div className="w-4 h-0.5 bg-yellow-300/80 rounded-full" />
                     </div>
                   </div>
-                  {/* Viewfinder */}
-                  <div className="absolute -top-2 left-3 w-4 h-3 rounded-sm bg-[#374151] border border-[#4B5563]" />
-                  {/* Flash burst */}
-                  <div className="absolute -top-1 -right-2 text-yellow-300 text-lg animate-pulse">✧</div>
-                </div>
 
-                {/* Deal Tag flying like rocket */}
-                <div className="relative">
-                  {/* The tag */}
-                  <div className="w-14 h-14 rounded-xl bg-[#00A36C] flex items-center justify-center shadow-2xl transform rotate-[25deg]">
-                    <Tag className="w-8 h-8 text-white" />
+                  {/* Deal Tag flying like rocket */}
+                  <div className="relative ml-2 transform rotate-[30deg]">
+                    {/* The tag */}
+                    <div className="w-14 h-14 rounded-xl bg-[#00A36C] flex items-center justify-center shadow-2xl">
+                      <Tag className="w-8 h-8 text-white" />
+                    </div>
+
+                    {/* Rocket fire/boosters below the tag */}
+                    <div className="absolute -bottom-5 left-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%)' }}>
+                      <div className="w-3 h-5 bg-gradient-to-b from-[#00A36C] to-yellow-400 rounded-b-full" />
+                      <div className="w-2 h-4 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-b-full -mt-1" />
+                      <div className="w-1 h-3 bg-gradient-to-b from-orange-500 to-red-500 rounded-b-full -mt-0.5 animate-pulse" />
+                    </div>
+
+                    {/* Sparkle trail */}
+                    <div className="absolute -bottom-8 -left-2 text-yellow-300 text-sm animate-pulse">✦</div>
+                    <div className="absolute -bottom-6 -left-4 text-orange-400/60 text-xs">✧</div>
                   </div>
-
-                  {/* Rocket fire/boosters below the tag */}
-                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center" style={{ transform: 'translateX(-50%) rotate(25deg)' }}>
-                    <div className="w-3 h-4 bg-gradient-to-b from-[#00A36C] to-yellow-400 rounded-b-full" />
-                    <div className="w-2 h-3 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-b-full -mt-1" />
-                    <div className="w-1 h-2 bg-gradient-to-b from-orange-500 to-red-500 rounded-b-full -mt-0.5 animate-pulse" />
-                  </div>
-
-                  {/* Sparkle trail */}
-                  <div className="absolute -bottom-6 -left-1 text-yellow-300 text-xs animate-pulse">✦</div>
-                  <div className="absolute -bottom-4 -left-3 text-orange-400/60 text-[10px]">✧</div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </Link>
-      </div>
 
-      {/* Spacer for the stacked card */}
-      <div className="h-2" />
+            {/* Bottom card - Snap a picture (green bg, sticking out) */}
+            <div 
+              className="rounded-2xl bg-[#00A36C] flex items-center justify-center py-5 px-4 shadow-lg -mt-3 relative z-0"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                  <Tag className="w-5 h-5 text-[#00A36C]" />
+                </div>
+                <span className="text-white text-base font-semibold">Snap a picture to get started</span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
 
       {/* Trending Products Section */}
       <div className="px-6 mb-6">

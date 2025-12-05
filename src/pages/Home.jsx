@@ -206,67 +206,77 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Identify with Camera Tile */}
+      {/* Identify with Camera Tile - Apple Wallet stacked style */}
       <div className="px-6 mb-6">
       <Link to={createPageUrl("Snap")}>
-        <div className="rounded-3xl overflow-hidden shadow-lg" style={{ height: '200px' }}>
-          {/* Art background */}
-          <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-            {/* Animated stars/sparkles */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(20)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute text-white animate-twinkle"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 70}%`,
-                    fontSize: `${4 + Math.random() * 6}px`,
-                    animationDelay: `${Math.random() * 3}s`,
-                    opacity: 0.3 + Math.random() * 0.5
-                  }}
-                >
-                  ✦
-                </div>
-              ))}
+        <div className="relative">
+          {/* Bottom card - Snap a picture (sticking out underneath) */}
+          <div 
+            className="absolute -bottom-10 left-2 right-2 h-20 rounded-2xl bg-white/95 backdrop-blur-sm flex items-end pb-3 px-4 shadow-lg"
+            style={{ zIndex: 0 }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-[#00A36C] flex items-center justify-center">
+                <Camera className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-[#1F2937] text-sm font-medium">Snap a picture to get started</span>
             </div>
+          </div>
 
-            {/* Deal tag flying like rocket - just the tag */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center">
-              {/* Motion lines behind tag */}
-              <div className="absolute -left-20 top-1/2 -translate-y-1/2 flex flex-col gap-1.5">
-                <div className="w-10 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/50 rounded-full" />
-                <div className="w-16 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/70 rounded-full" />
-                <div className="w-12 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/60 rounded-full" />
-                <div className="w-8 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/40 rounded-full" />
+          {/* Top card - Art */}
+          <div className="rounded-3xl overflow-hidden shadow-lg relative z-10" style={{ height: '180px' }}>
+            {/* Art background */}
+            <div className="relative h-full bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
+              {/* Animated stars/sparkles */}
+              <div className="absolute inset-0 overflow-hidden">
+                {[...Array(20)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute text-white animate-twinkle"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      fontSize: `${4 + Math.random() * 6}px`,
+                      animationDelay: `${Math.random() * 3}s`,
+                      opacity: 0.3 + Math.random() * 0.5
+                    }}
+                  >
+                    ✦
+                  </div>
+                ))}
               </div>
 
-              {/* Flying tag - rocket style */}
-              <div className="relative">
-                <div className="w-16 h-16 rounded-xl bg-[#00A36C] shadow-2xl flex items-center justify-center transform rotate-[30deg]">
-                  <Tag className="w-9 h-9 text-white" />
+              {/* Camera and Tag flying together */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+                {/* Motion lines behind */}
+                <div className="absolute -left-24 top-1/2 -translate-y-1/2 flex flex-col gap-1.5">
+                  <div className="w-10 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/50 rounded-full" />
+                  <div className="w-16 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/70 rounded-full" />
+                  <div className="w-12 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/60 rounded-full" />
+                  <div className="w-8 h-1 bg-gradient-to-r from-transparent to-[#00A36C]/40 rounded-full" />
                 </div>
-                {/* Sparkle trail */}
-                <div className="absolute -bottom-3 -left-3 text-yellow-300 text-lg animate-pulse">✦</div>
-                <div className="absolute -bottom-1 -left-6 text-white/60 text-sm">✧</div>
-              </div>
-            </div>
 
-            {/* Bottom CTA Row */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20 px-4 py-3 flex items-center gap-3">
-              {/* Camera icon - more realistic */}
-              <div className="w-10 h-10 rounded-xl bg-[#00A36C] flex items-center justify-center shadow-lg relative">
-                <div className="w-5 h-4 rounded-sm bg-white/90 relative">
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#1F2937] border-2 border-white/50" />
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-1 rounded-t bg-white/90" />
+                {/* Camera icon */}
+                <div className="w-14 h-12 rounded-xl bg-white/90 flex items-center justify-center shadow-xl">
+                  <Camera className="w-7 h-7 text-[#1F2937]" />
+                </div>
+
+                {/* Flying tag - rocket style (just the tag icon) */}
+                <div className="relative">
+                  <Tag className="w-12 h-12 text-[#00A36C] transform rotate-[30deg] drop-shadow-lg" />
+                  {/* Sparkle trail */}
+                  <div className="absolute -bottom-2 -left-2 text-yellow-300 text-sm animate-pulse">✦</div>
+                  <div className="absolute bottom-0 -left-4 text-white/60 text-xs">✧</div>
                 </div>
               </div>
-              <span className="text-white text-sm font-medium">Snap a picture to get started</span>
             </div>
           </div>
         </div>
       </Link>
       </div>
+
+      {/* Spacer for the stacked card */}
+      <div className="h-6" />
 
       {/* Trending Products Section */}
       <div className="px-6 mb-6">
@@ -305,57 +315,55 @@ export default function Home() {
 
           {/* Swipe Card Stack */}
           <div className="relative flex justify-center" style={{ height: '280px' }}>
-            {/* Phantom gradient background cards */}
+            {/* Phantom gradient background cards - sticking out on sides */}
             <div 
               className="absolute rounded-2xl"
               style={{ 
-                width: '180px', 
-                height: '180px',
-                top: '12px',
+                width: '200px', 
+                height: '190px',
+                top: '14px',
+                background: 'linear-gradient(145deg, #D1D5DB 0%, #C4C7CC 100%)',
+                transform: 'scale(0.88) rotate(-3deg)',
+                opacity: 0.35
+              }}
+            />
+            <div 
+              className="absolute rounded-2xl"
+              style={{ 
+                width: '195px', 
+                height: '185px',
+                top: '8px',
                 background: 'linear-gradient(145deg, #E5E7EB 0%, #D1D5DB 100%)',
-                transform: 'scale(0.85)',
-                opacity: 0.3
+                transform: 'scale(0.94) rotate(2deg)',
+                opacity: 0.55
               }}
             />
+
+            {/* Check mark - fixed in center of screen, revealed when swiping right */}
             <div 
-              className="absolute rounded-2xl"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center"
               style={{ 
-                width: '180px', 
-                height: '180px',
-                top: '6px',
-                background: 'linear-gradient(145deg, #F3F4F6 0%, #E5E7EB 100%)',
-                transform: 'scale(0.92)',
-                opacity: 0.5
+                width: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
+                height: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
+                opacity: dragOffset > 20 ? Math.min(1, (dragOffset - 20) / 60) : 0,
+                transition: dragOffset > 20 ? 'none' : 'opacity 0.2s'
               }}
-            />
+            >
+              <Check className="text-white" style={{ width: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px`, height: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px` }} />
+            </div>
 
-            {/* Check mark on screen - right side */}
-            {dragOffset > 20 && (
-              <div 
-                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center z-20"
-                style={{ 
-                  width: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
-                  height: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
-                  opacity: Math.min(1, dragOffset / 80)
-                }}
-              >
-                <Check className="text-white" style={{ width: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px`, height: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px` }} />
-              </div>
-            )}
-
-            {/* X mark on screen - left side */}
-            {dragOffset < -20 && (
-              <div 
-                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center z-20"
-                style={{ 
-                  width: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
-                  height: `${Math.min(60, 24 + Math.abs(dragOffset) * 0.4)}px`,
-                  opacity: Math.min(1, Math.abs(dragOffset) / 80)
-                }}
-              >
-                <X className="text-white" style={{ width: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px`, height: `${Math.min(32, 12 + Math.abs(dragOffset) * 0.2)}px` }} />
-              </div>
-            )}
+            {/* X mark - fixed in center of screen, revealed when swiping left */}
+            <div 
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center"
+              style={{ 
+                width: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
+                height: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
+                opacity: dragOffset < -20 ? Math.min(1, (Math.abs(dragOffset) - 20) / 60) : 0,
+                transition: dragOffset < -20 ? 'none' : 'opacity 0.2s'
+              }}
+            >
+              <X className="text-white" style={{ width: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px`, height: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px` }} />
+            </div>
 
             {/* Current card */}
             {swipeIndex < swipeCards.length && (
@@ -416,86 +424,74 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        /* Smart Suggestions Feed (After Onboarding) */
-        <div className="px-6 mb-8">
-          <h2 className="text-sm font-bold text-[#1F2937] mb-1">Smart Suggestions</h2>
-          <p className="text-xs text-[#6B7280] mb-4">Based on your preferences</p>
+        /* Smart Suggestions Feed (After Onboarding) - Horizontal scrollable */
+        <div className="mb-8">
+          <div className="px-6">
+            <h2 className="text-sm font-bold text-[#1F2937] mb-1">Smart Suggestions</h2>
+            <p className="text-xs text-[#6B7280] mb-4">Based on your preferences</p>
+          </div>
 
-          {/* From Brands You Liked */}
+          {/* From Brands You Liked - Horizontal */}
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3">From Brands You Liked</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Brands You Liked</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.brandsYouLiked.map((item) => (
-                <div key={item.id} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB]">
-                  <div className="aspect-square relative bg-[#F3F4F6]">
+                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded px-2 py-0.5">
-                      <span className="text-[9px] font-bold text-[#1F2937]">{item.brand}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
+                      <span className="text-[9px] font-bold text-white">{item.price}</span>
                     </div>
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />
                     </button>
                   </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-[#1F2937]">{item.title}</p>
-                    <p className="text-xs font-bold text-[#00A36C]">{item.price}</p>
-                  </div>
+                  <p className="text-[10px] font-medium text-[#6B7280]">{item.brand}</p>
+                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* From Stores You Liked */}
+          {/* From Stores You Liked - Horizontal */}
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3">From Stores You Liked</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Stores You Liked</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.storesYouLiked.map((item) => (
-                <div key={item.id} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB]">
-                  <div className="aspect-square relative bg-[#F3F4F6]">
+                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded px-2 py-0.5">
-                      <span className="text-[9px] font-bold text-[#1F2937]">{item.store}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
+                      <span className="text-[9px] font-bold text-white">{item.price}</span>
                     </div>
-                    {item.brand && (
-                      <div className="absolute top-8 left-2 bg-[#1F2937]/80 backdrop-blur-sm rounded px-2 py-0.5">
-                        <span className="text-[9px] font-medium text-white">{item.brand}</span>
-                      </div>
-                    )}
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />
                     </button>
                   </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-[#1F2937]">{item.title}</p>
-                    <p className="text-xs font-bold text-[#00A36C]">{item.price}</p>
-                  </div>
+                  <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
+                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Products Similar to What You Liked */}
+          {/* Products Similar to What You Liked - Horizontal */}
           <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3">Products Similar to What You Liked</h3>
-            <div className="grid grid-cols-2 gap-3">
+            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">Similar to What You Liked</h3>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
               {smartSuggestions.similarToLiked.map((item) => (
-                <div key={item.id} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB]">
-                  <div className="aspect-square relative bg-[#F3F4F6]">
+                <div key={item.id} className="flex-shrink-0" style={{ width: '130px' }}>
+                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                     <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    {item.badge && (
-                      <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
-                        <span className="text-[9px] font-bold text-white">{item.badge}</span>
-                      </div>
-                    )}
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
+                      <span className="text-[9px] font-bold text-white">{item.price}</span>
+                    </div>
                     <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
                       <Heart className="w-3 h-3 text-white" />
                     </button>
                   </div>
-                  <div className="p-2">
-                    <p className="text-xs font-medium text-[#1F2937]">{item.title}</p>
-                    <p className="text-[10px] text-[#6B7280]">{item.store}</p>
-                    <p className="text-xs font-bold text-[#00A36C]">{item.price}</p>
-                  </div>
+                  <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
+                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
                 </div>
               ))}
             </div>

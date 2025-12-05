@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Heart, ArrowRight, MoreHorizontal, Star, Bell, BellRing, Sparkles, X, Tag } from "lucide-react";
+import { Heart, ArrowRight, MoreHorizontal, Star, BellRing, Sparkles, Tag } from "lucide-react";
 
 export default function Following() {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [showNotifModal, setShowNotifModal] = useState(null);
-  const [showManageModal, setShowManageModal] = useState(false);
   const [notifications, setNotifications] = useState({});
-  const [unfollowed, setUnfollowed] = useState([]);
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
@@ -87,7 +85,7 @@ export default function Following() {
         
         <h1 className="text-base font-medium text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>Following</h1>
         
-        <button onClick={() => setShowManageModal(true)} className="text-xs font-medium text-[#6B7280]">Manage</button>
+        <button onClick={() => navigate(createPageUrl("FollowingList"))} className="text-xs font-medium text-[#6B7280]">Manage</button>
       </div>
 
       {/* Store Cards */}
@@ -175,8 +173,8 @@ export default function Following() {
                   <span className="text-[10px] text-[#9CA3AF]">Items Added</span>
                 </div>
                 <Link to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}>
-                  <div className="w-7 h-7 rounded-full bg-[#1F2937] flex items-center justify-center">
-                    <ArrowRight className="w-3.5 h-3.5 text-white" />
+                  <div className="w-7 h-7 rounded-full bg-transparent flex items-center justify-center">
+                    <ArrowRight className="w-4 h-4 text-[#1F2937]" />
                   </div>
                 </Link>
               </div>
@@ -186,144 +184,63 @@ export default function Following() {
         ))}
       </div>
 
-      {/* Manage Modal */}
-      {showManageModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowManageModal(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <button onClick={() => setShowManageModal(false)} className="relative flex items-center justify-center group">
-                <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
-              </button>
-              <h3 className="text-base font-bold text-[#1F2937]">Following List</h3>
-              <button onClick={() => setShowManageModal(false)}>
-                <X className="w-5 h-5 text-[#6B7280]" />
-              </button>
-            </div>
 
-            {/* Following List */}
-            <div className="space-y-3">
-              {followedStores.filter(s => !unfollowed.includes(s.id)).map((store) => (
-                <div key={store.id} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center p-1">
-                      <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
-                    </div>
-                    <span className="text-sm font-medium text-[#1F2937]">{store.name}</span>
-                  </div>
-                  <button 
-                    onClick={() => setUnfollowed(prev => [...prev, store.id])}
-                    className="px-4 py-1.5 rounded-lg bg-[#F3F4F6] text-xs font-medium text-[#6B7280]"
-                  >
-                    Following
-                  </button>
-                </div>
-              ))}
-              
-              {/* Unfollowed stores */}
-              {followedStores.filter(s => unfollowed.includes(s.id)).map((store) => (
-                <div key={store.id} className="flex items-center justify-between opacity-60">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center p-1">
-                      <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
-                    </div>
-                    <span className="text-sm font-medium text-[#1F2937]">{store.name}</span>
-                  </div>
-                  <button 
-                    onClick={() => setUnfollowed(prev => prev.filter(id => id !== store.id))}
-                    className="px-4 py-1.5 rounded-lg bg-[#1F2937] text-xs font-medium text-white"
-                  >
-                    Follow
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Notification Modal */}
+      {/* Notification Modal - Compact */}
       {showNotifModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowNotifModal(null)}>
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10" onClick={e => e.stopPropagation()}>
-            {/* Close button */}
-            <button onClick={() => setShowNotifModal(null)} className="absolute top-4 right-4">
-              <X className="w-5 h-5 text-[#6B7280]" />
-            </button>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-6" onClick={() => setShowNotifModal(null)}>
+          <div className="bg-white rounded-2xl p-4 w-full max-w-xs shadow-xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-sm font-bold text-[#1F2937] mb-3">Notifications</h3>
 
-            <h3 className="text-lg font-bold text-[#1F2937] mb-1">Notifications</h3>
-            <p className="text-xs text-[#6B7280] mb-4">Get alerts from {followedStores.find(s => s.id === showNotifModal)?.name}</p>
-
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button 
                 onClick={() => toggleNotification(showNotifModal, 'deals')}
-                className={`w-full p-4 rounded-2xl flex items-center gap-3 transition-colors ${
+                className={`w-full p-2.5 rounded-xl flex items-center gap-2 transition-colors ${
                   notifications[showNotifModal]?.deals 
-                    ? 'bg-[#00A36C]/10 border-2 border-[#00A36C]' 
-                    : 'bg-[#F3F4F6] border-2 border-transparent'
+                    ? 'bg-[#00A36C]/10' 
+                    : 'bg-[#F3F4F6]'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  notifications[showNotifModal]?.deals ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'
-                }`}>
-                  <Tag className={`w-5 h-5 ${notifications[showNotifModal]?.deals ? 'text-white' : 'text-[#6B7280]'}`} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-[#1F2937]">Deal Alerts</p>
-                  <p className="text-xs text-[#6B7280]">Get notified about new deals & discounts</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                <Tag className={`w-4 h-4 ${notifications[showNotifModal]?.deals ? 'text-[#00A36C]' : 'text-[#6B7280]'}`} />
+                <span className="text-xs font-medium text-[#1F2937] flex-1 text-left">Deals</span>
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                   notifications[showNotifModal]?.deals ? 'border-[#00A36C] bg-[#00A36C]' : 'border-[#D1D5DB]'
                 }`}>
-                  {notifications[showNotifModal]?.deals && <span className="text-white text-xs">✓</span>}
+                  {notifications[showNotifModal]?.deals && <span className="text-white text-[8px]">✓</span>}
                 </div>
               </button>
 
               <button 
                 onClick={() => toggleNotification(showNotifModal, 'arrivals')}
-                className={`w-full p-4 rounded-2xl flex items-center gap-3 transition-colors ${
+                className={`w-full p-2.5 rounded-xl flex items-center gap-2 transition-colors ${
                   notifications[showNotifModal]?.arrivals 
-                    ? 'bg-[#00A36C]/10 border-2 border-[#00A36C]' 
-                    : 'bg-[#F3F4F6] border-2 border-transparent'
+                    ? 'bg-[#00A36C]/10' 
+                    : 'bg-[#F3F4F6]'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  notifications[showNotifModal]?.arrivals ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'
-                }`}>
-                  <Sparkles className={`w-5 h-5 ${notifications[showNotifModal]?.arrivals ? 'text-white' : 'text-[#6B7280]'}`} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-[#1F2937]">New Arrivals</p>
-                  <p className="text-xs text-[#6B7280]">Be first to know about new products</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                <Sparkles className={`w-4 h-4 ${notifications[showNotifModal]?.arrivals ? 'text-[#00A36C]' : 'text-[#6B7280]'}`} />
+                <span className="text-xs font-medium text-[#1F2937] flex-1 text-left">New Arrivals</span>
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                   notifications[showNotifModal]?.arrivals ? 'border-[#00A36C] bg-[#00A36C]' : 'border-[#D1D5DB]'
                 }`}>
-                  {notifications[showNotifModal]?.arrivals && <span className="text-white text-xs">✓</span>}
+                  {notifications[showNotifModal]?.arrivals && <span className="text-white text-[8px]">✓</span>}
                 </div>
               </button>
 
               <button 
                 onClick={() => toggleNotification(showNotifModal, 'priceDrop')}
-                className={`w-full p-4 rounded-2xl flex items-center gap-3 transition-colors ${
+                className={`w-full p-2.5 rounded-xl flex items-center gap-2 transition-colors ${
                   notifications[showNotifModal]?.priceDrop 
-                    ? 'bg-[#00A36C]/10 border-2 border-[#00A36C]' 
-                    : 'bg-[#F3F4F6] border-2 border-transparent'
+                    ? 'bg-[#00A36C]/10' 
+                    : 'bg-[#F3F4F6]'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  notifications[showNotifModal]?.priceDrop ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'
-                }`}>
-                  <BellRing className={`w-5 h-5 ${notifications[showNotifModal]?.priceDrop ? 'text-white' : 'text-[#6B7280]'}`} />
-                </div>
-                <div className="text-left flex-1">
-                  <p className="text-sm font-semibold text-[#1F2937]">Price Drops</p>
-                  <p className="text-xs text-[#6B7280]">Alert me when prices go down</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                <BellRing className={`w-4 h-4 ${notifications[showNotifModal]?.priceDrop ? 'text-[#00A36C]' : 'text-[#6B7280]'}`} />
+                <span className="text-xs font-medium text-[#1F2937] flex-1 text-left">Price Drops</span>
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
                   notifications[showNotifModal]?.priceDrop ? 'border-[#00A36C] bg-[#00A36C]' : 'border-[#D1D5DB]'
                 }`}>
-                  {notifications[showNotifModal]?.priceDrop && <span className="text-white text-xs">✓</span>}
+                  {notifications[showNotifModal]?.priceDrop && <span className="text-white text-[8px]">✓</span>}
                 </div>
               </button>
             </div>

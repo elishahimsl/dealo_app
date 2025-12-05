@@ -29,6 +29,7 @@ import AllDeals from './pages/AllDeals';
 import StoreDetail from './pages/StoreDetail';
 import RecentlyViewed from './pages/RecentlyViewed';
 import Following from './pages/Following';
+import FollowingList from './pages/FollowingList';
 import __Layout from './Layout.jsx';
 
 
@@ -64,6 +65,7 @@ export const PAGES = {
     "StoreDetail": StoreDetail,
     "RecentlyViewed": RecentlyViewed,
     "Following": Following,
+    "FollowingList": FollowingList,
 }
 
 export const pagesConfig = {

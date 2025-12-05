@@ -122,45 +122,44 @@ export default function StoreDetail() {
     { id: 3, name: "New Arrivals", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300", label: "New Arrivals" },
   ];
 
-  // Darker color for background
-  const bgColor = store.name === "Target" ? "#8B0000" : store.color;
+  // Same color as logo but transparent
+  const bgColor = store.name === "Target" ? "rgba(204, 0, 0, 0.3)" : `${store.color}40`;
 
   return (
-    <div className="min-h-screen pb-24" style={{ backgroundColor: bgColor }}>
-      {/* White card pulled up on top of colored background */}
-      <div className="relative pt-16">
-        {/* Back button - deal tag style */}
+    <div className="min-h-screen bg-white pb-24">
+      {/* Transparent colored header area */}
+      <div className="h-32" style={{ backgroundColor: bgColor }} />
+      
+      {/* White card pulled up on top */}
+      <div className="relative -mt-8">
+        {/* Back button - just black arrow, smaller */}
         <button 
           onClick={() => navigate(-1)} 
-          className="absolute top-6 left-4 z-30 flex items-center gap-1"
+          className="absolute -top-20 left-4 z-30"
         >
-          <div className="w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center">
-            <ChevronLeft className="w-5 h-5 text-[#00A36C]" />
-          </div>
+          <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
         </button>
 
-        {/* Menu button */}
+        {/* Menu button - just 3 black lines, no background, smaller */}
         <button 
-          className="absolute top-6 right-4 w-8 h-8 rounded-full bg-white/90 shadow flex items-center justify-center z-30"
+          className="absolute -top-20 right-4 z-30 flex flex-col gap-0.5"
         >
-          <div className="flex flex-col gap-1">
-            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
-            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
-            <div className="w-3.5 h-0.5 bg-[#1F2937] rounded-full" />
-          </div>
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
+          <div className="w-4 h-0.5 bg-[#1F2937] rounded-full" />
         </button>
 
         {/* White page card */}
-        <div className="bg-white rounded-t-3xl min-h-screen pt-14 relative">
-          {/* Logo - centered, overlapping the top of the card */}
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-20">
-            <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center border-4 border-white">
-              <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
+        <div className="bg-white rounded-t-3xl min-h-screen pt-10 relative">
+          {/* Logo - centered, smaller circle, overlapping the top */}
+          <div className="absolute -top-10 left-1/2 -translate-x-1/2 z-20">
+            <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-white">
+              <img src={store.logo} alt={store.name} className="w-12 h-12 object-contain" />
             </div>
           </div>
 
-          {/* Store Info - centered below logo, no store name text */}
-          <div className="flex flex-col items-center pb-4">
+          {/* Store Info - centered below logo, no store name */}
+          <div className="flex flex-col items-center pb-4 pt-2">
             <div className="flex items-center gap-1 mb-2">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
@@ -187,9 +186,9 @@ export default function StoreDetail() {
               <div className="flex-1">
                 <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
                   <img 
-                    src="https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=200" 
+                    src="https://images.unsplash.com/photo-1629949009710-a040ed77dc6e?w=200" 
                     alt="" 
-                    className="absolute right-0 bottom-0 w-14 h-14 object-contain opacity-40"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 w-12 h-12 object-contain opacity-50"
                   />
                   <span className="absolute inset-0 flex items-center justify-center text-[#1F2937] font-bold text-sm z-10">Deals</span>
                 </button>

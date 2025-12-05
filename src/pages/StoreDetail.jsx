@@ -124,99 +124,96 @@ export default function StoreDetail() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
-      {/* Store color header band - lighter/more transparent */}
+      {/* Store color header band - lighter */}
       <div 
-        className="fixed top-0 left-0 right-0 h-44 z-0"
-        style={{ backgroundColor: `${store.color}25` }}
+        className="absolute top-0 left-0 right-0 h-32 z-0"
+        style={{ backgroundColor: `${store.color}30` }}
       />
 
-      {/* Back button - top left */}
+      {/* Back button - on the header band, left side */}
       <button 
         onClick={() => navigate(-1)} 
-        className="fixed top-6 left-4 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center z-30"
+        className="absolute top-20 left-4 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center z-20"
       >
         <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
       </button>
 
-      {/* Menu button - top right */}
+      {/* Menu button - on the header band, right side */}
       <button 
-        className="fixed top-6 right-4 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center z-30"
+        className="absolute top-20 right-4 w-8 h-8 rounded-full bg-white shadow flex items-center justify-center z-20"
       >
         <Menu className="w-5 h-5 text-[#6B7280]" />
       </button>
 
-      {/* Store Info - Logo on right, text on left */}
-      <div className="relative z-10 pt-16 px-6 pb-4">
-        <div className="flex items-center gap-4">
-          {/* Left side - Text info */}
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-[#1F2937] mb-1">{store.name}</h1>
-            <div className="flex items-center gap-1 mb-1">
-              <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-              <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
-              <span className="text-sm text-[#6B7280]">· {store.reviews} reviews</span>
-            </div>
-            <p className="text-xs text-[#6B7280] italic mb-3">{store.tagline}</p>
-            <button 
-              onClick={() => setIsFollowing(!isFollowing)}
-              className={`px-5 py-1.5 rounded-full text-xs font-semibold ${
-                isFollowing 
-                  ? 'bg-[#E5E7EB] text-[#1F2937]' 
-                  : 'bg-[#1F2937] text-white'
-              }`}
-            >
-              {isFollowing ? 'Following' : 'Follow'}
-            </button>
-          </div>
-          
-          {/* Right side - Logo */}
-          <div className="w-20 h-20 rounded-full bg-white shadow-lg flex items-center justify-center border border-[#E5E7EB]">
-            <img src={store.logo} alt={store.name} className="w-14 h-14 object-contain" />
-          </div>
+      {/* Logo - centered, overlapping the header band */}
+      <div className="relative z-10 flex justify-center pt-16">
+        <div className="w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center border-4 border-white">
+          <img src={store.logo} alt={store.name} className="w-16 h-16 object-contain" />
         </div>
+      </div>
+
+      {/* Store Info - centered below logo */}
+      <div className="relative z-10 flex flex-col items-center pt-3 pb-4">
+        <h1 className="text-xl font-bold text-[#1F2937] mb-1">{store.name}</h1>
+        <div className="flex items-center gap-1 mb-2">
+          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+          <span className="text-sm font-semibold text-[#1F2937]">{store.rating}</span>
+          <span className="text-sm text-[#6B7280]">· {store.reviews} reviews</span>
+        </div>
+        <button 
+          onClick={() => setIsFollowing(!isFollowing)}
+          className={`px-6 py-1.5 rounded-full text-sm font-semibold mb-2 ${
+            isFollowing 
+              ? 'bg-[#E5E7EB] text-[#1F2937]' 
+              : 'bg-[#1F2937] text-white'
+          }`}
+        >
+          {isFollowing ? 'Following' : 'Follow'}
+        </button>
+        <p className="text-xs text-[#6B7280] italic">{store.tagline}</p>
       </div>
 
       {/* Main content */}
       <div className="relative z-10 bg-[#F9FAFB] min-h-screen pt-2">
 
-        {/* Featured Categories - Vertical tiles with labels underneath */}
-        <div className="px-6 mt-4">
+        {/* Featured Categories - Horizontal row with labels underneath */}
+        <div className="px-6 mt-2">
           <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured</h2>
-          <div className="space-y-3">
+          <div className="flex gap-3">
             {/* Deals tile */}
-            <div>
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '70px' }}>
-                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600" alt="Deals" className="w-full h-full object-cover" />
+            <div className="flex-1">
+              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
+                <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300" alt="Deals" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg">Deals</span>
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">Deals</span>
               </button>
-              <div className="flex items-center gap-1.5 mt-1.5">
+              <div className="flex items-center gap-1 mt-1.5">
                 <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
                 <span className="text-[10px] text-[#6B7280]">Top Deals</span>
               </div>
             </div>
             
             {/* Best Sellers tile */}
-            <div>
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '70px' }}>
-                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600" alt="Best Sellers" className="w-full h-full object-cover" />
+            <div className="flex-1">
+              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
+                <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=300" alt="Best Sellers" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg">Best Sellers</span>
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">Best Sellers</span>
               </button>
-              <div className="flex items-center gap-1.5 mt-1.5">
+              <div className="flex items-center gap-1 mt-1.5">
                 <Star className="w-3 h-3 text-[#6B7280]" />
                 <span className="text-[10px] text-[#6B7280]">Best Sellers</span>
               </div>
             </div>
             
             {/* New Arrivals tile */}
-            <div>
-              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '70px' }}>
-                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600" alt="New Arrivals" className="w-full h-full object-cover" />
+            <div className="flex-1">
+              <button className="w-full rounded-xl overflow-hidden relative" style={{ height: '80px' }}>
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300" alt="New Arrivals" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40" />
-                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg">New Arrivals</span>
+                <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm">New Arrivals</span>
               </button>
-              <div className="flex items-center gap-1.5 mt-1.5">
+              <div className="flex items-center gap-1 mt-1.5">
                 <ShoppingBag className="w-3 h-3 text-[#6B7280]" />
                 <span className="text-[10px] text-[#6B7280]">New</span>
               </div>

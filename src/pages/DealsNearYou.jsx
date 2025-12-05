@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Camera, Heart, ThumbsUp, ThumbsDown, SlidersHorizontal } from "lucide-react";
+import { Search, Camera, Heart, ThumbsUp, ThumbsDown, SlidersHorizontal, Tag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function DealsNearYou() {

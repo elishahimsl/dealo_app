@@ -101,8 +101,8 @@ export default function Following() {
               }}
             />
             
-            {/* Deal content in bottom tile - centered in visible area */}
-            <div className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl flex items-center justify-center gap-2 z-0 pt-6">
+            {/* Deal content in bottom tile - at bottom */}
+            <div className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl flex items-end justify-center gap-2 z-0 pb-3">
               <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
               <span className="text-white text-[11px] font-light">{store.dealText}</span>
             </div>

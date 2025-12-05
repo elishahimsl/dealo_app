@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {

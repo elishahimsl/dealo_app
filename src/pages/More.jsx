@@ -16,34 +16,34 @@ export default function Discover() {
   ];
 
   const stores = [
-    { id: 1, name: "Amazon", url: "https://amazon.com" },
-    { id: 2, name: "Walmart", url: "https://walmart.com" },
-    { id: 3, name: "Target", url: "https://target.com" },
-    { id: 4, name: "Best Buy", url: "https://bestbuy.com" },
-    { id: 5, name: "Costco", url: "https://costco.com" },
-    { id: 6, name: "Sam's Club", url: "https://samsclub.com" },
-    { id: 7, name: "Home Depot", url: "https://homedepot.com" },
-    { id: 8, name: "Lowe's", url: "https://lowes.com" },
-    { id: 9, name: "IKEA", url: "https://ikea.com" },
-    { id: 10, name: "Macy's", url: "https://macys.com" },
-    { id: 11, name: "Kohl's", url: "https://kohls.com" },
+    { id: 1, name: "Amazon", url: "https://amazon.com", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
+    { id: 2, name: "Walmart", url: "https://walmart.com", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Walmart_logo.svg" },
+    { id: 3, name: "Target", url: "https://target.com", logo: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Target_logo.svg" },
+    { id: 4, name: "Best Buy", url: "https://bestbuy.com", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Best_Buy_Logo.svg" },
+    { id: 5, name: "Costco", url: "https://costco.com", logo: "https://upload.wikimedia.org/wikipedia/commons/5/59/Costco_Wholesale_logo_2010-10-26.svg" },
+    { id: 6, name: "Sam's Club", url: "https://samsclub.com", logo: "https://upload.wikimedia.org/wikipedia/commons/8/81/Sams_Club.svg" },
+    { id: 7, name: "Home Depot", url: "https://homedepot.com", logo: "https://upload.wikimedia.org/wikipedia/commons/5/5f/TheHomeDepot.svg" },
+    { id: 8, name: "Lowe's", url: "https://lowes.com", logo: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Lowe%27s_Companies_logo.svg" },
+    { id: 9, name: "IKEA", url: "https://ikea.com", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Ikea_logo.svg" },
+    { id: 10, name: "Macy's", url: "https://macys.com", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b6/Macys_logo.svg" },
+    { id: 11, name: "Kohl's", url: "https://kohls.com", logo: "https://upload.wikimedia.org/wikipedia/commons/1/18/Kohl%27s_logo.svg" },
   ];
 
   const brands = [
-    { id: 1, name: "Apple", url: "https://apple.com" },
-    { id: 2, name: "Samsung", url: "https://samsung.com" },
-    { id: 3, name: "Nike", url: "https://nike.com" },
-    { id: 4, name: "Adidas", url: "https://adidas.com" },
-    { id: 5, name: "Sony", url: "https://sony.com" },
-    { id: 6, name: "Microsoft", url: "https://microsoft.com" },
-    { id: 7, name: "Levi's", url: "https://levis.com" },
-    { id: 8, name: "The North Face", url: "https://thenorthface.com" },
-    { id: 9, name: "Patagonia", url: "https://patagonia.com" },
-    { id: 10, name: "KitchenAid", url: "https://kitchenaid.com" },
-    { id: 11, name: "Dyson", url: "https://dyson.com" },
-    { id: 12, name: "Columbia", url: "https://columbia.com" },
-    { id: 13, name: "Ray-Ban", url: "https://ray-ban.com" },
-    { id: 14, name: "Coach", url: "https://coach.com" },
+    { id: 1, name: "Apple", url: "https://apple.com", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
+    { id: 2, name: "Samsung", url: "https://samsung.com", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" },
+    { id: 3, name: "Nike", url: "https://nike.com", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" },
+    { id: 4, name: "Adidas", url: "https://adidas.com", logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg" },
+    { id: 5, name: "Sony", url: "https://sony.com", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Sony_logo.svg" },
+    { id: 6, name: "Microsoft", url: "https://microsoft.com", logo: "https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" },
+    { id: 7, name: "Levi's", url: "https://levis.com", logo: "https://upload.wikimedia.org/wikipedia/commons/4/47/Levi%27s_logo.svg" },
+    { id: 8, name: "The North Face", url: "https://thenorthface.com", logo: "https://upload.wikimedia.org/wikipedia/commons/9/93/The_North_Face_logo.svg" },
+    { id: 9, name: "Patagonia", url: "https://patagonia.com", logo: "https://upload.wikimedia.org/wikipedia/commons/4/49/Patagonia_logo.svg" },
+    { id: 10, name: "KitchenAid", url: "https://kitchenaid.com", logo: "https://upload.wikimedia.org/wikipedia/commons/d/de/KitchenAid_Logo.svg" },
+    { id: 11, name: "Dyson", url: "https://dyson.com", logo: "https://upload.wikimedia.org/wikipedia/commons/7/74/Dyson_logo.svg" },
+    { id: 12, name: "Columbia", url: "https://columbia.com", logo: "https://upload.wikimedia.org/wikipedia/commons/6/60/Columbia_Sportswear_logo.svg" },
+    { id: 13, name: "Ray-Ban", url: "https://ray-ban.com", logo: "https://upload.wikimedia.org/wikipedia/commons/6/69/Ray-Ban_logo.svg" },
+    { id: 14, name: "Coach", url: "https://coach.com", logo: "https://upload.wikimedia.org/wikipedia/commons/8/89/Coach_logo.svg" },
   ];
 
   const allTopics = [
@@ -108,7 +108,7 @@ export default function Discover() {
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
             <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} onError={(e) => e.target.style.display = 'none'} />
+              <img src={store.logo} alt={store.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} />
             </button>
           ))}
         </div>
@@ -123,7 +123,7 @@ export default function Discover() {
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
             <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} onError={(e) => e.target.style.display = 'none'} />
+              <img src={brand.logo} alt={brand.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} />
             </button>
           ))}
         </div>

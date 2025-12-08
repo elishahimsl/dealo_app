@@ -37,13 +37,13 @@ export default function AllBrands() {
           <Link 
             key={brand.id} 
             to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`}
-            className="rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
+            className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
             style={{ height: '100px' }}
           >
             <img 
               src={brand.logo} 
               alt={brand.name} 
-              className="max-w-[70%] max-h-[60%] object-contain" 
+              className="w-16 h-16 object-contain" 
               style={{ borderRadius: '8px' }}
             />
           </Link>

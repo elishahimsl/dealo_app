@@ -34,13 +34,13 @@ export default function AllStores() {
           <Link 
             key={store.id} 
             to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}
-            className="rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
+            className="rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 border border-[#E5E7EB] flex items-center justify-center hover:shadow-md transition-shadow"
             style={{ height: '100px' }}
           >
             <img 
               src={store.logo} 
               alt={store.name} 
-              className="max-w-[70%] max-h-[60%] object-contain" 
+              className="w-16 h-16 object-contain" 
               style={{ borderRadius: '8px' }}
             />
           </Link>

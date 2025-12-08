@@ -75,7 +75,7 @@ export default function Discover() {
             <Search className="w-4 h-4 text-[#6B7280]" />
             <span className="text-sm text-[#6B7280]">Search</span>
           </button>
-          <button onClick={() => navigate(createPageUrl("Snap"))}>
+          <button onClick={() => navigate(createPageUrl("Snap") + "?from=More")}>
             <Camera className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>
@@ -107,8 +107,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
-              <img src={store.logo} alt={store.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} />
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
+              <img src={store.logo} alt={store.name} className="w-14 h-14 object-contain" style={{ borderRadius: '8px' }} />
             </button>
           ))}
         </div>
@@ -122,8 +122,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
-              <img src={brand.logo} alt={brand.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} />
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
+              <img src={brand.logo} alt={brand.name} className="w-14 h-14 object-contain" style={{ borderRadius: '8px' }} />
             </button>
           ))}
         </div>
@@ -146,7 +146,7 @@ export default function Discover() {
             return (
               <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className={`rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative bg-gradient-to-br ${topic.gradient} border border-[#E5E7EB]`} style={{ height: '80px' }}>
                 <div className="absolute right-2 top-2">
-                  <Icon className="w-10 h-10 text-[#00A36C]" strokeWidth={1.5} />
+                  <Icon className="w-7 h-7 text-[#00A36C]" strokeWidth={1.5} />
                 </div>
                 <span className="absolute bottom-2 left-3 font-bold text-[#1F2937] text-sm">{topic.name}</span>
               </button>

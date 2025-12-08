@@ -7,6 +7,8 @@ import { Camera, X, Loader2, Sparkles, Bookmark, Send, Image as ImageIcon, Zap, 
 
 export default function Snap() {
   const navigate = useNavigate();
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromPage = urlParams.get('from') || 'Home';
   const [cameraReady, setCameraReady] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState(null);
@@ -844,7 +846,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(createPageUrl("Home"))}
+          onClick={() => navigate(createPageUrl(fromPage))}
           className="rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 border border-white/20"
         >
           <X className="w-5 h-5 text-white" />

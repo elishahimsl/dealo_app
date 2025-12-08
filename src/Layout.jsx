@@ -14,7 +14,7 @@ export default function Layout({ children, currentPageName }) {
   const navItems = [
     { name: "Home", icon: Home, path: createPageUrl("Home") },
     { name: "Compare", icon: Scale, path: createPageUrl("Compare") },
-    { name: "Scan", icon: Camera, path: createPageUrl("Snap"), isCenter: true },
+    { name: "Scan", icon: Camera, path: createPageUrl("Snap") + `?from=${currentPageName}`, isCenter: true },
     { name: "Discover", icon: Compass, path: createPageUrl("More") },
     { name: "Account", icon: User, path: createPageUrl("Profile") },
   ];

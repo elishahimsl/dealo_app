@@ -40,7 +40,7 @@ export default function Layout({ children, currentPageName }) {
             </div>
           </Link>
 
-          <div className="flex items-center justify-around h-20">
+          <div className="flex items-center justify-around h-16">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);

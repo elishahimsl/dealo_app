@@ -70,20 +70,20 @@ export default function Compare() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F3F4F6] via-[#E5E7EB] to-[#D1D5DB] pb-24">
+    <div className="min-h-screen bg-white pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-center">
         <h1 className="text-lg font-bold text-[#1F2937]">Compare</h1>
       </div>
 
-      <div className="px-6 space-y-6">
+      <div className="px-6 space-y-4">
         {/* Main Comparison Box */}
-        <div className="bg-white rounded-3xl p-5 border border-[#E5E7EB] shadow-sm">
+        <div className="bg-[#2D3748] rounded-3xl p-5 shadow-sm">
           {/* Add Products Label */}
-          <h2 className="text-xs font-medium text-[#6B7280] mb-3">Add Products</h2>
+          <h2 className="text-xs font-medium text-[#9CA3AF] mb-3">Add Products</h2>
           
           {/* Product Tiles */}
-          <div className="flex gap-3 mb-4">
+          <div className="flex gap-3 mb-3">
             {/* Item 1 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
@@ -92,7 +92,7 @@ export default function Compare() {
                 onMouseDown={() => item1 && setTimeout(() => handleLongPress(1), 500)}
                 onTouchStart={() => item1 && setTimeout(() => handleLongPress(1), 500)}
                 className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
-                  item1 ? 'bg-[#F9FAFB]' : 'bg-[#F9FAFB] border-2 border-[#E5E7EB]'
+                  item1 ? 'bg-[#3D4856]' : 'bg-[#3D4856] border-2 border-[#4A5568]'
                 }`}
                 style={{ height: '140px' }}
               >
@@ -102,7 +102,7 @@ export default function Compare() {
                   <Plus className="w-8 h-8 text-[#9CA3AF]" />
                 )}
               </div>
-              {item1 && <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item1.price}</p>}
+              {item1 && <p className="text-xs font-semibold text-white mt-2 text-center">{item1.price}</p>}
             </div>
 
             {/* Item 2 Tile */}
@@ -113,7 +113,7 @@ export default function Compare() {
                 onMouseDown={() => item2 && setTimeout(() => handleLongPress(2), 500)}
                 onTouchStart={() => item2 && setTimeout(() => handleLongPress(2), 500)}
                 className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
-                  item2 ? 'bg-[#F9FAFB]' : 'bg-[#F9FAFB] border-2 border-[#E5E7EB]'
+                  item2 ? 'bg-[#3D4856]' : 'bg-[#3D4856] border-2 border-[#4A5568]'
                 }`}
                 style={{ height: '140px' }}
               >
@@ -123,22 +123,31 @@ export default function Compare() {
                   <Plus className="w-8 h-8 text-[#9CA3AF]" />
                 )}
               </div>
-              {item2 && <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>}
+              {item2 && <p className="text-xs font-semibold text-white mt-2 text-center">{item2.price}</p>}
             </div>
           </div>
 
           {/* Preferences Row */}
           <button 
             onClick={() => navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
-            className="w-full flex items-center justify-between py-3 px-4 hover:bg-[#F9FAFB] rounded-xl transition-colors"
+            className="w-full flex items-center justify-between py-3 hover:bg-[#3D4856] rounded-xl transition-colors"
           >
-            <span className="text-sm font-medium text-[#1F2937]">Preferences</span>
-            <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-              <svg className="w-4 h-4 text-[#1F2937]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="text-sm font-medium text-white">Preferences</span>
+            <div className="w-7 h-7 rounded-full bg-[#4A5568] flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </button>
+        </div>
+
+        {/* Info Text */}
+        <div className="px-2">
+          <div className="flex items-start gap-2 mb-1">
+            <span className="text-2xl">⚡</span>
+            <h3 className="text-base font-semibold text-[#1F2937]">Add two products to compare</h3>
+          </div>
+          <p className="text-sm text-[#6B7280] ml-8">specs, price, reviews, and AI recommendations</p>
         </div>
 
         {/* Analyze Button */}

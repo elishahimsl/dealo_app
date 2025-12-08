@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag, ShoppingBag, User, Dumbbell, Heart, Shirt, Smartphone, UtensilsCrossed, Home as HomeIcon, Sparkles, Baby, PawPrint, BookOpen, Flower2, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -47,21 +47,21 @@ export default function Discover() {
   ];
 
   const allTopics = [
-    { id: 9, name: "Women", image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400" },
-    { id: 10, name: "Men", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400" },
-    { id: 1, name: "Sports", image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=400" },
-    { id: 2, name: "Health", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400" },
-    { id: 3, name: "Fashion", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=400" },
-    { id: 4, name: "Tech", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400" },
-    { id: 5, name: "Food", image: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400" },
-    { id: 6, name: "Home", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400" },
-    { id: 7, name: "Beauty", image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400" },
-    { id: 8, name: "Toys", image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=400" },
-    { id: 11, name: "Kids", image: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=400" },
-    { id: 12, name: "Pets", image: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400" },
-    { id: 13, name: "Books", image: "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400" },
-    { id: 14, name: "Garden", image: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400" },
-    { id: 15, name: "Auto", image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400" },
+    { id: 9, name: "Women", icon: User, gradient: "from-pink-400 to-purple-500" },
+    { id: 10, name: "Men", icon: User, gradient: "from-blue-500 to-indigo-600" },
+    { id: 1, name: "Sports", icon: Dumbbell, gradient: "from-orange-400 to-red-500" },
+    { id: 2, name: "Health", icon: Heart, gradient: "from-green-400 to-emerald-500" },
+    { id: 3, name: "Fashion", icon: Shirt, gradient: "from-purple-400 to-pink-500" },
+    { id: 4, name: "Tech", icon: Smartphone, gradient: "from-slate-500 to-gray-700" },
+    { id: 5, name: "Food", icon: UtensilsCrossed, gradient: "from-yellow-400 to-orange-500" },
+    { id: 6, name: "Home", icon: HomeIcon, gradient: "from-teal-400 to-cyan-500" },
+    { id: 7, name: "Beauty", icon: Sparkles, gradient: "from-rose-400 to-pink-500" },
+    { id: 8, name: "Toys", icon: Baby, gradient: "from-indigo-400 to-purple-500" },
+    { id: 11, name: "Kids", icon: Baby, gradient: "from-cyan-400 to-blue-500" },
+    { id: 12, name: "Pets", icon: PawPrint, gradient: "from-amber-400 to-orange-500" },
+    { id: 13, name: "Books", icon: BookOpen, gradient: "from-blue-400 to-indigo-500" },
+    { id: 14, name: "Garden", icon: Flower2, gradient: "from-lime-400 to-green-500" },
+    { id: 15, name: "Auto", icon: Car, gradient: "from-gray-500 to-slate-600" },
   ];
 
   const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
@@ -107,9 +107,9 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[75%] max-h-[55%] object-contain pointer-events-none" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden pointer-events-none">{store.name}</span>
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[65%] max-h-[45%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
             </button>
           ))}
         </div>
@@ -123,9 +123,9 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 flex items-center justify-center cursor-pointer" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[75%] max-h-[55%] object-contain pointer-events-none" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden pointer-events-none">{brand.name}</span>
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[65%] max-h-[45%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+              <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
             </button>
           ))}
         </div>
@@ -134,21 +134,26 @@ export default function Discover() {
       {/* Topics */}
       <div className="mb-4">
         <div className="px-6 mb-3">
-          <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-24 rounded-2xl shadow-lg overflow-hidden relative">
-            <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800" alt="Deals" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
+          <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-24 rounded-2xl shadow-lg overflow-hidden relative bg-gradient-to-r from-[#00A36C] to-emerald-600">
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
+              <Tag className="w-16 h-16 text-white transform -rotate-12" />
+            </div>
             <h3 className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-bold text-white">Deals</h3>
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-2 px-6">
-          {visibleTopics.map((topic) => (
-            <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className="rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative" style={{ height: '80px' }}>
-              <img src={topic.image} alt={topic.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <span className="absolute bottom-2 left-3 font-bold text-white text-sm">{topic.name}</span>
-            </button>
-          ))}
+          {visibleTopics.map((topic) => {
+            const Icon = topic.icon;
+            return (
+              <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className={`rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative bg-gradient-to-br ${topic.gradient}`} style={{ height: '80px' }}>
+                <div className="absolute right-2 top-2 opacity-20">
+                  <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+                </div>
+                <span className="absolute bottom-2 left-3 font-bold text-white text-sm">{topic.name}</span>
+              </button>
+            );
+          })}
         </div>
 
         <div className="px-6 mt-3 flex justify-center">

@@ -13,15 +13,30 @@ export default function TopicDetail() {
 
   const isMenOrWomen = topicName === 'Men' || topicName === 'Women';
 
-  const clothingCategories = [
+  const menClothingCategories = [
     { name: "Shirts & Tops", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
     { name: "Shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
-    { name: "Pants", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
-    { name: "Socks", image: "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=300" },
-    { name: "Active", image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=300" },
+    { name: "Pants & Jeans", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
+    { name: "Jackets & Coats", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300" },
+    { name: "Activewear", image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=300" },
     { name: "Shorts", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=300" },
     { name: "Underwear", image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300" },
     { name: "Sleepwear", image: "https://images.unsplash.com/photo-1631947430066-48c30d57b943?w=300" },
+    { name: "Suits & Blazers", image: "https://images.unsplash.com/photo-1593032465175-7d7eebd1e005?w=300" },
+    { name: "Accessories", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300" },
+  ];
+
+  const womenClothingCategories = [
+    { name: "Dresses", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" },
+    { name: "Tops & Blouses", image: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=300" },
+    { name: "Shoes", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=300" },
+    { name: "Pants & Jeans", image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300" },
+    { name: "Skirts", image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=300" },
+    { name: "Activewear", image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=300" },
+    { name: "Jackets & Coats", image: "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=300" },
+    { name: "Lingerie", image: "https://images.unsplash.com/photo-1611042553365-9b101441c135?w=300" },
+    { name: "Swimwear", image: "https://images.unsplash.com/photo-1562408590-e32931084e23?w=300" },
+    { name: "Bags & Accessories", image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300" },
   ];
 
   const topicBrands = {
@@ -53,43 +68,43 @@ export default function TopicDetail() {
 
   const menCategories = [
     { name: "Clothing", items: [
-      { name: "T-Shirts", price: "$29.99", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
+      { name: "T-Shirts", price: "$29.99", originalPrice: "$39.99", discount: 10, image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300" },
       { name: "Jeans", price: "$59.99", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=300" },
       { name: "Jackets", price: "$89.99", image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=300" },
-      { name: "Hoodies", price: "$49.99", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300" },
+      { name: "Hoodies", price: "$49.99", originalPrice: "$69.99", discount: 20, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300" },
     ]},
     { name: "Shoes", items: [
       { name: "Sneakers", price: "$119.99", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
-      { name: "Boots", price: "$149.99", image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=300" },
+      { name: "Boots", price: "$149.99", originalPrice: "$179.99", discount: 30, image: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=300" },
       { name: "Loafers", price: "$89.99", image: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=300" },
       { name: "Running", price: "$129.99", image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300" },
     ]},
     { name: "Accessories", items: [
-      { name: "Watches", price: "$199.99", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" },
+      { name: "Watches", price: "$199.99", originalPrice: "$249.99", discount: 50, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" },
       { name: "Belts", price: "$39.99", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300" },
       { name: "Wallets", price: "$49.99", image: "https://images.unsplash.com/photo-1627123424574-724758594e93?w=300" },
-      { name: "Sunglasses", price: "$79.99", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
+      { name: "Sunglasses", price: "$79.99", originalPrice: "$94.99", discount: 15, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
     ]},
   ];
 
   const womenCategories = [
     { name: "Clothing", items: [
-      { name: "Dresses", price: "$59.99", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" },
+      { name: "Dresses", price: "$59.99", originalPrice: "$79.99", discount: 20, image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=300" },
       { name: "Tops", price: "$34.99", image: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=300" },
-      { name: "Jeans", price: "$69.99", image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300" },
+      { name: "Jeans", price: "$69.99", originalPrice: "$94.99", discount: 25, image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=300" },
       { name: "Activewear", price: "$49.99", image: "https://images.unsplash.com/photo-1518459031867-a89b944bffe4?w=300" },
     ]},
     { name: "Shoes", items: [
       { name: "Heels", price: "$89.99", image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=300" },
-      { name: "Sneakers", price: "$99.99", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300" },
+      { name: "Sneakers", price: "$99.99", originalPrice: "$119.99", discount: 20, image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300" },
       { name: "Sandals", price: "$49.99", image: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=300" },
-      { name: "Flats", price: "$59.99", image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=300" },
+      { name: "Flats", price: "$59.99", originalPrice: "$74.99", discount: 15, image: "https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d?w=300" },
     ]},
     { name: "Beauty", items: [
-      { name: "Skincare", price: "$45.99", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300" },
+      { name: "Skincare", price: "$45.99", originalPrice: "$60.99", discount: 15, image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300" },
       { name: "Makeup", price: "$35.99", image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=300" },
       { name: "Fragrance", price: "$79.99", image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=300" },
-      { name: "Haircare", price: "$29.99", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300" },
+      { name: "Haircare", price: "$29.99", originalPrice: "$39.99", discount: 10, image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=300" },
     ]},
   ];
 
@@ -111,6 +126,7 @@ export default function TopicDetail() {
   const brands = topicBrands[topicName] || topicBrands.default;
   const visibleBrands = showMoreBrands ? brands : brands.slice(0, 4);
   const categories = topicName === 'Men' ? menCategories : topicName === 'Women' ? womenCategories : genericCategories;
+  const clothingCategories = topicName === 'Men' ? menClothingCategories : topicName === 'Women' ? womenClothingCategories : [];
 
   const toggleCategory = (catName) => {
     setShowMoreCategories(prev => ({ ...prev, [catName]: !prev[catName] }));
@@ -122,33 +138,53 @@ export default function TopicDetail() {
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-4">
           <button onClick={() => navigate(-1)}><ArrowLeft className="w-5 h-5 text-[#1F2937]" /></button>
-          <h1 className="text-base font-semibold text-[#1F2937]">{topicName}</h1>
+          <div className="w-5" />
           <div className="w-5" />
         </div>
         
         {/* Search Bar */}
-        <div className="relative mb-4">
+        <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
           <Input placeholder="Search" className="pl-10 h-9 rounded-xl bg-[#E5E7EB] border-0 text-sm" />
         </div>
+
+        {/* Topic Name below search */}
+        <h1 className="text-base font-semibold text-[#1F2937] text-center mt-3">{topicName}</h1>
       </div>
+
+      {/* Clothing Categories - Only for Men/Women */}
+      {isMenOrWomen && (
+        <div className="px-6 mb-6">
+          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Categories</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {(showMoreClothing ? clothingCategories : clothingCategories.slice(0, 6)).map((cat, idx) => (
+              <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ height: '100px' }}>
+                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <p className="text-white text-sm font-semibold">{cat.name}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          {clothingCategories.length > 6 && (
+            <button onClick={() => setShowMoreClothing(!showMoreClothing)} className="w-full py-2 mt-3 text-center text-sm font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl hover:bg-[#D6F5E9]">
+              {showMoreClothing ? 'Less' : 'More'}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Featured Brands */}
       <div className="px-6 mb-6">
         <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Brands</h2>
         <div className="grid grid-cols-2 gap-3">
           {visibleBrands.map((brand, idx) => (
-            <div key={idx}>
-              <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square">
-                <img src={brand.image} alt={brand.name} className="w-full h-full object-cover" />
+            <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm aspect-square relative">
+              <img src={brand.image} alt={brand.name} className="w-full h-full object-cover brightness-[0.3]" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <img src={brand.logo} alt={brand.name} className="w-20 h-20 object-contain brightness-0 invert mb-2" />
+                <p className="text-sm font-bold text-white">{brand.name}</p>
               </div>
-              <p className="text-xs font-semibold text-[#1F2937]">{brand.name}</p>
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
-                <span className="text-[10px] text-[#1F2937]">{brand.rating}</span>
-                <span className="text-[10px] text-[#6B7280]">({brand.reviews.toLocaleString()})</span>
-              </div>
-              <a href={`https://${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#00A36C] underline">Visit Store</a>
             </div>
           ))}
         </div>
@@ -160,39 +196,26 @@ export default function TopicDetail() {
         )}
       </div>
 
-      {/* Clothing Categories - Only for Men/Women */}
-      {isMenOrWomen && (
-        <div className="px-6 mb-6">
-          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Categories</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {(showMoreClothing ? clothingCategories : clothingCategories.slice(0, 4)).map((cat, idx) => (
-              <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ height: '80px' }}>
-                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <p className="text-white text-sm font-semibold">{cat.name}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <button onClick={() => setShowMoreClothing(!showMoreClothing)} className="w-full py-2 mt-3 text-center text-sm font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl hover:bg-[#D6F5E9]">
-            {showMoreClothing ? 'Less' : 'More'}
-          </button>
-        </div>
-      )}
-
       {/* Product Categories */}
       <div className="px-6 space-y-6">
         {categories.map((cat) => (
           <div key={cat.name}>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-bold text-[#1F2937]">{cat.name}</h2>
-              <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+              <button className="w-7 h-7 rounded-full border border-[#E5E7EB] flex items-center justify-center">
+                <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+              </button>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {(showMoreCategories[cat.name] ? cat.items : cat.items.slice(0, 4)).map((item, idx) => (
                 <div key={idx}>
-                  <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square">
+                  <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square relative">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    {item.discount && (
+                      <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">
+                        Save ${item.discount}
+                      </div>
+                    )}
                   </div>
                   <p className="text-xs font-semibold text-[#1F2937]">{item.name}</p>
                   <p className="text-xs text-[#1F2937] font-bold">{item.price}</p>
@@ -201,7 +224,6 @@ export default function TopicDetail() {
                     <span className="text-[10px] text-[#1F2937]">4.5</span>
                     <span className="text-[10px] text-[#6B7280]">(120)</span>
                   </div>
-                  <a href="#" className="text-[10px] text-[#00A36C] underline">Visit Store</a>
                 </div>
               ))}
             </div>

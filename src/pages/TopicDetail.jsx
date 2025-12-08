@@ -158,7 +158,7 @@ export default function TopicDetail() {
           <h2 className="text-sm font-bold text-[#1F2937] mb-3">Categories</h2>
           <div className="grid grid-cols-2 gap-3">
             {(showMoreClothing ? clothingCategories : clothingCategories.slice(0, 6)).map((cat, idx) => (
-              <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ height: '100px' }}>
+              <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm relative" style={{ height: '70px' }}>
                 <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <p className="text-white text-sm font-semibold">{cat.name}</p>
@@ -179,12 +179,20 @@ export default function TopicDetail() {
         <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Brands</h2>
         <div className="grid grid-cols-2 gap-3">
           {visibleBrands.map((brand, idx) => (
-            <div key={idx} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm aspect-square relative">
-              <img src={brand.image} alt={brand.name} className="w-full h-full object-cover brightness-[0.3]" />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <img src={brand.logo} alt={brand.name} className="w-20 h-20 object-contain brightness-0 invert mb-2" />
-                <p className="text-sm font-bold text-white">{brand.name}</p>
+            <div key={idx}>
+              <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 relative" style={{ height: '70px' }}>
+                <img src={brand.image} alt={brand.name} className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <img src={brand.logo} alt={brand.name} className="w-16 h-16 object-contain brightness-0 invert" />
+                </div>
               </div>
+              <p className="text-xs font-semibold text-[#1F2937]">{brand.name}</p>
+              <div className="flex items-center gap-1">
+                <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
+                <span className="text-[10px] text-[#1F2937]">{brand.rating}</span>
+                <span className="text-[10px] text-[#6B7280]">({brand.reviews.toLocaleString()})</span>
+              </div>
+              <a href={`https://${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-[#00A36C] underline">Visit Store</a>
             </div>
           ))}
         </div>
@@ -196,45 +204,7 @@ export default function TopicDetail() {
         )}
       </div>
 
-      {/* Product Categories */}
-      <div className="px-6 space-y-6">
-        {categories.map((cat) => (
-          <div key={cat.name}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-[#1F2937]">{cat.name}</h2>
-              <button className="w-7 h-7 rounded-full border border-[#E5E7EB] flex items-center justify-center">
-                <ChevronRight className="w-4 h-4 text-[#6B7280]" />
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {(showMoreCategories[cat.name] ? cat.items : cat.items.slice(0, 4)).map((item, idx) => (
-                <div key={idx}>
-                  <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square relative">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    {item.discount && (
-                      <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">
-                        Save ${item.discount}
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs font-semibold text-[#1F2937]">{item.name}</p>
-                  <p className="text-xs text-[#1F2937] font-bold">{item.price}</p>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
-                    <span className="text-[10px] text-[#1F2937]">4.5</span>
-                    <span className="text-[10px] text-[#6B7280]">(120)</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {cat.items.length > 4 && (
-              <button onClick={() => toggleCategory(cat.name)} className="w-full py-2 mt-2 text-center text-xs font-semibold text-[#00A36C] border border-[#00A36C] rounded-xl">
-                {showMoreCategories[cat.name] ? 'Less' : 'More'}
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+
     </div>
   );
 }

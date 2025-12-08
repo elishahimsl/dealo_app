@@ -47,21 +47,21 @@ export default function Discover() {
   ];
 
   const allTopics = [
-    { id: 9, name: "Women", icon: User, gradient: "from-pink-400 to-purple-500" },
-    { id: 10, name: "Men", icon: User, gradient: "from-blue-500 to-indigo-600" },
-    { id: 1, name: "Sports", icon: Dumbbell, gradient: "from-orange-400 to-red-500" },
-    { id: 2, name: "Health", icon: Heart, gradient: "from-green-400 to-emerald-500" },
-    { id: 3, name: "Fashion", icon: Shirt, gradient: "from-purple-400 to-pink-500" },
-    { id: 4, name: "Tech", icon: Smartphone, gradient: "from-slate-500 to-gray-700" },
-    { id: 5, name: "Food", icon: UtensilsCrossed, gradient: "from-yellow-400 to-orange-500" },
-    { id: 6, name: "Home", icon: HomeIcon, gradient: "from-teal-400 to-cyan-500" },
-    { id: 7, name: "Beauty", icon: Sparkles, gradient: "from-rose-400 to-pink-500" },
-    { id: 8, name: "Toys", icon: Baby, gradient: "from-indigo-400 to-purple-500" },
-    { id: 11, name: "Kids", icon: Baby, gradient: "from-cyan-400 to-blue-500" },
-    { id: 12, name: "Pets", icon: PawPrint, gradient: "from-amber-400 to-orange-500" },
-    { id: 13, name: "Books", icon: BookOpen, gradient: "from-blue-400 to-indigo-500" },
-    { id: 14, name: "Garden", icon: Flower2, gradient: "from-lime-400 to-green-500" },
-    { id: 15, name: "Auto", icon: Car, gradient: "from-gray-500 to-slate-600" },
+    { id: 9, name: "Women", icon: User, gradient: "from-gray-100 to-gray-200" },
+    { id: 10, name: "Men", icon: User, gradient: "from-gray-100 to-gray-200" },
+    { id: 1, name: "Sports", icon: Dumbbell, gradient: "from-gray-100 to-gray-200" },
+    { id: 2, name: "Health", icon: Heart, gradient: "from-gray-100 to-gray-200" },
+    { id: 3, name: "Fashion", icon: Shirt, gradient: "from-gray-100 to-gray-200" },
+    { id: 4, name: "Tech", icon: Smartphone, gradient: "from-gray-100 to-gray-200" },
+    { id: 5, name: "Food", icon: UtensilsCrossed, gradient: "from-gray-100 to-gray-200" },
+    { id: 6, name: "Home", icon: HomeIcon, gradient: "from-gray-100 to-gray-200" },
+    { id: 7, name: "Beauty", icon: Sparkles, gradient: "from-gray-100 to-gray-200" },
+    { id: 8, name: "Toys", icon: Baby, gradient: "from-gray-100 to-gray-200" },
+    { id: 11, name: "Kids", icon: Baby, gradient: "from-gray-100 to-gray-200" },
+    { id: 12, name: "Pets", icon: PawPrint, gradient: "from-gray-100 to-gray-200" },
+    { id: 13, name: "Books", icon: BookOpen, gradient: "from-gray-100 to-gray-200" },
+    { id: 14, name: "Garden", icon: Flower2, gradient: "from-gray-100 to-gray-200" },
+    { id: 15, name: "Auto", icon: Car, gradient: "from-gray-100 to-gray-200" },
   ];
 
   const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
@@ -107,9 +107,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-[65%] max-h-[45%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden">{store.name}</span>
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center gap-2 p-3" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="w-12 h-12 object-contain" onError={(e) => e.target.style.display = 'none'} />
             </button>
           ))}
         </div>
@@ -123,9 +122,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex items-center justify-center" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-[65%] max-h-[45%] object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
-              <span className="text-xs font-bold text-[#1F2937] hidden">{brand.name}</span>
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center gap-2 p-3" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="w-12 h-12 object-contain" onError={(e) => e.target.style.display = 'none'} />
             </button>
           ))}
         </div>
@@ -146,11 +144,11 @@ export default function Discover() {
           {visibleTopics.map((topic) => {
             const Icon = topic.icon;
             return (
-              <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className={`rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative bg-gradient-to-br ${topic.gradient}`} style={{ height: '80px' }}>
-                <div className="absolute right-2 top-2 opacity-20">
-                  <Icon className="w-10 h-10 text-white" strokeWidth={1.5} />
+              <button key={topic.id} onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${topic.name}`)} className={`rounded-2xl shadow-sm hover:shadow-md overflow-hidden relative bg-gradient-to-br ${topic.gradient} border border-[#E5E7EB]`} style={{ height: '80px' }}>
+                <div className="absolute right-2 top-2">
+                  <Icon className="w-10 h-10 text-[#00A36C]" strokeWidth={1.5} />
                 </div>
-                <span className="absolute bottom-2 left-3 font-bold text-white text-sm">{topic.name}</span>
+                <span className="absolute bottom-2 left-3 font-bold text-[#1F2937] text-sm">{topic.name}</span>
               </button>
             );
           })}

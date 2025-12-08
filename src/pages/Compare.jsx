@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, Plus, Tag, Loader2, Sparkles, Image as ImageIcon, Search, X, Check, Trash2 } from "lucide-react";
+import { Camera, Plus, Tag, Loader2, Sparkles, Image as ImageIcon, Search, X, Check, Trash2, ChevronRight } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
 export default function Compare() {

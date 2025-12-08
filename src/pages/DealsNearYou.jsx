@@ -42,11 +42,11 @@ export default function DealsNearYou() {
   };
 
   const filters = [
-    { id: "for-you", name: "For You" },
-    { id: "trending", name: "Trending" },
-    { id: "hot-deals", name: "Hot Deals" },
-    { id: "new-arrivals", name: "New Arrivals" },
-    { id: "limited-time", name: "Limited Time" },
+    { id: "for-you", name: "For You", data: deals },
+    { id: "trending", name: "Trending", data: deals.filter(d => ["tech", "fashion"].includes(d.category)) },
+    { id: "hot-deals", name: "Hot Deals", data: [...deals].sort((a, b) => parseInt(b.discount) - parseInt(a.discount)) },
+    { id: "new-arrivals", name: "New Arrivals", data: deals },
+    { id: "limited-time", name: "Limited Time", data: deals },
   ];
 
   const topics = ["Tech", "Fashion", "Home", "Beauty", "Sports", "Food", "Toys", "Auto"];
@@ -83,8 +83,8 @@ export default function DealsNearYou() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header with back arrow tag */}
-      <div className="px-6 pt-6 pb-4 flex items-center">
-        <button onClick={() => navigate(-1)} className="mr-3 group">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center relative">
+        <button onClick={() => navigate(-1)} className="absolute left-6 group">
           <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
         </button>
         <h1 className="text-base font-semibold text-[#1F2937]">Deals</h1>
@@ -130,7 +130,7 @@ export default function DealsNearYou() {
 
         {/* Deals Grid - 2 column - infinite scroll */}
         <div className="grid grid-cols-2 gap-3">
-          {deals.map((deal) => (
+          {(filters.find(f => f.id === activeFilter)?.data || deals).map((deal) => (
             <div key={deal.id}>
               {/* Product tile with gradient border */}
               <div 
@@ -141,9 +141,9 @@ export default function DealsNearYou() {
               >
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6]">
                   <img src={deal.image} alt="" className="w-full h-full object-cover" />
-                  {/* Discount badge - top left - GREEN */}
+                  {/* Discount badge - top left - GREEN - no arrow */}
                   <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[9px] font-bold px-2 py-1 rounded">
-                    {deal.discount}
+                    {deal.discount.replace('↓', '').replace('↑', '')}
                   </div>
                   {/* Heart - bottom right */}
                   <button 

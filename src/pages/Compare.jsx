@@ -72,12 +72,8 @@ export default function Compare() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Header */}
-      <div className="px-6 pt-6 pb-2 flex items-center justify-between">
-        <button onClick={() => navigate(createPageUrl("Home"))} className="relative flex items-center justify-center group">
-          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
-        </button>
+      <div className="px-6 pt-6 pb-2 flex items-center justify-center">
         <h1 className="text-base font-medium text-[#1F2937]">Compare</h1>
-        <div className="w-5" />
       </div>
 
       <div className="px-6 space-y-4">

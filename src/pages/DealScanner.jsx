@@ -18,11 +18,11 @@ export default function DealScanner() {
   ];
 
   const trendingCategories = [
-    { id: "tech", name: "Tech", icon: "💻" },
-    { id: "shoes", name: "Shoes", icon: "👟" },
-    { id: "clothing", name: "Clothing", icon: "👕" },
-    { id: "home", name: "Home", icon: "🏠" },
-    { id: "beauty", name: "Beauty", icon: "💄" },
+    { id: "all", name: "All" },
+    { id: "tech", name: "Tech" },
+    { id: "clothing", name: "Clothing" },
+    { id: "home", name: "Home" },
+    { id: "beauty", name: "Beauty" },
   ];
 
   const trendingPriceDrops = [
@@ -33,7 +33,10 @@ export default function DealScanner() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-center">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center relative">
+        <button onClick={() => navigate(-1)} className="absolute left-6">
+          <Tag className="w-5 h-5 text-[#1F2937]" />
+        </button>
         <h1 className="text-base font-semibold text-[#1F2937]">Deal Scanner</h1>
       </div>
 
@@ -52,16 +55,12 @@ export default function DealScanner() {
 
         {/* Tool Buttons */}
         <div className="flex gap-3">
-          <button className="flex-1 bg-white rounded-2xl p-3 border border-[#E5E7EB] flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center">
-              <Cpu className="w-4 h-4 text-[#00A36C]" />
-            </div>
+          <button className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center">
+            <Cpu className="w-5 h-5 text-[#00A36C]" />
             <span className="text-xs font-semibold text-[#1F2937]">AI Deal Finder</span>
           </button>
-          <button className="flex-1 bg-white rounded-2xl p-3 border border-[#E5E7EB] flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center">
-              <Store className="w-4 h-4 text-[#00A36C]" />
-            </div>
+          <button className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center">
+            <Store className="w-5 h-5 text-[#00A36C]" />
             <span className="text-xs font-semibold text-[#1F2937]">Compare Stores</span>
           </button>
         </div>
@@ -103,27 +102,31 @@ export default function DealScanner() {
 
         {/* Trending Price Drops */}
         <div>
-          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Trending Price Drops</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-[#1F2937]">Trending Price Drops</h2>
+            <button className="w-6 h-6 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+              <svg className="w-3 h-3 text-[#6B7280]" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+              </svg>
+            </button>
+          </div>
           
           {/* Category pills */}
-          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-hide justify-start">
             {trendingCategories.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                className={`text-xs font-medium whitespace-nowrap ${
                   activeCategory === cat.id 
-                    ? 'bg-[#1F2937] text-white' 
-                    : 'bg-white border border-[#E5E7EB] text-[#1F2937]'
+                    ? 'bg-[#E5E7EB] text-[#1F2937] px-3 py-1 rounded-full' 
+                    : 'text-[#6B7280]'
                 }`}
               >
-                <span>{cat.icon}</span>
-                <span>{cat.name}</span>
+                {cat.name}
               </button>
             ))}
           </div>
-
-          <p className="text-xs text-[#6B7280] mb-3">All</p>
 
           {/* Price drop cards - 2 column grid */}
           <div className="grid grid-cols-2 gap-3">
@@ -132,9 +135,9 @@ export default function DealScanner() {
                 {/* Image carousel tile */}
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={item.images[0]} alt="" className="w-full h-full object-cover" />
-                  {/* Discount badge - top left */}
+                  {/* Discount badge - top left - no arrow */}
                   <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[9px] font-bold px-2 py-0.5 rounded">
-                    {item.discount}
+                    {item.discount.replace('↓', '').replace('↑', '')}
                   </div>
                   {/* Heart - bottom right */}
                   <button 

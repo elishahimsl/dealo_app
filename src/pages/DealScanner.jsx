@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Camera, Heart, Tag, Cpu, Store } from "lucide-react";
+import { Search, Camera, Heart, Tag, Cpu, Store, Bell } from "lucide-react";
 
 export default function DealScanner() {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
+  const [loading, setLoading] = useState(false);
 
   const toggleFavorite = (id) => {
     setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
@@ -25,10 +26,41 @@ export default function DealScanner() {
     { id: "beauty", name: "Beauty" },
   ];
 
-  const trendingPriceDrops = [
-    { id: 101, name: "iPhone 15 Pro", brand: "Apple", price: "$800", originalPrice: "$1100", discount: "↓27%", images: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=300", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=300"] },
-    { id: 102, name: "Quarter-Zip", brand: "Banana Republic", price: "$75", originalPrice: "$100", discount: "↓40%", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300", "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300"] },
+  const [trendingPriceDrops, setTrendingPriceDrops] = useState([
+    { id: 101, name: "iPhone 15 Pro", brand: "Apple", price: "$800", originalPrice: "$1100", discount: "-27%", images: ["https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=300", "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=300"], category: "tech" },
+    { id: 102, name: "Quarter-Zip", brand: "Banana Republic", price: "$75", originalPrice: "$100", discount: "-40%", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300", "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=300"], category: "clothing" },
+    { id: 103, name: "Sofa Set", brand: "IKEA", price: "$499", originalPrice: "$799", discount: "-38%", images: ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300"], category: "home" },
+    { id: 104, name: "Face Cream", brand: "CeraVe", price: "$12", originalPrice: "$18", discount: "-33%", images: ["https://images.unsplash.com/photo-1556228720-195a672e8a03?w=300"], category: "beauty" },
+    { id: 105, name: "MacBook Air", brand: "Apple", price: "$899", originalPrice: "$1199", discount: "-25%", images: ["https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300"], category: "tech" },
+    { id: 106, name: "Hoodie", brand: "Nike", price: "$45", originalPrice: "$75", discount: "-40%", images: ["https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300"], category: "clothing" },
+  ]);
+
+  const morePriceDrops = [
+    { id: 107, name: "Smart Watch", brand: "Samsung", price: "$199", originalPrice: "$299", discount: "-33%", images: ["https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"], category: "tech" },
+    { id: 108, name: "Denim Jacket", brand: "Levi's", price: "$59", originalPrice: "$98", discount: "-40%", images: ["https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=300"], category: "clothing" },
+    { id: 109, name: "Table Lamp", brand: "Target", price: "$29", originalPrice: "$49", discount: "-41%", images: ["https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=300"], category: "home" },
+    { id: 110, name: "Lipstick Set", brand: "MAC", price: "$35", originalPrice: "$55", discount: "-36%", images: ["https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300"], category: "beauty" },
   ];
+
+  const loadMorePriceDrops = () => {
+    if (loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      const newDrops = morePriceDrops.map(d => ({ ...d, id: d.id + Math.random() * 10000 }));
+      setTrendingPriceDrops(prev => [...prev, ...newDrops]);
+      setLoading(false);
+    }, 500);
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadMorePriceDrops();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [trendingPriceDrops, loading]);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
@@ -102,17 +134,15 @@ export default function DealScanner() {
 
         {/* Trending Price Drops */}
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 -mx-6 px-6">
             <h2 className="text-sm font-bold text-[#1F2937]">Trending Price Drops</h2>
-            <button className="w-6 h-6 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-              <svg className="w-3 h-3 text-[#6B7280]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-              </svg>
+            <button>
+              <Bell className="w-5 h-5 text-[#6B7280]" />
             </button>
           </div>
           
           {/* Category pills */}
-          <div className="flex gap-4 overflow-x-auto pb-3 scrollbar-hide justify-start">
+          <div className="flex gap-6 overflow-x-auto pb-3 scrollbar-hide justify-between -mx-6 px-6">
             {trendingCategories.map((cat) => (
               <button
                 key={cat.id}
@@ -128,9 +158,9 @@ export default function DealScanner() {
             ))}
           </div>
 
-          {/* Price drop cards - 2 column grid */}
+          {/* Price drop cards - 2 column grid - infinite scroll */}
           <div className="grid grid-cols-2 gap-3">
-            {trendingPriceDrops.map((item) => (
+            {(activeCategory === "all" ? trendingPriceDrops : trendingPriceDrops.filter(item => item.category === activeCategory)).map((item) => (
               <div key={item.id}>
                 {/* Image carousel tile */}
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
@@ -165,6 +195,13 @@ export default function DealScanner() {
               </div>
             ))}
           </div>
+
+          {/* Loading indicator */}
+          {loading && (
+            <div className="flex justify-center py-4 mt-3">
+              <div className="w-6 h-6 border-2 border-[#00A36C] border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
         </div>
       </div>
 

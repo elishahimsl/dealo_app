@@ -40,7 +40,8 @@ export default function AllStores() {
             <img 
               src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} 
               alt={store.name} 
-              className="w-20 h-20 object-contain rounded-lg" 
+              className="max-w-[70%] max-h-[60%] object-contain" 
+              style={{ borderRadius: '8px' }}
               onError={(e) => { 
                 e.target.style.display = 'none'; 
                 e.target.nextSibling.style.display = 'block'; 

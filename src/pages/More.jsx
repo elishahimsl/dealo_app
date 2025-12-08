@@ -107,8 +107,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {stores.slice(0, 6).map((store) => (
-            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center gap-2 p-3" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="w-16 h-16 object-contain rounded-lg" onError={(e) => e.target.style.display = 'none'} />
+            <button key={store.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${store.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={store.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} onError={(e) => e.target.style.display = 'none'} />
             </button>
           ))}
         </div>
@@ -122,8 +122,8 @@ export default function Discover() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
           {brands.slice(0, 6).map((brand) => (
-            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center gap-2 p-3" style={{ width: '130px', height: '80px' }}>
-              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="w-16 h-16 object-contain rounded-lg" onError={(e) => e.target.style.display = 'none'} />
+            <button key={brand.id} onClick={() => navigate(createPageUrl("StoreDetail") + `?store=${encodeURIComponent(brand.name)}`)} className="flex-shrink-0 bg-white rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col items-center justify-center p-4" style={{ width: '130px', height: '80px' }}>
+              <img src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} alt={brand.name} className="max-w-full max-h-full object-contain" style={{ borderRadius: '8px' }} onError={(e) => e.target.style.display = 'none'} />
             </button>
           ))}
         </div>

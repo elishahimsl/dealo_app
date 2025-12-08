@@ -43,7 +43,8 @@ export default function AllBrands() {
             <img 
               src={`https://logo.clearbit.com/${brand.name.toLowerCase().replace(/[^a-z]/g, '')}.com`} 
               alt={brand.name} 
-              className="w-20 h-20 object-contain rounded-lg" 
+              className="max-w-[70%] max-h-[60%] object-contain" 
+              style={{ borderRadius: '8px' }}
               onError={(e) => { 
                 e.target.style.display = 'none'; 
                 e.target.nextSibling.style.display = 'block'; 

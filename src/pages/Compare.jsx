@@ -73,7 +73,7 @@ export default function Compare() {
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-center">
-        <h1 className="text-base font-normal text-[#1F2937]">Compare</h1>
+        <h1 className="text-base font-semibold text-[#1F2937]">Compare</h1>
       </div>
 
       <div className="px-6 space-y-6">
@@ -83,7 +83,7 @@ export default function Compare() {
           <h2 className="text-xs font-medium text-white mb-3">Add Products</h2>
           
           {/* Product Tiles */}
-          <div className="flex gap-3 mb-4">
+          <div className="flex gap-3 mb-6">
             {/* Item 1 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
@@ -133,14 +133,18 @@ export default function Compare() {
             className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
           >
             <span className="text-base font-semibold text-white">Preferences</span>
-            <ChevronRight className="w-5 h-5 text-white" />
+            <div className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
           </button>
         </div>
 
         {/* Info Text */}
         <div className="px-2">
           <div className="flex items-start gap-2 mb-1">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-[#1F2937] flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
               </svg>
@@ -153,8 +157,8 @@ export default function Compare() {
         {/* Analyze Button */}
         <Button 
           onClick={handleAnalyze} 
-          disabled={!item1 || !item2 || analyzing} 
-          className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 disabled:bg-[#D1D5DB] text-white font-semibold"
+          disabled={!item1 || !item2}
+          className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
         >
           {analyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing...</> : 'Analyze'}
         </Button>
@@ -179,50 +183,54 @@ export default function Compare() {
                 onClick={() => { navigate(createPageUrl("Snap") + `?from=Compare&slot=${showUploadOptions}`); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
-                <span className="text-base text-[#1F2937]">Take Photo</span>
-                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="flex items-center gap-3">
+                  <Camera className="w-5 h-5 text-[#00A36C]" />
+                  <span className="text-base text-[#1F2937]">Take Photo</span>
+                </div>
               </button>
 
               <button 
                 onClick={() => { navigate(createPageUrl("SearchProducts"), { state: { slot: showUploadOptions === 1 ? 'item1' : 'item2', item1, item2 } }); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
-                <span className="text-base text-[#1F2937]">Search Product</span>
-                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="flex items-center gap-3">
+                  <Search className="w-5 h-5 text-[#00A36C]" />
+                  <span className="text-base text-[#1F2937]">Search Product</span>
+                </div>
               </button>
 
               <button 
                 onClick={() => { navigate(createPageUrl("MyCart")); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
-                <span className="text-base text-[#1F2937]">Choose From Saved Items</span>
-                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                  </svg>
+                  <span className="text-base text-[#1F2937]">Choose From Saved Items</span>
+                </div>
               </button>
 
               <button 
                 onClick={() => { navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } }); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
-                <span className="text-base text-[#1F2937]">Shop Sense Smart Pick</span>
-                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-[#00A36C]" />
+                  <span className="text-base text-[#1F2937]">Smart Pick</span>
+                </div>
               </button>
 
               <button 
                 onClick={() => { alert("Paste product URL (feature coming soon)"); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
-                <span className="text-base text-[#1F2937]">Import From Link</span>
-                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
+                <div className="flex items-center gap-3">
+                  <svg className="w-5 h-5 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                  </svg>
+                  <span className="text-base text-[#1F2937]">Import From Link</span>
+                </div>
               </button>
             </div>
           </div>

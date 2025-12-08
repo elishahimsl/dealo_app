@@ -9,73 +9,35 @@ export default function Home() {
     const saved = localStorage.getItem('dealo_favorites');
     return saved ? JSON.parse(saved) : [];
   });
-  const [swipeIndex, setSwipeIndex] = useState(0);
-  const [swipeDirection, setSwipeDirection] = useState(null);
-  const [likedProducts, setLikedProducts] = useState([]);
-  const [dislikedProducts, setDislikedProducts] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [dragOffset, setDragOffset] = useState(0);
-  const [startX, setStartX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('dealo_favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  // Check if user has completed onboarding swipes
-  useEffect(() => {
-    const hasOnboarded = localStorage.getItem('dealo_onboarded');
-    if (hasOnboarded) {
-      setShowSuggestions(true);
-    }
-  }, []);
-
-  const toggleFavorite = (id) => {
-    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
-  };
-
-  // Touch/drag handlers for swipe
-  const handleTouchStart = (e) => {
-    setStartX(e.touches[0].clientX);
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const currentX = e.touches[0].clientX;
-    setDragOffset(currentX - startX);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    if (Math.abs(dragOffset) > 80) {
-      handleSwipe(dragOffset > 0 ? 'right' : 'left');
-    }
-    setDragOffset(0);
-  };
-
-  const handleMouseDown = (e) => {
-    setStartX(e.clientX);
-    setIsDragging(true);
+  const toggleFavorite = async (id, product) => {
+    const isCurrentlyFavorited = favorites.includes(id);
     
-    const handleMouseMove = (e) => {
-      if (!isDragging) return;
-      setDragOffset(e.clientX - startX);
-    };
-    
-    const handleMouseUp = () => {
-      setIsDragging(false);
-      if (Math.abs(dragOffset) > 80) {
-        handleSwipe(dragOffset > 0 ? 'right' : 'left');
+    if (isCurrentlyFavorited) {
+      setFavorites(prev => prev.filter(f => f !== id));
+    } else {
+      setFavorites(prev => [...prev, id]);
+      // Save to database
+      try {
+        await base44.entities.Capture.create({
+          title: product.title,
+          content_type: 'other',
+          file_url: product.image,
+          file_type: 'image',
+          ai_summary: `${product.title} from ${product.store || product.brand}`,
+          keywords: [product.store || product.brand, product.title]
+        });
+      } catch (error) {
+        console.error("Error saving to database:", error);
       }
-      setDragOffset(0);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    }
   };
+
+
 
   const trendingProducts = [
     { id: 1, price: "$20.00", image: "https://images.unsplash.com/photo-1543512214-318c7553f230?w=400", title: "Smart Speaker", store: "Amazon" },
@@ -84,26 +46,8 @@ export default function Home() {
     { id: 4, price: "$89.00", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", title: "Running Shoes", store: "Nike" },
   ];
 
-  // Swipe cards for onboarding
-  const swipeCards = [
-    { id: 101, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600", title: "Running Shoes", price: "$89.99", badge: "Trending", brand: "Nike" },
-    { id: 102, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600", title: "Wireless Headphones", price: "$149.99", badge: "Hot Deal", brand: "Sony" },
-    { id: 103, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600", title: "Smart Watch", price: "$299.99", badge: "New", brand: "Apple" },
-    { id: 104, image: "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600", title: "Skincare Set", price: "$45.99", badge: "Popular", brand: "CeraVe" },
-    { id: 105, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600", title: "Hoodie", price: "$59.99", badge: "Trending", brand: "Nike" },
-    { id: 106, image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600", title: "4K Smart TV", price: "$499.99", badge: "Deal", brand: "Samsung" },
-  ];
-
-  // Smart suggestions data (shown after onboarding)
+  // Smart suggestions data
   const smartSuggestions = {
-    brandsYouLiked: [
-      { id: 201, brand: "Uniqlo", price: "$24.99", title: "Joggers", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
-      { id: 202, brand: "Nike", price: "$30.99", title: "Active Shorts", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400" },
-      { id: 203, brand: "Adidas", price: "$45.00", title: "Track Jacket", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400" },
-      { id: 204, brand: "Levi's", price: "$59.99", title: "Denim Jacket", image: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=400" },
-      { id: 205, brand: "H&M", price: "$19.99", title: "Basic Tee", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
-      { id: 206, brand: "Zara", price: "$35.00", title: "Chinos", image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400" },
-    ],
     storesYouLiked: [
       { id: 301, store: "Target", brand: "Xbox", price: "$500.99", title: "Xbox One", image: "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=400" },
       { id: 302, store: "Walmart", price: "$1,200", title: "TV 75\"", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400" },
@@ -120,28 +64,14 @@ export default function Home() {
       { id: 405, price: "$18.99", title: "Watch", store: "Amazon", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400" },
       { id: 406, price: "$55.00", title: "Sunglasses", store: "Walmart", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400" },
     ],
-  };
-
-  const handleSwipe = (direction) => {
-    setSwipeDirection(direction);
-    const currentCard = swipeCards[swipeIndex];
-    
-    if (direction === 'right') {
-      setLikedProducts(prev => [...prev, currentCard]);
-    } else {
-      setDislikedProducts(prev => [...prev, currentCard]);
-    }
-
-    setTimeout(() => {
-      setSwipeDirection(null);
-      if (swipeIndex < swipeCards.length - 1) {
-        setSwipeIndex(prev => prev + 1);
-      } else {
-        // Onboarding complete
-        localStorage.setItem('dealo_onboarded', 'true');
-        setShowSuggestions(true);
-      }
-    }, 300);
+    brandsYouLiked: [
+      { id: 201, brand: "Uniqlo", price: "$24.99", title: "Joggers", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400" },
+      { id: 202, brand: "Nike", price: "$30.99", title: "Active Shorts", image: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400" },
+      { id: 203, brand: "Adidas", price: "$45.00", title: "Track Jacket", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400" },
+      { id: 204, brand: "Levi's", price: "$59.99", title: "Denim Jacket", image: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=400" },
+      { id: 205, brand: "H&M", price: "$19.99", title: "Basic Tee", image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400" },
+      { id: 206, brand: "Zara", price: "$35.00", title: "Chinos", image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400" },
+    ],
   };
 
   return (
@@ -310,13 +240,13 @@ export default function Home() {
               <div key={product.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  {/* Price badge - centered text */}
-                  <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded flex items-center justify-center px-1.5 py-0.5">
-                    <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
+                  {/* Price badge - bigger, centered text */}
+                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded flex items-center justify-center px-2 py-1">
+                    <span className="text-xs font-bold text-white leading-none">{product.price}</span>
                   </div>
                   {/* Heart */}
                   <button 
-                    onClick={() => toggleFavorite(product.id)}
+                    onClick={() => toggleFavorite(product.id, product)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
                       favorites.includes(product.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
                     }`}
@@ -331,219 +261,94 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Tinder-Style Swipe Cards OR Smart Suggestions */}
-      {!showSuggestions ? (
-        <div className="px-6 mb-6">
+      {/* Smart Suggestions Feed - Horizontal scrollable */}
+      <div className="mb-8">
+        <div className="px-6">
           <h2 className="text-sm font-bold text-[#1F2937] mb-1">Smart Suggestions</h2>
-          <p className="text-xs text-[#6B7280] mb-4">Swipe to help us learn your style</p>
+          <p className="text-xs text-[#6B7280] mb-4">Based on your preferences</p>
+        </div>
 
-          {/* Swipe Card Stack */}
-          <div className="relative flex justify-center" style={{ height: '280px' }}>
-            {/* Phantom gradient background cards - sticking out on multiple sides */}
-            <div 
-              className="absolute rounded-2xl"
-              style={{ 
-                width: '200px', 
-                height: '190px',
-                top: '20px',
-                background: 'linear-gradient(145deg, #C4C7CC 0%, #B0B3B8 100%)',
-                transform: 'scale(0.82) rotate(-6deg) translateX(-15px)',
-                opacity: 0.25
-              }}
-            />
-            <div 
-              className="absolute rounded-2xl"
-              style={{ 
-                width: '200px', 
-                height: '190px',
-                top: '18px',
-                background: 'linear-gradient(145deg, #D1D5DB 0%, #C4C7CC 100%)',
-                transform: 'scale(0.85) rotate(5deg) translateX(12px)',
-                opacity: 0.3
-              }}
-            />
-            <div 
-              className="absolute rounded-2xl"
-              style={{ 
-                width: '200px', 
-                height: '190px',
-                top: '14px',
-                background: 'linear-gradient(145deg, #D1D5DB 0%, #C4C7CC 100%)',
-                transform: 'scale(0.88) rotate(-3deg) translateX(-8px)',
-                opacity: 0.4
-              }}
-            />
-            <div 
-              className="absolute rounded-2xl"
-              style={{ 
-                width: '195px', 
-                height: '185px',
-                top: '8px',
-                background: 'linear-gradient(145deg, #E5E7EB 0%, #D1D5DB 100%)',
-                transform: 'scale(0.94) rotate(2deg) translateX(5px)',
-                opacity: 0.55
-              }}
-            />
-
-            {/* Check mark - fixed in center of screen, revealed when swiping right */}
-            <div 
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-500 flex items-center justify-center"
-              style={{ 
-                width: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
-                height: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
-                opacity: dragOffset > 20 ? Math.min(1, (dragOffset - 20) / 60) : 0,
-                transition: dragOffset > 20 ? 'none' : 'opacity 0.2s'
-              }}
-            >
-              <Check className="text-white" style={{ width: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px`, height: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px` }} />
-            </div>
-
-            {/* X mark - fixed in center of screen, revealed when swiping left */}
-            <div 
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-500 flex items-center justify-center"
-              style={{ 
-                width: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
-                height: `${Math.min(70, 30 + Math.abs(dragOffset) * 0.5)}px`,
-                opacity: dragOffset < -20 ? Math.min(1, (Math.abs(dragOffset) - 20) / 60) : 0,
-                transition: dragOffset < -20 ? 'none' : 'opacity 0.2s'
-              }}
-            >
-              <X className="text-white" style={{ width: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px`, height: `${Math.min(36, 16 + Math.abs(dragOffset) * 0.25)}px` }} />
-            </div>
-
-            {/* Current card */}
-            {swipeIndex < swipeCards.length && (
-              <div 
-                className="relative z-10"
-                style={{
-                  transform: `translateX(${dragOffset}px) rotate(${dragOffset * 0.05}deg)`,
-                  transition: swipeDirection ? 'all 0.3s ease-out' : 'none'
-                }}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                onMouseDown={handleMouseDown}
-              >
-                {/* Gradient border wrapper */}
-                <div 
-                  className="rounded-2xl p-[3px]"
-                  style={{
-                    background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(229,231,235,0.6) 50%, rgba(209,213,219,0.4) 100%)',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
-                  }}
-                >
-                  {/* Image tile */}
-                  <div 
-                    className="rounded-xl overflow-hidden bg-[#F3F4F6] relative"
-                    style={{ width: '180px', height: '180px' }}
+        {/* From Stores You Liked - Horizontal */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Stores You Liked</h3>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+            {smartSuggestions.storesYouLiked.map((item) => (
+              <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
+                <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
+                  <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
+                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
+                  </div>
+                  <button 
+                    onClick={() => toggleFavorite(item.id, item)}
+                    className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                      favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
                   >
-                    <img 
-                      src={swipeCards[swipeIndex].image} 
-                      alt="" 
-                      className="w-full h-full object-cover"
-                    />
-                    
-                    {/* Badge */}
-                    <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                      {swipeCards[swipeIndex].badge}
-                    </div>
-
-                    {/* Heart button */}
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); toggleFavorite(swipeCards[swipeIndex].id); }}
-                      className={`absolute bottom-2 right-2 w-8 h-8 rounded-full flex items-center justify-center ${
-                        favorites.includes(swipeCards[swipeIndex].id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
-                      }`}
-                    >
-                      <Heart className={`w-4 h-4 ${favorites.includes(swipeCards[swipeIndex].id) ? 'text-white fill-white' : 'text-white'}`} />
-                    </button>
-                  </div>
+                    <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
                 </div>
-
-                {/* Text underneath - moves with tile */}
-                <div className="mt-3 text-center">
-                  <p className="text-sm font-semibold text-[#1F2937]">{swipeCards[swipeIndex].title}</p>
-                  <p className="text-xs text-[#6B7280]">{swipeCards[swipeIndex].brand}</p>
-                </div>
+                <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
+                <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
               </div>
-            )}
+            ))}
           </div>
         </div>
-      ) : (
-        /* Smart Suggestions Feed (After Onboarding) - Horizontal scrollable */
-        <div className="mb-8">
-          <div className="px-6">
-            <h2 className="text-sm font-bold text-[#1F2937] mb-1">Smart Suggestions</h2>
-            <p className="text-xs text-[#6B7280] mb-4">Based on your preferences</p>
-          </div>
 
-          {/* From Brands You Liked - Horizontal */}
-          <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Brands You Liked</h3>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-              {smartSuggestions.brandsYouLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
-                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
-                    <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
-                    </div>
-                    <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
-                      <Heart className="w-3 h-3 text-white" />
-                    </button>
+        {/* Products Similar to What You Liked - Horizontal */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">Similar to What You Liked</h3>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+            {smartSuggestions.similarToLiked.map((item) => (
+              <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
+                <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
+                  <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
+                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
                   </div>
-                  <p className="text-[10px] font-medium text-[#6B7280]">{item.brand}</p>
-                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
+                  <button 
+                    onClick={() => toggleFavorite(item.id, item)}
+                    className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                      favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
+                  >
+                    <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* From Stores You Liked - Horizontal */}
-          <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Stores You Liked</h3>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-              {smartSuggestions.storesYouLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
-                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
-                    <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
-                    </div>
-                    <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
-                      <Heart className="w-3 h-3 text-white" />
-                    </button>
-                  </div>
-                  <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
-                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Products Similar to What You Liked - Horizontal */}
-          <div className="mb-6">
-            <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">Similar to What You Liked</h3>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
-              {smartSuggestions.similarToLiked.map((item) => (
-                <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
-                  <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
-                    <img src={item.image} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                      <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
-                    </div>
-                    <button className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
-                      <Heart className="w-3 h-3 text-white" />
-                    </button>
-                  </div>
-                  <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
-                  <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
-                </div>
-              ))}
-            </div>
+                <p className="text-[10px] font-medium text-[#6B7280]">{item.store}</p>
+                <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
+              </div>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* From Brands You Liked - Horizontal */}
+        <div className="mb-6">
+          <h3 className="text-xs font-semibold text-[#6B7280] mb-3 px-6">From Brands You Liked</h3>
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-6">
+            {smartSuggestions.brandsYouLiked.map((item) => (
+              <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
+                <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
+                  <img src={item.image} alt="" className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
+                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
+                  </div>
+                  <button 
+                    onClick={() => toggleFavorite(item.id, item)}
+                    className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                      favorites.includes(item.id) ? 'bg-[#00A36C]' : 'bg-[#6B7280]/60'
+                    }`}
+                  >
+                    <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
+                  </button>
+                </div>
+                <p className="text-[10px] font-medium text-[#6B7280]">{item.brand}</p>
+                <p className="text-xs font-semibold text-[#1F2937]">{item.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
       <div className="px-6 pb-12 pt-4 text-center">

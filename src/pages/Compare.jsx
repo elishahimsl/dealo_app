@@ -70,17 +70,20 @@ export default function Compare() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6] pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-[#F3F4F6] via-[#E5E7EB] to-[#D1D5DB] pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-center">
         <h1 className="text-lg font-bold text-[#1F2937]">Compare</h1>
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Add Products Section */}
-        <div>
-          <h2 className="text-sm font-semibold text-[#6B7280] mb-3">Add Products</h2>
-          <div className="flex gap-3">
+        {/* Main Comparison Box */}
+        <div className="bg-white rounded-3xl p-5 border border-[#E5E7EB] shadow-sm">
+          {/* Add Products Label */}
+          <h2 className="text-xs font-medium text-[#6B7280] mb-3">Add Products</h2>
+          
+          {/* Product Tiles */}
+          <div className="flex gap-3 mb-4">
             {/* Item 1 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
@@ -89,7 +92,7 @@ export default function Compare() {
                 onMouseDown={() => item1 && setTimeout(() => handleLongPress(1), 500)}
                 onTouchStart={() => item1 && setTimeout(() => handleLongPress(1), 500)}
                 className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
-                  item1 ? 'bg-white' : 'bg-white border-2 border-dashed border-[#D1D5DB]'
+                  item1 ? 'bg-[#F9FAFB]' : 'bg-[#F9FAFB] border-2 border-[#E5E7EB]'
                 }`}
                 style={{ height: '140px' }}
               >
@@ -110,7 +113,7 @@ export default function Compare() {
                 onMouseDown={() => item2 && setTimeout(() => handleLongPress(2), 500)}
                 onTouchStart={() => item2 && setTimeout(() => handleLongPress(2), 500)}
                 className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
-                  item2 ? 'bg-white' : 'bg-white border-2 border-dashed border-[#D1D5DB]'
+                  item2 ? 'bg-[#F9FAFB]' : 'bg-[#F9FAFB] border-2 border-[#E5E7EB]'
                 }`}
                 style={{ height: '140px' }}
               >
@@ -123,42 +126,19 @@ export default function Compare() {
               {item2 && <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>}
             </div>
           </div>
-        </div>
 
-        {/* Preferences Section */}
-        <div className="bg-white rounded-2xl p-5 border border-[#E5E7EB]">
-          <h2 className="text-sm font-semibold text-[#6B7280] mb-4">Preferences</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#1F2937]">Price</span>
-                <span className="text-xs text-[#6B7280]">{pricePreference[0] < 50 ? 'Lower' : 'Higher'}</span>
-              </div>
-              <Slider value={pricePreference} onValueChange={setPricePreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
+          {/* Preferences Row */}
+          <button 
+            onClick={() => navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
+            className="w-full flex items-center justify-between py-3 px-4 hover:bg-[#F9FAFB] rounded-xl transition-colors"
+          >
+            <span className="text-sm font-medium text-[#1F2937]">Preferences</span>
+            <div className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+              <svg className="w-4 h-4 text-[#1F2937]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#1F2937]">Quality</span>
-                <span className="text-xs text-[#6B7280]">{qualityPreference[0] < 50 ? 'Lower' : 'Higher'}</span>
-              </div>
-              <Slider value={qualityPreference} onValueChange={setQualityPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#1F2937]">Brand</span>
-                <span className="text-xs text-[#6B7280]">{brandPreference[0] < 50 ? 'Less Important' : 'More Important'}</span>
-              </div>
-              <Slider value={brandPreference} onValueChange={setBrandPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#1F2937]">Durability</span>
-                <span className="text-xs text-[#6B7280]">{durabilityPreference[0] < 50 ? 'Lower' : 'Higher'}</span>
-              </div>
-              <Slider value={durabilityPreference} onValueChange={setDurabilityPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
-            </div>
-          </div>
+          </button>
         </div>
 
         {/* Analyze Button */}
@@ -171,22 +151,88 @@ export default function Compare() {
         </Button>
       </div>
 
-      {/* Upload Options Modal */}
+      {/* Bottom Sheet for Add Product Options */}
       {showUploadOptions && (
-        <div className="fixed inset-0 bg-black/40 z-50" onClick={() => setShowUploadOptions(null)}>
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] p-2 w-48" onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => { navigate(createPageUrl("Snap")); setShowUploadOptions(null); }} className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left">
-              <Camera className="w-4 h-4 text-[#6B7280]" /><span className="text-sm text-[#1F2937]">Camera</span>
-            </button>
-            <button onClick={() => { (showUploadOptions === 1 ? fileInput1Ref : fileInput2Ref).current?.click(); setShowUploadOptions(null); }} className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left">
-              <ImageIcon className="w-4 h-4 text-[#6B7280]" /><span className="text-sm text-[#1F2937]">Upload Photo</span>
-            </button>
-            <button onClick={() => { navigate(createPageUrl("SearchProducts"), { state: { slot: showUploadOptions === 1 ? 'item1' : 'item2', item1, item2 } }); setShowUploadOptions(null); }} className="flex items-center gap-2 px-4 py-2 hover:bg-[#F9FAFB] rounded-xl w-full text-left">
-              <Search className="w-4 h-4 text-[#6B7280]" /><span className="text-sm text-[#1F2937]">Search Products</span>
-            </button>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowUploadOptions(null)}>
+          <div 
+            className="bg-white rounded-t-3xl w-full pb-8 pt-4 animate-slide-up" 
+            style={{ maxHeight: '66vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Drag Handle */}
+            <div className="flex justify-center mb-4">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+
+            {/* Options */}
+            <div className="px-6 space-y-2">
+              <button 
+                onClick={() => { navigate(createPageUrl("Snap") + `?from=Compare&slot=${showUploadOptions}`); setShowUploadOptions(null); }} 
+                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
+              >
+                <span className="text-base text-[#1F2937]">Take Photo</span>
+                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <button 
+                onClick={() => { navigate(createPageUrl("SearchProducts"), { state: { slot: showUploadOptions === 1 ? 'item1' : 'item2', item1, item2 } }); setShowUploadOptions(null); }} 
+                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
+              >
+                <span className="text-base text-[#1F2937]">Search Product</span>
+                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <button 
+                onClick={() => { navigate(createPageUrl("MyCart")); setShowUploadOptions(null); }} 
+                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
+              >
+                <span className="text-base text-[#1F2937]">Choose From Saved Items</span>
+                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <button 
+                onClick={() => { navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } }); setShowUploadOptions(null); }} 
+                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
+              >
+                <span className="text-base text-[#1F2937]">Shop Sense Smart Pick</span>
+                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              <button 
+                onClick={() => { alert("Paste product URL (feature coming soon)"); setShowUploadOptions(null); }} 
+                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
+              >
+                <span className="text-base text-[#1F2937]">Import From Link</span>
+                <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slide-up {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+      `}</style>
 
       {/* Delete Slot Modal */}
       {deleteSlot && (

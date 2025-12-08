@@ -240,9 +240,9 @@ export default function Home() {
               <div key={product.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  {/* Price badge - bigger, centered text */}
-                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded flex items-center justify-center px-2 py-1">
-                    <span className="text-xs font-bold text-white leading-none">{product.price}</span>
+                  {/* Price badge - bigger box, original text size */}
+                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded flex items-center justify-center px-2.5 py-1.5">
+                    <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
                   </div>
                   {/* Heart */}
                   <button 
@@ -276,8 +276,8 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
-                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
                   </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}
@@ -303,8 +303,8 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
-                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
                   </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}
@@ -330,8 +330,8 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 inline-flex items-center justify-center">
-                    <span className="text-xs font-bold text-white leading-none">{item.price}</span>
+                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
                   </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}

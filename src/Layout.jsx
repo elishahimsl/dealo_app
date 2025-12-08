@@ -56,16 +56,11 @@ export default function Layout({ children, currentPageName }) {
                   className="flex flex-col items-center justify-center flex-1 transition-all"
                 >
                   <Icon 
-                    className={`w-6 h-6 mb-1 transition-colors ${
+                    className={`w-6 h-6 transition-colors ${
                       active ? 'text-[#00A36C]' : 'text-[#6B7280]'
                     }`}
                     strokeWidth={active ? 2.5 : 2}
                   />
-                  <span className={`text-xs font-semibold transition-colors ${
-                    active ? 'text-[#00A36C]' : 'text-[#6B7280]'
-                  }`} style={{ fontFamily: 'Nunito, sans-serif' }}>
-                    {item.name}
-                  </span>
                 </Link>
               );
             })}

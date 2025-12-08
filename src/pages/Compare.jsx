@@ -73,17 +73,17 @@ export default function Compare() {
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-center">
-        <h1 className="text-lg font-bold text-[#1F2937]">Compare</h1>
+        <h1 className="text-base font-normal text-[#1F2937]">Compare</h1>
       </div>
 
-      <div className="px-6 space-y-4">
+      <div className="px-6 space-y-6">
         {/* Main Comparison Box */}
         <div className="bg-[#2D3748] rounded-3xl p-5 shadow-sm">
           {/* Add Products Label */}
-          <h2 className="text-xs font-medium text-[#9CA3AF] mb-3">Add Products</h2>
+          <h2 className="text-xs font-medium text-white mb-3">Add Products</h2>
           
           {/* Product Tiles */}
-          <div className="flex gap-3 mb-3">
+          <div className="flex gap-3 mb-4">
             {/* Item 1 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
@@ -99,7 +99,7 @@ export default function Compare() {
                 {item1 ? (
                   <img src={item1.file_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <Plus className="w-8 h-8 text-[#9CA3AF]" />
+                  <Plus className="w-8 h-8 text-[#00A36C]" />
                 )}
               </div>
               {item1 && <p className="text-xs font-semibold text-white mt-2 text-center">{item1.price}</p>}
@@ -120,7 +120,7 @@ export default function Compare() {
                 {item2 ? (
                   <img src={item2.file_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <Plus className="w-8 h-8 text-[#9CA3AF]" />
+                  <Plus className="w-8 h-8 text-[#00A36C]" />
                 )}
               </div>
               {item2 && <p className="text-xs font-semibold text-white mt-2 text-center">{item2.price}</p>}
@@ -129,22 +129,22 @@ export default function Compare() {
 
           {/* Preferences Row */}
           <button 
-            onClick={() => navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
-            className="w-full flex items-center justify-between py-3 hover:bg-[#3D4856] rounded-xl transition-colors"
+            onClick={() => navigate(createPageUrl("Preferences"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
+            className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
           >
-            <span className="text-sm font-medium text-white">Preferences</span>
-            <div className="w-7 h-7 rounded-full bg-[#4A5568] flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
+            <span className="text-base font-semibold text-white">Preferences</span>
+            <ChevronRight className="w-5 h-5 text-white" />
           </button>
         </div>
 
         {/* Info Text */}
         <div className="px-2">
           <div className="flex items-start gap-2 mb-1">
-            <span className="text-2xl">⚡</span>
+            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#00A36C] to-[#007E52] flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+              </svg>
+            </div>
             <h3 className="text-base font-semibold text-[#1F2937]">Add two products to compare</h3>
           </div>
           <p className="text-sm text-[#6B7280] ml-8">specs, price, reviews, and AI recommendations</p>

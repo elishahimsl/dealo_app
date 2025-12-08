@@ -66,8 +66,8 @@ export default function DealScanner() {
     <div className="min-h-screen bg-[#F9FAFB] pb-24">
       {/* Header */}
       <div className="px-6 pt-6 pb-4 flex items-center justify-center relative">
-        <button onClick={() => navigate(-1)} className="absolute left-6">
-          <Tag className="w-5 h-5 text-[#1F2937]" />
+        <button onClick={() => navigate(-1)} className="absolute left-6 relative flex items-center justify-center group">
+          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
         </button>
         <h1 className="text-base font-semibold text-[#1F2937]">Deal Scanner</h1>
       </div>
@@ -137,7 +137,7 @@ export default function DealScanner() {
           <div className="flex items-center justify-between mb-3 -mx-6 px-6">
             <h2 className="text-sm font-bold text-[#1F2937]">Trending Price Drops</h2>
             <button>
-              <Bell className="w-5 h-5 text-[#6B7280]" />
+              <Bell className="w-4 h-4 text-[#6B7280]" />
             </button>
           </div>
           

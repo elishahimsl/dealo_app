@@ -70,117 +70,105 @@ export default function Compare() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[#F3F4F6] pb-24">
       {/* Header */}
-      <div className="px-6 pt-6 pb-2 flex items-center justify-center">
-        <h1 className="text-base font-medium text-[#1F2937]">Compare</h1>
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center">
+        <h1 className="text-lg font-bold text-[#1F2937]">Compare</h1>
       </div>
 
-      <div className="px-6 space-y-4">
-        {/* Comparison Area */}
-        <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] relative">
-          <div className="flex items-center justify-center gap-8">
-            {/* Item 1 */}
+      <div className="px-6 space-y-6">
+        {/* Add Products Section */}
+        <div>
+          <h2 className="text-sm font-semibold text-[#6B7280] mb-3">Add Products</h2>
+          <div className="flex gap-3">
+            {/* Item 1 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
               <div
+                onClick={() => !item1 && setShowUploadOptions(1)}
                 onMouseDown={() => item1 && setTimeout(() => handleLongPress(1), 500)}
                 onTouchStart={() => item1 && setTimeout(() => handleLongPress(1), 500)}
-                className={`w-full rounded-2xl bg-[#E5E7EB] flex items-center justify-center overflow-hidden transition-all ${item1 ? '' : 'hover:bg-[#D1D5DB]'}`}
-                style={{ height: '140px', transform: 'perspective(800px) rotateY(8deg) rotateZ(2deg)' }}
+                className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
+                  item1 ? 'bg-white' : 'bg-white border-2 border-dashed border-[#D1D5DB]'
+                }`}
+                style={{ height: '140px' }}
               >
-                {item1 && <img src={item1.file_url} alt="" className="w-full h-full object-cover" />}
+                {item1 ? (
+                  <img src={item1.file_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <Plus className="w-8 h-8 text-[#9CA3AF]" />
+                )}
               </div>
               {item1 && <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item1.price}</p>}
             </div>
 
-            {/* Item 2 */}
+            {/* Item 2 Tile */}
             <div className="flex-1">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 2)} ref={fileInput2Ref} className="hidden" />
               <div
+                onClick={() => !item2 && setShowUploadOptions(2)}
                 onMouseDown={() => item2 && setTimeout(() => handleLongPress(2), 500)}
                 onTouchStart={() => item2 && setTimeout(() => handleLongPress(2), 500)}
-                className={`w-full rounded-2xl bg-[#E5E7EB] flex items-center justify-center overflow-hidden transition-all ${item2 ? '' : 'hover:bg-[#D1D5DB]'}`}
-                style={{ height: '140px', transform: 'perspective(800px) rotateY(-8deg) rotateZ(-2deg)' }}
+                className={`w-full rounded-2xl flex items-center justify-center overflow-hidden cursor-pointer ${
+                  item2 ? 'bg-white' : 'bg-white border-2 border-dashed border-[#D1D5DB]'
+                }`}
+                style={{ height: '140px' }}
               >
-                {item2 && <img src={item2.file_url} alt="" className="w-full h-full object-cover" />}
+                {item2 ? (
+                  <img src={item2.file_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <Plus className="w-8 h-8 text-[#9CA3AF]" />
+                )}
               </div>
               {item2 && <p className="text-xs font-semibold text-[#1F2937] mt-2 text-center">{item2.price}</p>}
             </div>
           </div>
-
-          {/* VS Badge */}
-          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
-            <div className="w-10 h-10 rounded-full bg-[#00A36C] flex items-center justify-center shadow-lg border-2 border-white">
-              <span className="text-white font-bold text-xs">VS</span>
-            </div>
-          </div>
-
-          {/* Plus Button */}
-          <button onClick={() => setShowUploadOptions(showUploadOptions ? null : (!item1 ? 1 : 2))} className="absolute bottom-3 right-3 w-8 h-8 rounded-lg bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB] transition-colors">
-            <Plus className="w-5 h-5 text-[#6B7280]" />
-          </button>
         </div>
 
-        {/* ShopSense Applied Tag */}
-        {shopSenseApplied && (
-          <div className="flex justify-center">
-            <div className="flex items-center gap-1 bg-[#D6F5E9] text-[#00A36C] px-3 py-1 rounded-full text-xs font-semibold">
-              <Check className="w-3 h-3" /> ShopSense Applied
-            </div>
-          </div>
-        )}
-
-        {/* Analyze Button */}
-        <div className="flex justify-center">
-          <Button onClick={handleAnalyze} disabled={!item1 || !item2 || analyzing} className="h-8 rounded-full bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 text-xs px-6">
-            {analyzing ? <><Loader2 className="w-3 h-3 mr-2 animate-spin" />Analyzing...</> : 'Analyze'}
-          </Button>
-        </div>
-
-        {/* Preferences */}
-        <div className="pt-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-bold text-[#1F2937] text-base">Your Preferences</h3>
-              <p className="text-xs text-[#6B7280]">Set what matters to you</p>
-            </div>
-            <Button onClick={() => navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })} variant="outline" className="rounded-full h-8 px-4 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white text-xs flex items-center gap-2">
-              <Sparkles className="w-3 h-3" />Shop Sense
-            </Button>
-          </div>
-
+        {/* Preferences Section */}
+        <div className="bg-white rounded-2xl p-5 border border-[#E5E7EB]">
+          <h2 className="text-sm font-semibold text-[#6B7280] mb-4">Preferences</h2>
+          
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#1F2937]">Price</span>
-                <span className="text-xs text-[#6B7280]">{pricePreference[0] < 50 ? 'Least' : 'Most'}</span>
+                <span className="text-sm font-medium text-[#1F2937]">Price</span>
+                <span className="text-xs text-[#6B7280]">{pricePreference[0] < 50 ? 'Lower' : 'Higher'}</span>
               </div>
               <Slider value={pricePreference} onValueChange={setPricePreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#1F2937]">Quality</span>
-                <span className="text-xs text-[#6B7280]">{qualityPreference[0] < 50 ? 'Least' : 'Most'}</span>
+                <span className="text-sm font-medium text-[#1F2937]">Quality</span>
+                <span className="text-xs text-[#6B7280]">{qualityPreference[0] < 50 ? 'Lower' : 'Higher'}</span>
               </div>
               <Slider value={qualityPreference} onValueChange={setQualityPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#1F2937]">Brand</span>
-                <span className="text-xs text-[#6B7280]">{brandPreference[0] < 50 ? 'Least' : 'Most'}</span>
+                <span className="text-sm font-medium text-[#1F2937]">Brand</span>
+                <span className="text-xs text-[#6B7280]">{brandPreference[0] < 50 ? 'Less Important' : 'More Important'}</span>
               </div>
               <Slider value={brandPreference} onValueChange={setBrandPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#1F2937]">Durability</span>
-                <span className="text-xs text-[#6B7280]">{durabilityPreference[0] < 50 ? 'Least' : 'Most'}</span>
+                <span className="text-sm font-medium text-[#1F2937]">Durability</span>
+                <span className="text-xs text-[#6B7280]">{durabilityPreference[0] < 50 ? 'Lower' : 'Higher'}</span>
               </div>
               <Slider value={durabilityPreference} onValueChange={setDurabilityPreference} max={100} step={1} className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]" />
             </div>
           </div>
         </div>
+
+        {/* Analyze Button */}
+        <Button 
+          onClick={handleAnalyze} 
+          disabled={!item1 || !item2 || analyzing} 
+          className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] disabled:opacity-50 disabled:bg-[#D1D5DB] text-white font-semibold"
+        >
+          {analyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing...</> : 'Analyze'}
+        </Button>
       </div>
 
       {/* Upload Options Modal */}

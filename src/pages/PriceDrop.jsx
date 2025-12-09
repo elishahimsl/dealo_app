@@ -45,7 +45,7 @@ export default function PriceDrop() {
     ];
 
     return (
-      <div className="min-h-screen bg-[#F9FAFB] pb-24">
+      <div className="min-h-screen bg-white pb-24">
         {/* Header */}
         <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white border-b border-[#E5E7EB]">
           <button onClick={() => setSelectedProduct(null)} className="relative flex items-center justify-center group">
@@ -58,17 +58,17 @@ export default function PriceDrop() {
         </div>
 
         <div className="px-6 py-6 space-y-6">
-          {/* Product Info - No tile */}
+          {/* Product Info - Full width */}
           <div className="flex gap-4">
-            <div className="w-24 h-28 rounded-xl bg-[#F3F4F6] overflow-hidden flex-shrink-0">
+            <div className="w-32 h-36 rounded-xl bg-[#F3F4F6] overflow-hidden flex-shrink-0">
               <img src={selectedProduct.image} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1 py-1">
-              <h2 className="font-bold text-[#1F2937] text-sm mb-1">{selectedProduct.name || selectedProduct.title}</h2>
-              <p className="text-lg font-bold text-[#4B5563] mb-0.5">{selectedProduct.price}</p>
+              <h2 className="font-bold text-[#1F2937] text-base mb-2">{selectedProduct.name || selectedProduct.title}</h2>
+              <p className="text-xl font-bold text-[#4B5563] mb-1">{selectedProduct.price}</p>
               <div className="flex items-center gap-1">
-                <span className="text-xs text-[#00A36C] font-medium">↓ 6%</span>
-                <span className="text-xs text-[#6B7280]">(avg. $95)</span>
+                <span className="text-sm text-[#00A36C] font-medium">↓ 6%</span>
+                <span className="text-sm text-[#6B7280]">(avg. $95)</span>
               </div>
             </div>
           </div>
@@ -101,8 +101,8 @@ export default function PriceDrop() {
 
             {/* Chart with grid */}
             <div className="relative h-36">
-              {/* Y-axis labels */}
-              <div className="absolute left-0 top-0 bottom-4 flex flex-col justify-between text-[9px] text-[#9CA3AF] w-7">
+              {/* Y-axis labels - RIGHT SIDE */}
+              <div className="absolute right-0 top-0 bottom-0 flex flex-col justify-between text-[9px] text-[#9CA3AF] w-7 items-end">
                 <span>$100</span>
                 <span>$85</span>
                 <span>$70</span>
@@ -111,7 +111,7 @@ export default function PriceDrop() {
               </div>
 
               {/* Chart area */}
-              <div className="ml-8 h-full relative">
+              <div className="mr-8 h-full relative">
                 <svg viewBox="0 0 300 100" className="w-full h-full" preserveAspectRatio="none">
                   <defs>
                     <linearGradient id="glowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -146,16 +146,14 @@ export default function PriceDrop() {
                   
                   {/* Current point */}
                   <circle cx={(priceHistory.length - 1) * 33} cy={100 - priceHistory[priceHistory.length - 1]} r="5" fill="#00A36C" />
+                  
+                  {/* X-axis labels ON TOP of line */}
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <text key={i} x={i * 75} y={100 - priceHistory[i * 2] - 8} fontSize="9" fill="#9CA3AF" textAnchor="middle">
+                      {i === 0 ? '3' : i === 1 ? '10' : i === 2 ? '17' : i === 3 ? '24' : '30'}
+                    </text>
+                  ))}
                 </svg>
-              </div>
-              
-              {/* X-axis labels */}
-              <div className="ml-8 flex justify-between text-[9px] text-[#9CA3AF] mt-1">
-                <span>3</span>
-                <span>10</span>
-                <span>17</span>
-                <span>24</span>
-                <span>30</span>
               </div>
             </div>
           </div>
@@ -166,9 +164,21 @@ export default function PriceDrop() {
             <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
               <p className="text-2xl font-bold text-[#1F2937] mb-2">$30 - $35</p>
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm text-[#6B7280]">Moderate Confidence</span>
-                <div className="w-8 h-8 rounded-full border-2 border-[#00A36C] flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-[#00A36C]">65%</span>
+                <span className="text-sm text-[#6B7280]">
+                  {65 < 25 ? 'Low Confidence' : 65 <= 50 ? 'Moderate Confidence' : 65 <= 75 ? 'Moderate Confidence' : 'High Confidence'}
+                </span>
+                <div 
+                  className={`w-8 h-8 rounded-full border-2 flex items-center justify-center ${
+                    65 < 25 ? 'border-red-500' : 65 <= 50 ? 'border-yellow-500' : 65 <= 75 ? 'border-yellow-500' : 'border-[#00A36C]'
+                  }`}
+                >
+                  <span 
+                    className={`text-[10px] font-bold ${
+                      65 < 25 ? 'text-red-500' : 65 <= 50 ? 'text-yellow-500' : 65 <= 75 ? 'text-yellow-500' : 'text-[#00A36C]'
+                    }`}
+                  >
+                    65%
+                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">

@@ -334,8 +334,14 @@ Provide a detailed comparison and recommendation.`,
               </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto px-6 pb-6">
-              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 space-y-6">
+            <div className="flex-1 overflow-y-auto px-6 pb-32">
+              <div 
+                className="rounded-2xl p-4 space-y-6 relative"
+                style={{
+                  background: 'linear-gradient(white, white) padding-box, linear-gradient(135deg, #E5E7EB, #D1D5DB, #9CA3AF) border-box',
+                  border: '2px solid transparent'
+                }}
+              >
                 {/* Brand Importance */}
                 <div>
                   <label className="text-xs font-medium text-[#6B7280] mb-3 block">Brand Importance</label>

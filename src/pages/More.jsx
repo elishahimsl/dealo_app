@@ -68,11 +68,12 @@ export default function Discover() {
 
   return (
     <div className="min-h-screen bg-white pb-24 relative overflow-hidden">
-      {/* Green gradient splash in top left */}
+      {/* Green splash in top right */}
       <div 
-        className="absolute top-0 left-0 w-96 h-96 pointer-events-none"
+        className="absolute -top-20 -right-20 w-72 h-72 rounded-full pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at top left, rgba(0, 163, 108, 0.12) 0%, rgba(0, 163, 108, 0.06) 40%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(0, 163, 108, 0.18) 0%, rgba(0, 163, 108, 0.08) 35%, transparent 65%)',
+          filter: 'blur(40px)',
           zIndex: 0
         }}
       />

@@ -168,17 +168,17 @@ Provide a detailed comparison and recommendation.`,
           </div>
 
           {/* Preferences Row */}
-          <button 
-            onClick={() => setShowPreferences(true)}
-            className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
-          >
+          <div className="w-full flex items-center justify-between">
             <span className="text-base font-semibold text-white">Preferences</span>
-            <div className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
+            <button 
+              onClick={() => setShowPreferences(true)}
+              className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#4B5563] transition-colors"
+            >
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Info Text */}

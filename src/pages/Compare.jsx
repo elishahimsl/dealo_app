@@ -279,24 +279,47 @@ Provide a detailed comparison and recommendation.`,
       {showPreferences && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowPreferences(false)}>
           <div 
-            className="bg-white rounded-t-3xl w-full pb-8 pt-6 animate-slide-up overflow-y-auto" 
+            className="bg-white rounded-t-3xl w-full animate-slide-up overflow-hidden flex flex-col" 
             style={{ height: '85vh' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6 h-full flex flex-col">
-              {/* Drag Handle */}
-              <div className="flex justify-center mb-4">
-                <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
-              </div>
+            {/* Drag Handle */}
+            <div 
+              className="flex justify-center py-3 cursor-pointer"
+              onTouchStart={(e) => {
+                const startY = e.touches[0].clientY;
+                const handleTouchMove = (e) => {
+                  const currentY = e.touches[0].clientY;
+                  if (currentY - startY > 100) {
+                    setShowPreferences(false);
+                  }
+                };
+                document.addEventListener('touchmove', handleTouchMove);
+                document.addEventListener('touchend', () => {
+                  document.removeEventListener('touchmove', handleTouchMove);
+                }, { once: true });
+              }}
+            >
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
 
-              <h2 className="text-xl font-bold text-[#1F2937] mb-6">Product Priorities</h2>
-              
-              <div className="flex-1 space-y-6 overflow-y-auto pb-4">
+            {/* Header */}
+            <div className="px-6 pb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-[#1F2937]">Product Priorities</h2>
+              <button className="flex flex-col gap-1">
+                <div className="w-5 h-0.5 bg-[#1F2937]" />
+                <div className="w-5 h-0.5 bg-[#1F2937]" />
+                <div className="w-5 h-0.5 bg-[#1F2937]" />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              <div className="space-y-6">
                 {/* Brand Importance */}
                 <div>
                   <label className="text-sm font-medium text-[#1F2937] mb-3 block">Brand Importance</label>
-                  <div className="relative">
-                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                  <div className="relative px-3">
+                    <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -307,21 +330,22 @@ Provide a detailed comparison and recommendation.`,
                       max="100"
                       value={brandPreference[0]}
                       onChange={(e) => setBrandPreference([parseInt(e.target.value)])}
-                      className="slider-custom w-full"
+                      className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-value': brandPreference[0] }}
                     />
-                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
-                      <span>Low</span>
-                      <span className="font-semibold text-[#1F2937]">Fair</span>
-                      <span>High</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
+                    <span>Low</span>
+                    <span className="font-semibold text-[#1F2937]">Fair</span>
+                    <span>High</span>
                   </div>
                 </div>
 
                 {/* Price */}
                 <div>
                   <label className="text-sm font-medium text-[#1F2937] mb-3 block">Price</label>
-                  <div className="relative">
-                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                  <div className="relative px-3">
+                    <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -332,21 +356,22 @@ Provide a detailed comparison and recommendation.`,
                       max="100"
                       value={pricePreference[0]}
                       onChange={(e) => setPricePreference([parseInt(e.target.value)])}
-                      className="slider-custom w-full"
+                      className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-value': pricePreference[0] }}
                     />
-                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
-                      <span>Low</span>
-                      <span className="font-semibold text-[#1F2937]">Fair</span>
-                      <span>High</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
+                    <span>Low</span>
+                    <span className="font-semibold text-[#1F2937]">Fair</span>
+                    <span>High</span>
                   </div>
                 </div>
 
                 {/* Durability */}
                 <div>
                   <label className="text-sm font-medium text-[#1F2937] mb-3 block">Durability</label>
-                  <div className="relative">
-                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                  <div className="relative px-3">
+                    <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -357,21 +382,22 @@ Provide a detailed comparison and recommendation.`,
                       max="100"
                       value={durabilityPreference[0]}
                       onChange={(e) => setDurabilityPreference([parseInt(e.target.value)])}
-                      className="slider-custom w-full"
+                      className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-value': durabilityPreference[0] }}
                     />
-                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
-                      <span>Low</span>
-                      <span className="font-semibold text-[#1F2937]">Fair</span>
-                      <span>High</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
+                    <span>Low</span>
+                    <span className="font-semibold text-[#1F2937]">Fair</span>
+                    <span>High</span>
                   </div>
                 </div>
 
                 {/* Reviews */}
                 <div>
                   <label className="text-sm font-medium text-[#1F2937] mb-3 block">Reviews</label>
-                  <div className="relative">
-                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                  <div className="relative px-3">
+                    <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -382,21 +408,22 @@ Provide a detailed comparison and recommendation.`,
                       max="100"
                       value={reviewsPreference[0]}
                       onChange={(e) => setReviewsPreference([parseInt(e.target.value)])}
-                      className="slider-custom w-full"
+                      className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-value': reviewsPreference[0] }}
                     />
-                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
-                      <span>Low</span>
-                      <span className="font-semibold text-[#1F2937]">Fair</span>
-                      <span>High</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
+                    <span>Low</span>
+                    <span className="font-semibold text-[#1F2937]">Fair</span>
+                    <span>High</span>
                   </div>
                 </div>
 
                 {/* Originality */}
                 <div>
                   <label className="text-sm font-medium text-[#1F2937] mb-3 block">Originality</label>
-                  <div className="relative">
-                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                  <div className="relative px-3">
+                    <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -407,20 +434,23 @@ Provide a detailed comparison and recommendation.`,
                       max="100"
                       value={qualityPreference[0]}
                       onChange={(e) => setQualityPreference([parseInt(e.target.value)])}
-                      className="slider-custom w-full"
+                      className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-value': qualityPreference[0] }}
                     />
-                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
-                      <span>Low</span>
-                      <span className="font-semibold text-[#1F2937]">Fair</span>
-                      <span>High</span>
-                    </div>
+                  </div>
+                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
+                    <span>Low</span>
+                    <span className="font-semibold text-[#1F2937]">Fair</span>
+                    <span>High</span>
                   </div>
                 </div>
               </div>
+            </div>
 
+            <div className="px-6 pb-6 pt-4 bg-white border-t border-[#E5E7EB]">
               <Button 
                 onClick={() => setShowPreferences(false)}
-                className="w-full h-12 rounded-full bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold mt-4"
+                className="w-full h-12 rounded-full bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
               >
                 Analyze
               </Button>
@@ -448,9 +478,9 @@ Provide a detailed comparison and recommendation.`,
           appearance: none;
           background: transparent;
           outline: none;
-          height: 0;
-          position: relative;
-          top: -10px;
+          height: 8px;
+          cursor: pointer;
+          padding: 0 12px;
         }
         
         .slider-custom::-webkit-slider-thumb {
@@ -463,6 +493,7 @@ Provide a detailed comparison and recommendation.`,
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+          margin-top: -8px;
         }
         
         .slider-custom::-moz-range-thumb {
@@ -473,6 +504,13 @@ Provide a detailed comparison and recommendation.`,
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .slider-custom::-webkit-slider-thumb {
+          border-color: ${props => {
+            const val = props.value || 50;
+            return val < 33 ? '#EF4444' : val < 66 ? '#F59E0B' : '#10B981';
+          }};
         }
       `}</style>
 

@@ -352,7 +352,7 @@ Provide a detailed comparison and recommendation.`,
                       value={brandPreference[0]}
                       onChange={(e) => setBrandPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
-                      style={{ '--slider-value': brandPreference[0] }}
+                      data-value={brandPreference[0]}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
@@ -378,7 +378,7 @@ Provide a detailed comparison and recommendation.`,
                       value={pricePreference[0]}
                       onChange={(e) => setPricePreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
-                      style={{ '--slider-value': pricePreference[0] }}
+                      data-value={pricePreference[0]}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
@@ -404,7 +404,7 @@ Provide a detailed comparison and recommendation.`,
                       value={durabilityPreference[0]}
                       onChange={(e) => setDurabilityPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
-                      style={{ '--slider-value': durabilityPreference[0] }}
+                      data-value={durabilityPreference[0]}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
@@ -430,7 +430,7 @@ Provide a detailed comparison and recommendation.`,
                       value={reviewsPreference[0]}
                       onChange={(e) => setReviewsPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
-                      style={{ '--slider-value': reviewsPreference[0] }}
+                      data-value={reviewsPreference[0]}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
@@ -456,7 +456,7 @@ Provide a detailed comparison and recommendation.`,
                       value={qualityPreference[0]}
                       onChange={(e) => setQualityPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
-                      style={{ '--slider-value': qualityPreference[0] }}
+                      data-value={qualityPreference[0]}
                     />
                   </div>
                   <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
@@ -510,7 +510,6 @@ Provide a detailed comparison and recommendation.`,
           width: 18px;
           height: 18px;
           background: white;
-          border: 4px solid #F59E0B;
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -521,10 +520,119 @@ Provide a detailed comparison and recommendation.`,
           width: 18px;
           height: 18px;
           background: white;
-          border: 4px solid #F59E0B;
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .slider-custom[data-value="0"]::-webkit-slider-thumb,
+        .slider-custom[data-value="1"]::-webkit-slider-thumb,
+        .slider-custom[data-value="2"]::-webkit-slider-thumb,
+        .slider-custom[data-value="3"]::-webkit-slider-thumb,
+        .slider-custom[data-value="4"]::-webkit-slider-thumb,
+        .slider-custom[data-value="5"]::-webkit-slider-thumb,
+        .slider-custom[data-value="6"]::-webkit-slider-thumb,
+        .slider-custom[data-value="7"]::-webkit-slider-thumb,
+        .slider-custom[data-value="8"]::-webkit-slider-thumb,
+        .slider-custom[data-value="9"]::-webkit-slider-thumb,
+        .slider-custom[data-value="10"]::-webkit-slider-thumb,
+        .slider-custom[data-value="11"]::-webkit-slider-thumb,
+        .slider-custom[data-value="12"]::-webkit-slider-thumb,
+        .slider-custom[data-value="13"]::-webkit-slider-thumb,
+        .slider-custom[data-value="14"]::-webkit-slider-thumb,
+        .slider-custom[data-value="15"]::-webkit-slider-thumb,
+        .slider-custom[data-value="16"]::-webkit-slider-thumb,
+        .slider-custom[data-value="17"]::-webkit-slider-thumb,
+        .slider-custom[data-value="18"]::-webkit-slider-thumb,
+        .slider-custom[data-value="19"]::-webkit-slider-thumb,
+        .slider-custom[data-value="20"]::-webkit-slider-thumb,
+        .slider-custom[data-value="21"]::-webkit-slider-thumb,
+        .slider-custom[data-value="22"]::-webkit-slider-thumb,
+        .slider-custom[data-value="23"]::-webkit-slider-thumb,
+        .slider-custom[data-value="24"]::-webkit-slider-thumb,
+        .slider-custom[data-value="25"]::-webkit-slider-thumb,
+        .slider-custom[data-value="26"]::-webkit-slider-thumb,
+        .slider-custom[data-value="27"]::-webkit-slider-thumb,
+        .slider-custom[data-value="28"]::-webkit-slider-thumb,
+        .slider-custom[data-value="29"]::-webkit-slider-thumb,
+        .slider-custom[data-value="30"]::-webkit-slider-thumb,
+        .slider-custom[data-value="31"]::-webkit-slider-thumb,
+        .slider-custom[data-value="32"]::-webkit-slider-thumb {
+          border: 4px solid #EF4444;
+        }
+        
+        .slider-custom[data-value="33"]::-webkit-slider-thumb,
+        .slider-custom[data-value="34"]::-webkit-slider-thumb,
+        .slider-custom[data-value="35"]::-webkit-slider-thumb,
+        .slider-custom[data-value="36"]::-webkit-slider-thumb,
+        .slider-custom[data-value="37"]::-webkit-slider-thumb,
+        .slider-custom[data-value="38"]::-webkit-slider-thumb,
+        .slider-custom[data-value="39"]::-webkit-slider-thumb,
+        .slider-custom[data-value="40"]::-webkit-slider-thumb,
+        .slider-custom[data-value="41"]::-webkit-slider-thumb,
+        .slider-custom[data-value="42"]::-webkit-slider-thumb,
+        .slider-custom[data-value="43"]::-webkit-slider-thumb,
+        .slider-custom[data-value="44"]::-webkit-slider-thumb,
+        .slider-custom[data-value="45"]::-webkit-slider-thumb,
+        .slider-custom[data-value="46"]::-webkit-slider-thumb,
+        .slider-custom[data-value="47"]::-webkit-slider-thumb,
+        .slider-custom[data-value="48"]::-webkit-slider-thumb,
+        .slider-custom[data-value="49"]::-webkit-slider-thumb,
+        .slider-custom[data-value="50"]::-webkit-slider-thumb,
+        .slider-custom[data-value="51"]::-webkit-slider-thumb,
+        .slider-custom[data-value="52"]::-webkit-slider-thumb,
+        .slider-custom[data-value="53"]::-webkit-slider-thumb,
+        .slider-custom[data-value="54"]::-webkit-slider-thumb,
+        .slider-custom[data-value="55"]::-webkit-slider-thumb,
+        .slider-custom[data-value="56"]::-webkit-slider-thumb,
+        .slider-custom[data-value="57"]::-webkit-slider-thumb,
+        .slider-custom[data-value="58"]::-webkit-slider-thumb,
+        .slider-custom[data-value="59"]::-webkit-slider-thumb,
+        .slider-custom[data-value="60"]::-webkit-slider-thumb,
+        .slider-custom[data-value="61"]::-webkit-slider-thumb,
+        .slider-custom[data-value="62"]::-webkit-slider-thumb,
+        .slider-custom[data-value="63"]::-webkit-slider-thumb,
+        .slider-custom[data-value="64"]::-webkit-slider-thumb,
+        .slider-custom[data-value="65"]::-webkit-slider-thumb {
+          border: 4px solid #F59E0B;
+        }
+        
+        .slider-custom[data-value="66"]::-webkit-slider-thumb,
+        .slider-custom[data-value="67"]::-webkit-slider-thumb,
+        .slider-custom[data-value="68"]::-webkit-slider-thumb,
+        .slider-custom[data-value="69"]::-webkit-slider-thumb,
+        .slider-custom[data-value="70"]::-webkit-slider-thumb,
+        .slider-custom[data-value="71"]::-webkit-slider-thumb,
+        .slider-custom[data-value="72"]::-webkit-slider-thumb,
+        .slider-custom[data-value="73"]::-webkit-slider-thumb,
+        .slider-custom[data-value="74"]::-webkit-slider-thumb,
+        .slider-custom[data-value="75"]::-webkit-slider-thumb,
+        .slider-custom[data-value="76"]::-webkit-slider-thumb,
+        .slider-custom[data-value="77"]::-webkit-slider-thumb,
+        .slider-custom[data-value="78"]::-webkit-slider-thumb,
+        .slider-custom[data-value="79"]::-webkit-slider-thumb,
+        .slider-custom[data-value="80"]::-webkit-slider-thumb,
+        .slider-custom[data-value="81"]::-webkit-slider-thumb,
+        .slider-custom[data-value="82"]::-webkit-slider-thumb,
+        .slider-custom[data-value="83"]::-webkit-slider-thumb,
+        .slider-custom[data-value="84"]::-webkit-slider-thumb,
+        .slider-custom[data-value="85"]::-webkit-slider-thumb,
+        .slider-custom[data-value="86"]::-webkit-slider-thumb,
+        .slider-custom[data-value="87"]::-webkit-slider-thumb,
+        .slider-custom[data-value="88"]::-webkit-slider-thumb,
+        .slider-custom[data-value="89"]::-webkit-slider-thumb,
+        .slider-custom[data-value="90"]::-webkit-slider-thumb,
+        .slider-custom[data-value="91"]::-webkit-slider-thumb,
+        .slider-custom[data-value="92"]::-webkit-slider-thumb,
+        .slider-custom[data-value="93"]::-webkit-slider-thumb,
+        .slider-custom[data-value="94"]::-webkit-slider-thumb,
+        .slider-custom[data-value="95"]::-webkit-slider-thumb,
+        .slider-custom[data-value="96"]::-webkit-slider-thumb,
+        .slider-custom[data-value="97"]::-webkit-slider-thumb,
+        .slider-custom[data-value="98"]::-webkit-slider-thumb,
+        .slider-custom[data-value="99"]::-webkit-slider-thumb,
+        .slider-custom[data-value="100"]::-webkit-slider-thumb {
+          border: 4px solid #10B981;
         }
       `}</style>
 

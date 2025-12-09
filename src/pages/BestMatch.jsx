@@ -98,14 +98,16 @@ export default function BestMatch() {
           </svg>
         </button>
         <h1 className="text-lg font-semibold text-[#1F2937]">DeaLo AI</h1>
+        <button className="absolute right-6 w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center">
+          <HelpCircle className="w-4 h-4 text-[#6B7280]" />
+        </button>
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto px-6 py-6 relative">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center px-6">
-            <h2 className="text-2xl font-bold text-[#1F2937] mb-2">Hi, I'm DeaLo!</h2>
-            <p className="text-[#6B7280] text-sm">What are you looking for today?</p>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <h2 className="text-2xl font-bold text-[#1F2937]">Hi, I'm DeaLo!</h2>
           </div>
         )}
 
@@ -200,19 +202,21 @@ export default function BestMatch() {
             onClick={() => setShowInspiration(true)}
             className="flex-shrink-0"
           >
-            <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-              <path d="M2 2l7.586 7.586"/>
-              <circle cx="11" cy="11" r="2"/>
+            <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
             </svg>
           </button>
           <button 
             onClick={handleSendMessage}
-            className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-[#6B7280] flex items-center justify-center"
+            disabled={!inputText.trim()}
+            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+              inputText.trim() 
+                ? 'bg-[#1F2937]' 
+                : 'bg-[#E5E7EB]'
+            }`}
           >
-            <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            <svg className={`w-4 h-4 ${inputText.trim() ? 'text-white' : 'text-[#9CA3AF]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5c0 0 7 4.5 7 7s-7 7-7 7" />
             </svg>
           </button>
         </div>

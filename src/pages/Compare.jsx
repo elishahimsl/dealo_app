@@ -22,6 +22,7 @@ export default function Compare() {
   const [qualityPreference, setQualityPreference] = useState(location.state?.preferences?.quality || [50]);
   const [brandPreference, setBrandPreference] = useState(location.state?.preferences?.brand || [50]);
   const [durabilityPreference, setDurabilityPreference] = useState(location.state?.preferences?.durability || [50]);
+  const [reviewsPreference, setReviewsPreference] = useState([50]);
 
   const handleFileSelect = async (file, itemNumber) => {
     try {
@@ -167,17 +168,17 @@ Provide a detailed comparison and recommendation.`,
           </div>
 
           {/* Preferences Row */}
-          <div className="w-full flex items-center justify-between">
+          <button 
+            onClick={() => setShowPreferences(true)}
+            className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
+          >
             <span className="text-base font-semibold text-white">Preferences</span>
-            <button 
-              onClick={() => navigate(createPageUrl("Preferences"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
-              className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#4B5563] transition-colors"
-            >
+            <div className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </button>
-          </div>
+            </div>
+          </button>
         </div>
 
         {/* Info Text */}
@@ -195,7 +196,7 @@ Provide a detailed comparison and recommendation.`,
         <Button 
           onClick={handleAnalyze} 
           disabled={!item1 || !item2}
-          className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
+          className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold disabled:opacity-50"
         >
           {analyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Analyzing...</> : 'Analyze'}
         </Button>
@@ -274,110 +275,154 @@ Provide a detailed comparison and recommendation.`,
         </div>
       )}
 
-      {/* Preferences Modal */}
+      {/* Preferences Modal - Slide Up Sheet */}
       {showPreferences && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end" onClick={() => setShowPreferences(false)}>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowPreferences(false)}>
           <div 
             className="bg-white rounded-t-3xl w-full pb-8 pt-6 animate-slide-up overflow-y-auto" 
-            style={{ maxHeight: '85vh' }}
+            style={{ height: '85vh' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="px-6">
-              <h2 className="text-xl font-bold text-[#1F2937] mb-6">Preferences</h2>
+            <div className="px-6 h-full flex flex-col">
+              {/* Drag Handle */}
+              <div className="flex justify-center mb-4">
+                <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+              </div>
+
+              <h2 className="text-xl font-bold text-[#1F2937] mb-6">Product Priorities</h2>
               
-              {/* Price */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Price</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
+              <div className="flex-1 space-y-6 overflow-y-auto pb-4">
+                {/* Brand Importance */}
+                <div>
+                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Brand Importance</label>
+                  <div className="relative">
+                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                      <div className="flex-1 bg-[#EF4444]" />
+                      <div className="flex-1 bg-[#F59E0B]" />
+                      <div className="flex-1 bg-[#10B981]" />
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={brandPreference[0]}
+                      onChange={(e) => setBrandPreference([parseInt(e.target.value)])}
+                      className="slider-custom w-full"
+                    />
+                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                      <span>Low</span>
+                      <span className="font-semibold text-[#1F2937]">Fair</span>
+                      <span>High</span>
+                    </div>
+                  </div>
                 </div>
-                <Slider value={pricePreference} onValueChange={setPricePreference} max={100} step={1} className="w-full" />
-              </div>
 
-              {/* Quality */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Quality</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {qualityPreference[0] >= 80 ? 'Most Important' : qualityPreference[0] >= 60 ? 'Very Important' : qualityPreference[0] >= 40 ? 'Important' : qualityPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
+                {/* Price */}
+                <div>
+                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Price</label>
+                  <div className="relative">
+                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                      <div className="flex-1 bg-[#EF4444]" />
+                      <div className="flex-1 bg-[#F59E0B]" />
+                      <div className="flex-1 bg-[#10B981]" />
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={pricePreference[0]}
+                      onChange={(e) => setPricePreference([parseInt(e.target.value)])}
+                      className="slider-custom w-full"
+                    />
+                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                      <span>Low</span>
+                      <span className="font-semibold text-[#1F2937]">Fair</span>
+                      <span>High</span>
+                    </div>
+                  </div>
                 </div>
-                <Slider value={qualityPreference} onValueChange={setQualityPreference} max={100} step={1} className="w-full" />
-              </div>
 
-              {/* Brand */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Brand</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {brandPreference[0] >= 80 ? 'Most Important' : brandPreference[0] >= 60 ? 'Very Important' : brandPreference[0] >= 40 ? 'Important' : brandPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
+                {/* Durability */}
+                <div>
+                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Durability</label>
+                  <div className="relative">
+                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                      <div className="flex-1 bg-[#EF4444]" />
+                      <div className="flex-1 bg-[#F59E0B]" />
+                      <div className="flex-1 bg-[#10B981]" />
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={durabilityPreference[0]}
+                      onChange={(e) => setDurabilityPreference([parseInt(e.target.value)])}
+                      className="slider-custom w-full"
+                    />
+                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                      <span>Low</span>
+                      <span className="font-semibold text-[#1F2937]">Fair</span>
+                      <span>High</span>
+                    </div>
+                  </div>
                 </div>
-                <Slider value={brandPreference} onValueChange={setBrandPreference} max={100} step={1} className="w-full" />
-              </div>
 
-              {/* Durability */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Durability</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {durabilityPreference[0] >= 80 ? 'Most Important' : durabilityPreference[0] >= 60 ? 'Very Important' : durabilityPreference[0] >= 40 ? 'Important' : durabilityPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
+                {/* Reviews */}
+                <div>
+                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Reviews</label>
+                  <div className="relative">
+                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                      <div className="flex-1 bg-[#EF4444]" />
+                      <div className="flex-1 bg-[#F59E0B]" />
+                      <div className="flex-1 bg-[#10B981]" />
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={reviewsPreference[0]}
+                      onChange={(e) => setReviewsPreference([parseInt(e.target.value)])}
+                      className="slider-custom w-full"
+                    />
+                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                      <span>Low</span>
+                      <span className="font-semibold text-[#1F2937]">Fair</span>
+                      <span>High</span>
+                    </div>
+                  </div>
                 </div>
-                <Slider value={durabilityPreference} onValueChange={setDurabilityPreference} max={100} step={1} className="w-full" />
-              </div>
 
-              {/* Sustainability */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Sustainability</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
+                {/* Originality */}
+                <div>
+                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Originality</label>
+                  <div className="relative">
+                    <div className="h-2 rounded-full overflow-hidden flex mb-2">
+                      <div className="flex-1 bg-[#EF4444]" />
+                      <div className="flex-1 bg-[#F59E0B]" />
+                      <div className="flex-1 bg-[#10B981]" />
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={qualityPreference[0]}
+                      onChange={(e) => setQualityPreference([parseInt(e.target.value)])}
+                      className="slider-custom w-full"
+                    />
+                    <div className="flex justify-between text-xs text-[#9CA3AF] mt-1">
+                      <span>Low</span>
+                      <span className="font-semibold text-[#1F2937]">Fair</span>
+                      <span>High</span>
+                    </div>
+                  </div>
                 </div>
-                <Slider value={[50]} max={100} step={1} className="w-full" />
-              </div>
-
-              {/* Features */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Features</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
-                </div>
-                <Slider value={[50]} max={100} step={1} className="w-full" />
-              </div>
-
-              {/* Design */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Design</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
-                </div>
-                <Slider value={[50]} max={100} step={1} className="w-full" />
-              </div>
-
-              {/* Customer Reviews */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-semibold text-[#1F2937]">Customer Reviews</label>
-                  <span className="text-sm text-[#6B7280]">
-                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
-                  </span>
-                </div>
-                <Slider value={[50]} max={100} step={1} className="w-full" />
               </div>
 
               <Button 
                 onClick={() => setShowPreferences(false)}
-                className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
+                className="w-full h-12 rounded-full bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold mt-4"
               >
-                Apply
+                Analyze
               </Button>
             </div>
           </div>
@@ -395,6 +440,39 @@ Provide a detailed comparison and recommendation.`,
         }
         .animate-slide-up {
           animation: slide-up 0.3s ease-out;
+        }
+        
+        /* Custom slider styling */
+        .slider-custom {
+          -webkit-appearance: none;
+          appearance: none;
+          background: transparent;
+          outline: none;
+          height: 0;
+          position: relative;
+          top: -10px;
+        }
+        
+        .slider-custom::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 24px;
+          height: 24px;
+          background: white;
+          border: 3px solid #F59E0B;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .slider-custom::-moz-range-thumb {
+          width: 24px;
+          height: 24px;
+          background: white;
+          border: 3px solid #F59E0B;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
       `}</style>
 

@@ -106,8 +106,9 @@ export default function BestMatch() {
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 relative">
         {messages.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <h2 className="text-2xl font-bold text-[#1F2937]">Hi, I'm DeaLo!</h2>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <h2 className="text-2xl font-bold text-[#1F2937] mb-2">Hi, I'm DeaLo!</h2>
+            <p className="text-[#6B7280] text-sm">What are you looking for today?</p>
           </div>
         )}
 

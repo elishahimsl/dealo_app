@@ -51,7 +51,7 @@ export default function Profile() {
   const activityRows = [
     { icon: Clock, label: "Recent Searches", page: "DiscoverSearch" },
     { icon: Camera, label: "Scan History", page: "RecentlyViewed" },
-    { icon: Scale, label: "Compare History", page: "Compare" },
+    { icon: Layers, label: "Compare History", page: "Compare" },
   ];
 
   // Settings Modal

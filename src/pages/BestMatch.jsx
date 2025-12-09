@@ -1,189 +1,405 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Tag, HelpCircle, Lightbulb, Clock, Heart, Camera, Plus } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
+import { HelpCircle, Send, Wand2, Plus, Camera, Image as ImageIcon, Bookmark, Sparkles, TrendingUp, Home, ShoppingBag, X } from "lucide-react";
 
 export default function BestMatch() {
   const navigate = useNavigate();
-  const [activeMode, setActiveMode] = useState("style");
-  const [showInfoSheet, setShowInfoSheet] = useState(false);
   const [inputText, setInputText] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [showPlusMenu, setShowPlusMenu] = useState(false);
+  const [showInspiration, setShowInspiration] = useState(false);
+  const [showSavedItems, setShowSavedItems] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(null);
+  const [activeResultTab, setActiveResultTab] = useState("topPicks");
+  const [isLoading, setIsLoading] = useState(false);
+  const chatEndRef = useRef(null);
 
-  const actionBubbles = [
-    { id: "inspo", icon: Lightbulb, label: "Inspo" },
-    { id: "recents", icon: Clock, label: "Recents" },
-    { id: "saved", icon: Heart, label: "Saved" },
-  ];
+  const { data: savedItems = [] } = useQuery({
+    queryKey: ['captures'],
+    queryFn: () => base44.entities.Capture.list(),
+  });
 
-  const suggestions = [
-    { id: 1, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300", brand: "Nike", product: "Air Max 90", price: "$89.99" },
-    { id: 2, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300", brand: "Sony", product: "WH-1000XM5", price: "$279.99" },
-    { id: 3, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300", brand: "Apple", product: "Watch Series 9", price: "$399.99" },
-    { id: 4, image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300", brand: "Nike", product: "Tech Hoodie", price: "$89.99" },
-  ];
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSendMessage = async () => {
+    if (!inputText.trim()) return;
+    
+    const userMessage = { type: 'user', text: inputText };
+    setMessages(prev => [...prev, userMessage]);
+    setInputText("");
+    setIsLoading(true);
+
+    try {
+      const aiResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `User is looking for: "${inputText}". Generate 3-4 product recommendations with the following details for each:
+        - Product name/title
+        - Price (realistic, format: $XX.XX)
+        - Store name
+        - A brief reason why it's recommended (e.g., "Best value for the price", "25% cheaper than similar items", "Closest match to your request")
+        - Badge type: "Best Deal", "Best Match", or null
+        - Product image URL from Unsplash related to the product type`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  price: { type: "string" },
+                  store: { type: "string" },
+                  reason: { type: "string" },
+                  badge: { type: "string" },
+                  image_url: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      setMessages(prev => [...prev, { type: 'ai', products: aiResponse.products }]);
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+    }
+    
+    setIsLoading(false);
+  };
+
+  const insertSavedItem = (item) => {
+    setMessages(prev => [...prev, {
+      type: 'saved',
+      product: {
+        title: item.title,
+        image_url: item.file_url,
+        price: "$0.00",
+        store: "Saved Item"
+      }
+    }]);
+    setShowSavedItems(false);
+  };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24 flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="relative flex items-center justify-center group">
-          <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
-        </button>
-        
-        <h1 className="text-lg font-bold text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>
-          DeaLo <span className="text-[#00A36C]">AI</span>
-        </h1>
-        
-        <button onClick={() => setShowInfoSheet(true)} className="w-7 h-7 rounded-full border border-[#E5E7EB] flex items-center justify-center">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-[#F3F4F6]">
+        <h1 className="text-2xl font-bold text-[#1F2937]">DeaLo AI</h1>
+        <button className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center">
           <HelpCircle className="w-4 h-4 text-[#6B7280]" />
         </button>
       </div>
 
-      {/* Mode Toggle - Style / Deals as tabs */}
-      <div className="px-6 mb-6">
-        <div className="flex items-center justify-center gap-2">
-          <button
-            onClick={() => setActiveMode("style")}
-            className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-              activeMode === "style" 
-                ? 'bg-[#00A36C] text-white' 
-                : 'bg-white text-[#6B7280] border border-[#E5E7EB]'
-            }`}
-          >
-            Style
-          </button>
-          <button
-            onClick={() => setActiveMode("deals")}
-            className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
-              activeMode === "deals" 
-                ? 'bg-[#00A36C] text-white' 
-                : 'bg-white text-[#6B7280] border border-[#E5E7EB]'
-            }`}
-          >
-            Deals
-          </button>
-        </div>
-      </div>
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto px-6 py-6">
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-20 h-20 rounded-full bg-[#00A36C]/10 flex items-center justify-center mb-4">
+              <Sparkles className="w-10 h-10 text-[#00A36C]" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#1F2937] mb-2">Hi, I'm DeaLo!</h2>
+            <p className="text-[#6B7280] text-sm">What are you looking for today?</p>
+          </div>
+        )}
 
-      {/* Action Bubbles */}
-      <div className="px-6 mb-6">
-        <div className="flex justify-center gap-3">
-          {actionBubbles.map((bubble) => {
-            const Icon = bubble.icon;
-            return (
-              <button 
-                key={bubble.id}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#E5E7EB] shadow-sm"
-              >
-                <Icon className="w-4 h-4 text-[#6B7280]" />
-                <span className="text-xs font-medium text-[#1F2937]">{bubble.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Suggestions */}
-      <div className="flex-1 px-6 mb-6">
-        <h3 className="text-sm font-bold text-[#1F2937] mb-3">Suggestions</h3>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
-          {suggestions.map((item) => (
-            <div key={item.id} className="flex-shrink-0" style={{ width: '140px' }}>
-              {/* Image tile only */}
-              <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
-                <img src={item.image} alt="" className="w-full h-full object-cover" />
-                {/* Price badge - green bg, white text */}
-                <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-0.5">
-                  <span className="text-[10px] font-bold text-white">{item.price}</span>
+        {messages.map((msg, idx) => (
+          <div key={idx} className="mb-4">
+            {msg.type === 'user' && (
+              <div className="flex justify-end">
+                <div className="bg-[#F3F4F6] rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%]">
+                  <p className="text-sm text-[#1F2937]">{msg.text}</p>
                 </div>
-                {/* Heart */}
-                <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#6B7280]/60 flex items-center justify-center">
-                  <Heart className="w-3.5 h-3.5 text-white" />
+              </div>
+            )}
+            
+            {msg.type === 'ai' && (
+              <div className="space-y-3">
+                {msg.products?.map((product, pidx) => (
+                  <div key={pidx} className="bg-white rounded-2xl border border-[#E5E7EB] p-3 flex gap-3">
+                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#F3F4F6]">
+                      <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1">
+                      {product.badge && (
+                        <div className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-1 ${
+                          product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 'bg-[#3B82F6] text-white'
+                        }`}>
+                          {product.badge}
+                        </div>
+                      )}
+                      <h3 className="font-bold text-[#1F2937] text-sm mb-0.5">{product.title}</h3>
+                      <p className="text-lg font-bold text-[#1F2937] mb-0.5">{product.price}</p>
+                      <p className="text-xs text-[#6B7280] mb-1">{product.store}</p>
+                      <p className="text-xs text-[#6B7280]">{product.reason}</p>
+                    </div>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => setShowFullResults(msg.products)}
+                  className="w-full py-3 bg-[#F3F4F6] text-[#1F2937] rounded-xl font-semibold text-sm"
+                >
+                  View All Results
                 </button>
               </div>
-              {/* Text underneath - separate from tile */}
-              <p className="text-[10px] font-medium text-[#6B7280]">{item.brand}</p>
-              <p className="text-xs font-semibold text-[#1F2937]">{item.product}</p>
+            )}
+
+            {msg.type === 'saved' && (
+              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-3 flex gap-3 animate-scale-in">
+                <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#F3F4F6]">
+                  <img src={msg.product.image_url} alt={msg.product.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-[#1F2937] text-sm mb-0.5">{msg.product.title}</h3>
+                  <p className="text-xs text-[#6B7280]">Added from saved items</p>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-[#F3F4F6] rounded-2xl px-4 py-3">
+              <div className="flex gap-1">
+                <div className="w-2 h-2 bg-[#6B7280] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <div className="w-2 h-2 bg-[#6B7280] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <div className="w-2 h-2 bg-[#6B7280] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
+        
+        <div ref={chatEndRef} />
       </div>
 
-      {/* Bottom Input Bar - Message style */}
-      <div className="px-6 pb-6 mt-auto">
-        <div className="bg-white rounded-2xl border border-[#E5E7EB] shadow-sm flex items-center p-2 gap-2">
-          <button className="w-10 h-10 rounded-xl bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+      {/* Bottom Input Bar */}
+      <div className="px-4 pb-6 pt-2 relative">
+        <div className="bg-[#F9FAFB] rounded-3xl border border-[#E5E7EB] flex items-center px-4 py-3 gap-3">
+          <button 
+            onClick={() => setShowPlusMenu(!showPlusMenu)}
+            className="flex-shrink-0"
+          >
             <Plus className="w-5 h-5 text-[#6B7280]" />
           </button>
           <input
             type="text"
-            placeholder="Find Matches"
+            placeholder="Ask DeaLo anything..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             className="flex-1 text-sm outline-none placeholder:text-[#9CA3AF] bg-transparent"
           />
           <button 
-            onClick={() => navigate(createPageUrl("Snap"))}
-            className="w-10 h-10 rounded-xl bg-[#00A36C] flex items-center justify-center flex-shrink-0"
+            onClick={() => setShowInspiration(true)}
+            className="flex-shrink-0"
           >
-            <Camera className="w-5 h-5 text-white" />
+            <Wand2 className="w-5 h-5 text-[#6B7280]" />
+          </button>
+          <button 
+            onClick={handleSendMessage}
+            className="flex-shrink-0"
+          >
+            <Send className="w-5 h-5 text-[#6B7280]" />
           </button>
         </div>
+
+        {/* Plus Menu Popup */}
+        {showPlusMenu && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setShowPlusMenu(false)} />
+            <div className="absolute bottom-20 left-8 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] py-2 z-50 animate-scale-in">
+              <button 
+                onClick={() => { navigate(createPageUrl("Snap") + "?from=BestMatch"); setShowPlusMenu(false); }}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F9FAFB] text-left"
+              >
+                <Camera className="w-5 h-5 text-[#00A36C]" />
+                <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Take Photo</span>
+              </button>
+              <button 
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F9FAFB] text-left"
+              >
+                <ImageIcon className="w-5 h-5 text-[#00A36C]" />
+                <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Upload from Gallery</span>
+              </button>
+              <button 
+                onClick={() => { setShowSavedItems(true); setShowPlusMenu(false); }}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F9FAFB] text-left"
+              >
+                <Bookmark className="w-5 h-5 text-[#00A36C]" />
+                <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Add from Saved</span>
+              </button>
+              <button 
+                onClick={() => { setShowInspiration(true); setShowPlusMenu(false); }}
+                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F9FAFB] text-left"
+              >
+                <Wand2 className="w-5 h-5 text-[#00A36C]" />
+                <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Inspiration</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Info Sheet Modal */}
-      {showInfoSheet && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowInfoSheet(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-10 max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto mb-6" />
-            
-            <h3 className="text-lg font-bold text-[#1F2937] mb-4">How DeaLo AI Works</h3>
-            
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#00A36C]/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm">1</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1F2937]">Describe or upload</p>
-                  <p className="text-xs text-[#6B7280]">Type what you're looking for or snap a photo.</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#00A36C]/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm">2</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1F2937]">AI finds matches</p>
-                  <p className="text-xs text-[#6B7280]">We search thousands of stores for the best options.</p>
+      {/* Inspiration Sheet */}
+      {showInspiration && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowInspiration(false)}>
+          <div 
+            className="bg-white w-full rounded-t-3xl overflow-hidden flex flex-col animate-slide-up" 
+            style={{ height: '50vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center py-3">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+            <div className="px-6 pb-4">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-1">Inspiration</h2>
+              <p className="text-sm text-[#6B7280]">Explore trending finds & ideas</p>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              <div className="mb-6">
+                <h3 className="text-xs font-bold text-[#6B7280] mb-3">TRENDING CATEGORIES</h3>
+                <div className="flex gap-2 flex-wrap">
+                  {['Tech', 'Home', 'Shoes', 'Fashion', 'Beauty'].map(cat => (
+                    <button key={cat} className="px-4 py-2 bg-[#F3F4F6] rounded-full text-sm font-medium text-[#1F2937]">
+                      {cat}
+                    </button>
+                  ))}
                 </div>
               </div>
-              
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-[#00A36C]/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm">3</span>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-[#1F2937]">Compare and save</p>
-                  <p className="text-xs text-[#6B7280]">Review matches and find the perfect deal.</p>
+              <div className="mb-6">
+                <h3 className="text-xs font-bold text-[#6B7280] mb-3">POPULAR RIGHT NOW</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} className="aspect-square rounded-xl bg-[#F3F4F6]" />
+                  ))}
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
 
-            <button 
-              onClick={() => setShowInfoSheet(false)}
-              className="w-full mt-6 py-3 rounded-2xl bg-[#00A36C] text-white font-semibold"
-            >
-              Got it
-            </button>
+      {/* Saved Items Sheet */}
+      {showSavedItems && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowSavedItems(false)}>
+          <div 
+            className="bg-white w-full rounded-t-3xl overflow-hidden flex flex-col animate-slide-up" 
+            style={{ height: '60vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center py-3">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+            <div className="px-6 pb-4">
+              <h2 className="text-xl font-bold text-[#1F2937]">Saved Items</h2>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-3">
+              {savedItems.map(item => (
+                <div key={item.id} className="bg-white rounded-xl border border-[#E5E7EB] p-3 flex gap-3">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-[#F3F4F6]">
+                    <img src={item.file_url} alt={item.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-[#1F2937] text-sm mb-1">{item.title}</h3>
+                    <button 
+                      onClick={() => insertSavedItem(item)}
+                      className="text-xs font-semibold text-[#00A36C]"
+                    >
+                      Use in Chat →
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Results Sheet */}
+      {showFullResults && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowFullResults(null)}>
+          <div 
+            className="bg-white w-full rounded-t-3xl overflow-hidden flex flex-col animate-slide-up" 
+            style={{ height: '92vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center py-3">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+            <div className="px-6 pb-2 flex items-center justify-between">
+              <h2 className="text-xl font-bold text-[#1F2937]">All Results</h2>
+              <button onClick={() => setShowFullResults(null)}>
+                <X className="w-5 h-5 text-[#6B7280]" />
+              </button>
+            </div>
+            
+            {/* Tabs */}
+            <div className="flex border-b border-[#E5E7EB] px-6">
+              {['topPicks', 'bestDeals', 'bestMatches'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveResultTab(tab)}
+                  className={`flex-1 py-3 text-sm font-semibold relative ${
+                    activeResultTab === tab ? 'text-[#1F2937]' : 'text-[#6B7280]'
+                  }`}
+                >
+                  {tab === 'topPicks' && 'Top Picks'}
+                  {tab === 'bestDeals' && 'Best Deals'}
+                  {tab === 'bestMatches' && 'Best Matches'}
+                  {activeResultTab === tab && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00A36C]" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Results List */}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
+              {showFullResults.map((product, idx) => (
+                <div key={idx} className="bg-white rounded-2xl border border-[#E5E7EB] p-4 flex gap-4">
+                  <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-[#F3F4F6]">
+                    <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1">
+                    {product.badge && (
+                      <div className={`inline-block px-2 py-1 rounded text-xs font-bold mb-2 ${
+                        product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 'bg-[#3B82F6] text-white'
+                      }`}>
+                        {product.badge}
+                      </div>
+                    )}
+                    <h3 className="font-bold text-[#1F2937] mb-1">{product.title}</h3>
+                    <p className="text-xl font-bold text-[#1F2937] mb-1">{product.price}</p>
+                    <p className="text-sm text-[#6B7280] mb-2">{product.store}</p>
+                    <p className="text-sm text-[#6B7280]">{product.reason}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
 
       <style>{`
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        @keyframes scale-in {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out;
+        }
+        .animate-scale-in {
+          animation: scale-in 0.2s ease-out;
+        }
       `}</style>
     </div>
   );

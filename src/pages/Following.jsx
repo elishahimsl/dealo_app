@@ -77,15 +77,16 @@ export default function Following() {
   return (
     <div className="min-h-screen bg-[#EDEEF0] pb-24">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        {/* Animated back/deal icon - no circle */}
-        <button onClick={() => navigate(-1)} className="relative flex items-center justify-center group">
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center relative">
+        {/* Back button - absolute left */}
+        <button onClick={() => navigate(-1)} className="absolute left-6 flex items-center justify-center group">
           <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
         </button>
         
-        <h1 className="text-base font-medium text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>Following</h1>
+        <h1 className="text-base font-normal text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>Following</h1>
         
-        <button onClick={() => navigate(createPageUrl("FollowingList"))} className="text-xs font-medium text-[#6B7280]">Manage</button>
+        {/* Manage button - absolute right */}
+        <button onClick={() => navigate(createPageUrl("FollowingList"))} className="absolute right-6 text-xs font-medium text-[#6B7280]">Manage</button>
       </div>
 
       {/* Store Cards */}

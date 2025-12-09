@@ -67,9 +67,17 @@ export default function Discover() {
   const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] pb-24">
+    <div className="min-h-screen bg-white pb-24 relative overflow-hidden">
+      {/* Green gradient splash in top left */}
+      <div 
+        className="absolute top-0 left-0 w-96 h-96 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at top left, rgba(0, 163, 108, 0.12) 0%, rgba(0, 163, 108, 0.06) 40%, transparent 70%)',
+          zIndex: 0
+        }}
+      />
       {/* Search Bar */}
-      <div className="px-6 pt-6 mb-4">
+      <div className="px-6 pt-6 mb-4 relative z-10">
         <div className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
           <button onClick={() => navigate(createPageUrl("DiscoverSearch"))} className="flex-1 flex items-center gap-2">
             <Search className="w-4 h-4 text-[#6B7280]" />
@@ -82,7 +90,7 @@ export default function Discover() {
       </div>
 
       {/* DeaLo Tools */}
-      <div className="px-6 mb-4">
+      <div className="px-6 mb-4 relative z-10">
         <h2 className="text-xs font-bold text-[#1F2937] mb-2">DeaLo Tools</h2>
         <div className="grid grid-cols-2 gap-2">
           {specialTools.map((tool) => {
@@ -100,7 +108,7 @@ export default function Discover() {
       </div>
 
       {/* Stores */}
-      <div className="mb-4">
+      <div className="mb-4 relative z-10">
         <div className="px-6 mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-[#1F2937]">Search by Store</h2>
           <button onClick={() => navigate(createPageUrl("AllStores"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
@@ -115,7 +123,7 @@ export default function Discover() {
       </div>
 
       {/* Brands */}
-      <div className="mb-4">
+      <div className="mb-4 relative z-10">
         <div className="px-6 mb-2 flex items-center justify-between">
           <h2 className="text-sm font-bold text-[#1F2937]">Search by Brand</h2>
           <button onClick={() => navigate(createPageUrl("AllBrands"))}><ChevronRight className="w-5 h-5 text-[#6B7280]" /></button>
@@ -130,7 +138,7 @@ export default function Discover() {
       </div>
 
       {/* Topics */}
-      <div className="mb-4">
+      <div className="mb-4 relative z-10">
         <div className="px-6 mb-3">
           <button onClick={() => navigate(createPageUrl("DealsNearYou"))} className="w-full h-24 rounded-2xl shadow-lg overflow-hidden relative bg-gradient-to-r from-[#00A36C] to-emerald-600">
             <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">

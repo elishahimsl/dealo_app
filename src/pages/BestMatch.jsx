@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { HelpCircle, Send, Wand2, Plus, Camera, Image as ImageIcon, Bookmark, Sparkles, TrendingUp, Home, ShoppingBag, X } from "lucide-react";
+import { HelpCircle, Plus, Camera, Image as ImageIcon, Bookmark, Sparkles, TrendingUp, Home, ShoppingBag, X } from "lucide-react";
 
 export default function BestMatch() {
   const navigate = useNavigate();
@@ -36,12 +36,12 @@ export default function BestMatch() {
 
     try {
       const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: `User is looking for: "${inputText}". Generate 3-4 product recommendations with the following details for each:
+        prompt: `User is looking for: "${inputText}". Generate EXACTLY 3 product recommendations with the following details for each:
         - Product name/title
         - Price (realistic, format: $XX.XX)
         - Store name
-        - A brief reason why it's recommended (e.g., "Best value for the price", "25% cheaper than similar items", "Closest match to your request")
-        - Badge type: "Best Deal", "Best Match", or null
+        - A brief reason why it's recommended
+        - Badge type: First product should have "Top Pick", second should have "Best Deal", third should have "Best Match"
         - Product image URL from Unsplash related to the product type`,
         response_json_schema: {
           type: "object",
@@ -200,13 +200,18 @@ export default function BestMatch() {
             onClick={() => setShowInspiration(true)}
             className="flex-shrink-0"
           >
-            <Wand2 className="w-5 h-5 text-[#6B7280]" />
+            <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+              <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+              <path d="M2 2l7.586 7.586"/>
+              <circle cx="11" cy="11" r="2"/>
+            </svg>
           </button>
           <button 
             onClick={handleSendMessage}
-            className="flex-shrink-0"
+            className="flex-shrink-0 w-8 h-8 rounded-full border-2 border-[#6B7280] flex items-center justify-center"
           >
-            <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </button>
@@ -236,13 +241,6 @@ export default function BestMatch() {
               >
                 <Bookmark className="w-5 h-5 text-[#00A36C]" />
                 <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Add from Saved</span>
-              </button>
-              <button 
-                onClick={() => { setShowInspiration(true); setShowPlusMenu(false); }}
-                className="w-full px-4 py-3 flex items-center gap-3 hover:bg-[#F9FAFB] text-left"
-              >
-                <Wand2 className="w-5 h-5 text-[#00A36C]" />
-                <span className="text-sm font-medium text-[#1F2937] whitespace-nowrap">Inspiration</span>
               </button>
             </div>
           </>

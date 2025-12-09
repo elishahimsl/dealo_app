@@ -411,10 +411,12 @@ Provide a detailed comparison and recommendation.`,
                       data-value={brandPreference[0]}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
-                    <span>Low</span>
-                    <span className="font-semibold text-[#1F2937]">Fair</span>
-                    <span>High</span>
+                  <div className="flex justify-between text-xs mt-3 px-3">
+                    <span className={brandPreference[0] <= 20 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>Low</span>
+                    <span className="font-semibold text-[#1F2937]">
+                      {brandPreference[0] <= 20 ? 'Low' : brandPreference[0] >= 80 ? 'High' : brandPreference[0] <= 40 ? 'Below Average' : brandPreference[0] >= 60 ? 'Above Average' : 'Fair'}
+                    </span>
+                    <span className={brandPreference[0] >= 80 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>High</span>
                   </div>
                 </div>
 
@@ -437,10 +439,12 @@ Provide a detailed comparison and recommendation.`,
                       data-value={pricePreference[0]}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
-                    <span>Low</span>
-                    <span className="font-semibold text-[#1F2937]">Fair</span>
-                    <span>High</span>
+                  <div className="flex justify-between text-xs mt-3 px-3">
+                    <span className={pricePreference[0] <= 20 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>Low</span>
+                    <span className="font-semibold text-[#1F2937]">
+                      {pricePreference[0] <= 20 ? 'Low' : pricePreference[0] >= 80 ? 'High' : pricePreference[0] <= 40 ? 'Below Average' : pricePreference[0] >= 60 ? 'Above Average' : 'Fair'}
+                    </span>
+                    <span className={pricePreference[0] >= 80 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>High</span>
                   </div>
                 </div>
 
@@ -463,10 +467,12 @@ Provide a detailed comparison and recommendation.`,
                       data-value={durabilityPreference[0]}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
-                    <span>Low</span>
-                    <span className="font-semibold text-[#1F2937]">Fair</span>
-                    <span>High</span>
+                  <div className="flex justify-between text-xs mt-3 px-3">
+                    <span className={durabilityPreference[0] <= 20 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>Low</span>
+                    <span className="font-semibold text-[#1F2937]">
+                      {durabilityPreference[0] <= 20 ? 'Low' : durabilityPreference[0] >= 80 ? 'High' : durabilityPreference[0] <= 40 ? 'Below Average' : durabilityPreference[0] >= 60 ? 'Above Average' : 'Fair'}
+                    </span>
+                    <span className={durabilityPreference[0] >= 80 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>High</span>
                   </div>
                 </div>
 
@@ -489,10 +495,12 @@ Provide a detailed comparison and recommendation.`,
                       data-value={reviewsPreference[0]}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
-                    <span>Low</span>
-                    <span className="font-semibold text-[#1F2937]">Fair</span>
-                    <span>High</span>
+                  <div className="flex justify-between text-xs mt-3 px-3">
+                    <span className={reviewsPreference[0] <= 20 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>Low</span>
+                    <span className="font-semibold text-[#1F2937]">
+                      {reviewsPreference[0] <= 20 ? 'Low' : reviewsPreference[0] >= 80 ? 'High' : reviewsPreference[0] <= 40 ? 'Below Average' : reviewsPreference[0] >= 60 ? 'Above Average' : 'Fair'}
+                    </span>
+                    <span className={reviewsPreference[0] >= 80 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>High</span>
                   </div>
                 </div>
 
@@ -515,10 +523,12 @@ Provide a detailed comparison and recommendation.`,
                       data-value={qualityPreference[0]}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-[#9CA3AF] mt-3 px-3">
-                    <span>Low</span>
-                    <span className="font-semibold text-[#1F2937]">Fair</span>
-                    <span>High</span>
+                  <div className="flex justify-between text-xs mt-3 px-3">
+                    <span className={qualityPreference[0] <= 20 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>Low</span>
+                    <span className="font-semibold text-[#1F2937]">
+                      {qualityPreference[0] <= 20 ? 'Low' : qualityPreference[0] >= 80 ? 'High' : qualityPreference[0] <= 40 ? 'Below Average' : qualityPreference[0] >= 60 ? 'Above Average' : 'Fair'}
+                    </span>
+                    <span className={qualityPreference[0] >= 80 ? 'text-[#1F2937] font-semibold' : 'text-[#9CA3AF]'}>High</span>
                   </div>
                 </div>
               </div>

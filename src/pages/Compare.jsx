@@ -24,6 +24,9 @@ export default function Compare() {
   const [durabilityPreference, setDurabilityPreference] = useState(location.state?.preferences?.durability || [50]);
   const [reviewsPreference, setReviewsPreference] = useState([50]);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const scrollRef = useRef(null);
 
   const handleFileSelect = async (file, itemNumber) => {
     try {
@@ -280,25 +283,40 @@ Provide a detailed comparison and recommendation.`,
       {showPreferences && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowPreferences(false)}>
           <div 
-            className="bg-white rounded-t-3xl w-full animate-slide-up overflow-hidden flex flex-col" 
-            style={{ height: '85vh' }}
+            className="bg-white rounded-t-3xl w-full overflow-hidden flex flex-col" 
+            style={{ 
+              height: '85vh',
+              transform: `translateY(${dragOffset}px)`,
+              transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag Handle */}
             <div 
               className="flex justify-center py-3 cursor-pointer"
               onTouchStart={(e) => {
-                const startY = e.touches[0].clientY;
-                const handleTouchMove = (e) => {
-                  const currentY = e.touches[0].clientY;
-                  if (currentY - startY > 100) {
-                    setShowPreferences(false);
-                  }
-                };
-                document.addEventListener('touchmove', handleTouchMove);
-                document.addEventListener('touchend', () => {
-                  document.removeEventListener('touchmove', handleTouchMove);
-                }, { once: true });
+                if (scrollRef.current && scrollRef.current.scrollTop === 0) {
+                  setIsDragging(true);
+                  const startY = e.touches[0].clientY;
+                  const handleTouchMove = (moveEvent) => {
+                    const currentY = moveEvent.touches[0].clientY;
+                    const diff = currentY - startY;
+                    if (diff > 0) {
+                      setDragOffset(diff);
+                    }
+                  };
+                  const handleTouchEnd = () => {
+                    setIsDragging(false);
+                    if (dragOffset > 150) {
+                      setShowPreferences(false);
+                    }
+                    setDragOffset(0);
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  };
+                  document.addEventListener('touchmove', handleTouchMove);
+                  document.addEventListener('touchend', handleTouchEnd);
+                }
               }}
             >
               <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
@@ -341,24 +359,30 @@ Provide a detailed comparison and recommendation.`,
             </div>
             
             <div 
+              ref={scrollRef}
               className="flex-1 overflow-y-auto px-6 pb-32"
-              onScroll={(e) => {
-                if (e.target.scrollTop === 0) {
-                  const startY = e.clientY || 0;
-                  const handleMove = (moveEvent) => {
-                    const currentY = moveEvent.clientY || moveEvent.touches?.[0]?.clientY || 0;
-                    if (currentY - startY > 50) {
-                      setShowPreferences(false);
-                      document.removeEventListener('mousemove', handleMove);
-                      document.removeEventListener('touchmove', handleMove);
+              onTouchStart={(e) => {
+                if (e.currentTarget.scrollTop === 0) {
+                  setIsDragging(true);
+                  const startY = e.touches[0].clientY;
+                  const handleTouchMove = (moveEvent) => {
+                    const currentY = moveEvent.touches[0].clientY;
+                    const diff = currentY - startY;
+                    if (diff > 0) {
+                      setDragOffset(diff);
                     }
                   };
-                  document.addEventListener('mousemove', handleMove);
-                  document.addEventListener('touchmove', handleMove);
-                  setTimeout(() => {
-                    document.removeEventListener('mousemove', handleMove);
-                    document.removeEventListener('touchmove', handleMove);
-                  }, 500);
+                  const handleTouchEnd = () => {
+                    setIsDragging(false);
+                    if (dragOffset > 150) {
+                      setShowPreferences(false);
+                    }
+                    setDragOffset(0);
+                    document.removeEventListener('touchmove', handleTouchMove);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  };
+                  document.addEventListener('touchmove', handleTouchMove);
+                  document.addEventListener('touchend', handleTouchEnd);
                 }
               }}
             >

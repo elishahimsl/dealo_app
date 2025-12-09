@@ -133,7 +133,6 @@ export default function Preferences() {
                     onValueChange={(val) => setPriorities(prev => ({ ...prev, [key]: val }))}
                     max={100}
                     step={1}
-                    className="[&_[role=slider]]:bg-[#00A36C] [&_[role=slider]]:border-[#00A36C]"
                   />
                 </div>
               ))}

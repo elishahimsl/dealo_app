@@ -167,30 +167,28 @@ Provide a detailed comparison and recommendation.`,
           </div>
 
           {/* Preferences Row */}
-          <button 
-            onClick={() => setShowPreferences(true)}
-            className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
-          >
+          <div className="w-full flex items-center justify-between">
             <span className="text-base font-semibold text-white">Preferences</span>
-            <div className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center">
+            <button 
+              onClick={() => navigate(createPageUrl("Preferences"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
+              className="w-6 h-6 rounded-full bg-[#6B7280] flex items-center justify-center hover:bg-[#4B5563] transition-colors"
+            >
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </div>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Info Text */}
         <div className="px-2">
           <div className="flex items-start gap-2 mb-1">
-            <div className="w-6 h-6 rounded-full bg-[#1F2937] flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
-              </svg>
-            </div>
+            <svg className="w-5 h-5 text-[#1F2937] mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
+            </svg>
             <h3 className="text-base font-semibold text-[#1F2937]">Add two products to compare</h3>
           </div>
-          <p className="text-sm text-[#6B7280] ml-8">specs, price, reviews, and AI recommendations</p>
+          <p className="text-sm text-[#6B7280] ml-7">specs, price, reviews, and AI recommendations</p>
         </div>
 
         {/* Analyze Button */}

@@ -14,7 +14,7 @@ export default function Compare() {
   const [analyzing, setAnalyzing] = useState(false);
   const [showUploadOptions, setShowUploadOptions] = useState(null); // null, 1, or 2
   const [deleteSlot, setDeleteSlot] = useState(null);
-  const [shopSenseApplied, setShopSenseApplied] = useState(location.state?.shopSenseApplied || false);
+  const [showPreferences, setShowPreferences] = useState(false);
   const fileInput1Ref = useRef(null);
   const fileInput2Ref = useRef(null);
 
@@ -50,11 +50,50 @@ export default function Compare() {
     }
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!item1 || !item2) return;
-    navigate(createPageUrl("ShopSense"), {
-      state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } }
-    });
+    setAnalyzing(true);
+    
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Compare these two products and determine which is better based on the user's preferences.
+        
+Product 1: ${item1.title} - ${item1.price}
+Product 2: ${item2.title} - ${item2.price}
+
+User Preferences (0-100 scale):
+- Price importance: ${pricePreference[0]}
+- Quality importance: ${qualityPreference[0]}
+- Brand importance: ${brandPreference[0]}
+- Durability importance: ${durabilityPreference[0]}
+
+Provide a detailed comparison and recommendation.`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            winner: { type: "string", enum: ["item1", "item2"] },
+            confidence: { type: "number" },
+            reasoning: { type: "string" },
+            price_comparison: { type: "string" },
+            quality_comparison: { type: "string" },
+            overall_verdict: { type: "string" }
+          }
+        }
+      });
+
+      navigate(createPageUrl("ComparisonResults"), {
+        state: { 
+          item1, 
+          item2, 
+          result,
+          preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference }
+        }
+      });
+    } catch (error) {
+      console.error("Error analyzing:", error);
+    }
+    
+    setAnalyzing(false);
   };
 
   const handleDeleteItem = (slot) => {
@@ -129,7 +168,7 @@ export default function Compare() {
 
           {/* Preferences Row */}
           <button 
-            onClick={() => navigate(createPageUrl("Preferences"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } })}
+            onClick={() => setShowPreferences(true)}
             className="w-full flex items-center justify-between hover:bg-[#3D4856] rounded-xl transition-colors"
           >
             <span className="text-base font-semibold text-white">Preferences</span>
@@ -169,7 +208,7 @@ export default function Compare() {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowUploadOptions(null)}>
           <div 
             className="bg-white rounded-t-3xl w-full pb-8 pt-4 animate-slide-up" 
-            style={{ maxHeight: '66vh' }}
+            style={{ maxHeight: '80vh' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag Handle */}
@@ -190,7 +229,7 @@ export default function Compare() {
               </button>
 
               <button 
-                onClick={() => { navigate(createPageUrl("SearchProducts"), { state: { slot: showUploadOptions === 1 ? 'item1' : 'item2', item1, item2 } }); setShowUploadOptions(null); }} 
+                onClick={() => { navigate(createPageUrl("SearchProducts") + `?slot=${showUploadOptions}`); setShowUploadOptions(null); }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
                 <div className="flex items-center gap-3">
@@ -232,6 +271,116 @@ export default function Compare() {
                   <span className="text-base text-[#1F2937]">Import From Link</span>
                 </div>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preferences Modal */}
+      {showPreferences && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end" onClick={() => setShowPreferences(false)}>
+          <div 
+            className="bg-white rounded-t-3xl w-full pb-8 pt-6 animate-slide-up overflow-y-auto" 
+            style={{ maxHeight: '85vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6">
+              <h2 className="text-xl font-bold text-[#1F2937] mb-6">Preferences</h2>
+              
+              {/* Price */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Price</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={pricePreference} onValueChange={setPricePreference} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Quality */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Quality</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {qualityPreference[0] >= 80 ? 'Most Important' : qualityPreference[0] >= 60 ? 'Very Important' : qualityPreference[0] >= 40 ? 'Important' : qualityPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={qualityPreference} onValueChange={setQualityPreference} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Brand */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Brand</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {brandPreference[0] >= 80 ? 'Most Important' : brandPreference[0] >= 60 ? 'Very Important' : brandPreference[0] >= 40 ? 'Important' : brandPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={brandPreference} onValueChange={setBrandPreference} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Durability */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Durability</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {durabilityPreference[0] >= 80 ? 'Most Important' : durabilityPreference[0] >= 60 ? 'Very Important' : durabilityPreference[0] >= 40 ? 'Important' : durabilityPreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={durabilityPreference} onValueChange={setDurabilityPreference} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Sustainability */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Sustainability</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={[50]} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Features */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Features</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={[50]} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Design */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Design</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={[50]} max={100} step={1} className="w-full" />
+              </div>
+
+              {/* Customer Reviews */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-sm font-semibold text-[#1F2937]">Customer Reviews</label>
+                  <span className="text-sm text-[#6B7280]">
+                    {pricePreference[0] >= 80 ? 'Most Important' : pricePreference[0] >= 60 ? 'Very Important' : pricePreference[0] >= 40 ? 'Important' : pricePreference[0] >= 20 ? 'Somewhat Important' : 'Least Important'}
+                  </span>
+                </div>
+                <Slider value={[50]} max={100} step={1} className="w-full" />
+              </div>
+
+              <Button 
+                onClick={() => setShowPreferences(false)}
+                className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
+              >
+                Apply
+              </Button>
             </div>
           </div>
         </div>

@@ -53,6 +53,55 @@ export default function DiscoverSearch() {
         </div>
       </div>
 
+      {/* Featured Stores */}
+      <div className="px-6 mb-6">
+        <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Stores</h2>
+        <div className="space-y-2">
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Nike")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" alt="Nike" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Nike</span>
+          </button>
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Amazon")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Amazon</span>
+          </button>
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Apple")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Apple</span>
+          </button>
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Target")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/9a/Target_logo.svg" alt="Target" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Target</span>
+          </button>
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Walmart")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Walmart_logo.svg" alt="Walmart" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Walmart</span>
+          </button>
+          <button 
+            onClick={() => navigate(createPageUrl("StoreDetail") + "?store=Best Buy")}
+            className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white rounded-xl transition-colors"
+          >
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/f5/Best_Buy_Logo.svg" alt="Best Buy" className="w-8 h-8 object-contain" />
+            <span className="text-sm font-medium text-[#1F2937]">Best Buy</span>
+          </button>
+        </div>
+      </div>
+
       <style>{`
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

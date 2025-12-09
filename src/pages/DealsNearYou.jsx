@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Search, Camera, Heart, ThumbsUp, ThumbsDown, SlidersHorizontal, Tag } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -98,7 +99,7 @@ export default function DealsNearYou() {
             placeholder="Search Product"
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-[#6B7280]"
           />
-          <button>
+          <button onClick={() => navigate(createPageUrl("Snap") + "?from=DealsNearYou")}>
             <Camera className="w-4 h-4 text-[#6B7280]" />
           </button>
         </div>

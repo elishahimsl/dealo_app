@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate, Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { 
-  User, Settings, ChevronRight, Bookmark, Scale, Star, Tag, 
+  User, Settings, ChevronRight, Bookmark, Star, Tag, 
   Bell, BellRing, Clock, Camera, LogOut, HelpCircle, Info, 
-  Lock, Globe, DollarSign, Store, TrendingUp, Scan
+  Lock, Globe, DollarSign, Store, TrendingUp, Scan, Users, Layers
 } from "lucide-react";
 
 export default function Profile() {
@@ -27,17 +27,17 @@ export default function Profile() {
   // Your Stuff cards
   const yourStuff = [
     { id: 1, icon: Bookmark, label: "Saved Products", count: 24, page: "MyCart" },
-    { id: 2, icon: Scale, label: "Saved Comparisons", count: 8, page: "Compare" },
-    { id: 3, icon: Star, label: "Favorite Brands", count: 12, page: "AllBrands" },
+    { id: 2, icon: Layers, label: "Saved Comparisons", count: 8, page: "Compare" },
+    { id: 3, icon: Users, label: "Following", count: 12, page: "FollowingList" },
     { id: 4, icon: Tag, label: "Favorite Categories", count: 6, page: "More" },
   ];
 
   // Stats
   const stats = [
     { icon: DollarSign, value: "$213", label: "Saved from Deals", color: "#00A36C" },
-    { icon: Store, value: "9", label: "Stores Visited", color: "#8B5CF6" },
-    { icon: Scan, value: captures.length.toString(), label: "Items Scanned", color: "#F59E0B" },
-    { icon: TrendingUp, value: "47", label: "Deals Found", color: "#EC4899" },
+    { icon: Store, value: "9", label: "Stores Visited", color: "#00A36C" },
+    { icon: Scan, value: captures.length.toString(), label: "Items Scanned", color: "#00A36C" },
+    { icon: TrendingUp, value: "47", label: "Deals Found", color: "#00A36C" },
   ];
 
   // Tracking toggles
@@ -177,23 +177,25 @@ export default function Profile() {
 
       {/* Your Stuff Section */}
       <div className="px-6 mb-8">
-        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Your Stuff</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {yourStuff.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button 
-                key={item.id}
-                onClick={() => navigate(createPageUrl(item.page))}
-                className="bg-white rounded-2xl p-4 shadow-sm text-left hover:shadow-md transition-shadow"
-                style={{ height: '100px' }}
-              >
-                <Icon className="w-6 h-6 text-[#00A36C] mb-2" strokeWidth={1.5} />
-                <p className="text-sm font-medium text-[#1F2937]">{item.label}</p>
-                <p className="text-xs text-[#9CA3AF]">{item.count} items</p>
-              </button>
-            );
-          })}
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <h2 className="text-lg font-bold text-[#1F2937] mb-4">Your Stuff</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {yourStuff.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button 
+                  key={item.id}
+                  onClick={() => navigate(createPageUrl(item.page))}
+                  className="bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#F3F4F6] transition-colors"
+                  style={{ height: '100px' }}
+                >
+                  <Icon className="w-6 h-6 text-[#00A36C] mb-2" strokeWidth={1.5} />
+                  <p className="text-sm font-medium text-[#1F2937]">{item.label}</p>
+                  <p className="text-xs text-[#9CA3AF]">{item.count} items</p>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 

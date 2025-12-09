@@ -23,6 +23,7 @@ export default function Compare() {
   const [brandPreference, setBrandPreference] = useState(location.state?.preferences?.brand || [50]);
   const [durabilityPreference, setDurabilityPreference] = useState(location.state?.preferences?.durability || [50]);
   const [reviewsPreference, setReviewsPreference] = useState([50]);
+  const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
   const handleFileSelect = async (file, itemNumber) => {
     try {
@@ -305,19 +306,39 @@ Provide a detailed comparison and recommendation.`,
 
             {/* Header */}
             <div className="px-6 pb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#1F2937]">Product Priorities</h2>
-              <button className="flex flex-col gap-1">
-                <div className="w-5 h-0.5 bg-[#1F2937]" />
-                <div className="w-5 h-0.5 bg-[#1F2937]" />
-                <div className="w-5 h-0.5 bg-[#1F2937]" />
-              </button>
+              <h2 className="text-lg font-bold text-[#1F2937]">Product Priorities</h2>
+              <div className="relative">
+                <button 
+                  onClick={() => setShowMenuDropdown(!showMenuDropdown)}
+                  className="flex flex-col gap-0.5"
+                >
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {showMenuDropdown && (
+                  <>
+                    <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setShowMenuDropdown(false)} />
+                    <div className="absolute right-0 top-8 bg-white rounded-xl shadow-lg py-2 z-50 w-48">
+                      <button className="w-full px-4 py-2 text-left text-sm text-[#1F2937] hover:bg-[#F9FAFB]">
+                        Save Preferences
+                      </button>
+                      <button className="w-full px-4 py-2 text-left text-sm text-[#1F2937] hover:bg-[#F9FAFB]">
+                        Help
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             
             <div className="flex-1 overflow-y-auto px-6 pb-6">
-              <div className="space-y-6">
+              <div className="bg-white rounded-2xl border border-[#E5E7EB] p-4 space-y-6">
                 {/* Brand Importance */}
                 <div>
-                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Brand Importance</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Brand Importance</label>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -343,7 +364,7 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Price */}
                 <div>
-                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Price</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Price</label>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -369,7 +390,7 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Durability */}
                 <div>
-                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Durability</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Durability</label>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -395,7 +416,7 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Reviews */}
                 <div>
-                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Reviews</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Reviews</label>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -421,7 +442,7 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Originality */}
                 <div>
-                  <label className="text-sm font-medium text-[#1F2937] mb-3 block">Originality</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Originality</label>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -445,15 +466,15 @@ Provide a detailed comparison and recommendation.`,
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="px-6 pb-6 pt-4 bg-white border-t border-[#E5E7EB]">
-              <Button 
-                onClick={() => setShowPreferences(false)}
-                className="w-full h-12 rounded-full bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
-              >
-                Analyze
-              </Button>
+              
+              <div className="mt-4">
+                  <Button 
+                  onClick={() => setShowPreferences(false)}
+                  className="w-full h-12 rounded-full bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
+                >
+                  Analyze
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -486,31 +507,24 @@ Provide a detailed comparison and recommendation.`,
         .slider-custom::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
-          width: 24px;
-          height: 24px;
+          width: 18px;
+          height: 18px;
           background: white;
-          border: 3px solid #F59E0B;
+          border: 4px solid #F59E0B;
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          margin-top: -8px;
+          margin-top: -5px;
         }
         
         .slider-custom::-moz-range-thumb {
-          width: 24px;
-          height: 24px;
+          width: 18px;
+          height: 18px;
           background: white;
-          border: 3px solid #F59E0B;
+          border: 4px solid #F59E0B;
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        .slider-custom::-webkit-slider-thumb {
-          border-color: ${props => {
-            const val = props.value || 50;
-            return val < 33 ? '#EF4444' : val < 66 ? '#F59E0B' : '#10B981';
-          }};
         }
       `}</style>
 

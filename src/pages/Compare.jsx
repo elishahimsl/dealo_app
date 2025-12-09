@@ -362,28 +362,36 @@ Provide a detailed comparison and recommendation.`,
               ref={scrollRef}
               className="flex-1 overflow-y-auto px-6 pb-32"
               onTouchStart={(e) => {
-                if (e.currentTarget.scrollTop === 0) {
-                  setIsDragging(true);
-                  const startY = e.touches[0].clientY;
-                  const handleTouchMove = (moveEvent) => {
-                    const currentY = moveEvent.touches[0].clientY;
-                    const diff = currentY - startY;
-                    if (diff > 0) {
-                      setDragOffset(diff);
-                    }
-                  };
-                  const handleTouchEnd = () => {
-                    setIsDragging(false);
-                    if (dragOffset > 150) {
-                      setShowPreferences(false);
-                    }
-                    setDragOffset(0);
-                    document.removeEventListener('touchmove', handleTouchMove);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                  };
-                  document.addEventListener('touchmove', handleTouchMove);
-                  document.addEventListener('touchend', handleTouchEnd);
-                }
+                const startScrollTop = e.currentTarget.scrollTop;
+                const maxScroll = e.currentTarget.scrollHeight - e.currentTarget.clientHeight;
+
+                setIsDragging(true);
+                const startY = e.touches[0].clientY;
+                const handleTouchMove = (moveEvent) => {
+                  const currentY = moveEvent.touches[0].clientY;
+                  const diff = currentY - startY;
+
+                  // Allow drag down from top
+                  if (startScrollTop === 0 && diff > 0) {
+                    setDragOffset(diff);
+                  }
+                  // Allow drag down when at bottom (swipe-to-dismiss)
+                  else if (e.currentTarget.scrollTop >= maxScroll - 5 && diff > 0) {
+                    setDragOffset(diff);
+                  }
+                };
+                const handleTouchEnd = () => {
+                  setIsDragging(false);
+                  // Lower threshold - 100px from bottom
+                  if (dragOffset > 100) {
+                    setShowPreferences(false);
+                  }
+                  setDragOffset(0);
+                  document.removeEventListener('touchmove', handleTouchMove);
+                  document.removeEventListener('touchend', handleTouchEnd);
+                };
+                document.addEventListener('touchmove', handleTouchMove);
+                document.addEventListener('touchend', handleTouchEnd);
               }}
             >
               <div 

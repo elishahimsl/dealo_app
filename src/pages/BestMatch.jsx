@@ -88,20 +88,22 @@ export default function BestMatch() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between border-b border-[#F3F4F6]">
-        <h1 className="text-2xl font-bold text-[#1F2937]">DeaLo AI</h1>
-        <button className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center">
-          <HelpCircle className="w-4 h-4 text-[#6B7280]" />
+      <div className="px-6 pt-6 pb-4 flex items-center justify-center relative">
+        <button 
+          onClick={() => navigate(-1)}
+          className="absolute left-6"
+        >
+          <svg className="w-5 h-5 text-[#1F2937]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
         </button>
+        <h1 className="text-lg font-semibold text-[#1F2937]">DeaLo AI</h1>
       </div>
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="w-20 h-20 rounded-full bg-[#00A36C]/10 flex items-center justify-center mb-4">
-              <Sparkles className="w-10 h-10 text-[#00A36C]" />
-            </div>
+          <div className="flex flex-col items-center justify-center h-full text-center px-6">
             <h2 className="text-2xl font-bold text-[#1F2937] mb-2">Hi, I'm DeaLo!</h2>
             <p className="text-[#6B7280] text-sm">What are you looking for today?</p>
           </div>
@@ -204,7 +206,9 @@ export default function BestMatch() {
             onClick={handleSendMessage}
             className="flex-shrink-0"
           >
-            <Send className="w-5 h-5 text-[#6B7280]" />
+            <svg className="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </button>
         </div>
 

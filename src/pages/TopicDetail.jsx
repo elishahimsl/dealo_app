@@ -211,19 +211,8 @@ export default function TopicDetail() {
                 <div key={idx}>
                   <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] shadow-sm mb-2 aspect-square relative">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    {item.discount && (
-                      <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">
-                        Save ${item.discount}
-                      </div>
-                    )}
                   </div>
                   <p className="text-xs font-semibold text-[#1F2937]">{item.name}</p>
-                  <p className="text-xs text-[#1F2937] font-bold">{item.price}</p>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-[#00A36C] fill-[#00A36C]" />
-                    <span className="text-[10px] text-[#1F2937]">4.5</span>
-                    <span className="text-[10px] text-[#6B7280]">(120)</span>
-                  </div>
                 </div>
               ))}
             </div>

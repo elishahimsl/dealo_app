@@ -30,6 +30,8 @@ import StoreDetail from './pages/StoreDetail';
 import RecentlyViewed from './pages/RecentlyViewed';
 import Following from './pages/Following';
 import FollowingList from './pages/FollowingList';
+import AllRecentlyViewed from './pages/AllRecentlyViewed';
+import AllRecentlyDropped from './pages/AllRecentlyDropped';
 import __Layout from './Layout.jsx';
 
 
@@ -66,6 +68,8 @@ export const PAGES = {
     "RecentlyViewed": RecentlyViewed,
     "Following": Following,
     "FollowingList": FollowingList,
+    "AllRecentlyViewed": AllRecentlyViewed,
+    "AllRecentlyDropped": AllRecentlyDropped,
 }
 
 export const pagesConfig = {

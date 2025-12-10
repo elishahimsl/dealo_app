@@ -314,9 +314,12 @@ export default function PriceDrop() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-bold text-[#1F2937]">Recently Viewed</h2>
-            <div className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <button 
+              onClick={() => navigate(createPageUrl("AllRecentlyViewed"))}
+              className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB]"
+            >
               <ChevronRight className="w-3 h-3 text-[#6B7280]" />
-            </div>
+            </button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {recentlyViewed.slice(0, 3).map((item) => (
@@ -341,9 +344,12 @@ export default function PriceDrop() {
         <div>
           <div className="flex items-center gap-2 mb-3">
             <h2 className="text-sm font-bold text-[#1F2937]">Recently Dropped</h2>
-            <div className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <button 
+              onClick={() => navigate(createPageUrl("AllRecentlyDropped"))}
+              className="w-5 h-5 rounded-full bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB]"
+            >
               <ChevronRight className="w-3 h-3 text-[#6B7280]" />
-            </div>
+            </button>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {recentlyDropped.slice(0, 4).map((item) => (

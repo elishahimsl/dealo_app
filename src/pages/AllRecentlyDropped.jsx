@@ -37,14 +37,8 @@ export default function AllRecentlyDropped() {
         <div className="grid grid-cols-2 gap-3">
           {recentlyDropped.map((item) => (
             <div key={item.id}>
-              {/* Product tile */}
               <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                {/* Price badge */}
-                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5">
-                  <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
-                </div>
-                {/* Heart */}
                 <button 
                   onClick={() => toggleFavorite(item.id)}
                   className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -54,13 +48,7 @@ export default function AllRecentlyDropped() {
                   <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
                 </button>
               </div>
-              {/* Info underneath */}
-              <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
-              <p className="text-xs font-medium text-[#1F2937] line-clamp-1 mb-1">{item.name}</p>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
-                <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{item.discount}</span>
-              </div>
+              <p className="text-xs font-medium text-[#1F2937] line-clamp-1">{item.name}</p>
             </div>
           ))}
         </div>

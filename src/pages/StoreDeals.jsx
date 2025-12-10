@@ -47,16 +47,6 @@ export default function StoreDeals() {
             <div key={product.id}>
               <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                
-                {product.badge && (
-                  <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                    {product.badge}
-                  </div>
-                )}
-
-                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                </div>
 
                 <button 
                   onClick={() => toggleFavorite(product.id)}
@@ -70,12 +60,7 @@ export default function StoreDeals() {
                 </button>
               </div>
 
-              <h3 className="text-xs font-semibold text-[#1F2937] mb-0.5 truncate">{product.title}</h3>
-              
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#6B7280] line-through">{product.originalPrice}</span>
-                <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{product.discount} off</span>
-              </div>
+              <h3 className="text-xs font-semibold text-[#1F2937] truncate">{product.title}</h3>
             </div>
           ))}
         </div>

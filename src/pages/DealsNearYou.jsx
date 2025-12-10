@@ -142,11 +142,6 @@ export default function DealsNearYou() {
               >
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6]">
                   <img src={deal.image} alt="" className="w-full h-full object-cover" />
-                  {/* Discount badge - top left - GREEN - no arrow */}
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[9px] font-bold px-2 py-1 rounded">
-                    {deal.discount.replace('↓', '').replace('↑', '')}
-                  </div>
-                  {/* Heart - bottom right */}
                   <button 
                     onClick={() => toggleFavorite(deal.id)}
                     className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center ${
@@ -158,13 +153,7 @@ export default function DealsNearYou() {
                 </div>
               </div>
               
-              {/* Info underneath */}
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <span className="text-sm font-bold text-[#1F2937]">{deal.price}</span>
-                <span className="text-xs text-[#6B7280] line-through">{deal.originalPrice}</span>
-              </div>
-              <p className="text-xs font-medium text-[#1F2937] mb-0.5">{deal.name}</p>
-              <p className="text-[10px] text-[#6B7280] mb-1">{deal.store}</p>
+              <p className="text-xs font-medium text-[#1F2937] mb-2">{deal.name}</p>
               
               {/* Thumbs up/down for algorithm */}
               <div className="flex items-center gap-3">

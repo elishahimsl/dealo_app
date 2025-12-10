@@ -104,14 +104,8 @@ export default function DealScanner() {
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {todaysBestDeals.map((deal) => (
               <div key={deal.id} className="flex-shrink-0" style={{ width: '120px' }}>
-                {/* Product tile */}
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={deal.image} alt="" className="w-full h-full object-cover" />
-                  {/* Save badge - top right */}
-                  <div className="absolute top-2 right-2 bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
-                    {deal.save}
-                  </div>
-                  {/* Heart - bottom right */}
                   <button 
                     onClick={() => toggleFavorite(deal.id)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -121,13 +115,7 @@ export default function DealScanner() {
                     <Heart className={`w-3 h-3 ${favorites.includes(deal.id) ? 'text-white fill-white' : 'text-white'}`} />
                   </button>
                 </div>
-                {/* Info underneath */}
-                <div className="flex items-center gap-1 mb-0.5">
-                  <span className="text-xs font-bold text-[#1F2937]">{deal.price}</span>
-                  <span className="text-[10px] text-[#6B7280] line-through">{deal.originalPrice}</span>
-                </div>
-                <p className="text-[10px] font-medium text-[#1F2937] mb-0.5">{deal.name}</p>
-                <p className="text-[10px] text-[#6B7280]">{deal.brand}</p>
+                <p className="text-xs font-medium text-[#1F2937]">{deal.name}</p>
               </div>
             ))}
           </div>
@@ -163,14 +151,8 @@ export default function DealScanner() {
           <div className="grid grid-cols-2 gap-3">
             {(activeCategory === "all" ? trendingPriceDrops : trendingPriceDrops.filter(item => item.category === activeCategory)).map((item) => (
               <div key={item.id}>
-                {/* Image carousel tile */}
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={item.images[0]} alt="" className="w-full h-full object-cover" />
-                  {/* Discount badge - top left - no arrow */}
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[9px] font-bold px-2 py-0.5 rounded">
-                    {item.discount.replace('↓', '').replace('↑', '')}
-                  </div>
-                  {/* Heart - bottom right */}
                   <button 
                     onClick={() => toggleFavorite(item.id)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -186,13 +168,7 @@ export default function DealScanner() {
                     ))}
                   </div>
                 </div>
-                {/* Info underneath */}
-                <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
-                <p className="text-xs font-medium text-[#1F2937] mb-0.5">{item.name}</p>
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-bold text-[#1F2937]">{item.price}</span>
-                  <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
-                </div>
+                <p className="text-xs font-medium text-[#1F2937]">{item.name}</p>
               </div>
             ))}
           </div>

@@ -47,16 +47,6 @@ export default function StoreBestSellers() {
             <div key={product.id}>
               <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                
-                {product.badge && (
-                  <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                    {product.badge}
-                  </div>
-                )}
-
-                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                </div>
 
                 <button 
                   onClick={() => toggleFavorite(product.id)}
@@ -70,17 +60,7 @@ export default function StoreBestSellers() {
                 </button>
               </div>
 
-              <h3 className="text-xs font-semibold text-[#1F2937] mb-0.5 truncate">{product.title}</h3>
-              
-              <div className="flex items-center gap-0.5 mb-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-2.5 h-2.5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                  />
-                ))}
-                <span className="text-[9px] text-[#6B7280] ml-0.5">({product.reviews})</span>
-              </div>
+              <h3 className="text-xs font-semibold text-[#1F2937] truncate">{product.title}</h3>
             </div>
           ))}
         </div>

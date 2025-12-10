@@ -36,18 +36,18 @@ export default function BestMatch() {
 
     try {
       const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: `User is looking for: "${inputText}". Search the internet and find 9 REAL products (actual products that exist online with real prices and stores). Return:
-        - First 3 products labeled "Top Pick" (highest rated/most popular)
-        - Next 3 products labeled "Best Deal" (best value/biggest discount) - include original_price for these
-        - Last 3 products labeled "Best Match" (closest match to query)
+        prompt: `User is looking for: "${inputText}". Search the internet and find exactly 3 REAL products:
+        1. One "Top Pick" (highest rated/most popular)
+        2. One "Best Deal" (best value/biggest discount) - MUST include original_price
+        3. One "Best Match" (closest match to query)
         
         For each product provide:
-        - Exact product name/title as listed online
+        - Exact product name/title
         - Current price (format: $XX.XX)
-        - Original price if it's a Best Deal (format: $XX.XX)
+        - Original price for Best Deal ONLY (format: $XX.XX)
         - Store/brand name
-        - Discount percentage for Best Deals (e.g., "50% off")
-        - High quality product image URL from the actual product listing or similar`,
+        - Discount percentage for Best Deal (e.g., "50% off")
+        - Product image URL (use real product images from online retailers)`,
         add_context_from_internet: true,
         response_json_schema: {
           type: "object",

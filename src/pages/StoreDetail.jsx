@@ -279,24 +279,7 @@ export default function StoreDetail() {
               </div>
 
               {/* Product Info underneath - no tile */}
-              <h3 className="text-xs font-semibold text-[#1F2937] mb-0.5 truncate">{product.title}</h3>
-              
-              {/* Rating */}
-              <div className="flex items-center gap-0.5 mb-0.5">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-2.5 h-2.5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
-                  />
-                ))}
-                <span className="text-[9px] text-[#6B7280] ml-0.5">({product.reviews})</span>
-              </div>
-
-              {/* Price */}
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-[#6B7280] line-through">{product.originalPrice}</span>
-                <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{product.discount} off</span>
-              </div>
+              <h3 className="text-xs font-semibold text-[#1F2937] truncate">{product.title}</h3>
             </div>
           ))}
         </div>

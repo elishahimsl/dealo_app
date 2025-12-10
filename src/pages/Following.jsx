@@ -102,18 +102,11 @@ export default function Following() {
               {/* Store Header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  {/* Logo - no border */}
+                  {/* Logo */}
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                     <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
                   </div>
-                  <div>
-                    <span className="text-sm font-semibold text-[#1F2937]">{store.name}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-medium text-[#1F2937]">{store.rating}</span>
-                      <Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
-                      <span className="text-[10px] text-[#6B7280]">({store.reviews})</span>
-                    </div>
-                  </div>
+                  <span className="text-sm font-semibold text-[#1F2937]">{store.name}</span>
                 </div>
                 <button onClick={() => setShowNotifModal(store.id)}>
                   <MoreHorizontal className="w-5 h-5 text-[#6B7280]" />

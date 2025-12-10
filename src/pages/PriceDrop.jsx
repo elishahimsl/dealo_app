@@ -75,7 +75,19 @@ export default function PriceDrop() {
 
           {/* Price Chart - No tile, with grid */}
           <div className="relative mt-2">
-            {/* Time range on top line */}
+            {/* Time range headers */}
+            <div className="flex justify-between mb-2">
+              {["30 days", "90 days", "1 year"].map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`text-[10px] font-medium ${timeRange === range ? 'text-[#00A36C]' : 'text-[#9CA3AF]'}`}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+            {/* Line underneath headers */}
             <div className="flex items-center mb-3">
               <div className="flex-1 h-0.5 bg-[#E5E7EB] relative">
                 <div 
@@ -86,17 +98,6 @@ export default function PriceDrop() {
                   }}
                 />
               </div>
-            </div>
-            <div className="flex justify-between mb-2 -mt-1">
-              {["30 days", "90 days", "1 year"].map((range) => (
-                <button
-                  key={range}
-                  onClick={() => setTimeRange(range)}
-                  className={`text-[10px] font-medium ${timeRange === range ? 'text-[#00A36C]' : 'text-[#9CA3AF]'}`}
-                >
-                  {range}
-                </button>
-              ))}
             </div>
 
             {/* Chart with grid */}
@@ -146,14 +147,16 @@ export default function PriceDrop() {
                   
                   {/* Current point */}
                   <circle cx={(priceHistory.length - 1) * 33} cy={100 - priceHistory[priceHistory.length - 1]} r="5" fill="#00A36C" />
-                  
-                  {/* X-axis labels ON TOP of line */}
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <text key={i} x={i * 75} y={100 - priceHistory[i * 2] - 8} fontSize="9" fill="#9CA3AF" textAnchor="middle">
-                      {i === 0 ? '3' : i === 1 ? '10' : i === 2 ? '17' : i === 3 ? '24' : '30'}
-                    </text>
-                  ))}
                 </svg>
+              </div>
+              
+              {/* X-axis labels below chart */}
+              <div className="flex justify-between text-[9px] text-[#9CA3AF] mr-8 mt-2">
+                <span>3</span>
+                <span>10</span>
+                <span>17</span>
+                <span>24</span>
+                <span>30</span>
               </div>
             </div>
           </div>

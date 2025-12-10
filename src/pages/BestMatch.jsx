@@ -36,13 +36,19 @@ export default function BestMatch() {
 
     try {
       const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: `User is looking for: "${inputText}". Generate EXACTLY 3 product recommendations with the following details for each:
-        - Product name/title
-        - Price (realistic, format: $XX.XX)
-        - Store name
-        - A brief reason why it's recommended
-        - Badge type: First product should have "Top Pick", second should have "Best Deal", third should have "Best Match"
-        - Product image URL from Unsplash related to the product type`,
+        prompt: `User is looking for: "${inputText}". Search the internet and find 9 REAL products (actual products that exist online with real prices and stores). Return:
+        - First 3 products labeled "Top Pick" (highest rated/most popular)
+        - Next 3 products labeled "Best Deal" (best value/biggest discount) - include original_price for these
+        - Last 3 products labeled "Best Match" (closest match to query)
+        
+        For each product provide:
+        - Exact product name/title as listed online
+        - Current price (format: $XX.XX)
+        - Original price if it's a Best Deal (format: $XX.XX)
+        - Store/brand name
+        - Discount percentage for Best Deals (e.g., "50% off")
+        - High quality product image URL from the actual product listing or similar`,
+        add_context_from_internet: true,
         response_json_schema: {
           type: "object",
           properties: {
@@ -53,9 +59,10 @@ export default function BestMatch() {
                 properties: {
                   title: { type: "string" },
                   price: { type: "string" },
+                  original_price: { type: "string" },
                   store: { type: "string" },
-                  reason: { type: "string" },
                   badge: { type: "string" },
+                  discount: { type: "string" },
                   image_url: { type: "string" }
                 }
               }

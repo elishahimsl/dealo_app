@@ -382,7 +382,7 @@ Provide a detailed comparison and recommendation.`,
                 };
                 const handleTouchEnd = () => {
                   setIsDragging(false);
-                  if (dragOffset > 80) {
+                  if (dragOffset > 150) {
                     setShowPreferences(false);
                   }
                   setDragOffset(0);

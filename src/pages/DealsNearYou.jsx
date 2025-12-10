@@ -44,9 +44,7 @@ export default function DealsNearYou() {
 
   const filters = [
     { id: "for-you", name: "For You", data: deals },
-    { id: "trending", name: "Trending", data: deals.filter(d => ["tech", "fashion"].includes(d.category)) },
     { id: "hot-deals", name: "Hot Deals", data: [...deals].sort((a, b) => parseInt(b.discount) - parseInt(a.discount)) },
-    { id: "new-arrivals", name: "New Arrivals", data: deals },
     { id: "limited-time", name: "Limited Time", data: deals },
   ];
 

@@ -92,7 +92,7 @@ export default function Following() {
           <div key={store.id} className="relative pt-1">
             {/* Top Card - Products with gradient border effect */}
             <div 
-              className="rounded-2xl p-[2px] relative z-10 mb-14"
+              className="rounded-2xl p-[2px] relative z-10 mb-6"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.4) 50%, rgba(150,150,150,0.3) 100%)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)'

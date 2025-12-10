@@ -47,7 +47,7 @@ export default function PriceDrop() {
     return (
       <div className="min-h-screen bg-white pb-24">
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white border-b border-[#E5E7EB]">
+        <div className="px-6 pt-6 pb-4 flex items-center justify-between bg-white">
           <button onClick={() => setSelectedProduct(null)} className="relative flex items-center justify-center group">
             <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300 group-hover:scale-110" />
           </button>
@@ -162,7 +162,7 @@ export default function PriceDrop() {
           </div>
 
           {/* Next Drop Prediction - Header outside tile */}
-          <div className="mt-8">
+          <div className="mt-12">
             <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Next Drop</h3>
             <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
               <p className="text-2xl font-bold text-[#1F2937] mb-2">$30 - $35</p>

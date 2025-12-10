@@ -119,11 +119,6 @@ export default function Following() {
                   <div key={product.id} className="flex-shrink-0 rounded-xl overflow-hidden bg-[#F3F4F6] relative" style={{ width: '100px' }}>
                     <div className="aspect-square relative">
                       <img src={product.image} alt="" className="w-full h-full object-cover" />
-                      
-                      {/* Price badge - more transparent, centered text */}
-                      <div className="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-1 flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                      </div>
 
                       {/* Heart - bottom right */}
                       <button 

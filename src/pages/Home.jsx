@@ -240,10 +240,6 @@ export default function Home() {
               <div key={product.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
                   <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  {/* Price badge - bigger box, original text size */}
-                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded flex items-center justify-center px-2.5 py-1.5">
-                    <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                  </div>
                   {/* Heart */}
                   <button 
                     onClick={() => toggleFavorite(product.id, product)}

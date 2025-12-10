@@ -272,9 +272,6 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
-                  </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -299,9 +296,6 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
-                  </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${
@@ -326,9 +320,6 @@ export default function Home() {
               <div key={item.id} className="flex-shrink-0" style={{ width: '120px' }}>
                 <div className="aspect-square rounded-2xl overflow-hidden relative bg-[#F3F4F6] mb-2">
                   <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2.5 py-1.5 inline-flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
-                  </div>
                   <button 
                     onClick={() => toggleFavorite(item.id, item)}
                     className={`absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${

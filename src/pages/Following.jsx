@@ -136,12 +136,12 @@ export default function Following() {
                 ))}
               </div>
 
-              {/* New Items + Arrow row */}
+              {/* Update Text + Arrow row */}
               <div className="flex items-center justify-between mt-3">
                 <div className="leading-tight">
-                  <span className="text-xs font-bold text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>{store.newItems} New</span>
+                  <span className="text-xs font-bold text-[#1F2937]" style={{ fontFamily: 'Inter, sans-serif' }}>{store.updateText.main}</span>
                   <br />
-                  <span className="text-[10px] text-[#9CA3AF]">Items Added</span>
+                  <span className="text-[10px] text-[#9CA3AF]">{store.updateText.sub}</span>
                 </div>
                 <Link to={createPageUrl("StoreDetail") + `?store=${encodeURIComponent(store.name)}`}>
                   <div className="w-7 h-7 rounded-full bg-transparent flex items-center justify-center">

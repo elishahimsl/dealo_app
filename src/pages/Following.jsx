@@ -93,24 +93,9 @@ export default function Following() {
       <div className="px-6 space-y-6">
         {followedStores.map((store) => (
           <div key={store.id} className="relative pt-1">
-            {/* Stacked card effect - Deal tile underneath - much more visible */}
-            <div 
-              className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%)',
-                boxShadow: '0 6px 25px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
-              }}
-            />
-            
-            {/* Deal content in bottom tile - at bottom */}
-            <div className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl flex items-end justify-center gap-2 z-0 pb-3">
-              <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
-              <span className="text-white text-[11px] font-light">{store.dealText}</span>
-            </div>
-
             {/* Top Card - Products with gradient border effect */}
             <div 
-              className="rounded-2xl p-[2px] relative z-10 mb-14"
+              className="rounded-2xl p-[2px] relative z-10"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.4) 50%, rgba(150,150,150,0.3) 100%)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
@@ -124,14 +109,7 @@ export default function Following() {
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                     <img src={store.logo} alt={store.name} className="w-full h-full object-contain" />
                   </div>
-                  <div>
-                    <span className="text-sm font-semibold text-[#1F2937]">{store.name}</span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-[10px] font-medium text-[#1F2937]">{store.rating}</span>
-                      <Star className="w-2.5 h-2.5 text-yellow-400 fill-yellow-400" />
-                      <span className="text-[10px] text-[#6B7280]">({store.reviews})</span>
-                    </div>
-                  </div>
+                  <span className="text-sm font-semibold text-[#1F2937]">{store.name}</span>
                 </div>
                 <button onClick={() => setShowNotifModal(store.id)}>
                   <MoreHorizontal className="w-5 h-5 text-[#6B7280]" />
@@ -144,11 +122,6 @@ export default function Following() {
                   <div key={product.id} className="flex-shrink-0 rounded-xl overflow-hidden bg-[#F3F4F6] relative" style={{ width: '100px' }}>
                     <div className="aspect-square relative">
                       <img src={product.image} alt="" className="w-full h-full object-cover" />
-                      
-                      {/* Price badge - more transparent, centered text */}
-                      <div className="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1.5 py-1 flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                      </div>
 
                       {/* Heart - bottom right */}
                       <button 

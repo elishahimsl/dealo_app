@@ -90,21 +90,6 @@ export default function Following() {
       <div className="px-6 space-y-6">
         {followedStores.map((store) => (
           <div key={store.id} className="relative pt-1">
-            {/* Stacked card effect - Deal tile underneath - much more visible */}
-            <div 
-              className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #4a4a4a 100%)',
-                boxShadow: '0 6px 25px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)'
-              }}
-            />
-            
-            {/* Deal content in bottom tile - at bottom */}
-            <div className="absolute -bottom-12 left-1 right-1 h-32 rounded-2xl flex items-end justify-center gap-2 z-0 pb-3">
-              <span className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded">{store.deal}</span>
-              <span className="text-white text-[11px] font-light">{store.dealText}</span>
-            </div>
-
             {/* Top Card - Products with gradient border effect */}
             <div 
               className="rounded-2xl p-[2px] relative z-10 mb-14"

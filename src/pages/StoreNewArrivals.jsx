@@ -47,16 +47,6 @@ export default function StoreNewArrivals() {
             <div key={product.id}>
               <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                
-                {product.badge && (
-                  <div className="absolute bottom-2 left-2 bg-[#3B82F6] text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                    {product.badge}
-                  </div>
-                )}
-
-                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                </div>
 
                 <button 
                   onClick={() => toggleFavorite(product.id)}

@@ -214,13 +214,7 @@ export default function PriceDrop() {
                       <Heart className={`w-3 h-3 ${favorites.includes(s.store) ? 'text-white fill-white' : 'text-white'}`} />
                     </button>
                   </div>
-                  {/* Brand with logo underneath */}
-                  <div className="flex items-center gap-1">
-                    <img src={s.logo} alt="" className="w-3 h-3 object-contain" />
-                    <span className="text-[10px] font-medium text-[#1F2937]">{s.store}</span>
-                  </div>
-                  {/* Visit store link - underlined */}
-                  <button className="text-[9px] text-[#00A36C] font-medium underline">Visit Store</button>
+                  <span className="text-[10px] font-medium text-[#1F2937]">{s.store}</span>
                 </div>
               ))}
             </div>
@@ -329,12 +323,7 @@ export default function PriceDrop() {
                 className="flex-shrink-0 rounded-xl overflow-hidden bg-[#F3F4F6]"
                 style={{ width: '100px', height: '100px' }}
               >
-                <div className="w-full h-full relative">
-                  <img src={item.image} alt="" className="w-full h-full object-cover" />
-                  <div className="absolute top-1.5 left-1.5 bg-black/40 backdrop-blur-sm rounded px-1 py-0.5">
-                    <span className="text-[9px] font-bold text-white leading-none">{item.price}</span>
-                  </div>
-                </div>
+                <img src={item.image} alt="" className="w-full h-full object-cover" />
               </button>
             ))}
           </div>
@@ -375,13 +364,7 @@ export default function PriceDrop() {
                     <Heart className={`w-3 h-3 ${favorites.includes(item.id) ? 'text-white fill-white' : 'text-white'}`} />
                   </button>
                 </div>
-                {/* Info underneath - no tile */}
-                <p className="text-[10px] text-[#6B7280] mb-0.5">{item.brand}</p>
-                <p className="text-xs font-medium text-[#1F2937] line-clamp-1 mb-1">{item.name}</p>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-[#6B7280] line-through">{item.originalPrice}</span>
-                  <span className="bg-[#00A36C] text-white text-[8px] font-bold px-1 py-0.5 rounded">{item.discount}</span>
-                </div>
+                <p className="text-xs font-medium text-[#1F2937] line-clamp-1">{item.name}</p>
               </button>
             ))}
           </div>

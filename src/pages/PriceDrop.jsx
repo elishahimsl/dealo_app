@@ -162,7 +162,7 @@ export default function PriceDrop() {
           </div>
 
           {/* Next Drop Prediction - Header outside tile */}
-          <div>
+          <div className="mt-8">
             <h3 className="font-bold text-[#1F2937] mb-3 text-sm">Next Drop</h3>
             <div className="bg-[#F9FAFB] rounded-xl p-4 border border-[#E5E7EB]">
               <p className="text-2xl font-bold text-[#1F2937] mb-2">$30 - $35</p>

@@ -265,18 +265,6 @@ export default function StoreDetail() {
               <div className="aspect-square rounded-2xl overflow-hidden relative mb-2">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
                 
-                {/* Badge - bottom left */}
-                {product.badge && (
-                  <div className="absolute bottom-2 left-2 bg-black/40 backdrop-blur-sm text-white text-[8px] font-bold px-2 py-0.5 rounded">
-                    {product.badge}
-                  </div>
-                )}
-
-                {/* Price badge - centered, fitted to text */}
-                <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5 inline-flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white leading-none">{product.price}</span>
-                </div>
-
                 {/* Heart - bottom right */}
                 <button 
                   onClick={() => toggleFavorite(product.id)}

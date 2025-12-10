@@ -143,9 +143,9 @@ export default function TopicDetail() {
         </div>
         
         {/* Search Bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
-          <Input placeholder="Search" className="pl-10 h-9 rounded-xl bg-[#E5E7EB] border-0 text-sm" />
+        <div className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
+          <Search className="w-4 h-4 text-[#6B7280]" />
+          <span className="text-sm text-[#6B7280]">Search</span>
         </div>
 
         {/* Topic Name below search */}

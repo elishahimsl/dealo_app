@@ -103,13 +103,13 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Search Bar - Full Width Thinner */}
+        {/* Search Bar */}
         <Link to={createPageUrl("DiscoverSearch")} className="block mb-4">
-          <div className="w-full bg-[#E5E7EB] rounded-full px-4 py-2 flex items-center gap-3">
+          <div className="w-full h-10 rounded-2xl bg-[#E5E7EB] flex items-center px-4 gap-2">
             <svg className="w-4 h-4 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className="text-sm text-[#6B7280] flex-1">Search Product</span>
+            <span className="text-sm text-[#6B7280] flex-1">Search</span>
             <Camera className="w-4 h-4 text-[#6B7280]" />
           </div>
         </Link>

@@ -412,7 +412,6 @@ export default function BestMatch() {
 
             {/* Results List */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
-              {/* Labeled products at top */}
               {showFullResults
                 .filter(p => 
                   (activeResultTab === 'topPicks' && p.badge === 'Top Pick') ||
@@ -434,24 +433,26 @@ export default function BestMatch() {
                     {/* Product Info */}
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-1">
-                        <div className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                          product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
-                          product.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
-                          'bg-[#F59E0B] text-white'
-                        }`}>
-                          {product.badge}
-                        </div>
-                        <button>
+                        {idx === 0 && (
+                          <div className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                            product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
+                            product.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
+                            'bg-[#F59E0B] text-white'
+                          }`}>
+                            {product.badge}
+                          </div>
+                        )}
+                        <button className={idx === 0 ? '' : 'ml-auto'}>
                           <Bookmark className="w-4 h-4 text-[#6B7280]" />
                         </button>
                       </div>
-                      <p className="text-[10px] text-[#6B7280] mb-0.5">{product.store}</p>
-                      <h3 className="font-semibold text-[#1F2937] text-xs mb-1 line-clamp-2">{product.title}</h3>
-                      <div className="flex items-center gap-2">
+                      <p className="text-[9px] text-[#6B7280] mb-0.5">{product.store}</p>
+                      <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{product.title}</h3>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-[#1F2937]">{product.price}</p>
                         {product.original_price && (
-                          <p className="text-xs text-[#6B7280] line-through">{product.original_price}</p>
+                          <p className="text-[10px] text-[#6B7280] line-through">{product.original_price}</p>
                         )}
-                        <p className="text-sm font-bold text-[#1F2937]">{product.price}</p>
                       </div>
                     </div>
                   </div>

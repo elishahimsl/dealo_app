@@ -32,6 +32,9 @@ import Following from './pages/Following';
 import FollowingList from './pages/FollowingList';
 import AllRecentlyViewed from './pages/AllRecentlyViewed';
 import AllRecentlyDropped from './pages/AllRecentlyDropped';
+import StoreDeals from './pages/StoreDeals';
+import StoreBestSellers from './pages/StoreBestSellers';
+import StoreNewArrivals from './pages/StoreNewArrivals';
 import __Layout from './Layout.jsx';
 
 
@@ -70,6 +73,9 @@ export const PAGES = {
     "FollowingList": FollowingList,
     "AllRecentlyViewed": AllRecentlyViewed,
     "AllRecentlyDropped": AllRecentlyDropped,
+    "StoreDeals": StoreDeals,
+    "StoreBestSellers": StoreBestSellers,
+    "StoreNewArrivals": StoreNewArrivals,
 }
 
 export const pagesConfig = {

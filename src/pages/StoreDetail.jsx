@@ -184,7 +184,11 @@ export default function StoreDetail() {
             <div className="flex gap-3">
               {/* Deals tile */}
               <div className="flex-1">
-                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                <button 
+                  onClick={() => navigate(createPageUrl("StoreDeals") + `?store=${encodeURIComponent(storeName)}`)}
+                  className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" 
+                  style={{ height: '80px' }}
+                >
                   <img 
                     src="https://images.unsplash.com/photo-1629949009710-a040ed77dc6e?w=200" 
                     alt="" 
@@ -197,10 +201,14 @@ export default function StoreDetail() {
                   <span className="text-[10px] text-[#6B7280]">Top Deals</span>
                 </div>
               </div>
-              
+
               {/* Best Sellers tile */}
               <div className="flex-1">
-                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                <button 
+                  onClick={() => navigate(createPageUrl("StoreBestSellers") + `?store=${encodeURIComponent(storeName)}`)}
+                  className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" 
+                  style={{ height: '80px' }}
+                >
                   <img 
                     src="https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=200" 
                     alt="" 
@@ -213,10 +221,14 @@ export default function StoreDetail() {
                   <span className="text-[10px] text-[#6B7280]">Best Sellers</span>
                 </div>
               </div>
-              
+
               {/* New Arrivals tile */}
               <div className="flex-1">
-                <button className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" style={{ height: '80px' }}>
+                <button 
+                  onClick={() => navigate(createPageUrl("StoreNewArrivals") + `?store=${encodeURIComponent(storeName)}`)}
+                  className="w-full rounded-xl bg-[#F3F4F6] relative overflow-hidden" 
+                  style={{ height: '80px' }}
+                >
                   <img 
                     src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200" 
                     alt="" 

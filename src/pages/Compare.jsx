@@ -61,18 +61,24 @@ export default function Compare() {
     
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Compare these two products and determine which is better based on the user's preferences.
-        
+        prompt: `Compare these two products and determine which is better based on the user's weighted preferences.
+
 Product 1: ${item1.title} - ${item1.price}
 Product 2: ${item2.title} - ${item2.price}
 
-User Preferences (0-100 scale):
-- Price importance: ${pricePreference[0]}
-- Quality importance: ${qualityPreference[0]}
-- Brand importance: ${brandPreference[0]}
-- Durability importance: ${durabilityPreference[0]}
+User Preferences (0-100 scale, higher = more important):
 
-Provide a detailed comparison and recommendation.`,
+Brand (${brandPreference[0]}/100): ${brandPreference[0] > 70 ? 'Heavily prioritize' : brandPreference[0] > 40 ? 'Consider' : 'Ignore'} well-known and trusted brands. ${brandPreference[0] > 70 ? 'Favor reputable brands even if more expensive.' : ''}
+
+Price (${pricePreference[0]}/100): ${pricePreference[0] > 70 ? 'Heavily favor' : pricePreference[0] > 40 ? 'Consider' : 'Ignore'} the lowest price. ${pricePreference[0] > 70 ? 'Cost is the primary factor.' : ''}
+
+Durability (${durabilityPreference[0]}/100): ${durabilityPreference[0] > 70 ? 'Heavily prioritize' : durabilityPreference[0] > 40 ? 'Consider' : 'Ignore'} build quality and product lifespan. ${durabilityPreference[0] > 70 ? 'Long-term quality matters most.' : ''}
+
+Reviews (${reviewsPreference[0]}/100): ${reviewsPreference[0] > 70 ? 'Heavily prioritize' : reviewsPreference[0] > 40 ? 'Consider' : 'Ignore'} customer ratings and satisfaction. ${reviewsPreference[0] > 70 ? 'Customer feedback is critical.' : ''}
+
+Discount (${qualityPreference[0]}/100): ${qualityPreference[0] > 70 ? 'Heavily prioritize' : qualityPreference[0] > 40 ? 'Consider' : 'Ignore'} current savings and price drops. ${qualityPreference[0] > 70 ? 'Biggest deal wins.' : ''}
+
+Analyze both products considering these weighted priorities and determine the winner.`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -401,7 +407,8 @@ Provide a detailed comparison and recommendation.`,
               >
                 {/* Brand */}
                 <div>
-                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Brand</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-1 block">Brand</label>
+                  <p className="text-[10px] text-[#9CA3AF] mb-3">Prioritize well-known and trusted brands</p>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -431,7 +438,8 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Price */}
                 <div>
-                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Price</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-1 block">Price</label>
+                  <p className="text-[10px] text-[#9CA3AF] mb-3">Prioritize the lowest price</p>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -461,7 +469,8 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Durability */}
                 <div>
-                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Durability</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-1 block">Durability</label>
+                  <p className="text-[10px] text-[#9CA3AF] mb-3">Prioritize build quality and product lifespan</p>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -491,7 +500,8 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Reviews */}
                 <div>
-                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Reviews</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-1 block">Reviews</label>
+                  <p className="text-[10px] text-[#9CA3AF] mb-3">Prioritize higher customer ratings</p>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
@@ -521,7 +531,8 @@ Provide a detailed comparison and recommendation.`,
 
                 {/* Discount */}
                 <div>
-                  <label className="text-xs font-medium text-[#6B7280] mb-3 block">Discount</label>
+                  <label className="text-xs font-medium text-[#6B7280] mb-1 block">Discount</label>
+                  <p className="text-[10px] text-[#9CA3AF] mb-3">Prioritize the biggest savings and price drops</p>
                   <div className="relative px-3">
                     <div className="h-2 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />

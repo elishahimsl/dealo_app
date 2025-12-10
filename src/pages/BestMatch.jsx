@@ -254,37 +254,60 @@ export default function BestMatch() {
 
       {/* Inspiration Sheet */}
       {showInspiration && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowInspiration(false)}>
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-end" onClick={() => setShowInspiration(false)}>
           <div 
             className="bg-white w-full rounded-t-3xl overflow-hidden flex flex-col animate-slide-up" 
-            style={{ height: '50vh' }}
+            style={{ height: '90vh' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center py-3">
               <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
             </div>
-            <div className="px-6 pb-4">
-              <h2 className="text-xl font-bold text-[#1F2937] mb-1">Inspiration</h2>
-              <p className="text-sm text-[#6B7280]">Explore trending finds & ideas</p>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 pb-6">
-              <div className="mb-6">
-                <h3 className="text-xs font-bold text-[#6B7280] mb-3">TRENDING CATEGORIES</h3>
-                <div className="flex gap-2 flex-wrap">
-                  {['Tech', 'Home', 'Shoes', 'Fashion', 'Beauty'].map(cat => (
-                    <button key={cat} className="px-4 py-2 bg-[#F3F4F6] rounded-full text-sm font-medium text-[#1F2937]">
-                      {cat}
-                    </button>
-                  ))}
-                </div>
+            
+            {/* Header */}
+            <div className="px-6 pb-3">
+              <h2 className="text-sm font-bold text-[#1F2937] mb-3">Inspiration</h2>
+              
+              {/* Category pills - horizontal scroll */}
+              <div className="flex gap-6 overflow-x-auto pb-2 scrollbar-hide">
+                {['All', 'Tech', 'Home', 'Shoes', 'Fashion', 'Beauty'].map(cat => (
+                  <button 
+                    key={cat} 
+                    className={`text-xs font-medium whitespace-nowrap ${
+                      cat === 'All' 
+                        ? 'bg-[#E5E7EB] text-[#1F2937] px-3 py-1 rounded-full' 
+                        : 'text-[#6B7280]'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
-              <div className="mb-6">
-                <h3 className="text-xs font-bold text-[#6B7280] mb-3">POPULAR RIGHT NOW</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="aspect-square rounded-xl bg-[#F3F4F6]" />
-                  ))}
-                </div>
+            </div>
+
+            {/* Content - scrollable */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { name: "Wireless Headphones", price: "$89", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300" },
+                  { name: "Smart Watch", price: "$149", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" },
+                  { name: "Running Shoes", price: "$119", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
+                  { name: "Bluetooth Speaker", price: "$59", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300" },
+                  { name: "Hoodie", price: "$45", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300" },
+                  { name: "Backpack", price: "$69", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300" },
+                  { name: "Sunglasses", price: "$79", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
+                  { name: "Laptop", price: "$899", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300" },
+                ].map((item, idx) => (
+                  <div key={idx}>
+                    <div className="aspect-square rounded-2xl overflow-hidden relative mb-2 bg-[#F3F4F6]">
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded px-1.5 py-0.5">
+                        <span className="text-[10px] font-bold text-white leading-none">{item.price}</span>
+                      </div>
+                    </div>
+                    <p className="text-xs font-medium text-[#1F2937]">{item.name}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

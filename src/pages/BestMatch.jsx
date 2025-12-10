@@ -131,23 +131,35 @@ export default function BestMatch() {
             
             {msg.type === 'ai' && (
               <div className="space-y-3">
-                {msg.products?.map((product, pidx) => (
-                  <div key={pidx} className="bg-white rounded-2xl border border-[#E5E7EB] p-3 flex gap-3">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#F3F4F6]">
+                {msg.products?.slice(0, 3).map((product, pidx) => (
+                  <div key={pidx} className="flex gap-2">
+                    {/* Product Image - Separate Tile */}
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-[#E5E7EB]">
                       <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                     </div>
-                    <div className="flex-1">
-                      {product.badge && (
-                        <div className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-1 ${
-                          product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 'bg-[#3B82F6] text-white'
-                        }`}>
-                          {product.badge}
-                        </div>
-                      )}
-                      <h3 className="font-bold text-[#1F2937] text-sm mb-0.5">{product.title}</h3>
-                      <p className="text-lg font-bold text-[#1F2937] mb-0.5">{product.price}</p>
-                      <p className="text-xs text-[#6B7280] mb-1">{product.store}</p>
-                      <p className="text-xs text-[#6B7280]">{product.reason}</p>
+                    
+                    {/* Product Info - Bigger Tile */}
+                    <div className="flex-1 bg-white rounded-2xl border border-[#E5E7EB] p-3">
+                      <div className="flex items-start justify-between mb-2">
+                        {product.badge && (
+                          <div className={`px-2 py-0.5 rounded text-[9px] font-bold ${
+                            product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 'bg-[#3B82F6] text-white'
+                          }`}>
+                            {product.badge}
+                          </div>
+                        )}
+                        <button>
+                          <Bookmark className="w-4 h-4 text-[#6B7280]" />
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-[#6B7280] mb-0.5">{product.store}</p>
+                      <h3 className="font-bold text-[#1F2937] text-xs mb-1 line-clamp-2">{product.title}</h3>
+                      <div className="flex items-center gap-2">
+                        {product.original_price && (
+                          <p className="text-xs text-[#6B7280] line-through">{product.original_price}</p>
+                        )}
+                        <p className="text-sm font-bold text-[#1F2937]">{product.price}</p>
+                      </div>
                     </div>
                   </div>
                 ))}

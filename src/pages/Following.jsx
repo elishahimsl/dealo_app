@@ -23,54 +23,51 @@ export default function Following() {
     }));
   };
 
+  const updateTexts = [
+    { main: "Updated this", sub: "week" },
+    { main: "New drop", sub: "available" },
+    { main: "Store", sub: "refreshed" },
+    { main: "Recently added", sub: "items" },
+    { main: "Featured collection", sub: "updated" },
+    { main: "Now", sub: "trending" }
+  ];
+
   const followedStores = [
     {
       id: 1,
       name: "Nike",
       logo: "https://logo.clearbit.com/nike.com",
-      rating: 4.8,
-      reviews: "12.5k",
-      newItems: 3,
+      updateText: updateTexts[0],
       products: [
-        { id: 101, price: "$79.99", originalPrice: "$149.99", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
-        { id: 102, price: "$46.99", image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300" },
-        { id: 103, price: "$189.99", image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300" },
-        { id: 104, price: "$129.99", image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=300" },
-        { id: 105, price: "$89.99", image: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=300" },
-      ],
-      deal: "Save $25",
-      dealText: "on shirts under $50"
+        { id: 101, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
+        { id: 102, image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300" },
+        { id: 103, image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300" },
+        { id: 104, image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=300" },
+        { id: 105, image: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=300" },
+      ]
     },
     {
       id: 2,
       name: "Adidas",
       logo: "https://logo.clearbit.com/adidas.com",
-      rating: 4.6,
-      reviews: "9.2k",
-      newItems: 5,
+      updateText: updateTexts[1],
       products: [
-        { id: 201, price: "$86.99", image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=300" },
-        { id: 202, price: "$110.99", image: "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=300" },
-        { id: 203, price: "$57.99", image: "https://images.unsplash.com/photo-1562183241-b937e95585b6?w=300" },
-        { id: 204, price: "$74.99", image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=300" },
-      ],
-      deal: "Save $10",
-      dealText: "on orders over $100"
+        { id: 201, image: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=300" },
+        { id: 202, image: "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=300" },
+        { id: 203, image: "https://images.unsplash.com/photo-1562183241-b937e95585b6?w=300" },
+        { id: 204, image: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=300" },
+      ]
     },
     {
       id: 3,
       name: "Target",
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Target_logo.svg/1200px-Target_logo.svg.png",
-      rating: 4.5,
-      reviews: "17.5k",
-      newItems: 8,
+      updateText: updateTexts[2],
       products: [
-        { id: 301, price: "$24.99", image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=300" },
-        { id: 302, price: "$18.99", image: "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=300" },
-        { id: 303, price: "$34.99", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300" },
-      ],
-      deal: "20% off",
-      dealText: "home decor this week"
+        { id: 301, image: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=300" },
+        { id: 302, image: "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=300" },
+        { id: 303, image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300" },
+      ]
     },
   ];
 

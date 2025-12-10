@@ -191,21 +191,13 @@ export default function MyCart() {
             <div key={product.id}>
               <div className="bg-white rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm mb-2 relative aspect-square">
                 <img src={product.image} alt={product.title} className="w-full h-full object-cover" />
-                {product.savings && (
-                  <div className="absolute top-2 left-2 bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded-md">Save {product.savings}</div>
-                )}
                 <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-[#00A36C] flex items-center justify-center shadow-md">
                   <Heart className="w-4 h-4 text-white fill-white" />
                 </button>
               </div>
               <div>
                 <p className="text-[10px] text-[#6B7280] mb-0.5">{product.brand}</p>
-                <h3 className="font-bold text-[#1F2937] text-xs mb-0.5 line-clamp-2 leading-tight">{product.title}</h3>
-                <p className="text-sm font-bold text-[#1F2937] mb-1">{product.price}</p>
-                <div className="flex items-center gap-2 text-[10px]">
-                  {product.size && <span className="text-[#6B7280]">{product.size}</span>}
-                  <a href={`https://${product.store.toLowerCase().replace(' ', '')}.com`} target="_blank" rel="noopener noreferrer" className="text-[#00A36C] underline">Visit Store</a>
-                </div>
+                <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2 leading-tight">{product.title}</h3>
               </div>
             </div>
           ))}

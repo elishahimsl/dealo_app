@@ -11,6 +11,9 @@ export default function BestMatch() {
   const [messages, setMessages] = useState([]);
   const [showPlusMenu, setShowPlusMenu] = useState(false);
   const [showInspiration, setShowInspiration] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categoryProducts, setCategoryProducts] = useState([]);
+  const [loadingCategory, setLoadingCategory] = useState(false);
   const [showSavedItems, setShowSavedItems] = useState(false);
   const [showFullResults, setShowFullResults] = useState(null);
   const [activeResultTab, setActiveResultTab] = useState("topPicks");
@@ -92,6 +95,42 @@ export default function BestMatch() {
     setShowSavedItems(false);
   };
 
+  const loadCategoryProducts = async (category) => {
+    setSelectedCategory(category);
+    setLoadingCategory(true);
+    
+    try {
+      const aiResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `Find 8 real popular products in the "${category}" category. Search the internet for actual products with real images.
+        For each product provide:
+        - Product name
+        - High quality product image URL from actual retailers`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  image_url: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      setCategoryProducts(aiResponse.products || []);
+    } catch (error) {
+      console.error("Error loading category products:", error);
+    }
+    
+    setLoadingCategory(false);
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -132,15 +171,15 @@ export default function BestMatch() {
             {msg.type === 'ai' && (
               <div className="space-y-2">
                 {msg.products?.map((product, pidx) => (
-                  <div key={pidx} className="flex flex-col gap-2">
-                    {/* Product Image - Bigger */}
-                    <div className="w-full aspect-square rounded-2xl overflow-hidden bg-[#E5E7EB]">
+                  <div key={pidx} className="flex gap-3">
+                    {/* Product Image - Left side */}
+                    <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0">
                       <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                     </div>
                     
-                    {/* Product Info - No tile, just text */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
+                    {/* Product Info - Right side */}
+                    <div className="flex-1 flex flex-col justify-between py-1">
+                      <div>
                         {product.badge && (
                           <div className={`inline-block px-2 py-0.5 rounded text-[8px] font-bold mb-1 ${
                             product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
@@ -159,7 +198,7 @@ export default function BestMatch() {
                           )}
                         </div>
                       </div>
-                      <button>
+                      <button className="self-end">
                         <Bookmark className="w-4 h-4 text-[#6B7280]" />
                       </button>
                     </div>
@@ -286,16 +325,20 @@ export default function BestMatch() {
             </div>
             
             {/* Header */}
-            <div className="px-6 pb-3">
-              <h2 className="text-sm font-bold text-[#1F2937] mb-3">Inspiration</h2>
+            <div className="flex flex-col items-center px-6 pb-3">
+              <h2 className="text-sm font-normal text-[#1F2937] mb-3">Inspiration</h2>
               
               {/* Category buttons - clickable */}
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                {['Tech', 'Home', 'Shoes', 'Fashion', 'Beauty', 'Sports'].map(cat => (
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {['All', 'Tech', 'Home', 'Shoes', 'Fashion', 'Beauty', 'Sports'].map(cat => (
                   <button 
                     key={cat} 
-                    onClick={() => navigate(createPageUrl("TopicDetail") + `?topic=${cat}`)}
-                    className="px-4 py-2 bg-[#F3F4F6] rounded-full text-xs font-medium text-[#1F2937] whitespace-nowrap hover:bg-[#E5E7EB]"
+                    onClick={() => loadCategoryProducts(cat)}
+                    className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
+                      selectedCategory === cat 
+                        ? 'bg-[#1F2937] text-white' 
+                        : 'bg-[#F3F4F6] text-[#1F2937] hover:bg-[#E5E7EB]'
+                    }`}
                   >
                     {cat}
                   </button>
@@ -305,25 +348,22 @@ export default function BestMatch() {
 
             {/* Content - scrollable */}
             <div className="flex-1 overflow-y-auto px-6 pb-6">
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { name: "Wireless Headphones", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300" },
-                  { name: "Smart Watch", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300" },
-                  { name: "Running Shoes", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300" },
-                  { name: "Bluetooth Speaker", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300" },
-                  { name: "Hoodie", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=300" },
-                  { name: "Backpack", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=300" },
-                  { name: "Sunglasses", image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300" },
-                  { name: "Laptop", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300" },
-                ].map((item, idx) => (
-                  <div key={idx}>
-                    <div className="aspect-square rounded-2xl overflow-hidden mb-2 bg-[#E5E7EB]">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              {loadingCategory ? (
+                <div className="flex justify-center items-center h-full">
+                  <div className="w-6 h-6 border-2 border-[#1F2937] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {categoryProducts.map((item, idx) => (
+                    <div key={idx}>
+                      <div className="aspect-square rounded-2xl overflow-hidden mb-2 bg-[#E5E7EB]">
+                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-xs font-medium text-[#1F2937]">{item.name}</p>
                     </div>
-                    <p className="text-xs font-medium text-[#1F2937]">{item.name}</p>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

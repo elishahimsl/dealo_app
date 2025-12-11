@@ -22,6 +22,20 @@ export default function Compare() {
   const [reviewsPreference, setReviewsPreference] = useState([50]);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
+  const getSliderLabel = (value) => {
+    if (value <= 15) return { text: 'Low', position: 'low' };
+    if (value <= 35) return { text: 'Below Average', position: 'middle' };
+    if (value <= 65) return { text: 'Fair', position: 'middle' };
+    if (value <= 85) return { text: 'Above Average', position: 'middle' };
+    return { text: 'High', position: 'high' };
+  };
+
+  const getSliderColor = (value) => {
+    if (value <= 33) return '#EF4444';
+    if (value <= 66) return '#F59E0B';
+    return '#10B981';
+  };
+
   // Fetch saved captures for search
   const { data: savedProducts = [] } = useQuery({
     queryKey: ['captures'],
@@ -237,16 +251,19 @@ Analyze both products considering these weighted priorities and determine the wi
           <h2 className="text-sm font-bold text-[#1F2937] mb-3">Saved Comparisons</h2>
           <button 
             onClick={() => navigate(createPageUrl("SavedComparisons"))}
-            className="w-full bg-[#00A36C]/5 border border-[#00A36C]/20 rounded-2xl p-4 flex items-center gap-4 hover:bg-[#00A36C]/10 transition-colors"
+            className="w-full bg-gradient-to-br from-[#00A36C] to-[#007E52] rounded-2xl p-4 flex items-center gap-4 hover:opacity-90 transition-opacity shadow-lg"
           >
-            <div className="w-12 h-12 rounded-xl bg-[#00A36C]/10 flex items-center justify-center flex-shrink-0">
-              <Folder className="w-6 h-6 text-[#00A36C]" />
+            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="2" fill="currentColor"/>
+              </svg>
             </div>
             <div className="flex-1 text-left">
-              <h3 className="font-bold text-[#1F2937] text-sm mb-0.5">Saved Comparisons</h3>
-              <p className="text-xs text-[#6B7280]">View your saved matchups</p>
+              <h3 className="font-bold text-white text-sm mb-0.5">Saved Comparisons</h3>
+              <p className="text-xs text-white/80">View your saved matchups</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+            <ChevronRight className="w-5 h-5 text-white/80" />
           </button>
         </div>
 
@@ -269,10 +286,10 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=1")}
-              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
+              <div className="text-[#00A36C] text-5xl font-light leading-none">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add first product</span>
-              <div className="text-[#00A36C] text-3xl font-light">+</div>
             </button>
           )}
 
@@ -293,10 +310,10 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=2")}
-              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
+              <div className="text-[#00A36C] text-5xl font-light leading-none">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add second product</span>
-              <div className="text-[#00A36C] text-3xl font-light">+</div>
             </button>
           )}
 
@@ -380,11 +397,15 @@ Analyze both products considering these weighted priorities and determine the wi
                       value={brandPreference[0]}
                       onChange={(e) => setBrandPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-color': getSliderColor(brandPreference[0]) }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
-                    <span>Low</span>
-                    <span>High</span>
+                  <div className="flex justify-between items-center text-[10px] mt-1.5 px-3">
+                    <span className={getSliderLabel(brandPreference[0]).position === 'low' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>Low</span>
+                    {getSliderLabel(brandPreference[0]).position === 'middle' && (
+                      <span className="text-[#1F2937] font-medium">{getSliderLabel(brandPreference[0]).text}</span>
+                    )}
+                    <span className={getSliderLabel(brandPreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
 
@@ -405,11 +426,15 @@ Analyze both products considering these weighted priorities and determine the wi
                       value={pricePreference[0]}
                       onChange={(e) => setPricePreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-color': getSliderColor(pricePreference[0]) }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
-                    <span>Low</span>
-                    <span>High</span>
+                  <div className="flex justify-between items-center text-[10px] mt-1.5 px-3">
+                    <span className={getSliderLabel(pricePreference[0]).position === 'low' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>Low</span>
+                    {getSliderLabel(pricePreference[0]).position === 'middle' && (
+                      <span className="text-[#1F2937] font-medium">{getSliderLabel(pricePreference[0]).text}</span>
+                    )}
+                    <span className={getSliderLabel(pricePreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
 
@@ -430,11 +455,15 @@ Analyze both products considering these weighted priorities and determine the wi
                       value={durabilityPreference[0]}
                       onChange={(e) => setDurabilityPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-color': getSliderColor(durabilityPreference[0]) }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
-                    <span>Low</span>
-                    <span>High</span>
+                  <div className="flex justify-between items-center text-[10px] mt-1.5 px-3">
+                    <span className={getSliderLabel(durabilityPreference[0]).position === 'low' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>Low</span>
+                    {getSliderLabel(durabilityPreference[0]).position === 'middle' && (
+                      <span className="text-[#1F2937] font-medium">{getSliderLabel(durabilityPreference[0]).text}</span>
+                    )}
+                    <span className={getSliderLabel(durabilityPreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
 
@@ -455,11 +484,15 @@ Analyze both products considering these weighted priorities and determine the wi
                       value={reviewsPreference[0]}
                       onChange={(e) => setReviewsPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-color': getSliderColor(reviewsPreference[0]) }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
-                    <span>Low</span>
-                    <span>High</span>
+                  <div className="flex justify-between items-center text-[10px] mt-1.5 px-3">
+                    <span className={getSliderLabel(reviewsPreference[0]).position === 'low' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>Low</span>
+                    {getSliderLabel(reviewsPreference[0]).position === 'middle' && (
+                      <span className="text-[#1F2937] font-medium">{getSliderLabel(reviewsPreference[0]).text}</span>
+                    )}
+                    <span className={getSliderLabel(reviewsPreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
 
@@ -480,11 +513,15 @@ Analyze both products considering these weighted priorities and determine the wi
                       value={qualityPreference[0]}
                       onChange={(e) => setQualityPreference([parseInt(e.target.value)])}
                       className="slider-custom w-full absolute top-0 left-0"
+                      style={{ '--slider-color': getSliderColor(qualityPreference[0]) }}
                     />
                   </div>
-                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
-                    <span>Low</span>
-                    <span>High</span>
+                  <div className="flex justify-between items-center text-[10px] mt-1.5 px-3">
+                    <span className={getSliderLabel(qualityPreference[0]).position === 'low' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>Low</span>
+                    {getSliderLabel(qualityPreference[0]).position === 'middle' && (
+                      <span className="text-[#1F2937] font-medium">{getSliderLabel(qualityPreference[0]).text}</span>
+                    )}
+                    <span className={getSliderLabel(qualityPreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
               </div>
@@ -519,10 +556,10 @@ Analyze both products considering these weighted priorities and determine the wi
         .slider-custom::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           background: white;
-          border: 3px solid #00A36C;
+          border: 4px solid var(--slider-color, #00A36C);
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -530,10 +567,10 @@ Analyze both products considering these weighted priorities and determine the wi
         }
         
         .slider-custom::-moz-range-thumb {
-          width: 16px;
-          height: 16px;
+          width: 14px;
+          height: 14px;
           background: white;
-          border: 3px solid #00A36C;
+          border: 4px solid var(--slider-color, #00A36C);
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);

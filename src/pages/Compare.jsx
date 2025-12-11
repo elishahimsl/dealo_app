@@ -143,9 +143,9 @@ Analyze both products considering these weighted priorities and determine the wi
         {/* Preferences Icon - Top Right */}
         <button 
           onClick={() => setShowPreferences(true)}
-          className="absolute top-6 right-6 w-7 h-7 flex items-center justify-center"
+          className="absolute top-6 right-4 w-6 h-6 flex items-center justify-center"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="3" width="7" height="7" rx="1.5" />
             <rect x="14" y="3" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
@@ -223,19 +223,19 @@ Analyze both products considering these weighted priorities and determine the wi
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {trendingComparisons.map((comp, idx) => (
-              <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3" style={{ minWidth: '200px' }}>
+              <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-md" style={{ minWidth: '200px' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex flex-col items-center flex-1">
-                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                    <div className="w-20 h-32 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
                       <img src={comp.product1.image} alt={comp.product1.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product1.name}</p>
                   </div>
-                  <div className="bg-[#F3F4F6] rounded px-2 py-1">
+                  <div className="w-8 h-8 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
                     <span className="text-[10px] font-bold text-[#6B7280]">VS</span>
                   </div>
                   <div className="flex flex-col items-center flex-1">
-                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                    <div className="w-20 h-32 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
                       <img src={comp.product2.image} alt={comp.product2.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product2.name}</p>
@@ -251,19 +251,19 @@ Analyze both products considering these weighted priorities and determine the wi
           <h2 className="text-sm font-bold text-[#1F2937] mb-3">Saved Comparisons</h2>
           <button 
             onClick={() => navigate(createPageUrl("SavedComparisons"))}
-            className="w-full bg-gradient-to-br from-[#00A36C] to-[#007E52] rounded-2xl p-4 flex items-center gap-4 hover:opacity-90 transition-opacity shadow-lg"
+            className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 flex items-center gap-4 hover:bg-[#F9FAFB] transition-colors shadow-sm"
           >
-            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="w-12 h-12 rounded-xl bg-[#00A36C]/10 flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-[#00A36C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
                 <circle cx="12" cy="13" r="2" fill="currentColor"/>
               </svg>
             </div>
             <div className="flex-1 text-left">
-              <h3 className="font-bold text-white text-sm mb-0.5">Saved Comparisons</h3>
-              <p className="text-xs text-white/80">View your saved matchups</p>
+              <h3 className="font-bold text-[#1F2937] text-sm mb-0.5">Saved Comparisons</h3>
+              <p className="text-xs text-[#6B7280]">View your saved matchups</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-white/80" />
+            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
           </button>
         </div>
 

@@ -34,6 +34,8 @@ export default function Compare() {
   const [selectingSlot, setSelectingSlot] = useState(false);
 
   const handleFileSelect = async (file, itemNumber) => {
+    if (!file) return;
+    
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       
@@ -50,13 +52,18 @@ export default function Compare() {
         }
       });
 
-      const itemData = { ...result, file_url: result.image_url || file_url };
+      const itemData = {
+        title: result?.title || "Unknown Product",
+        price: result?.price || "$0.00",
+        file_url: result?.image_url || file_url
+      };
       
       if (itemNumber === 1) setItem1(itemData);
       else setItem2(itemData);
       setShowUploadOptions(null);
     } catch (error) {
       console.error("Error processing file:", error);
+      setShowUploadOptions(null);
     }
   };
 
@@ -180,9 +187,9 @@ Analyze both products considering these weighted priorities and determine the wi
     if (!selectedProduct) return;
     
     const itemData = {
-      title: selectedProduct.title,
-      price: selectedProduct.price,
-      file_url: selectedProduct.image_url
+      title: selectedProduct?.title || "Unknown Product",
+      price: selectedProduct?.price || "$0.00",
+      file_url: selectedProduct?.image_url || ""
     };
     
     if (slot === 1) setItem1(itemData);

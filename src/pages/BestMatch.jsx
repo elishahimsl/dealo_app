@@ -4,6 +4,7 @@ import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { HelpCircle, Plus, Camera, Image as ImageIcon, Bookmark, Sparkles, TrendingUp, Home, ShoppingBag, X } from "lucide-react";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function BestMatch() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function BestMatch() {
   const [showFullResults, setShowFullResults] = useState(null);
   const [activeResultTab, setActiveResultTab] = useState("topPicks");
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const chatEndRef = useRef(null);
 
   const { data: savedItems = [] } = useQuery({
@@ -131,6 +133,20 @@ export default function BestMatch() {
     setLoadingCategory(false);
   };
 
+  const handleProductClick = (product) => {
+    setShowLoadingScreen(true);
+    setTimeout(() => {
+      // Generate a Google search URL for the product
+      const searchQuery = encodeURIComponent(`${product.title} ${product.store || ''} buy`);
+      window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+      setShowLoadingScreen(false);
+    }, 2000);
+  };
+
+  if (showLoadingScreen) {
+    return <LoadingScreen />;
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -171,9 +187,9 @@ export default function BestMatch() {
             {msg.type === 'ai' && (
               <div className="space-y-2">
                 {msg.products?.map((product, pidx) => (
-                  <div key={pidx} className="flex gap-3">
-                    {/* Product Image - Left side */}
-                    <div className="w-24 h-24 rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0">
+                  <div key={pidx} className="flex gap-3 cursor-pointer" onClick={() => handleProductClick(product)}>
+                    {/* Product Image - Left side, bigger */}
+                    <div className="w-32 h-32 rounded-2xl overflow-hidden bg-[#E5E7EB] flex-shrink-0">
                       <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
                     </div>
                     
@@ -198,7 +214,7 @@ export default function BestMatch() {
                           )}
                         </div>
                       </div>
-                      <button className="self-end">
+                      <button className="self-end" onClick={(e) => e.stopPropagation()}>
                         <Bookmark className="w-4 h-4 text-[#6B7280]" />
                       </button>
                     </div>

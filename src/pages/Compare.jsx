@@ -158,9 +158,14 @@ Analyze both products considering these weighted priorities and determine the wi
         }
       });
       
-      setSearchResults(aiResponse.products || []);
+      if (aiResponse && Array.isArray(aiResponse.products)) {
+        setSearchResults(aiResponse.products);
+      } else {
+        setSearchResults([]);
+      }
     } catch (error) {
       console.error("Error searching:", error);
+      setSearchResults([]);
     }
     
     setIsSearching(false);
@@ -222,7 +227,7 @@ Analyze both products considering these weighted priorities and determine the wi
           </div>
         )}
         
-        {searchResults.length > 0 && (
+        {Array.isArray(searchResults) && searchResults.length > 0 && (
           <div className="mt-2 bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden">
             {searchResults.map((product, idx) => (
               <button
@@ -231,12 +236,12 @@ Analyze both products considering these weighted priorities and determine the wi
                 className="w-full flex items-center gap-3 p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0"
               >
                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
-                  <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                  <img src={product?.image_url || ''} alt={product?.title || ''} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 text-left">
-                  <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.title}</h3>
-                  <p className="text-xs text-[#6B7280]">{product.store}</p>
-                  <p className="text-sm font-bold text-[#00A36C] mt-0.5">{product.price}</p>
+                  <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product?.title || 'Unknown'}</h3>
+                  <p className="text-xs text-[#6B7280]">{product?.store || 'Unknown Store'}</p>
+                  <p className="text-sm font-bold text-[#00A36C] mt-0.5">{product?.price || '$0.00'}</p>
                 </div>
               </button>
             ))}

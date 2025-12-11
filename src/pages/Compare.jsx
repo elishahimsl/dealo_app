@@ -75,8 +75,8 @@ export default function Compare() {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `Compare these two products and determine which is better based on the user's weighted preferences.
 
-Product 1: ${item1.title} - ${item1.price}
-Product 2: ${item2.title} - ${item2.price}
+Product 1: ${item1?.title || 'Unknown'} - ${item1?.price || '$0'}
+Product 2: ${item2?.title || 'Unknown'} - ${item2?.price || '$0'}
 
 User Preferences (0-100 scale, higher = more important):
 
@@ -104,14 +104,16 @@ Analyze both products considering these weighted priorities and determine the wi
         }
       });
 
-      navigate(createPageUrl("ComparisonResults"), {
-        state: { 
-          item1, 
-          item2, 
-          result,
-          preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference }
-        }
-      });
+      if (result) {
+        navigate(createPageUrl("ComparisonResults"), {
+          state: { 
+            item1, 
+            item2, 
+            result,
+            preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference }
+          }
+        });
+      }
     } catch (error) {
       console.error("Error analyzing:", error);
     }
@@ -277,12 +279,12 @@ Analyze both products considering these weighted priorities and determine the wi
                 style={{ height: '140px' }}
               >
                 {item1 ? (
-                  <img src={item1.file_url} alt="" className="w-full h-full object-cover" />
+                  <img src={item1?.file_url || ''} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <Plus className="w-8 h-8 text-[#00A36C]" />
                 )}
               </div>
-              {item1 && <p className="text-xs font-semibold text-white mt-2 text-center">{item1.price}</p>}
+              {item1 && <p className="text-xs font-semibold text-white mt-2 text-center">{item1?.price || '$0.00'}</p>}
               
               {/* Options popup for Item 1 */}
               {showUploadOptions === 1 && (
@@ -330,12 +332,12 @@ Analyze both products considering these weighted priorities and determine the wi
                 style={{ height: '140px' }}
               >
                 {item2 ? (
-                  <img src={item2.file_url} alt="" className="w-full h-full object-cover" />
+                  <img src={item2?.file_url || ''} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <Plus className="w-8 h-8 text-[#00A36C]" />
                 )}
               </div>
-              {item2 && <p className="text-xs font-semibold text-white mt-2 text-center">{item2.price}</p>}
+              {item2 && <p className="text-xs font-semibold text-white mt-2 text-center">{item2?.price || '$0.00'}</p>}
               
               {/* Options popup for Item 2 */}
               {showUploadOptions === 2 && (

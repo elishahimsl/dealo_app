@@ -27,6 +27,11 @@ export default function Compare() {
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const scrollRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectingSlot, setSelectingSlot] = useState(false);
 
   const handleFileSelect = async (file, itemNumber) => {
     try {
@@ -119,6 +124,71 @@ Analyze both products considering these weighted priorities and determine the wi
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    setSearchResults([]);
+    
+    try {
+      const aiResponse = await base44.integrations.Core.InvokeLLM({
+        prompt: `Search for products matching: "${searchQuery}". Find 5 real products from online stores.
+        For each product provide:
+        - Product name/title
+        - Current price (format: $XX.XX)
+        - Store/brand name
+        - Product image URL (real product images from retailers)`,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  title: { type: "string" },
+                  price: { type: "string" },
+                  store: { type: "string" },
+                  image_url: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      setSearchResults(aiResponse.products || []);
+    } catch (error) {
+      console.error("Error searching:", error);
+    }
+    
+    setIsSearching(false);
+  };
+
+  const handleSelectProduct = (product) => {
+    setSelectedProduct(product);
+    setSelectingSlot(true);
+  };
+
+  const handleAddToSlot = (slot) => {
+    if (!selectedProduct) return;
+    
+    const itemData = {
+      title: selectedProduct.title,
+      price: selectedProduct.price,
+      file_url: selectedProduct.image_url
+    };
+    
+    if (slot === 1) setItem1(itemData);
+    else setItem2(itemData);
+    
+    setSelectedProduct(null);
+    setSelectingSlot(false);
+    setSearchResults([]);
+    setSearchQuery("");
+  };
+
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
@@ -133,9 +203,45 @@ Analyze both products considering these weighted priorities and determine the wi
           <input
             type="text"
             placeholder="Search for a product to compare"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             className="flex-1 bg-transparent outline-none text-sm text-[#1F2937] placeholder:text-[#9CA3AF]"
           />
+          {searchQuery && (
+            <button onClick={() => { setSearchQuery(""); setSearchResults([]); }}>
+              <X className="w-4 h-4 text-[#9CA3AF]" />
+            </button>
+          )}
         </div>
+        
+        {/* Search Results */}
+        {isSearching && (
+          <div className="mt-2 text-center py-4">
+            <Loader2 className="w-5 h-5 animate-spin mx-auto text-[#00A36C]" />
+          </div>
+        )}
+        
+        {searchResults.length > 0 && (
+          <div className="mt-2 bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden">
+            {searchResults.map((product, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSelectProduct(product)}
+                className="w-full flex items-center gap-3 p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0"
+              >
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
+                  <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.title}</h3>
+                  <p className="text-xs text-[#6B7280]">{product.store}</p>
+                  <p className="text-sm font-bold text-[#00A36C] mt-0.5">{product.price}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="px-6 space-y-6">
@@ -745,6 +851,29 @@ Analyze both products considering these weighted priorities and determine the wi
             <button onClick={() => handleDeleteItem(deleteSlot)} className="w-16 mx-auto bg-red-500 text-white py-1.5 rounded-lg text-xs font-semibold hover:bg-red-600 transition-colors flex items-center justify-center">
               Delete
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Select Slot Modal */}
+      {selectingSlot && selectedProduct && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" onClick={() => setSelectingSlot(false)}>
+          <div className="bg-white rounded-2xl p-6 mx-6 max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-[#1F2937] mb-4 text-center">Add to which slot?</h3>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleAddToSlot(1)}
+                className="flex-1 py-3 rounded-xl bg-[#00A36C] text-white font-semibold hover:bg-[#007E52]"
+              >
+                Slot 1
+              </button>
+              <button
+                onClick={() => handleAddToSlot(2)}
+                className="flex-1 py-3 rounded-xl bg-[#00A36C] text-white font-semibold hover:bg-[#007E52]"
+              >
+                Slot 2
+              </button>
+            </div>
           </div>
         </div>
       )}

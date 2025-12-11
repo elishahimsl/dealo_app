@@ -288,7 +288,7 @@ Analyze both products considering these weighted priorities and determine the wi
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=1")}
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
-              <div className="text-[#00A36C] text-5xl font-light leading-none">+</div>
+              <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add first product</span>
             </button>
           )}
@@ -312,7 +312,7 @@ Analyze both products considering these weighted priorities and determine the wi
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=2")}
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
-              <div className="text-[#00A36C] text-5xl font-light leading-none">+</div>
+              <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add second product</span>
             </button>
           )}

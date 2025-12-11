@@ -224,9 +224,9 @@ Analyze both products considering these weighted priorities and determine the wi
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {trendingComparisons.map((comp, idx) => (
               <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-md" style={{ minWidth: '200px' }}>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2">
                   <div className="flex flex-col items-center flex-1">
-                    <div className="w-20 h-32 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
                       <img src={comp.product1.image} alt={comp.product1.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product1.name}</p>
@@ -235,7 +235,7 @@ Analyze both products considering these weighted priorities and determine the wi
                     <span className="text-[10px] font-bold text-[#6B7280]">VS</span>
                   </div>
                   <div className="flex flex-col items-center flex-1">
-                    <div className="w-20 h-32 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
                       <img src={comp.product2.image} alt={comp.product2.name} className="w-full h-full object-cover" />
                     </div>
                     <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product2.name}</p>

@@ -122,8 +122,20 @@ Analyze both products considering these weighted priorities and determine the wi
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-center">
+      <div className="px-6 pt-6 pb-2 flex items-center justify-center">
         <h1 className="text-base font-semibold text-[#1F2937]">Compare</h1>
+      </div>
+      
+      {/* Search Bar */}
+      <div className="px-6 pb-4">
+        <div className="bg-[#F3F4F6] rounded-full px-4 py-3 flex items-center gap-2">
+          <Search className="w-4 h-4 text-[#9CA3AF]" />
+          <input
+            type="text"
+            placeholder="Search for a product to compare"
+            className="flex-1 bg-transparent outline-none text-sm text-[#1F2937] placeholder:text-[#9CA3AF]"
+          />
+        </div>
       </div>
 
       <div className="px-6 space-y-6">
@@ -238,12 +250,16 @@ Analyze both products considering these weighted priorities and determine the wi
               </button>
 
               <button 
-                onClick={() => { navigate(createPageUrl("SearchProducts") + `?slot=${showUploadOptions}`); setShowUploadOptions(null); }} 
+                onClick={() => { 
+                  const input = showUploadOptions === 1 ? fileInput1Ref : fileInput2Ref;
+                  input.current?.click(); 
+                  setShowUploadOptions(null); 
+                }} 
                 className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
               >
                 <div className="flex items-center gap-3">
-                  <Search className="w-5 h-5 text-[#00A36C]" />
-                  <span className="text-base text-[#1F2937]">Search Product</span>
+                  <ImageIcon className="w-5 h-5 text-[#00A36C]" />
+                  <span className="text-base text-[#1F2937]">Upload from Library</span>
                 </div>
               </button>
 
@@ -256,28 +272,6 @@ Analyze both products considering these weighted priorities and determine the wi
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
                   <span className="text-base text-[#1F2937]">Choose From Saved Items</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { navigate(createPageUrl("ShopSenseTuner"), { state: { item1, item2, preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference } } }); setShowUploadOptions(null); }} 
-                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-[#00A36C]" />
-                  <span className="text-base text-[#1F2937]">Smart Pick</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { alert("Paste product URL (feature coming soon)"); setShowUploadOptions(null); }} 
-                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                  <span className="text-base text-[#1F2937]">Import From Link</span>
                 </div>
               </button>
             </div>

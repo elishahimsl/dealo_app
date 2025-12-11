@@ -127,8 +127,8 @@ Analyze both products considering these weighted priorities and determine the wi
       </div>
       
       {/* Search Bar */}
-      <div className="px-6 pb-4">
-        <div className="bg-[#F3F4F6] rounded-full px-4 py-3 flex items-center gap-2">
+      <div className="px-4 pb-4">
+        <div className="bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-2">
           <Search className="w-4 h-4 text-[#9CA3AF]" />
           <input
             type="text"
@@ -147,7 +147,7 @@ Analyze both products considering these weighted priorities and determine the wi
           {/* Product Tiles */}
           <div className="flex gap-3 mb-6">
             {/* Item 1 Tile */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 1)} ref={fileInput1Ref} className="hidden" />
               <div
                 onClick={() => !item1 && setShowUploadOptions(1)}
@@ -165,10 +165,42 @@ Analyze both products considering these weighted priorities and determine the wi
                 )}
               </div>
               {item1 && <p className="text-xs font-semibold text-white mt-2 text-center">{item1.price}</p>}
+              
+              {/* Options popup for Item 1 */}
+              {showUploadOptions === 1 && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowUploadOptions(null)} />
+                  <div className="absolute left-full ml-2 top-0 bg-white rounded-xl shadow-lg py-2 z-50 whitespace-nowrap">
+                    <button 
+                      onClick={() => { navigate(createPageUrl("Snap") + `?from=Compare&slot=1`); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <Camera className="w-4 h-4 text-[#00A36C]" />
+                      <span className="text-sm text-[#1F2937]">Take</span>
+                    </button>
+                    <button 
+                      onClick={() => { fileInput1Ref.current?.click(); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <ImageIcon className="w-4 h-4 text-[#00A36C]" />
+                      <span className="text-sm text-[#1F2937]">Upload</span>
+                    </button>
+                    <button 
+                      onClick={() => { navigate(createPageUrl("MyCart")); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <svg className="w-4 h-4 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      <span className="text-sm text-[#1F2937]">Saved</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Item 2 Tile */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleFileSelect(e.target.files[0], 2)} ref={fileInput2Ref} className="hidden" />
               <div
                 onClick={() => !item2 && setShowUploadOptions(2)}
@@ -186,6 +218,38 @@ Analyze both products considering these weighted priorities and determine the wi
                 )}
               </div>
               {item2 && <p className="text-xs font-semibold text-white mt-2 text-center">{item2.price}</p>}
+              
+              {/* Options popup for Item 2 */}
+              {showUploadOptions === 2 && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowUploadOptions(null)} />
+                  <div className="absolute right-full mr-2 top-0 bg-white rounded-xl shadow-lg py-2 z-50 whitespace-nowrap">
+                    <button 
+                      onClick={() => { navigate(createPageUrl("Snap") + `?from=Compare&slot=2`); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <Camera className="w-4 h-4 text-[#00A36C]" />
+                      <span className="text-sm text-[#1F2937]">Take</span>
+                    </button>
+                    <button 
+                      onClick={() => { fileInput2Ref.current?.click(); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <ImageIcon className="w-4 h-4 text-[#00A36C]" />
+                      <span className="text-sm text-[#1F2937]">Upload</span>
+                    </button>
+                    <button 
+                      onClick={() => { navigate(createPageUrl("MyCart")); setShowUploadOptions(null); }} 
+                      className="w-full px-3 py-2 hover:bg-[#F9FAFB] flex items-center gap-2 text-left"
+                    >
+                      <svg className="w-4 h-4 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      <span className="text-sm text-[#1F2937]">Saved</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -224,60 +288,7 @@ Analyze both products considering these weighted priorities and determine the wi
         </Button>
       </div>
 
-      {/* Bottom Sheet for Add Product Options */}
-      {showUploadOptions && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowUploadOptions(null)}>
-          <div 
-            className="bg-white rounded-t-3xl w-full pb-8 pt-4 animate-slide-up" 
-            style={{ maxHeight: '80vh' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Drag Handle */}
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
-            </div>
 
-            {/* Options */}
-            <div className="px-6 space-y-2">
-              <button 
-                onClick={() => { navigate(createPageUrl("Snap") + `?from=Compare&slot=${showUploadOptions}`); setShowUploadOptions(null); }} 
-                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Camera className="w-5 h-5 text-[#00A36C]" />
-                  <span className="text-base text-[#1F2937]">Take Photo</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { 
-                  const input = showUploadOptions === 1 ? fileInput1Ref : fileInput2Ref;
-                  input.current?.click(); 
-                  setShowUploadOptions(null); 
-                }} 
-                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <ImageIcon className="w-5 h-5 text-[#00A36C]" />
-                  <span className="text-base text-[#1F2937]">Upload from Library</span>
-                </div>
-              </button>
-
-              <button 
-                onClick={() => { navigate(createPageUrl("MyCart")); setShowUploadOptions(null); }} 
-                className="w-full flex items-center justify-between py-4 hover:bg-[#F9FAFB] rounded-xl transition-colors px-4"
-              >
-                <div className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-[#00A36C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                  </svg>
-                  <span className="text-base text-[#1F2937]">Choose From Saved Items</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Preferences Modal - Slide Up Sheet */}
       {showPreferences && (

@@ -121,16 +121,16 @@ Analyze both products considering these weighted priorities and determine the wi
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
-      <div className="px-6 pt-8 pb-4 text-center relative">
-        <h1 className="text-2xl font-bold text-[#1F2937] mb-2">Compare</h1>
-        <p className="text-sm text-[#6B7280] mb-4">Find the best product for your needs</p>
+      <div className="px-6 pt-6 pb-3 text-center relative">
+        <h1 className="text-lg font-bold text-[#1F2937] mb-1">Compare</h1>
+        <p className="text-xs text-[#6B7280] mb-3">Find the best product for your needs</p>
         
         {/* Preferences Icon - Top Right */}
         <button 
           onClick={() => setShowPreferences(true)}
-          className="absolute top-8 right-6 w-10 h-10 flex items-center justify-center"
+          className="absolute top-6 right-6 w-7 h-7 flex items-center justify-center"
         >
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <rect x="3" y="3" width="7" height="7" rx="1.5" />
             <rect x="14" y="3" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
@@ -140,7 +140,7 @@ Analyze both products considering these weighted priorities and determine the wi
         
         {/* Search Bar */}
         <div className="relative">
-          <div className="bg-[#F3F4F6] rounded-full px-4 py-3 flex items-center gap-3">
+          <div className="bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-3">
             <Search className="w-5 h-5 text-[#9CA3AF]" />
             <input
               type="text"
@@ -202,24 +202,28 @@ Analyze both products considering these weighted priorities and determine the wi
       <div className="px-6 space-y-6">
         {/* Trending Comparisons */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-[#1F2937]">Trending Comparisons</h2>
-            <button className="text-sm font-semibold text-[#00A36C]">View All</button>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-[#1F2937]">Trending Comparisons</h2>
+            <button className="text-xs font-semibold text-[#00A36C]">View All</button>
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {trendingComparisons.map((comp, idx) => (
-              <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-4 flex items-center gap-3" style={{ minWidth: '280px' }}>
-                <div className="flex items-center gap-2 flex-1">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6]">
-                    <img src={comp.product1.image} alt={comp.product1.name} className="w-full h-full object-cover" />
+              <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3" style={{ minWidth: '200px' }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex flex-col items-center flex-1">
+                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                      <img src={comp.product1.image} alt={comp.product1.name} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product1.name}</p>
                   </div>
-                  <p className="text-xs font-semibold text-[#1F2937] flex-1">{comp.product1.name}</p>
-                </div>
-                <span className="text-xs font-bold text-[#6B7280]">vs</span>
-                <div className="flex items-center gap-2 flex-1">
-                  <p className="text-xs font-semibold text-[#1F2937] flex-1 text-right">{comp.product2.name}</p>
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6]">
-                    <img src={comp.product2.image} alt={comp.product2.name} className="w-full h-full object-cover" />
+                  <div className="bg-[#F3F4F6] rounded px-2 py-1">
+                    <span className="text-[10px] font-bold text-[#6B7280]">VS</span>
+                  </div>
+                  <div className="flex flex-col items-center flex-1">
+                    <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
+                      <img src={comp.product2.image} alt={comp.product2.name} className="w-full h-full object-cover" />
+                    </div>
+                    <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product2.name}</p>
                   </div>
                 </div>
               </div>
@@ -229,7 +233,7 @@ Analyze both products considering these weighted priorities and determine the wi
 
         {/* Saved Comparisons Tile */}
         <div>
-          <h2 className="text-lg font-bold text-[#1F2937] mb-4">Saved Comparisons</h2>
+          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Saved Comparisons</h2>
           <button 
             onClick={() => navigate(createPageUrl("SavedComparisons"))}
             className="w-full bg-[#00A36C]/5 border border-[#00A36C]/20 rounded-2xl p-4 flex items-center gap-4 hover:bg-[#00A36C]/10 transition-colors"
@@ -264,12 +268,10 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=1")}
-              className="w-full border-2 border-dashed border-[#00A36C] rounded-2xl p-6 flex items-center justify-center gap-3 hover:bg-[#00A36C]/5 transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
             >
-              <div className="w-6 h-6 rounded-full bg-[#00A36C] flex items-center justify-center">
-                <span className="text-white text-xl font-light">+</span>
-              </div>
-              <span className="text-sm font-semibold text-[#00A36C]">Add first product</span>
+              <span className="text-sm font-medium text-[#1F2937]">Add first product</span>
+              <div className="text-[#00A36C] text-2xl font-light">+</div>
             </button>
           )}
 
@@ -290,12 +292,10 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=2")}
-              className="w-full border-2 border-dashed border-[#00A36C] rounded-2xl p-6 flex items-center justify-center gap-3 hover:bg-[#00A36C]/5 transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
             >
-              <div className="w-6 h-6 rounded-full bg-[#00A36C] flex items-center justify-center">
-                <span className="text-white text-xl font-light">+</span>
-              </div>
-              <span className="text-sm font-semibold text-[#00A36C]">Add second product</span>
+              <span className="text-sm font-medium text-[#1F2937]">Add second product</span>
+              <div className="text-[#00A36C] text-2xl font-light">+</div>
             </button>
           )}
 
@@ -303,7 +303,7 @@ Analyze both products considering these weighted priorities and determine the wi
           <Button 
             onClick={handleAnalyze} 
             disabled={!item1 || !item2 || analyzing}
-            className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-10 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {analyzing ? (
               <>

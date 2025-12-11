@@ -469,40 +469,81 @@ export default function BestMatch() {
                   (activeResultTab === 'bestMatches' && p.badge === 'Best Match')
                 )
                 .map((product, idx) => (
-                  <div key={idx} className="flex gap-2 mb-3">
-                    {/* Product Image with grey background */}
-                    <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB] relative">
-                      <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
-                      {product.badge === 'Best Deal' && product.discount && (
-                        <div className="absolute top-1 left-1 bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
-                          {product.discount}
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Product Info */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-1">
-                        {idx === 0 && (
-                          <div className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                            product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
-                            product.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
-                            'bg-[#F59E0B] text-white'
-                          }`}>
-                            {product.badge}
+                  <div key={idx} className="cursor-pointer" onClick={() => handleProductClick(product)}>
+                    <div className="flex gap-3 mb-3">
+                      {/* Product Image - bigger width */}
+                      <div className="w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB] relative">
+                        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                        {activeResultTab === 'bestDeals' && product.discount && (
+                          <div className="absolute top-1 left-1 bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
+                            {product.discount}
                           </div>
                         )}
-                        <button className={idx === 0 ? '' : 'ml-auto'}>
+                      </div>
+                      
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          {idx === 0 && (
+                            <div className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-1 ${
+                              product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
+                              product.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
+                              'bg-[#F59E0B] text-white'
+                            }`}>
+                              {product.badge}
+                            </div>
+                          )}
+                          <p className="text-[9px] text-[#6B7280] mb-0.5">{product.store}</p>
+                          <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{product.title}</h3>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs font-bold text-[#1F2937]">{product.price}</p>
+                            {activeResultTab === 'bestDeals' && product.original_price && (
+                              <p className="text-[10px] text-[#6B7280] line-through">{product.original_price}</p>
+                            )}
+                          </div>
+                        </div>
+                        <button className="self-end" onClick={(e) => e.stopPropagation()}>
                           <Bookmark className="w-4 h-4 text-[#6B7280]" />
                         </button>
                       </div>
-                      <p className="text-[9px] text-[#6B7280] mb-0.5">{product.store}</p>
-                      <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{product.title}</h3>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-bold text-[#1F2937]">{product.price}</p>
-                        {product.original_price && (
-                          <p className="text-[10px] text-[#6B7280] line-through">{product.original_price}</p>
-                        )}
+                    </div>
+                    
+                    {/* Separator after first item */}
+                    {idx === 0 && (
+                      <div className="border-t border-[#E5E7EB] my-4" />
+                    )}
+                  </div>
+                ))}
+              
+              {/* Additional products list */}
+              {showFullResults
+                .filter(p => 
+                  (activeResultTab === 'topPicks' && p.badge !== 'Top Pick') ||
+                  (activeResultTab === 'bestDeals' && p.badge !== 'Best Deal') ||
+                  (activeResultTab === 'bestMatches' && p.badge !== 'Best Match')
+                )
+                .slice(0, 5)
+                .map((product, idx) => (
+                  <div key={idx} className="cursor-pointer" onClick={() => handleProductClick(product)}>
+                    <div className="flex gap-3 mb-3">
+                      <div className="w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB]">
+                        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+                      </div>
+                      
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <p className="text-[9px] text-[#6B7280] mb-0.5">{product.store}</p>
+                          <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{product.title}</h3>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-xs font-bold text-[#1F2937]">{product.price}</p>
+                            {activeResultTab === 'bestDeals' && product.original_price && (
+                              <p className="text-[10px] text-[#6B7280] line-through">{product.original_price}</p>
+                            )}
+                          </div>
+                        </div>
+                        <button className="self-end" onClick={(e) => e.stopPropagation()}>
+                          <Bookmark className="w-4 h-4 text-[#6B7280]" />
+                        </button>
                       </div>
                     </div>
                   </div>

@@ -15,6 +15,12 @@ export default function BestMatch() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categoryProducts, setCategoryProducts] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
+  
+  useEffect(() => {
+    if (showInspiration && categoryProducts.length === 0 && selectedCategory === 'All') {
+      loadCategoryProducts('All');
+    }
+  }, [showInspiration]);
   const [showSavedItems, setShowSavedItems] = useState(false);
   const [showFullResults, setShowFullResults] = useState(null);
   const [activeResultTab, setActiveResultTab] = useState("topPicks");
@@ -41,21 +47,18 @@ export default function BestMatch() {
 
     try {
       const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: `User is looking for: "${inputText}". Search the internet and find 15 REAL products total:
-        - First product: "Top Pick" badge (highest rated/most popular) 
-        - Next 4 products: "Top Pick" category (good overall products, no badge, just price)
-        - Next product: "Best Deal" badge (best discount) with original_price and discount percentage
-        - Next 4 products: "Best Deal" category (good deals with original_price and discount)
-        - Next product: "Best Match" badge (closest to query)
-        - Next 4 products: "Best Match" category (similar products, no badge)
+        prompt: `User is looking for: "${inputText}". Search the internet and find exactly 3 REAL products:
+        1. One "Top Pick" (highest rated/most popular)
+        2. One "Best Deal" (best value/biggest discount) - MUST include original_price and discount
+        3. One "Best Match" (closest match to query)
         
-        For ALL products provide:
+        For each product provide:
         - Exact product name/title
         - Current price (format: $XX.XX)
-        - Original price for Best Deal products (format: $XX.XX)
+        - Original price for Best Deal (format: $XX.XX)
         - Store/brand name
-        - Badge: "Top Pick", "Best Deal", or "Best Match" (only for the first product in each category)
-        - Discount percentage for Best Deal products (e.g., "50% off")
+        - Badge: "Top Pick", "Best Deal", or "Best Match"
+        - Discount percentage for Best Deal (e.g., "50% off")
         - Product image URL (real product images from retailers)`,
         add_context_from_internet: true,
         response_json_schema: {
@@ -72,8 +75,7 @@ export default function BestMatch() {
                   store: { type: "string" },
                   badge: { type: "string" },
                   discount: { type: "string" },
-                  image_url: { type: "string" },
-                  category: { type: "string" }
+                  image_url: { type: "string" }
                 }
               }
             }
@@ -81,7 +83,7 @@ export default function BestMatch() {
         }
       });
 
-      setMessages(prev => [...prev, { type: 'ai', products: aiResponse.products }]);
+      setMessages(prev => [...prev, { type: 'ai', products: aiResponse.products, query: inputText }]);
     } catch (error) {
       console.error("Error getting AI response:", error);
     }
@@ -105,10 +107,12 @@ export default function BestMatch() {
   const loadCategoryProducts = async (category) => {
     setSelectedCategory(category);
     setLoadingCategory(true);
+    setCategoryProducts([]);
     
     try {
+      const categoryName = category === 'All' ? 'popular trending' : category;
       const aiResponse = await base44.integrations.Core.InvokeLLM({
-        prompt: `Find 8 real popular products in the "${category}" category. Search the internet for actual products with real images.
+        prompt: `Find 6 real popular products in the "${categoryName}" category. Search the internet for actual products with real images from online retailers.
         For each product provide:
         - Product name
         - High quality product image URL from actual retailers`,
@@ -226,7 +230,62 @@ export default function BestMatch() {
                   </div>
                 ))}
                 <button 
-                  onClick={() => setShowFullResults(msg.products)}
+                  onClick={async () => {
+                    setIsLoading(true);
+                    try {
+                      const fullResponse = await base44.integrations.Core.InvokeLLM({
+                        prompt: `User is looking for: "${msg.query}". Search the internet and find REAL products in 3 categories:
+                        
+                        TOP PICKS (5 products):
+                        - First one gets badge "Top Pick" (highest rated/most popular)
+                        - Next 4 are other good picks (no badge, just good products)
+                        
+                        BEST DEALS (5 products):
+                        - First one gets badge "Best Deal" (biggest discount) with original_price and discount
+                        - Next 4 are other deals (with original_price and discount, no badge)
+                        
+                        BEST MATCHES (5 products):
+                        - First one gets badge "Best Match" (closest to query)
+                        - Next 4 are similar matches (no badge)
+                        
+                        For each product provide:
+                        - Exact product name/title
+                        - Current price (format: $XX.XX)
+                        - Original price for deals (format: $XX.XX)
+                        - Store/brand name
+                        - Badge (only first in each category)
+                        - Discount for deals (e.g., "50% off")
+                        - Category: "topPicks", "bestDeals", or "bestMatches"
+                        - Product image URL (real images from retailers)`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                          type: "object",
+                          properties: {
+                            products: {
+                              type: "array",
+                              items: {
+                                type: "object",
+                                properties: {
+                                  title: { type: "string" },
+                                  price: { type: "string" },
+                                  original_price: { type: "string" },
+                                  store: { type: "string" },
+                                  badge: { type: "string" },
+                                  discount: { type: "string" },
+                                  image_url: { type: "string" },
+                                  category: { type: "string" }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      });
+                      setShowFullResults(fullResponse.products);
+                    } catch (error) {
+                      console.error("Error loading full results:", error);
+                    }
+                    setIsLoading(false);
+                  }}
                   className="w-full py-3 bg-[#F3F4F6] text-[#1F2937] rounded-xl font-semibold text-xs mt-2"
                 >
                   View All Results
@@ -346,24 +405,26 @@ export default function BestMatch() {
             </div>
             
             {/* Header */}
-            <div className="flex flex-col items-center px-6 pb-3">
+            <div className="flex flex-col items-center pb-3">
               <h2 className="text-sm font-normal text-[#1F2937] mb-3">Inspiration</h2>
               
-              {/* Category buttons - clickable */}
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {['All', 'Tech', 'Home', 'Shoes', 'Fashion', 'Beauty', 'Sports'].map(cat => (
-                  <button 
-                    key={cat} 
-                    onClick={() => loadCategoryProducts(cat)}
-                    className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-                      selectedCategory === cat 
-                        ? 'bg-[#1F2937] text-white' 
-                        : 'bg-[#F3F4F6] text-[#1F2937] hover:bg-[#E5E7EB]'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+              {/* Category buttons - clickable, scrollable with padding */}
+              <div className="w-full overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2 px-6 pb-2">
+                  {['All', 'Tech', 'Home', 'Shoes', 'Fashion', 'Beauty', 'Sports'].map(cat => (
+                    <button 
+                      key={cat} 
+                      onClick={() => loadCategoryProducts(cat)}
+                      className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0 ${
+                        selectedCategory === cat 
+                          ? 'bg-[#1F2937] text-white' 
+                          : 'bg-[#F3F4F6] text-[#1F2937] hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -467,65 +528,8 @@ export default function BestMatch() {
 
             {/* Results List */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
-              {/* First product with badge */}
-              {(() => {
-                const mainProduct = showFullResults.find(p => 
-                  (activeResultTab === 'topPicks' && p.badge === 'Top Pick') ||
-                  (activeResultTab === 'bestDeals' && p.badge === 'Best Deal') ||
-                  (activeResultTab === 'bestMatches' && p.badge === 'Best Match')
-                );
-                
-                return mainProduct ? (
-                  <div className="cursor-pointer" onClick={() => handleProductClick(mainProduct)}>
-                    <div className="flex gap-3 mb-3">
-                      <div className="w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB] relative">
-                        <img src={mainProduct.image_url} alt={mainProduct.title} className="w-full h-full object-cover" />
-                        {activeResultTab === 'bestDeals' && mainProduct.discount && (
-                          <div className="absolute top-1 left-1 bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded">
-                            {mainProduct.discount}
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <div className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-1 ${
-                            mainProduct.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
-                            mainProduct.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
-                            'bg-[#F59E0B] text-white'
-                          }`}>
-                            {mainProduct.badge}
-                          </div>
-                          <p className="text-[9px] text-[#6B7280] mb-0.5">{mainProduct.store}</p>
-                          <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{mainProduct.title}</h3>
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-xs font-bold text-[#1F2937]">{mainProduct.price}</p>
-                            {activeResultTab === 'bestDeals' && mainProduct.original_price && (
-                              <p className="text-[10px] text-[#6B7280] line-through">{mainProduct.original_price}</p>
-                            )}
-                          </div>
-                        </div>
-                        <button className="self-end" onClick={(e) => e.stopPropagation()}>
-                          <Bookmark className="w-4 h-4 text-[#6B7280]" />
-                        </button>
-                      </div>
-                    </div>
-                    <div className="border-t border-[#E5E7EB] my-4" />
-                  </div>
-                ) : null;
-              })()}
-              
-              {/* Additional products in the same category */}
               {showFullResults
-                .filter(p => {
-                  if (activeResultTab === 'topPicks') {
-                    return p.category === 'Top Pick' || (p.badge !== 'Best Deal' && p.badge !== 'Best Match' && p.badge !== 'Top Pick');
-                  } else if (activeResultTab === 'bestDeals') {
-                    return p.category === 'Best Deal' || (p.badge !== 'Top Pick' && p.badge !== 'Best Match' && p.badge !== 'Best Deal');
-                  } else {
-                    return p.category === 'Best Match' || (p.badge !== 'Top Pick' && p.badge !== 'Best Deal' && p.badge !== 'Best Match');
-                  }
-                })
+                .filter(p => p.category === activeResultTab)
                 .map((product, idx) => (
                   <div key={idx} className="cursor-pointer" onClick={() => handleProductClick(product)}>
                     <div className="flex gap-3 mb-3">
@@ -540,6 +544,15 @@ export default function BestMatch() {
                       
                       <div className="flex-1 flex flex-col justify-between">
                         <div>
+                          {idx === 0 && product.badge && (
+                            <div className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold mb-1 ${
+                              product.badge === 'Best Deal' ? 'bg-[#00A36C] text-white' : 
+                              product.badge === 'Top Pick' ? 'bg-[#3B82F6] text-white' : 
+                              'bg-[#F59E0B] text-white'
+                            }`}>
+                              {product.badge}
+                            </div>
+                          )}
                           <p className="text-[9px] text-[#6B7280] mb-0.5">{product.store}</p>
                           <h3 className="font-semibold text-[#1F2937] text-[11px] mb-1 line-clamp-2">{product.title}</h3>
                           <div className="flex items-center gap-1.5">
@@ -554,6 +567,10 @@ export default function BestMatch() {
                         </button>
                       </div>
                     </div>
+                    
+                    {idx === 0 && (
+                      <div className="border-t border-[#E5E7EB] my-4" />
+                    )}
                   </div>
                 ))}
             </div>

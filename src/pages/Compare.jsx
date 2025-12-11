@@ -20,6 +20,7 @@ export default function Compare() {
   const [brandPreference, setBrandPreference] = useState([50]);
   const [durabilityPreference, setDurabilityPreference] = useState([50]);
   const [reviewsPreference, setReviewsPreference] = useState([50]);
+  const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
   // Fetch saved captures for search
   const { data: savedProducts = [] } = useQuery({
@@ -271,7 +272,7 @@ Analyze both products considering these weighted priorities and determine the wi
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
             >
               <span className="text-sm font-medium text-[#1F2937]">Add first product</span>
-              <div className="text-[#00A36C] text-2xl font-light">+</div>
+              <div className="text-[#00A36C] text-3xl font-light">+</div>
             </button>
           )}
 
@@ -295,7 +296,7 @@ Analyze both products considering these weighted priorities and determine the wi
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors"
             >
               <span className="text-sm font-medium text-[#1F2937]">Add second product</span>
-              <div className="text-[#00A36C] text-2xl font-light">+</div>
+              <div className="text-[#00A36C] text-3xl font-light">+</div>
             </button>
           )}
 
@@ -329,18 +330,45 @@ Analyze both products considering these weighted priorities and determine the wi
               <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
             </div>
 
-            <div className="px-6 pb-4">
-              <h2 className="text-lg font-bold text-[#1F2937]">Product Priorities</h2>
+            <div className="px-6 pb-3 flex items-center justify-center relative">
+              <h2 className="text-sm font-semibold text-[#1F2937]">Preferences</h2>
+              
+              {/* Menu Icon - Top Right */}
+              <div className="absolute right-0">
+                <button 
+                  onClick={() => setShowMenuDropdown(!showMenuDropdown)}
+                  className="flex flex-col gap-1 p-1"
+                >
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                </button>
+                
+                {/* Dropdown Menu */}
+                {showMenuDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowMenuDropdown(false)} />
+                    <div className="absolute right-0 top-8 bg-white rounded-xl shadow-lg py-2 z-50 w-48">
+                      <button className="w-full px-4 py-2 text-left text-sm text-[#1F2937] hover:bg-[#F9FAFB]">
+                        Save Preferences
+                      </button>
+                      <button className="w-full px-4 py-2 text-left text-sm text-[#1F2937] hover:bg-[#F9FAFB]">
+                        Help
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             
             <div className="overflow-y-auto px-6 pb-6" style={{ height: 'calc(70vh - 120px)' }}>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Brand */}
                 <div>
-                  <label className="text-sm font-semibold text-[#1F2937] mb-1 block">Brand</label>
-                  <p className="text-xs text-[#6B7280] mb-3">Prioritize well-known and trusted brands</p>
+                  <label className="text-xs font-semibold text-[#1F2937] mb-1 block">Brand</label>
+                  <p className="text-[10px] text-[#6B7280] mb-2">Prioritize well-known and trusted brands</p>
                   <div className="relative px-3">
-                    <div className="h-2 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -354,7 +382,7 @@ Analyze both products considering these weighted priorities and determine the wi
                       className="slider-custom w-full absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-between text-xs mt-2 px-3 text-[#6B7280]">
+                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
                     <span>Low</span>
                     <span>High</span>
                   </div>
@@ -362,10 +390,10 @@ Analyze both products considering these weighted priorities and determine the wi
 
                 {/* Price */}
                 <div>
-                  <label className="text-sm font-semibold text-[#1F2937] mb-1 block">Price</label>
-                  <p className="text-xs text-[#6B7280] mb-3">Prioritize the lowest price</p>
+                  <label className="text-xs font-semibold text-[#1F2937] mb-1 block">Price</label>
+                  <p className="text-[10px] text-[#6B7280] mb-2">Prioritize the lowest price</p>
                   <div className="relative px-3">
-                    <div className="h-2 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -379,7 +407,7 @@ Analyze both products considering these weighted priorities and determine the wi
                       className="slider-custom w-full absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-between text-xs mt-2 px-3 text-[#6B7280]">
+                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
                     <span>Low</span>
                     <span>High</span>
                   </div>
@@ -387,10 +415,10 @@ Analyze both products considering these weighted priorities and determine the wi
 
                 {/* Durability */}
                 <div>
-                  <label className="text-sm font-semibold text-[#1F2937] mb-1 block">Durability</label>
-                  <p className="text-xs text-[#6B7280] mb-3">Prioritize build quality and product lifespan</p>
+                  <label className="text-xs font-semibold text-[#1F2937] mb-1 block">Durability</label>
+                  <p className="text-[10px] text-[#6B7280] mb-2">Prioritize build quality and product lifespan</p>
                   <div className="relative px-3">
-                    <div className="h-2 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -404,7 +432,7 @@ Analyze both products considering these weighted priorities and determine the wi
                       className="slider-custom w-full absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-between text-xs mt-2 px-3 text-[#6B7280]">
+                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
                     <span>Low</span>
                     <span>High</span>
                   </div>
@@ -412,10 +440,10 @@ Analyze both products considering these weighted priorities and determine the wi
 
                 {/* Reviews */}
                 <div>
-                  <label className="text-sm font-semibold text-[#1F2937] mb-1 block">Reviews</label>
-                  <p className="text-xs text-[#6B7280] mb-3">Prioritize higher customer ratings</p>
+                  <label className="text-xs font-semibold text-[#1F2937] mb-1 block">Reviews</label>
+                  <p className="text-[10px] text-[#6B7280] mb-2">Prioritize higher customer ratings</p>
                   <div className="relative px-3">
-                    <div className="h-2 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -429,7 +457,7 @@ Analyze both products considering these weighted priorities and determine the wi
                       className="slider-custom w-full absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-between text-xs mt-2 px-3 text-[#6B7280]">
+                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
                     <span>Low</span>
                     <span>High</span>
                   </div>
@@ -437,10 +465,10 @@ Analyze both products considering these weighted priorities and determine the wi
 
                 {/* Discount */}
                 <div>
-                  <label className="text-sm font-semibold text-[#1F2937] mb-1 block">Discount</label>
-                  <p className="text-xs text-[#6B7280] mb-3">Prioritize the biggest savings</p>
+                  <label className="text-xs font-semibold text-[#1F2937] mb-1 block">Discount</label>
+                  <p className="text-[10px] text-[#6B7280] mb-2">Prioritize the biggest savings</p>
                   <div className="relative px-3">
-                    <div className="h-2 rounded-full overflow-hidden flex">
+                    <div className="h-1.5 rounded-full overflow-hidden flex">
                       <div className="flex-1 bg-[#EF4444]" />
                       <div className="flex-1 bg-[#F59E0B]" />
                       <div className="flex-1 bg-[#10B981]" />
@@ -454,7 +482,7 @@ Analyze both products considering these weighted priorities and determine the wi
                       className="slider-custom w-full absolute top-0 left-0"
                     />
                   </div>
-                  <div className="flex justify-between text-xs mt-2 px-3 text-[#6B7280]">
+                  <div className="flex justify-between text-[10px] mt-1.5 px-3 text-[#6B7280]">
                     <span>Low</span>
                     <span>High</span>
                   </div>
@@ -491,19 +519,19 @@ Analyze both products considering these weighted priorities and determine the wi
         .slider-custom::-webkit-slider-thumb {
           -webkit-appearance: none;
           appearance: none;
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           background: white;
           border: 3px solid #00A36C;
           border-radius: 50%;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-          margin-top: -6px;
+          margin-top: -5px;
         }
         
         .slider-custom::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
+          width: 16px;
+          height: 16px;
           background: white;
           border: 3px solid #00A36C;
           border-radius: 50%;

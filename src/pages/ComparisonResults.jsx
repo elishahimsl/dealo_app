@@ -77,58 +77,68 @@ export default function ComparisonResults() {
       <div className="px-6 py-6 space-y-4">
         {/* Product Comparison Cards */}
         <div className="flex items-start gap-3">
-          {/* Product 1 Tile */}
-          <div className="flex-1 bg-white rounded-3xl p-4 shadow-lg relative">
-            <div className="absolute -top-2 -right-2 z-10">
-              <div className="bg-[#00A36C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
-                LOWEST PRICE
+          {/* Product 1 */}
+          <div className="flex-1">
+            <div className="bg-white rounded-xl shadow-lg relative">
+              <div className="absolute -top-2 -right-2 z-10">
+                <div className="bg-[#00A36C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
+                  LOWEST PRICE
+                </div>
+              </div>
+              <div className="w-full h-40 bg-white flex items-center justify-center p-4">
+                <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
-            <div className="w-full h-32 bg-white flex items-center justify-center mb-3">
-              <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
+            <div className="mt-3">
+              <h3 className="font-bold text-[#1F2937] text-base mb-1">{item1.title}</h3>
+              <p className="text-2xl font-bold text-[#1F2937] mb-2">{item1.price}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-400 text-lg">★★★★★</span>
+                <span className="text-sm text-[#6B7280]">(17.4k Reviews)</span>
+              </div>
+              <img src="https://logo.clearbit.com/amazon.com" alt="amazon" className="h-5 object-contain mt-2" onError={(e) => e.target.style.display = 'none'} />
             </div>
-            <h3 className="font-bold text-[#1F2937] text-sm mb-2 line-clamp-2">{item1.title}</h3>
-            <p className="text-xl font-bold text-[#1F2937] mb-2">{item1.price}</p>
-            <div className="flex items-center gap-1 mb-3">
-              <span className="text-sm font-semibold text-[#1F2937]">4.5 <span className="text-yellow-400">★</span></span>
-            </div>
-            <img src="https://logo.clearbit.com/amazon.com" alt="amazon" className="h-4 object-contain" onError={(e) => e.target.style.display = 'none'} />
           </div>
 
           {/* VS Circle */}
-          <div className="flex-shrink-0 pt-16">
+          <div className="flex-shrink-0" style={{ paddingTop: '80px' }}>
             <div className="w-12 h-12 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-md">
               <span className="text-sm font-bold text-[#6B7280]">VS</span>
             </div>
           </div>
 
-          {/* Product 2 Tile */}
-          <div className="flex-1 bg-white rounded-3xl p-4 shadow-lg relative">
-            <div className="absolute -top-2 -right-2 z-10">
-              <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
-                POPULAR PICK
+          {/* Product 2 */}
+          <div className="flex-1">
+            <div className="bg-white rounded-xl shadow-lg relative">
+              <div className="absolute -top-2 -right-2 z-10">
+                <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
+                  POPULAR PICK
+                </div>
+              </div>
+              <div className="w-full h-40 bg-white flex items-center justify-center p-4">
+                <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
-            <div className="w-full h-32 bg-white flex items-center justify-center mb-3">
-              <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
+            <div className="mt-3">
+              <h3 className="font-bold text-[#1F2937] text-base mb-1">{item2.title}</h3>
+              <p className="text-2xl font-bold text-[#1F2937] mb-2">{item2.price}</p>
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-400 text-lg">★★★★★</span>
+                <span className="text-sm text-[#6B7280]">(12.1k Reviews)</span>
+              </div>
+              <img src="https://logo.clearbit.com/bestbuy.com" alt="Best Buy" className="h-5 object-contain mt-2" onError={(e) => e.target.style.display = 'none'} />
             </div>
-            <h3 className="font-bold text-[#1F2937] text-sm mb-2 line-clamp-2">{item2.title}</h3>
-            <p className="text-xl font-bold text-[#1F2937] mb-2">{item2.price}</p>
-            <div className="flex items-center gap-1 mb-3">
-              <span className="text-sm font-semibold text-[#1F2937]">4.7 <span className="text-yellow-400">★</span></span>
-            </div>
-            <img src="https://logo.clearbit.com/bestbuy.com" alt="Best Buy" className="h-4 object-contain" onError={(e) => e.target.style.display = 'none'} />
           </div>
         </div>
 
         {/* Best Choice Tile */}
-        <div className="bg-white rounded-3xl p-5 shadow-lg">
+        <div className="bg-white rounded-xl p-5 shadow-lg">
           <h2 className="text-sm font-bold text-[#6B7280] mb-3">Best Choice For You</h2>
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-bold text-[#1F2937]">{winner.title}</h3>
             <div className="flex items-baseline">
-              <span className="text-3xl font-bold text-[#1F2937]">{overallWinner}</span>
-              <span className="text-lg text-[#6B7280]">/100</span>
+              <span className="text-2xl font-bold text-[#1F2937]">{overallWinner}</span>
+              <span className="text-base text-[#6B7280]">/100</span>
             </div>
           </div>
           <div className="w-full h-2 bg-[#E5E7EB] rounded-full mb-3 overflow-hidden">
@@ -140,8 +150,8 @@ export default function ComparisonResults() {
         </div>
 
         {/* Detailed Scores Tile */}
-        <div className="bg-white rounded-3xl p-5 shadow-lg">
-          <div className="space-y-3">
+        <div className="bg-white rounded-lg p-6 shadow-lg">
+          <div className="space-y-4">
             {[
               { label: "Price", item1: item1Scores.price, item2: item2Scores.price },
               { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability },
@@ -151,10 +161,10 @@ export default function ComparisonResults() {
               { label: "Design", item1: item1Scores.design, item2: item2Scores.design }
             ].map((category) => (
               <div key={category.label} className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-[#1F2937] w-36">{category.label}</span>
-                <div className="flex items-center gap-6">
-                  <span className="text-lg font-bold text-[#1F2937] w-10 text-right">{category.item1}</span>
-                  <span className="text-sm font-bold text-[#9CA3AF] w-10 text-right">{category.item2}</span>
+                <span className="text-base font-semibold text-[#1F2937]">{category.label}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl font-bold text-[#1F2937]">{category.item1}</span>
+                  <span className="text-base font-bold text-[#9CA3AF]">{category.item2}</span>
                 </div>
               </div>
             ))}
@@ -162,7 +172,7 @@ export default function ComparisonResults() {
         </div>
 
         {/* Price History Tile */}
-        <div className="bg-white rounded-3xl p-5 shadow-lg">
+        <div className="bg-white rounded-xl p-5 shadow-lg">
           <h2 className="text-base font-bold text-[#1F2937] mb-4">Price History</h2>
           
           {/* Graph with gradient */}
@@ -253,23 +263,23 @@ export default function ComparisonResults() {
         </div>
 
         {/* Store Options Tiles */}
-        <div className="bg-white rounded-3xl overflow-hidden shadow-lg">
+        <div className="bg-white rounded-xl overflow-hidden shadow-lg">
           <div className="p-5 pb-3">
             <h2 className="text-base font-bold text-[#1F2937] mb-1">Store Options</h2>
           </div>
           
           {/* Product 1 Stores */}
           <div className="px-5 pb-4">
-            <h3 className="text-sm font-semibold text-[#6B7280] mb-2">{item1.title}</h3>
-            <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+            <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item1.title}</h3>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
               {item1Stores.map((store, idx) => (
-                <button key={idx} className="w-full flex items-center justify-between p-4 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
-                  <div className="flex items-center gap-3">
-                    <img src={store.logo} alt={store.name} className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                    <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
+                <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
+                  <div className="flex items-center gap-2">
+                    <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
                   </div>
-                  <div className="bg-[#F3F4F6] rounded-lg px-3 py-1.5">
-                    <span className="text-sm font-medium text-[#6B7280]">Go to Store</span>
+                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">
+                    <span className="text-xs font-medium text-[#6B7280]">Go to Store</span>
                   </div>
                 </button>
               ))}
@@ -278,16 +288,16 @@ export default function ComparisonResults() {
 
           {/* Product 2 Stores */}
           <div className="px-5 pb-5">
-            <h3 className="text-sm font-semibold text-[#6B7280] mb-2">{item2.title}</h3>
-            <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+            <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item2.title}</h3>
+            <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
               {item2Stores.map((store, idx) => (
-                <button key={idx} className="w-full flex items-center justify-between p-4 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
-                  <div className="flex items-center gap-3">
-                    <img src={store.logo} alt={store.name} className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                    <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
+                <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
+                  <div className="flex items-center gap-2">
+                    <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
                   </div>
-                  <div className="bg-[#F3F4F6] rounded-lg px-3 py-1.5">
-                    <span className="text-sm font-medium text-[#6B7280]">Go to Store</span>
+                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">
+                    <span className="text-xs font-medium text-[#6B7280]">Go to Store</span>
                   </div>
                 </button>
               ))}
@@ -296,20 +306,22 @@ export default function ComparisonResults() {
         </div>
 
         {/* AI Alternatives Tile */}
-        <div className="bg-white rounded-3xl p-5 shadow-lg">
+        <div className="bg-white rounded-xl p-5 shadow-lg">
           <h2 className="text-base font-bold text-[#1F2937] mb-4">AI Alternatives</h2>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             {alternatives.map((alt, idx) => (
-              <div key={idx}>
-                <div className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-sm mb-2">
-                  <div className="w-full h-28 bg-[#F3F4F6] flex items-center justify-center p-3">
+              <div key={idx} className="flex flex-col">
+                <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden shadow-sm mb-2 relative aspect-square">
+                  <div className="w-full h-full bg-[#F3F4F6] flex items-center justify-center p-3">
                     <img src={alt.image} alt={alt.name} className="max-w-full max-h-full object-contain" />
                   </div>
+                  <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-[#FEE2E2] transition-colors">
+                    <Heart className="w-4 h-4 text-[#EF4444]" />
+                  </button>
                 </div>
-                <div className="px-1">
-                  <p className="text-base font-bold text-[#1F2937] mb-1">{alt.price}</p>
-                  <p className="text-xs text-[#3B82F6] font-medium">{alt.description}</p>
-                </div>
+                <p className="text-base font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
+                <p className="text-xs font-medium text-[#1F2937] mb-0.5 line-clamp-1">{alt.name}</p>
+                <p className="text-xs text-[#6B7280]">{alt.description}</p>
               </div>
             ))}
           </div>

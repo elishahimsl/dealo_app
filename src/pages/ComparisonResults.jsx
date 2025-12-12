@@ -230,14 +230,14 @@ export default function ComparisonResults() {
           <div className="border-t border-[#E5E7EB] mb-3" />
           
           {/* Time period selector - iOS style */}
-          <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 mb-4">
             {['1W', '1M', '3M', '6M', '1Y'].map((period) => (
               <button
                 key={period}
                 onClick={() => setTimePeriod(period)}
-                className={`flex-shrink-0 px-4 py-1.5 text-xs font-semibold transition-colors ${
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                   timePeriod === period
-                    ? 'text-[#1F2937]'
+                    ? 'bg-[#E5E7EB] text-[#1F2937]'
                     : 'text-[#6B7280]'
                 }`}
               >
@@ -373,20 +373,20 @@ export default function ComparisonResults() {
                     <circle 
                       cx={graphPosition * 400} 
                       cy={getYOnLine(graphPosition, item1Path)} 
-                      r="5" 
-                      fill="#3B82F6"
-                      stroke="#1F2937"
-                      strokeWidth="2"
+                      r="6" 
+                      fill="white"
+                      stroke="#3B82F6"
+                      strokeWidth="3"
                     />
                   )}
                   {activeGraph === 'item2' && (
                     <circle 
                       cx={graphPosition * 400} 
                       cy={getYOnLine(graphPosition, item2Path)} 
-                      r="5" 
-                      fill="#00A36C"
-                      stroke="#1F2937"
-                      strokeWidth="2"
+                      r="6" 
+                      fill="white"
+                      stroke="#00A36C"
+                      strokeWidth="3"
                     />
                   )}
                 </>

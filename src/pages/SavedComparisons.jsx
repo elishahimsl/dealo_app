@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { ChevronLeft, SlidersHorizontal } from "lucide-react";
 
 export default function SavedComparisons() {
@@ -49,7 +50,7 @@ export default function SavedComparisons() {
         {savedComparisons.map((comp) => (
           <button 
             key={comp.id} 
-            onClick={() => navigate('/comparison-results', { 
+            onClick={() => navigate(createPageUrl("ComparisonResults"), { 
               state: { 
                 item1: { title: comp.product1.name, file_url: comp.product1.image, price: '$999', brand: 'Brand' },
                 item2: { title: comp.product2.name, file_url: comp.product2.image, price: '$899', brand: 'Brand' },

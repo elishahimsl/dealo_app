@@ -97,22 +97,21 @@ export default function CompareSearch() {
         ) : (
           /* Default View - Featured Products */
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-bold text-[#1F2937]">Featured Products</h2>
-              <button className="text-xs font-semibold text-[#00A36C]">View All</button>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+            <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Products</h2>
+            <div className="space-y-3">
               {featuredProducts.map((product) => (
                 <button
                   key={product.id}
                   onClick={() => handleSelectProduct(product)}
-                  className="bg-white border border-[#E5E7EB] rounded-2xl p-3 hover:shadow-lg transition-shadow"
+                  className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
                 >
-                  <div className="w-full aspect-square rounded-xl overflow-hidden bg-[#F3F4F6] mb-2">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                   </div>
-                  <h3 className="font-semibold text-[#1F2937] text-xs mb-0.5 line-clamp-2">{product.name}</h3>
-                  <p className="text-[10px] text-[#6B7280]">{product.brand}</p>
+                  <div className="flex-1 text-left">
+                    <h3 className="font-bold text-[#1F2937] text-sm line-clamp-2 mb-0.5">{product.name}</h3>
+                    <p className="text-xs text-[#6B7280]">{product.brand}</p>
+                  </div>
                 </button>
               ))}
             </div>

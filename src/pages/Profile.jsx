@@ -78,72 +78,51 @@ export default function Profile() {
       <div className="min-h-screen bg-[#F7F8FA] pb-24">
         <div className="px-6 pt-6 pb-4 flex items-center justify-between">
           <button onClick={() => setShowSettings(false)} className="group">
-            <Tag className="w-5 h-5 text-[#00A36C] transform -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+            <ChevronRight className="w-5 h-5 text-[#1F2937] rotate-180" />
           </button>
           <h1 className="text-base font-semibold text-[#1F2937]">Settings</h1>
           <div className="w-5" />
         </div>
 
         <div className="px-6">
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
+          <div className="grid grid-cols-2 gap-3 mb-6">
             {[
-              { icon: Bell, label: "Notifications", page: null },
-              { icon: Lock, label: "Privacy", page: null },
-              { icon: Globe, label: "Language", page: null },
-              { icon: HelpCircle, label: "Help Center", page: null },
-              { icon: Info, label: "About", page: null },
-            ].map((item, idx) => {
+              { icon: Bell, label: "Notifications" },
+              { icon: Star, label: "Personalization" },
+              { icon: User, label: "Account and Login" },
+              { icon: Lock, label: "Data and Privacy" },
+              { icon: Globe, label: "Appearance" },
+              { icon: HelpCircle, label: "Help Center" },
+            ].map((item) => {
               const Icon = item.icon;
               return (
                 <button 
                   key={item.label}
-                  className={`w-full flex items-center gap-4 p-4 text-left hover:bg-[#F9FAFB] transition-colors ${idx < 4 ? 'border-b border-[#F3F4F6]' : ''}`}
+                  className="bg-white rounded-lg p-4 shadow-md hover:bg-[#F9FAFB] transition-colors text-left"
+                  style={{ height: '90px' }}
                 >
-                  <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
-                  <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
-                  <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
+                  <Icon className="w-5 h-5 text-[#00A36C] mb-2" strokeWidth={1.5} />
+                  <p className="text-xs font-medium text-[#1F2937] leading-tight">{item.label}</p>
                 </button>
               );
             })}
           </div>
 
-          {/* Tracking & Alerts in Settings */}
-          <div className="mb-6">
-            <h2 className="text-sm font-bold text-[#1F2937] mb-3 px-1">Tracking & Alerts</h2>
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              {[
-                { key: 'priceDrop', icon: Tag, label: "Price Drop Alerts" },
-                { key: 'restock', icon: BellRing, label: "Restock Alerts" },
-                { key: 'scan', icon: Camera, label: "Scan Alerts" },
-              ].map((item, idx) => {
-                const Icon = item.icon;
-                const isOn = alerts[item.key];
-                return (
-                  <div 
-                    key={item.key}
-                    className={`flex items-center gap-4 p-4 ${idx < 2 ? 'border-b border-[#F3F4F6]' : ''}`}
-                  >
-                    <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
-                    <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
-                    <button 
-                      onClick={() => setAlerts(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-                      className={`w-12 h-7 rounded-full p-1 transition-colors ${isOn ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'}`}
-                    >
-                      <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'translate-x-5' : ''}`} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           <button 
             onClick={() => base44.auth.logout()}
-            className="w-full flex items-center justify-center gap-2 py-3 text-red-500 hover:text-red-600 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 text-[#1F2937] hover:text-[#6B7280] transition-colors font-semibold mb-2"
           >
-            <LogOut className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-sm font-medium">Log Out</span>
+            <span className="text-sm">Sign Out</span>
           </button>
+          
+          <div className="text-center">
+            <p className="text-xs text-[#9CA3AF] mb-1">Version 1.0.0</p>
+            <div className="flex items-center justify-center gap-3 text-xs text-[#9CA3AF]">
+              <button className="hover:text-[#6B7280]">Terms</button>
+              <span>•</span>
+              <button className="hover:text-[#6B7280]">Privacy</button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -162,12 +141,9 @@ export default function Profile() {
         </button>
       </div>
 
-      {/* Profile Card */}
+      {/* Profile Section */}
       <div className="px-6 mb-6">
-        <button 
-          onClick={() => navigate(createPageUrl("Customization"))}
-          className="w-full bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4"
-        >
+        <div className="flex items-start gap-4 mb-4">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#A7F3D0] to-[#6EE7B7] flex items-center justify-center flex-shrink-0">
             {user?.full_name ? (
@@ -180,41 +156,48 @@ export default function Profile() {
           </div>
 
           {/* Info */}
-          <div className="flex-1 text-left">
-            <h2 className="text-lg font-semibold text-[#1F2937] mb-0.5">
-              {user?.full_name || 'Guest User'}
+          <div className="flex-1">
+            <h2 className="text-base font-semibold text-[#1F2937] mb-1">
+              {user?.full_name?.split(' ')[0] || 'Guest'}
             </h2>
-            <p className="text-sm text-[#6B7280]">
-              {user?.email || 'No email'}
+            <p className="text-xs text-[#6B7280] mb-1.5">
+              Shopping smarter, one scan at a time ✨
             </p>
             {user?.email && (
-              <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-[#D1FAE5] text-[#065F46] text-[10px] font-medium">
+              <span className="inline-block px-2 py-0.5 rounded-full bg-[#D1FAE5] text-[#065F46] text-[10px] font-medium">
                 Verified
               </span>
             )}
           </div>
+        </div>
 
-          {/* Chevron */}
-          <ChevronRight className="w-5 h-5 text-[#D1D5DB]" />
-        </button>
+        {/* Edit Profile and Share Buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          <button 
+            onClick={() => navigate(createPageUrl("EditProfile"))}
+            className="bg-white rounded-lg p-3 shadow-md hover:bg-[#F9FAFB] transition-colors"
+          >
+            <p className="text-xs font-semibold text-[#1F2937]">Edit Profile</p>
+          </button>
+          <button 
+            className="bg-white rounded-lg p-3 shadow-md hover:bg-[#F9FAFB] transition-colors"
+          >
+            <p className="text-xs font-semibold text-[#1F2937]">Share DeaLo</p>
+          </button>
+        </div>
       </div>
 
       {/* Stats Row */}
-      <div className="px-6 mb-8">
+      <div className="px-6 mb-6">
         <div className="grid grid-cols-4 gap-2">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <div 
                 key={idx}
-                className="bg-white rounded-2xl p-3 shadow-sm text-center"
+                className="bg-white rounded-lg p-3 shadow-md text-center"
               >
-                <div 
-                  className="w-8 h-8 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: `${stat.color}15` }}
-                >
-                  <Icon className="w-4 h-4" style={{ color: stat.color }} />
-                </div>
+                <Icon className="w-5 h-5 text-[#00A36C] mx-auto mb-2" strokeWidth={1.5} />
                 <p className="text-base font-bold text-[#1F2937]">{stat.value}</p>
                 <p className="text-[9px] text-[#6B7280] leading-tight">{stat.label}</p>
               </div>
@@ -245,10 +228,10 @@ export default function Profile() {
 
       {/* Recently Viewed Section */}
       <div className="px-6 mb-6">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 mb-3">
           <h2 className="text-sm font-bold text-[#1F2937]">Recently Viewed</h2>
-          <button className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          <button className="w-6 h-6 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <ChevronRight className="w-3.5 h-3.5 text-[#6B7280]" />
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -285,10 +268,10 @@ export default function Profile() {
 
       {/* Recently Scanned Section */}
       <div className="px-6 mb-6">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2 mb-3">
           <h2 className="text-sm font-bold text-[#1F2937]">Recently Scanned</h2>
-          <button className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          <button className="w-6 h-6 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <ChevronRight className="w-3.5 h-3.5 text-[#6B7280]" />
           </button>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">

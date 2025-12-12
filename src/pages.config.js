@@ -37,6 +37,7 @@ import StoreBestSellers from './pages/StoreBestSellers';
 import StoreNewArrivals from './pages/StoreNewArrivals';
 import SavedComparisons from './pages/SavedComparisons';
 import CompareSearch from './pages/CompareSearch';
+import EditProfile from './pages/EditProfile';
 import __Layout from './Layout.jsx';
 
 
@@ -80,6 +81,7 @@ export const PAGES = {
     "StoreNewArrivals": StoreNewArrivals,
     "SavedComparisons": SavedComparisons,
     "CompareSearch": CompareSearch,
+    "EditProfile": EditProfile,
 }
 
 export const pagesConfig = {

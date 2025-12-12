@@ -8,6 +8,8 @@ import { base44 } from "@/api/base44Client";
 export default function CompareSearch() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const urlParams = new URLSearchParams(window.location.search);
+  const slot = urlParams.get('slot');
 
   const { data: savedProducts = [] } = useQuery({
     queryKey: ['captures'],
@@ -30,7 +32,12 @@ export default function CompareSearch() {
   ];
 
   const handleSelectProduct = (product) => {
-    navigate(createPageUrl("Compare"));
+    navigate(createPageUrl("Compare"), {
+      state: { 
+        selectedProduct: product,
+        slot: slot
+      }
+    });
   };
 
   return (

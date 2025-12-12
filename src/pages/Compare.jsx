@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,15 @@ import { Search, X, Folder, ChevronRight, Loader2 } from "lucide-react";
 
 export default function Compare() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [item1, setItem1] = useState(null);
   const [item2, setItem2] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
+  const [showAddOptions, setShowAddOptions] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
   const [pricePreference, setPricePreference] = useState([50]);
   const [qualityPreference, setQualityPreference] = useState([50]);
@@ -83,6 +86,25 @@ export default function Compare() {
     if (slot === 1) setItem1(null);
     else setItem2(null);
   };
+
+  // Handle incoming product from CompareSearch or Snap
+  useEffect(() => {
+    if (location.state?.selectedProduct && location.state?.slot) {
+      const product = location.state.selectedProduct;
+      const itemData = {
+        title: product.title || product.name,
+        price: product.price || "$999",
+        brand: product.brand || product.keywords?.[0] || "Brand",
+        file_url: product.file_url || product.image
+      };
+      
+      if (location.state.slot === '1') setItem1(itemData);
+      else setItem2(itemData);
+      
+      // Clear state to prevent re-adding on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleAnalyze = async () => {
     if (!item1 || !item2) return;
@@ -249,7 +271,7 @@ Analyze both products considering these weighted priorities and determine the wi
             </div>
           ) : (
             <button 
-              onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=1")}
+              onClick={() => { setSelectedSlot(1); setShowAddOptions(true); }}
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
               <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
@@ -273,7 +295,7 @@ Analyze both products considering these weighted priorities and determine the wi
             </div>
           ) : (
             <button 
-              onClick={() => navigate(createPageUrl("Snap") + "?from=Compare&slot=2")}
+              onClick={() => { setSelectedSlot(2); setShowAddOptions(true); }}
               className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
             >
               <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
@@ -498,6 +520,94 @@ Analyze both products considering these weighted priorities and determine the wi
               >
                 Apply
               </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Product Options Modal */}
+      {showAddOptions && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowAddOptions(false)}>
+          <div 
+            className="bg-white rounded-t-3xl w-full p-6 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center mb-4">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+            <h2 className="text-lg font-bold text-[#1F2937] mb-6 text-center">Add Product</h2>
+            
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setShowAddOptions(false);
+                  navigate(createPageUrl("Snap") + `?from=Compare&slot=${selectedSlot}`);
+                }}
+                className="w-full bg-[#00A36C] text-white py-4 rounded-2xl font-semibold hover:bg-[#007E52] transition-colors flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+                Take Photo
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowAddOptions(false);
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    // Process file similar to Snap page
+                    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                    const aiResult = await base44.integrations.Core.InvokeLLM({
+                      prompt: 'Identify this product and provide its name, brand, and estimated price.',
+                      file_urls: file_url,
+                      response_json_schema: {
+                        type: "object",
+                        properties: {
+                          title: { type: "string" },
+                          brand: { type: "string" },
+                          price: { type: "string" }
+                        }
+                      }
+                    });
+                    const itemData = {
+                      title: aiResult.title,
+                      price: aiResult.price,
+                      brand: aiResult.brand,
+                      file_url: file_url
+                    };
+                    if (selectedSlot === 1) setItem1(itemData);
+                    else setItem2(itemData);
+                  };
+                  input.click();
+                }}
+                className="w-full bg-white border-2 border-[#E5E7EB] text-[#1F2937] py-4 rounded-2xl font-semibold hover:bg-[#F9FAFB] transition-colors flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Choose from Photos
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowAddOptions(false);
+                  navigate(createPageUrl("CompareSearch") + `?slot=${selectedSlot}`);
+                }}
+                className="w-full bg-white border-2 border-[#E5E7EB] text-[#1F2937] py-4 rounded-2xl font-semibold hover:bg-[#F9FAFB] transition-colors flex items-center justify-center gap-3"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+                Pick from Saved
+              </button>
             </div>
           </div>
         </div>

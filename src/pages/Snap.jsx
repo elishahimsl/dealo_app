@@ -94,6 +94,9 @@ export default function Snap() {
   const processCapture = async () => {
     if (!capturedImage) return;
     
+    const urlParams = new URLSearchParams(window.location.search);
+    const slot = urlParams.get('slot');
+    
     setScanning(true);
     setCapturedImage(null);
 
@@ -198,6 +201,22 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           ai_summary: aiResult.smart_summary,
           keywords: [aiResult.brand, aiResult.title]
         });
+
+        // If coming from Compare page, return with product data
+        if (fromPage === 'Compare' && slot) {
+          navigate(createPageUrl("Compare"), {
+            state: {
+              selectedProduct: {
+                title: aiResult.title,
+                brand: aiResult.brand,
+                price: aiResult.price,
+                file_url: aiResult.product_image_url || user_photo_url
+              },
+              slot: slot
+            }
+          });
+          return;
+        }
 
         setResult({ file_url: user_photo_url, ...aiResult });
     } catch (error) {

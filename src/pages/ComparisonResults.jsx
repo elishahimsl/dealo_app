@@ -184,7 +184,7 @@ export default function ComparisonResults() {
           <div className="border-t border-[#E5E7EB] mb-3" />
           
           {/* Time period selector - iOS style */}
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide">
             {['1W', '1M', '3M', '6M', '1Y'].map((period) => (
               <button
                 key={period}
@@ -215,18 +215,28 @@ export default function ComparisonResults() {
               
               if (Math.abs(y - item1Y) < Math.abs(y - item2Y)) {
                 setActiveGraph('item1');
+                const percent = Math.max(0, Math.min(1, x / width));
+                setGraphPosition(percent);
               } else {
                 setActiveGraph('item2');
+                const percent = Math.max(0, Math.min(1, x / width));
+                setGraphPosition(percent);
               }
             }}
             onMouseMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.clientX - rect.left - 40;
-              const width = rect.width - 48;
-              const percent = Math.max(0, Math.min(1, x / width));
-              setGraphPosition(percent);
+              if (graphPosition !== null) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX - rect.left - 40;
+                const width = rect.width - 48;
+                const percent = Math.max(0, Math.min(1, x / width));
+                setGraphPosition(percent);
+              }
             }}
-            onMouseLeave={() => setGraphPosition(null)}
+            onMouseLeave={() => {
+              if (graphPosition !== null) {
+                setGraphPosition(null);
+              }
+            }}
             onTouchStart={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.touches[0].clientX - rect.left - 40;
@@ -241,13 +251,17 @@ export default function ComparisonResults() {
               } else {
                 setActiveGraph('item2');
               }
-            }}
-            onTouchMove={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const x = e.touches[0].clientX - rect.left - 40;
-              const width = rect.width - 48;
               const percent = Math.max(0, Math.min(1, x / width));
               setGraphPosition(percent);
+            }}
+            onTouchMove={(e) => {
+              if (graphPosition !== null) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left - 40;
+                const width = rect.width - 48;
+                const percent = Math.max(0, Math.min(1, x / width));
+                setGraphPosition(percent);
+              }
             }}
             onTouchEnd={() => setGraphPosition(null)}
           >
@@ -313,16 +327,20 @@ export default function ComparisonResults() {
                     <circle 
                       cx={graphPosition * 400} 
                       cy={45 - (graphPosition * 15)} 
-                      r="4" 
-                      fill="#3B82F6" 
+                      r="5" 
+                      fill="#3B82F6"
+                      stroke="#1F2937"
+                      strokeWidth="2"
                     />
                   )}
                   {activeGraph === 'item2' && (
                     <circle 
                       cx={graphPosition * 400} 
                       cy={65 + (graphPosition * 8)} 
-                      r="4" 
-                      fill="#00A36C" 
+                      r="5" 
+                      fill="#00A36C"
+                      stroke="#1F2937"
+                      strokeWidth="2"
                     />
                   )}
                 </>
@@ -344,10 +362,10 @@ export default function ComparisonResults() {
             )}
             
             {/* Y-axis price labels */}
-            <div className="absolute -left-1 top-2 text-xs font-semibold text-[#6B7280]">$400</div>
-            <div className="absolute -left-1 top-1/3 text-xs font-semibold text-[#6B7280]">$350</div>
-            <div className="absolute -left-1 top-2/3 text-xs font-semibold text-[#6B7280]">$300</div>
-            <div className="absolute -left-1 bottom-2 text-xs font-semibold text-[#6B7280]">$250</div>
+            <div className="absolute -left-1 top-2 text-xs font-semibold text-[#6B7280]">400</div>
+            <div className="absolute -left-1 top-1/3 text-xs font-semibold text-[#6B7280]">350</div>
+            <div className="absolute -left-1 top-2/3 text-xs font-semibold text-[#6B7280]">300</div>
+            <div className="absolute -left-1 bottom-2 text-xs font-semibold text-[#6B7280]">250</div>
             
             {/* X-axis day labels - iOS style based on time period */}
             {(timePeriod === '1W' || timePeriod === '1M') ? (

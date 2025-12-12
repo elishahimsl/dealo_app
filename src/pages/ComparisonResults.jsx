@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowLeft, Heart, Share2, Bookmark } from "lucide-react";
@@ -9,6 +9,8 @@ export default function ComparisonResults() {
   const location = useLocation();
   const { item1, item2, result, preferences } = location.state || {};
   const [isSaved, setIsSaved] = useState(false);
+  const [graphPosition, setGraphPosition] = useState(null);
+  const [favoriteAlts, setFavoriteAlts] = useState({});
 
   if (!result || !item1 || !item2) {
     return (
@@ -64,8 +66,10 @@ export default function ComparisonResults() {
       {/* Header */}
       <div className="sticky top-0 z-20 bg-[#F9FAFB] px-6 py-4">
         <div className="flex items-center justify-between">
-          <button onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-6 h-6 text-[#1F2937]" />
+          <button onClick={() => navigate(-1)} className="relative">
+            <svg className="w-6 h-6 text-[#1F2937]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </button>
           <h1 className="text-base font-bold text-[#1F2937]">Comparison Results</h1>
           <button onClick={() => setIsSaved(!isSaved)}>
@@ -76,16 +80,16 @@ export default function ComparisonResults() {
 
       <div className="px-6 py-6 space-y-4">
         {/* Product Comparison Cards */}
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2">
           {/* Product 1 */}
-          <div className="flex-1">
-            <div className="bg-white rounded-3xl shadow-lg relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
-              <div className="absolute -top-2 -right-2 z-10">
-                <div className="bg-[#00A36C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
-                  LOWEST PRICE
-                </div>
+          <div className="flex-1 relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+              <div className="bg-[#00A36C] text-white text-[9px] font-bold px-3 py-1 rounded-md shadow-lg">
+                LOWEST PRICE
               </div>
-              <div className="w-full h-full flex items-center justify-center p-4">
+            </div>
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden" style={{ aspectRatio: '1/1' }}>
+              <div className="w-full h-full flex items-center justify-center p-6">
                 <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
@@ -101,21 +105,21 @@ export default function ComparisonResults() {
           </div>
 
           {/* VS Circle */}
-          <div className="flex-shrink-0" style={{ paddingTop: '60px' }}>
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-md">
-              <span className="text-sm font-bold text-[#6B7280]">VS</span>
+          <div className="flex-shrink-0" style={{ paddingTop: '80px' }}>
+            <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-sm">
+              <span className="text-xs font-bold text-[#6B7280]">VS</span>
             </div>
           </div>
 
           {/* Product 2 */}
-          <div className="flex-1">
-            <div className="bg-white rounded-3xl shadow-lg relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
-              <div className="absolute -top-2 -right-2 z-10">
-                <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
-                  POPULAR PICK
-                </div>
+          <div className="flex-1 relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+              <div className="bg-[#3B82F6] text-white text-[9px] font-bold px-3 py-1 rounded-md shadow-lg">
+                POPULAR PICK
               </div>
-              <div className="w-full h-full flex items-center justify-center p-4">
+            </div>
+            <div className="bg-white rounded-3xl shadow-lg overflow-hidden" style={{ aspectRatio: '1/1' }}>
+              <div className="w-full h-full flex items-center justify-center p-6">
                 <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
@@ -178,8 +182,26 @@ export default function ComparisonResults() {
         <div className="bg-white rounded-xl p-5 shadow-lg">
           <h2 className="text-base font-bold text-[#1F2937] mb-4">Price History</h2>
           
-          {/* Graph with gradient */}
-          <div className="relative h-40 mb-4 pl-10 pr-2">
+          {/* Graph with gradient - iOS style */}
+          <div 
+            className="relative h-40 mb-4 pl-10 pr-2 cursor-crosshair"
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left - 40;
+              const width = rect.width - 48;
+              const percent = Math.max(0, Math.min(1, x / width));
+              setGraphPosition(percent);
+            }}
+            onMouseLeave={() => setGraphPosition(null)}
+            onTouchMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.touches[0].clientX - rect.left - 40;
+              const width = rect.width - 48;
+              const percent = Math.max(0, Math.min(1, x / width));
+              setGraphPosition(percent);
+            }}
+            onTouchEnd={() => setGraphPosition(null)}
+          >
             <svg className="w-full h-full" viewBox="0 0 400 120" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -198,7 +220,7 @@ export default function ComparisonResults() {
               <line x1="0" y1="80" x2="400" y2="80" stroke="#E5E7EB" strokeWidth="1" />
               <line x1="0" y1="110" x2="400" y2="110" stroke="#E5E7EB" strokeWidth="1" />
               
-              {/* Product 1 area (blue) - jagged stock line */}
+              {/* Product 1 area (blue) */}
               <path
                 d="M0,45 L50,35 L100,42 L150,25 L200,38 L250,30 L300,45 L350,40 L400,50"
                 fill="none"
@@ -212,18 +234,7 @@ export default function ComparisonResults() {
                 fill="url(#gradient1)"
               />
               
-              {/* Product 1 dots */}
-              <circle cx="0" cy="45" r="4" fill="#3B82F6" />
-              <circle cx="50" cy="35" r="4" fill="#3B82F6" />
-              <circle cx="100" cy="42" r="4" fill="#3B82F6" />
-              <circle cx="150" cy="25" r="4" fill="#3B82F6" />
-              <circle cx="200" cy="38" r="4" fill="#3B82F6" />
-              <circle cx="250" cy="30" r="4" fill="#3B82F6" />
-              <circle cx="300" cy="45" r="4" fill="#3B82F6" />
-              <circle cx="350" cy="40" r="4" fill="#3B82F6" />
-              <circle cx="400" cy="50" r="4" fill="#3B82F6" />
-              
-              {/* Product 2 area (green) - jagged stock line */}
+              {/* Product 2 area (green) */}
               <path
                 d="M0,65 L50,72 L100,68 L150,80 L200,70 L250,75 L300,68 L350,72 L400,78"
                 fill="none"
@@ -237,17 +248,34 @@ export default function ComparisonResults() {
                 fill="url(#gradient2)"
               />
               
-              {/* Product 2 dots */}
-              <circle cx="0" cy="65" r="4" fill="#00A36C" />
-              <circle cx="50" cy="72" r="4" fill="#00A36C" />
-              <circle cx="100" cy="68" r="4" fill="#00A36C" />
-              <circle cx="150" cy="80" r="4" fill="#00A36C" />
-              <circle cx="200" cy="70" r="4" fill="#00A36C" />
-              <circle cx="250" cy="75" r="4" fill="#00A36C" />
-              <circle cx="300" cy="68" r="4" fill="#00A36C" />
-              <circle cx="350" cy="72" r="4" fill="#00A36C" />
-              <circle cx="400" cy="78" r="4" fill="#00A36C" />
+              {/* Interactive dot */}
+              {graphPosition !== null && (
+                <>
+                  <line 
+                    x1={graphPosition * 400} 
+                    y1="0" 
+                    x2={graphPosition * 400} 
+                    y2="120" 
+                    stroke="#1F2937" 
+                    strokeWidth="1.5"
+                    strokeDasharray="3,3"
+                  />
+                  <circle cx={graphPosition * 400} cy={45 - (graphPosition * 15)} r="5" fill="white" stroke="#3B82F6" strokeWidth="2.5" />
+                  <circle cx={graphPosition * 400} cy={65 + (graphPosition * 8)} r="5" fill="white" stroke="#00A36C" strokeWidth="2.5" />
+                </>
+              )}
             </svg>
+            
+            {/* Price tooltip */}
+            {graphPosition !== null && (
+              <div 
+                className="absolute -top-8 bg-white rounded-lg shadow-lg px-3 py-1.5 border border-[#E5E7EB]"
+                style={{ left: `${graphPosition * 100}%`, transform: 'translateX(-50%)' }}
+              >
+                <p className="text-xs font-bold text-[#3B82F6]">${Math.round(350 - graphPosition * 50)}</p>
+                <p className="text-xs font-bold text-[#00A36C]">${Math.round(330 - graphPosition * 40)}</p>
+              </div>
+            )}
             
             {/* Y-axis price labels */}
             <div className="absolute -left-1 top-2 text-xs font-semibold text-[#6B7280]">$400</div>
@@ -344,8 +372,11 @@ export default function ComparisonResults() {
                   <div className="w-full h-full bg-[#F3F4F6] flex items-center justify-center p-3">
                     <img src={alt.image} alt={alt.name} className="max-w-full max-h-full object-contain" />
                   </div>
-                  <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-[#FEE2E2] transition-colors">
-                    <Heart className="w-4 h-4 text-[#EF4444]" />
+                  <button 
+                    onClick={() => setFavoriteAlts({...favoriteAlts, [idx]: !favoriteAlts[idx]})}
+                    className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center transition-colors"
+                  >
+                    <Heart className={`w-4 h-4 ${favoriteAlts[idx] ? 'fill-[#00A36C] text-[#00A36C]' : 'text-[#9CA3AF]'}`} />
                   </button>
                 </div>
                 <p className="text-base font-bold text-[#1F2937] mb-0.5">{alt.price}</p>

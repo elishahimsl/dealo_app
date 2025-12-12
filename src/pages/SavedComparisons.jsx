@@ -37,7 +37,7 @@ export default function SavedComparisons() {
       </div>
 
       <div className="px-6 space-y-3 relative">
-        <button className="absolute -top-3 right-6 z-10">
+        <button className="absolute -top-6 right-6 z-10">
           <svg className="w-5 h-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="4" y1="8" x2="20" y2="8" strokeLinecap="round"/>
             <circle cx="8" cy="8" r="2" fill="currentColor"/>
@@ -47,7 +47,17 @@ export default function SavedComparisons() {
         </button>
         
         {savedComparisons.map((comp) => (
-          <div key={comp.id} className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-lg">
+          <button 
+            key={comp.id} 
+            onClick={() => navigate('/comparison-results', { 
+              state: { 
+                item1: { title: comp.product1.name, file_url: comp.product1.image, price: '$999', brand: 'Brand' },
+                item2: { title: comp.product2.name, file_url: comp.product2.image, price: '$899', brand: 'Brand' },
+                result: { winner: 1, item1_scores: { quality: 85, value: 78, features: 90, design: 88, durability: 82 }, item2_scores: { quality: 80, value: 85, features: 85, design: 82, durability: 80 }, explanation: 'Based on your preferences, this product offers better overall value.' }
+              }
+            })}
+            className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow"
+          >
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="flex flex-col items-center">
                 <div className="w-24 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-2">
@@ -68,7 +78,7 @@ export default function SavedComparisons() {
               </div>
             </div>
             <p className="text-xs text-[#6B7280] text-center mt-2">{comp.date}</p>
-          </div>
+          </button>
         ))}
       </div>
     </div>

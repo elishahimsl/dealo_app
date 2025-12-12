@@ -615,7 +615,7 @@ Analyze both products considering these weighted priorities and determine the wi
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       <style>{`

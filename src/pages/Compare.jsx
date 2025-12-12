@@ -155,62 +155,14 @@ Analyze both products considering these weighted priorities and determine the wi
         
         {/* Search Bar */}
         <div className="relative">
-          <div className="bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-3">
+          <button
+            onClick={() => navigate(createPageUrl("CompareSearch"))}
+            className="w-full bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-3"
+          >
             <Search className="w-5 h-5 text-[#9CA3AF]" />
-            <input
-              type="text"
-              placeholder="Search a product to compare..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setShowSearchResults(e.target.value.trim().length > 0);
-              }}
-              className="flex-1 bg-transparent outline-none text-sm text-[#1F2937] placeholder:text-[#9CA3AF]"
-            />
-            {searchQuery && (
-              <button onClick={() => { setSearchQuery(""); setShowSearchResults(false); }}>
-                <X className="w-5 h-5 text-[#9CA3AF]" />
-              </button>
-            )}
-          </div>
+            <span className="flex-1 text-left text-sm text-[#9CA3AF]">Search a product to compare...</span>
+          </button>
 
-          {/* Search Results Dropdown */}
-          {showSearchResults && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-[#E5E7EB] shadow-lg z-50 max-h-64 overflow-y-auto">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
-                  <div key={product.id} className="border-b border-[#E5E7EB] last:border-b-0">
-                    <button
-                      onClick={() => {
-                        if (!item1) handleSelectProduct(product, 1);
-                        else if (!item2) handleSelectProduct(product, 2);
-                        else handleSelectProduct(product, 1);
-                      }}
-                      className="w-full flex items-center gap-3 p-3 hover:bg-[#F9FAFB] text-left"
-                    >
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] flex-shrink-0">
-                        <img src={product.file_url} alt={product.title} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.title}</h3>
-                        <p className="text-xs text-[#6B7280]">{product.keywords?.[0] || 'Product'}</p>
-                      </div>
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <div className="p-6 text-center">
-                  <p className="text-sm text-[#6B7280] mb-3">No results found</p>
-                  <Button 
-                    onClick={() => navigate(createPageUrl("Snap") + "?from=Compare")}
-                    className="bg-[#00A36C] hover:bg-[#007E52] text-white"
-                  >
-                    Take a photo instead
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
@@ -223,7 +175,19 @@ Analyze both products considering these weighted priorities and determine the wi
           </div>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {trendingComparisons.map((comp, idx) => (
-              <div key={idx} className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-md" style={{ minWidth: '200px' }}>
+              <button 
+                key={idx} 
+                onClick={() => navigate(createPageUrl("ComparisonResults"), {
+                  state: {
+                    item1: { title: comp.product1.name, file_url: comp.product1.image, price: '$999', brand: 'Brand' },
+                    item2: { title: comp.product2.name, file_url: comp.product2.image, price: '$899', brand: 'Brand' },
+                    result: { winner: 'item1', confidence: 85, reasoning: 'Based on overall value and performance' },
+                    preferences: { price: pricePreference, quality: qualityPreference, brand: brandPreference, durability: durabilityPreference }
+                  }
+                })}
+                className="flex-shrink-0 bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-md hover:shadow-lg transition-shadow" 
+                style={{ minWidth: '200px' }}
+              >
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col items-center flex-1">
                     <div className="w-20 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-1">
@@ -241,7 +205,7 @@ Analyze both products considering these weighted priorities and determine the wi
                     <p className="text-[10px] font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product2.name}</p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

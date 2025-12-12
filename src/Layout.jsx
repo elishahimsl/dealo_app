@@ -8,7 +8,16 @@ export default function Layout({ children, currentPageName }) {
 
   // Hide nav on splash screen, camera page, and search products
   if (location.pathname === createPageUrl("Splash") || location.pathname === createPageUrl("Snap") || location.pathname === createPageUrl("SearchProducts")) {
-    return <div className="min-h-screen">{children}</div>;
+    return (
+      <div className="min-h-screen">
+        {children}
+        <style>{`
+          body { overflow-x: hidden; }
+          ::-webkit-scrollbar { display: none; }
+          * { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+      </div>
+    );
   }
 
   const CompareIcon = ({ className, strokeWidth }) => (

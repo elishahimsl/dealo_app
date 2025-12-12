@@ -32,9 +32,16 @@ export default function CompareSearch() {
   ];
 
   const handleSelectProduct = (product) => {
+    const productData = {
+      title: product.title || product.name,
+      price: product.ai_summary || product.price || "$999",
+      brand: product.keywords?.[0] || product.brand || "Brand",
+      file_url: product.file_url || product.image
+    };
+    
     navigate(createPageUrl("Compare"), {
       state: { 
-        selectedProduct: product,
+        selectedProduct: productData,
         slot: slot
       }
     });
@@ -71,23 +78,25 @@ export default function CompareSearch() {
         {searchQuery.trim() ? (
           /* Search Results */
           filteredProducts.length > 0 ? (
-            <div className="space-y-3">
+            <div>
               <h2 className="text-sm font-bold text-[#1F2937] mb-3">Search Results</h2>
-              {filteredProducts.map((product) => (
-                <button
-                  key={product.id}
-                  onClick={() => handleSelectProduct(product)}
-                  className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
-                >
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
-                    <img src={product.file_url} alt={product.title} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <h3 className="font-bold text-[#1F2937] text-sm line-clamp-2 mb-0.5">{product.title}</h3>
-                    <p className="text-xs text-[#6B7280]">{product.keywords?.[0] || 'Product'}</p>
-                  </div>
-                </button>
-              ))}
+              <div className="bg-white rounded-2xl border border-[#E5E7EB]">
+                {filteredProducts.map((product, idx) => (
+                  <button
+                    key={product.id}
+                    onClick={() => handleSelectProduct(product)}
+                    className="w-full p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0"
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] flex-shrink-0">
+                      <img src={product.file_url} alt={product.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 text-left">
+                      <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.title}</h3>
+                      <p className="text-xs text-[#6B7280]">{product.keywords?.[0] || 'Product'}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="text-center py-12">
@@ -95,22 +104,22 @@ export default function CompareSearch() {
             </div>
           )
         ) : (
-          /* Default View - Featured Products */
+          /* Default View - Show Saved Products or Featured Products */
           <div>
-            <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Products</h2>
+            <h2 className="text-sm font-bold text-[#1F2937] mb-3">{savedProducts.length > 0 ? 'Your Saved Products' : 'Featured Products'}</h2>
             <div className="bg-white rounded-2xl border border-[#E5E7EB]">
-              {featuredProducts.map((product, idx) => (
+              {(savedProducts.length > 0 ? savedProducts : featuredProducts).map((product, idx) => (
                 <button
                   key={product.id}
                   onClick={() => handleSelectProduct(product)}
                   className="w-full p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0"
                 >
                   <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] flex-shrink-0">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                    <img src={product.file_url || product.image} alt={product.title || product.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 text-left">
-                    <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.name}</h3>
-                    <p className="text-xs text-[#6B7280]">{product.brand}</p>
+                    <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.title || product.name}</h3>
+                    <p className="text-xs text-[#6B7280]">{product.keywords?.[0] || product.brand || 'Product'}</p>
                   </div>
                 </button>
               ))}

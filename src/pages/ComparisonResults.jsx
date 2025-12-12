@@ -14,6 +14,52 @@ export default function ComparisonResults() {
   const [activeGraph, setActiveGraph] = useState('item1'); // 'item1' or 'item2'
   const [timePeriod, setTimePeriod] = useState('1M');
 
+  // Price history data points for item1 (blue line)
+  const item1Path = [
+    { x: 0, y: 45 },
+    { x: 50, y: 35 },
+    { x: 100, y: 42 },
+    { x: 150, y: 25 },
+    { x: 200, y: 38 },
+    { x: 250, y: 30 },
+    { x: 300, y: 45 },
+    { x: 350, y: 40 },
+    { x: 400, y: 50 }
+  ];
+
+  // Price history data points for item2 (green line)
+  const item2Path = [
+    { x: 0, y: 65 },
+    { x: 50, y: 72 },
+    { x: 100, y: 68 },
+    { x: 150, y: 80 },
+    { x: 200, y: 70 },
+    { x: 250, y: 75 },
+    { x: 300, y: 68 },
+    { x: 350, y: 72 },
+    { x: 400, y: 78 }
+  ];
+
+  // Function to get Y position on the line for a given X position
+  const getYOnLine = (xPos, pathData) => {
+    const x = xPos * 400;
+    
+    // Find the two points that x falls between
+    for (let i = 0; i < pathData.length - 1; i++) {
+      if (x >= pathData[i].x && x <= pathData[i + 1].x) {
+        const x1 = pathData[i].x;
+        const y1 = pathData[i].y;
+        const x2 = pathData[i + 1].x;
+        const y2 = pathData[i + 1].y;
+        
+        // Linear interpolation between the two points
+        const t = (x - x1) / (x2 - x1);
+        return y1 + (y2 - y1) * t;
+      }
+    }
+    return pathData[pathData.length - 1].y;
+  };
+
   if (!result || !item1 || !item2) {
     return (
       <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center">
@@ -189,9 +235,9 @@ export default function ComparisonResults() {
               <button
                 key={period}
                 onClick={() => setTimePeriod(period)}
-                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                className={`flex-shrink-0 px-4 py-1.5 text-xs font-semibold transition-colors ${
                   timePeriod === period
-                    ? 'bg-[#E5E7EB] text-[#1F2937]'
+                    ? 'text-[#1F2937]'
                     : 'text-[#6B7280]'
                 }`}
               >
@@ -326,7 +372,7 @@ export default function ComparisonResults() {
                   {activeGraph === 'item1' && (
                     <circle 
                       cx={graphPosition * 400} 
-                      cy={45 - (graphPosition * 15)} 
+                      cy={getYOnLine(graphPosition, item1Path)} 
                       r="5" 
                       fill="#3B82F6"
                       stroke="#1F2937"
@@ -336,7 +382,7 @@ export default function ComparisonResults() {
                   {activeGraph === 'item2' && (
                     <circle 
                       cx={graphPosition * 400} 
-                      cy={65 + (graphPosition * 8)} 
+                      cy={getYOnLine(graphPosition, item2Path)} 
                       r="5" 
                       fill="#00A36C"
                       stroke="#1F2937"

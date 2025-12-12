@@ -340,7 +340,7 @@ Analyze both products considering these weighted priorities and determine the wi
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowPreferences(false)}>
           <div 
             className="bg-white rounded-t-3xl w-full overflow-hidden" 
-            style={{ height: '70vh' }}
+            style={{ height: '85vh' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-center py-3">
@@ -351,14 +351,14 @@ Analyze both products considering these weighted priorities and determine the wi
               <h2 className="text-sm font-semibold text-[#1F2937]">Preferences</h2>
               
               {/* Menu Icon - Top Right */}
-              <div className="absolute right-0">
+              <div className="absolute right-3">
                 <button 
                   onClick={() => setShowMenuDropdown(!showMenuDropdown)}
-                  className="flex flex-col gap-1 p-1"
+                  className="flex flex-col gap-0.5 p-1"
                 >
-                  <div className="w-4 h-0.5 bg-[#1F2937]" />
-                  <div className="w-4 h-0.5 bg-[#1F2937]" />
-                  <div className="w-4 h-0.5 bg-[#1F2937]" />
+                  <div className="w-3.5 h-0.5 bg-[#1F2937]" />
+                  <div className="w-3.5 h-0.5 bg-[#1F2937]" />
+                  <div className="w-3.5 h-0.5 bg-[#1F2937]" />
                 </button>
                 
                 {/* Dropdown Menu */}
@@ -378,7 +378,7 @@ Analyze both products considering these weighted priorities and determine the wi
               </div>
             </div>
             
-            <div className="overflow-y-auto px-6 pb-6" style={{ height: 'calc(70vh - 120px)' }}>
+            <div className="overflow-y-auto px-6 pb-6" style={{ height: 'calc(85vh - 120px)' }}>
               <div className="space-y-4">
                 {/* Brand */}
                 <div>

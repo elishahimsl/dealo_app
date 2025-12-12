@@ -13,8 +13,8 @@ export default function Layout({ children, currentPageName }) {
 
   const CompareIcon = ({ className, strokeWidth }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2}>
-      <circle cx="9" cy="12" r="4.5" />
-      <circle cx="15" cy="12" r="4.5" />
+      <circle cx="8.5" cy="12" r="6" />
+      <circle cx="15.5" cy="12" r="6" />
     </svg>
   );
 

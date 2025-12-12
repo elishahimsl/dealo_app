@@ -11,15 +11,9 @@ export default function Layout({ children, currentPageName }) {
     return <div className="min-h-screen">{children}</div>;
   }
 
-  const CompareIcon = ({ className, strokeWidth }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18" />
-    </svg>
-  );
-
   const navItems = [
     { name: "Home", icon: Home, path: createPageUrl("Home") },
-    { name: "Compare", icon: CompareIcon, path: createPageUrl("Compare") },
+    { name: "Compare", icon: Layers, path: createPageUrl("Compare") },
     { name: "Scan", icon: Camera, path: createPageUrl("Snap") + `?from=${currentPageName}`, isCenter: true },
     { name: "Discover", icon: Compass, path: createPageUrl("More") },
     { name: "Account", icon: User, path: createPageUrl("Profile") },
@@ -50,32 +44,23 @@ export default function Layout({ children, currentPageName }) {
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
-              
+
               if (item.isCenter) {
                 return <div key={item.name} className="flex-1" />;
               }
-              
+
               return (
                 <Link
                   key={item.name}
                   to={item.path}
                   className="flex flex-col items-center justify-center flex-1 transition-all"
                 >
-                  {typeof Icon === 'function' ? (
-                    <Icon 
-                      className={`w-6 h-6 transition-colors ${
-                        active ? 'text-[#00A36C]' : 'text-[#6B7280]'
-                      }`}
-                      strokeWidth={active ? 2.5 : 2}
-                    />
-                  ) : (
-                    <Icon 
-                      className={`w-6 h-6 transition-colors ${
-                        active ? 'text-[#00A36C]' : 'text-[#6B7280]'
-                      }`}
-                      strokeWidth={active ? 2.5 : 2}
-                    />
-                  )}
+                  <Icon 
+                    className={`w-6 h-6 transition-colors ${
+                      active ? 'text-[#00A36C]' : 'text-[#6B7280]'
+                    }`}
+                    strokeWidth={active ? 2.5 : 2}
+                  />
                 </Link>
               );
             })}

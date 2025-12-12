@@ -98,18 +98,18 @@ export default function CompareSearch() {
           /* Default View - Featured Products */
           <div>
             <h2 className="text-sm font-bold text-[#1F2937] mb-3">Featured Products</h2>
-            <div className="space-y-3">
-              {featuredProducts.map((product) => (
+            <div className="bg-white rounded-2xl border border-[#E5E7EB]">
+              {featuredProducts.map((product, idx) => (
                 <button
                   key={product.id}
                   onClick={() => handleSelectProduct(product)}
-                  className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
+                  className="w-full p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0"
                 >
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6] flex-shrink-0">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-[#F3F4F6] flex-shrink-0">
                     <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 text-left">
-                    <h3 className="font-bold text-[#1F2937] text-sm line-clamp-2 mb-0.5">{product.name}</h3>
+                    <h3 className="font-semibold text-[#1F2937] text-sm line-clamp-1">{product.name}</h3>
                     <p className="text-xs text-[#6B7280]">{product.brand}</p>
                   </div>
                 </button>

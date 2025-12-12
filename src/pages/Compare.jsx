@@ -272,7 +272,7 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => { setSelectedSlot(1); setShowAddOptions(true); }}
-              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors relative"
             >
               <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add first product</span>
@@ -296,7 +296,7 @@ Analyze both products considering these weighted priorities and determine the wi
           ) : (
             <button 
               onClick={() => { setSelectedSlot(2); setShowAddOptions(true); }}
-              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors"
+              className="w-full border border-[#E5E7EB] rounded-xl p-3 flex items-center gap-3 hover:bg-[#F9FAFB] transition-colors relative"
             >
               <div className="text-[#00A36C] text-4xl font-light leading-none flex items-center">+</div>
               <span className="text-sm font-medium text-[#1F2937]">Add second product</span>
@@ -527,18 +527,19 @@ Analyze both products considering these weighted priorities and determine the wi
 
       {/* Add Product Options Modal */}
       {showAddOptions && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-6" onClick={() => setShowAddOptions(false)}>
+        <>
+          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowAddOptions(false)} />
           <div 
-            className="bg-white rounded-3xl w-full max-w-lg p-5 shadow-2xl border border-[#E5E7EB] mb-32"
+            className="fixed bottom-20 left-6 right-6 bg-white rounded-3xl p-5 shadow-2xl border border-[#E5E7EB] z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-sm font-bold text-[#1F2937]">Add</h2>
               <button 
                 onClick={() => setShowAddOptions(false)}
-                className="w-7 h-7 rounded-full bg-[#F3F4F6] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
+                className="w-6 h-6 rounded-full bg-[#F3F4F6] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
               >
-                <X className="w-4 h-4 text-[#6B7280]" />
+                <X className="w-3.5 h-3.5 text-[#6B7280]" />
               </button>
             </div>
             

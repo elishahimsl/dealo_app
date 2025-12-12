@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag, ShoppingBag, User, Dumbbell, Heart, Shirt, Smartphone, UtensilsCrossed, Home as HomeIcon, Sparkles, Baby, PawPrint, BookOpen, Flower2, Car } from "lucide-react";
+import { Search, Scale, ScanSearch, Zap, Award, ChevronRight, Camera, Tag, ShoppingBag, User, Dumbbell, Heart, Shirt, Smartphone, UtensilsCrossed, Home as HomeIcon, Sparkles, Baby, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Discover() {
@@ -59,9 +59,6 @@ export default function Discover() {
     { id: 8, name: "Toys", icon: Baby, gradient: "from-gray-100 to-gray-200" },
     { id: 11, name: "Kids", icon: Baby, gradient: "from-gray-100 to-gray-200" },
     { id: 12, name: "Pets", icon: PawPrint, gradient: "from-gray-100 to-gray-200" },
-    { id: 13, name: "Books", icon: BookOpen, gradient: "from-gray-100 to-gray-200" },
-    { id: 14, name: "Garden", icon: Flower2, gradient: "from-gray-100 to-gray-200" },
-    { id: 15, name: "Auto", icon: Car, gradient: "from-gray-100 to-gray-200" },
   ];
 
   const visibleTopics = showAllTopics ? allTopics : allTopics.slice(0, 6);

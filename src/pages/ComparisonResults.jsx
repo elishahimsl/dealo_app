@@ -19,9 +19,7 @@ export default function ComparisonResults() {
   }
 
   const winner = result.winner === "item1" ? item1 : item2;
-  const loser = result.winner === "item1" ? item2 : item1;
 
-  // Mock scores
   const item1Scores = {
     price: 92,
     durability: 85,
@@ -41,28 +39,24 @@ export default function ComparisonResults() {
   };
 
   const winnerScores = result.winner === "item1" ? item1Scores : item2Scores;
-  const loserScores = result.winner === "item1" ? item2Scores : item1Scores;
-
   const overallWinner = Math.round(Object.values(winnerScores).reduce((a, b) => a + b, 0) / Object.keys(winnerScores).length);
-  const overallLoser = Math.round(Object.values(loserScores).reduce((a, b) => a + b, 0) / Object.keys(loserScores).length);
 
-  // Mock store data
   const item1Stores = [
-    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: "$1,299", url: "#" },
-    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: "$1,349", url: "#" },
-    { name: "B&H Photo", logo: "https://logo.clearbit.com/bhphotovideo.com", price: "$1,399", url: "#" }
+    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: "$299", url: "#" },
+    { name: "Target", logo: "https://logo.clearbit.com/target.com", price: "$309", url: "#" },
+    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: "$289", url: "#" }
   ];
 
   const item2Stores = [
-    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: "$1,199", url: "#" },
-    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: "$1,289", url: "#" },
-    { name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", price: "$1,249", url: "#" }
+    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: "$319", url: "#" },
+    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: "$329", url: "#" },
+    { name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", price: "$299", url: "#" }
   ];
 
   const alternatives = [
-    { name: "Dell XPS 15", price: "$1,249", description: "Similar but cheaper", image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200" },
-    { name: "HP Spectre x360", price: "$1,249", description: "Better specs at same price", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200" },
-    { name: "Lenovo ThinkPad X1", price: "$1,279", description: "Best value overall", image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" }
+    { name: "Dell XPS 15", price: "$249", description: "Similar but cheaper", image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200" },
+    { name: "HP Spectre x360", price: "$249", description: "Better specs at same price", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200" },
+    { name: "Lenovo ThinkPad", price: "$279", description: "Best value overall", image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" }
   ];
 
   return (
@@ -80,207 +74,240 @@ export default function ComparisonResults() {
         </div>
       </div>
 
-      {/* Product Comparison Cards */}
-      <div className="px-6 py-6 bg-white">
-        <div className="flex items-start gap-4">
-          {/* Product 1 */}
-          <div className="flex-1 relative">
-            <div className="absolute -top-2 -right-2 z-10">
-              <div className="bg-[#00A36C] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
-                LOWEST PRICE
+      <div className="px-6 py-6 space-y-4">
+        {/* Product Comparison Tile */}
+        <div className="bg-white rounded-3xl p-6 shadow-lg">
+          <div className="flex items-start gap-4">
+            {/* Product 1 */}
+            <div className="flex-1 relative">
+              <div className="absolute -top-2 -right-2 z-10">
+                <div className="bg-[#00A36C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
+                  LOWEST PRICE
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl overflow-hidden">
+                <div className="w-full h-40 bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center p-4">
+                  <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-[#1F2937] text-base mb-2">{item1.title}</h3>
+                  <p className="text-2xl font-bold text-[#1F2937] mb-2">{item1.price}</p>
+                  <div className="flex items-center gap-1 mb-3">
+                    <span className="text-sm font-semibold text-[#1F2937]">4.5 ★</span>
+                  </div>
+                  <p className="text-sm font-bold text-[#1F2937]">amazon</p>
+                </div>
               </div>
             </div>
-            <div className="bg-[#F9FAFB] rounded-2xl p-4 border border-[#E5E7EB]">
-              <div className="w-full h-32 mb-3 flex items-center justify-center">
-                <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
+
+            {/* VS Circle */}
+            <div className="flex-shrink-0 pt-20">
+              <div className="w-14 h-14 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-md">
+                <span className="text-base font-bold text-[#6B7280]">VS</span>
               </div>
-              <h3 className="font-bold text-[#1F2937] text-sm mb-2 line-clamp-2">{item1.title}</h3>
-              <p className="text-xl font-bold text-[#00A36C] mb-2">{item1.price}</p>
-              <div className="flex items-center gap-1 mb-1">
-                <span className="text-sm font-semibold text-[#1F2937]">4.5 ★</span>
-                <span className="text-xs text-[#6B7280]">(17.4k Reviews)</span>
+            </div>
+
+            {/* Product 2 */}
+            <div className="flex-1 relative">
+              <div className="absolute -top-2 -right-2 z-10">
+                <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
+                  POPULAR PICK
+                </div>
               </div>
-              <p className="text-xs font-bold text-[#1F2937] mt-2">amazon</p>
+              <div className="bg-white rounded-2xl overflow-hidden">
+                <div className="w-full h-40 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center p-4">
+                  <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-[#1F2937] text-base mb-2">{item2.title}</h3>
+                  <p className="text-2xl font-bold text-[#1F2937] mb-2">{item2.price}</p>
+                  <div className="flex items-center gap-1 mb-3">
+                    <span className="text-sm font-semibold text-[#1F2937]">4.7 ★</span>
+                  </div>
+                  <p className="text-sm font-bold text-[#1F2937]">BEST BUY</p>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* VS Circle */}
-          <div className="flex-shrink-0 pt-16">
-            <div className="w-12 h-12 rounded-full bg-[#E5E7EB] flex items-center justify-center">
-              <span className="text-sm font-bold text-[#6B7280]">VS</span>
+        {/* Best Choice Tile */}
+        <div className="bg-white rounded-3xl p-5 shadow-lg">
+          <h2 className="text-sm font-bold text-[#6B7280] mb-3">Best Choice For You</h2>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-bold text-[#1F2937]">{winner.title}</h3>
+            <div className="flex items-baseline">
+              <span className="text-4xl font-bold text-[#1F2937]">{overallWinner}</span>
+              <span className="text-xl text-[#6B7280]">/100</span>
             </div>
           </div>
+          <div className="w-full h-2 bg-[#E5E7EB] rounded-full mb-3 overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-[#3B82F6] to-[#00A36C] rounded-full" style={{ width: `${overallWinner}%` }} />
+          </div>
+          <p className="text-xs text-[#6B7280]">
+            Better price stability, higher review quality, and stronger durability
+          </p>
+        </div>
 
-          {/* Product 2 */}
-          <div className="flex-1 relative">
-            <div className="absolute -top-2 -right-2 z-10">
-              <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg">
-                POPULAR PICK
+        {/* Detailed Scores Tile */}
+        <div className="bg-white rounded-3xl p-5 shadow-lg">
+          <div className="space-y-3">
+            {[
+              { label: "Price", item1: item1Scores.price, item2: item2Scores.price },
+              { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability },
+              { label: "Reviews", item1: item1Scores.reviews, item2: item2Scores.reviews },
+              { label: "Brand Reputation", item1: item1Scores.brand, item2: item2Scores.brand },
+              { label: "Features", item1: item1Scores.features, item2: item2Scores.features },
+              { label: "Design", item1: item1Scores.design, item2: item2Scores.design }
+            ].map((category) => (
+              <div key={category.label} className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-[#1F2937] w-36">{category.label}</span>
+                <div className="flex items-center gap-6">
+                  <span className="text-xl font-bold text-[#1F2937] w-10 text-right">{category.item1}</span>
+                  <span className="text-xl font-bold text-[#6B7280] w-10 text-right">{category.item2}</span>
+                </div>
               </div>
-            </div>
-            <div className="bg-[#F9FAFB] rounded-2xl p-4 border border-[#E5E7EB]">
-              <div className="w-full h-32 mb-3 flex items-center justify-center">
-                <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
-              </div>
-              <h3 className="font-bold text-[#1F2937] text-sm mb-2 line-clamp-2">{item2.title}</h3>
-              <p className="text-xl font-bold text-[#00A36C] mb-2">{item2.price}</p>
-              <div className="flex items-center gap-1 mb-1">
-                <span className="text-sm font-semibold text-[#1F2937]">4.7 ★</span>
-                <span className="text-xs text-[#6B7280]">(12.1k Reviews)</span>
-              </div>
-              <p className="text-xs font-bold text-[#1F2937] mt-2">BEST BUY</p>
-            </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Best Choice Section */}
-      <div className="px-6 py-6 bg-white mt-2">
-        <h2 className="text-base font-bold text-[#1F2937] mb-4">Best Choice For You</h2>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-2xl font-bold text-[#1F2937]">{winner.title}</h3>
-          <div className="flex items-baseline">
-            <span className="text-5xl font-bold text-[#1F2937]">{overallWinner}</span>
-            <span className="text-2xl text-[#6B7280]">/100</span>
-          </div>
-        </div>
-        <div className="w-full h-2 bg-[#E5E7EB] rounded-full mb-4 overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-[#3B82F6] to-[#00A36C] rounded-full" style={{ width: `${overallWinner}%` }} />
-        </div>
-        <p className="text-sm text-[#6B7280]">
-          Better price stability, higher review quality, and stronger durability
-        </p>
-      </div>
-
-      {/* Detailed Scores */}
-      <div className="px-6 py-6 bg-white mt-2">
-        <div className="space-y-4">
-          {[
-            { label: "Price", item1: item1Scores.price, item2: item2Scores.price },
-            { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability },
-            { label: "Reviews", item1: item1Scores.reviews, item2: item2Scores.reviews },
-            { label: "Brand Reputation", item1: item1Scores.brand, item2: item2Scores.brand },
-            { label: "Features", item1: item1Scores.features, item2: item2Scores.features },
-            { label: "Design", item1: item1Scores.design, item2: item2Scores.design }
-          ].map((category) => (
-            <div key={category.label} className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-[#1F2937] w-32">{category.label}</span>
-              <div className="flex items-center gap-4 flex-1 justify-end">
-                <span className="text-lg font-bold text-[#1F2937] w-12 text-right">{category.item1}</span>
-                <span className="text-lg font-bold text-[#6B7280] w-12 text-right">{category.item2}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Price History */}
-      <div className="px-6 py-6 bg-white mt-2">
-        <h2 className="text-base font-bold text-[#1F2937] mb-4">Price History</h2>
-        
-        {/* Graph */}
-        <div className="relative h-32 mb-4">
-          <svg className="w-full h-full" viewBox="0 0 400 100" preserveAspectRatio="none">
-            {/* Grid lines */}
-            <line x1="0" y1="25" x2="400" y2="25" stroke="#E5E7EB" strokeWidth="1" />
-            <line x1="0" y1="50" x2="400" y2="50" stroke="#E5E7EB" strokeWidth="1" />
-            <line x1="0" y1="75" x2="400" y2="75" stroke="#E5E7EB" strokeWidth="1" />
-            
-            {/* Product 1 line (blue) */}
-            <path
-              d="M0,40 Q100,20 200,35 T400,45"
-              fill="none"
-              stroke="#3B82F6"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            
-            {/* Product 2 line (purple) */}
-            <path
-              d="M0,60 Q100,70 200,55 T400,65"
-              fill="none"
-              stroke="#A855F7"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+        {/* Price History Tile */}
+        <div className="bg-white rounded-3xl p-5 shadow-lg">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Price History</h2>
           
-          {/* Y-axis labels */}
-          <div className="absolute left-0 top-0 text-xs text-[#6B7280]">60</div>
-          <div className="absolute right-0 bottom-0 text-xs text-[#6B7280]">30</div>
-        </div>
+          {/* Graph with gradient */}
+          <div className="relative h-40 mb-4">
+            <svg className="w-full h-full" viewBox="0 0 400 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="gradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
+                  <stop offset="100%" style={{ stopColor: '#3B82F6', stopOpacity: 0 }} />
+                </linearGradient>
+                <linearGradient id="gradient2" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{ stopColor: '#00A36C', stopOpacity: 0.3 }} />
+                  <stop offset="100%" style={{ stopColor: '#00A36C', stopOpacity: 0 }} />
+                </linearGradient>
+              </defs>
+              
+              {/* Grid lines */}
+              <line x1="0" y1="30" x2="400" y2="30" stroke="#E5E7EB" strokeWidth="1" />
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#E5E7EB" strokeWidth="1" />
+              <line x1="0" y1="90" x2="400" y2="90" stroke="#E5E7EB" strokeWidth="1" />
+              
+              {/* Product 1 area (blue) */}
+              <path
+                d="M0,50 Q100,30 200,45 T400,55 L400,120 L0,120 Z"
+                fill="url(#gradient1)"
+              />
+              <path
+                d="M0,50 Q100,30 200,45 T400,55"
+                fill="none"
+                stroke="#3B82F6"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              
+              {/* Product 2 area (green) */}
+              <path
+                d="M0,70 Q100,80 200,65 T400,75 L400,120 L0,120 Z"
+                fill="url(#gradient2)"
+              />
+              <path
+                d="M0,70 Q100,80 200,65 T400,75"
+                fill="none"
+                stroke="#00A36C"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </svg>
+            
+            {/* Y-axis price labels */}
+            <div className="absolute left-0 top-0 text-xs font-semibold text-[#6B7280]">$400</div>
+            <div className="absolute left-0 top-1/3 text-xs font-semibold text-[#6B7280]">$350</div>
+            <div className="absolute left-0 top-2/3 text-xs font-semibold text-[#6B7280]">$300</div>
+            <div className="absolute left-0 bottom-0 text-xs font-semibold text-[#6B7280]">$250</div>
+          </div>
 
-        {/* Legend */}
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-full bg-[#3B82F6]"></div>
-              <span className="text-[#6B7280]">{item1.title}</span>
+          {/* Verdicts in boxes */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="flex-1 bg-[#E0F2FE] rounded-lg p-2 flex items-center gap-1">
+              <span className="text-[#3B82F6] text-xs">↓</span>
+              <span className="text-[#3B82F6] text-xs font-medium">Lowest in 60 days</span>
             </div>
-            <span className="text-[#00A36C]">↓ Lowest in 60 days</span>
+            <div className="flex-1 bg-[#FEE2E2] rounded-lg p-2 flex items-center gap-1">
+              <span className="text-[#EF4444] text-xs">↓</span>
+              <span className="text-[#EF4444] text-xs font-medium">Likely to drop soon</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-[#A855F7]"></div>
-            <span className="text-[#6B7280]">{item2.title}</span>
-            <span className="text-[#EF4444]">↓ Likely to drop soon</span>
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-[#3B82F6]"></div>
+              <span className="text-[#6B7280] font-medium">{item1.title}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full bg-[#00A36C]"></div>
+              <span className="text-[#6B7280] font-medium">{item2.title}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Store Options for Both Products */}
-      <div className="px-6 py-6 bg-white mt-2">
-        <h2 className="text-base font-bold text-[#1F2937] mb-4">Store Options</h2>
-        
-        {/* Product 1 Stores */}
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-[#6B7280] mb-3">{item1.title}</h3>
-          <div className="space-y-2">
-            {item1Stores.map((store, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB]">
-                <div className="flex items-center gap-3">
-                  <img src={store.logo} alt={store.name} className="w-8 h-8" onError={(e) => e.target.style.display = 'none'} />
-                  <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
+        {/* Store Options Tiles */}
+        <div className="bg-white rounded-3xl overflow-hidden shadow-lg">
+          <div className="p-5 pb-3">
+            <h2 className="text-base font-bold text-[#1F2937] mb-1">Store Options</h2>
+          </div>
+          
+          {/* Product 1 Stores */}
+          <div className="px-5 pb-4">
+            <h3 className="text-sm font-semibold text-[#6B7280] mb-2">{item1.title}</h3>
+            <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+              {item1Stores.map((store, idx) => (
+                <button key={idx} className="w-full flex items-center justify-between p-4 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
+                  <div className="flex items-center gap-3">
+                    <img src={store.logo} alt={store.name} className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
+                  </div>
+                  <span className="text-sm font-medium text-[#9CA3AF]">Go to Store</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Product 2 Stores */}
+          <div className="px-5 pb-5">
+            <h3 className="text-sm font-semibold text-[#6B7280] mb-2">{item2.title}</h3>
+            <div className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+              {item2Stores.map((store, idx) => (
+                <button key={idx} className="w-full flex items-center justify-between p-4 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
+                  <div className="flex items-center gap-3">
+                    <img src={store.logo} alt={store.name} className="w-6 h-6 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
+                  </div>
+                  <span className="text-sm font-medium text-[#9CA3AF]">Go to Store</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* AI Alternatives Tile */}
+        <div className="bg-white rounded-3xl p-5 shadow-lg">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">AI Alternatives</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {alternatives.map((alt, idx) => (
+              <div key={idx} className="bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-sm">
+                <div className="w-full h-28 bg-[#F3F4F6] flex items-center justify-center p-3">
+                  <img src={alt.image} alt={alt.name} className="max-w-full max-h-full object-contain" />
                 </div>
-                <Button className="bg-white border border-[#E5E7EB] text-[#1F2937] hover:bg-[#F9FAFB] text-sm px-4 py-2 h-auto rounded-lg">
-                  Go to Store
-                </Button>
+                <div className="p-3">
+                  <p className="text-base font-bold text-[#1F2937] mb-1">{alt.price}</p>
+                  <p className="text-xs text-[#3B82F6] font-medium">{alt.description}</p>
+                </div>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Product 2 Stores */}
-        <div>
-          <h3 className="text-sm font-semibold text-[#6B7280] mb-3">{item2.title}</h3>
-          <div className="space-y-2">
-            {item2Stores.map((store, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-[#F9FAFB] rounded-xl border border-[#E5E7EB]">
-                <div className="flex items-center gap-3">
-                  <img src={store.logo} alt={store.name} className="w-8 h-8" onError={(e) => e.target.style.display = 'none'} />
-                  <span className="text-lg font-bold text-[#1F2937]">{store.price}</span>
-                </div>
-                <Button className="bg-white border border-[#E5E7EB] text-[#1F2937] hover:bg-[#F9FAFB] text-sm px-4 py-2 h-auto rounded-lg">
-                  Go to Store
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* AI Alternatives */}
-      <div className="px-6 py-6 bg-white mt-2">
-        <h2 className="text-base font-bold text-[#1F2937] mb-4">AI Alternatives</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {alternatives.map((alt, idx) => (
-            <div key={idx} className="bg-[#F9FAFB] rounded-xl p-3 border border-[#E5E7EB]">
-              <div className="w-full h-24 mb-2 flex items-center justify-center bg-white rounded-lg">
-                <img src={alt.image} alt={alt.name} className="max-w-full max-h-full object-contain" />
-              </div>
-              <p className="text-lg font-bold text-[#1F2937] mb-1">{alt.price}</p>
-              <p className="text-xs text-[#3B82F6] font-medium">{alt.description}</p>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -289,14 +316,14 @@ export default function ComparisonResults() {
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <Button 
             onClick={() => setIsSaved(!isSaved)}
-            className="flex-1 bg-white border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#F0FDF4] font-semibold rounded-xl h-12"
+            className="flex-1 bg-white border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#F0FDF4] font-semibold rounded-xl h-12 text-sm"
           >
             Save Comparison
           </Button>
           <Button className="bg-white border-2 border-[#E5E7EB] hover:bg-[#F9FAFB] h-12 px-4 rounded-xl">
             <Share2 className="w-5 h-5 text-[#6B7280]" />
           </Button>
-          <Button className="flex-1 bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold rounded-xl h-12">
+          <Button className="flex-1 bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold rounded-xl h-12 text-sm">
             Buy Winner
           </Button>
         </div>

@@ -29,16 +29,21 @@ export default function SavedComparisons() {
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
-      <div className="px-6 pt-8 pb-2 flex items-center">
-        <button onClick={() => navigate(-1)}>
+      <div className="px-6 pt-8 pb-2 flex items-center justify-between relative">
+        <button onClick={() => navigate(-1)} className="absolute left-6">
           <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
         </button>
-        <h1 className="text-sm font-semibold text-[#1F2937] ml-3">Saved Comparisons</h1>
+        <h1 className="text-sm font-semibold text-[#1F2937] w-full text-center">Saved Comparisons</h1>
       </div>
 
       <div className="px-6 space-y-3 relative">
-        <button className="absolute -top-1 right-6 z-10">
-          <SlidersHorizontal className="w-5 h-5 text-[#6B7280]" />
+        <button className="absolute -top-3 right-6 z-10">
+          <svg className="w-5 h-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="4" y1="8" x2="20" y2="8" strokeLinecap="round"/>
+            <circle cx="8" cy="8" r="2" fill="currentColor"/>
+            <line x1="4" y1="16" x2="20" y2="16" strokeLinecap="round"/>
+            <circle cx="16" cy="16" r="2" fill="currentColor"/>
+          </svg>
         </button>
         
         {savedComparisons.map((comp) => (

@@ -16,9 +16,12 @@ export default function Layout({ children, currentPageName }) {
           ::-webkit-scrollbar { display: none; }
           * { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
+      <style>{`
+        main::-webkit-scrollbar { display: none; }
+      `}</style>
       </div>
-    );
-  }
+      );
+      }
 
   const CompareIcon = ({ className, strokeWidth }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round">

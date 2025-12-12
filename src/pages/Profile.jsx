@@ -6,7 +6,7 @@ import { createPageUrl } from "@/utils";
 import { 
   User, Settings, ChevronRight, Bookmark, Star, Tag, 
   Bell, BellRing, Clock, Camera, LogOut, HelpCircle, Info, 
-  Lock, Globe, DollarSign, Store, TrendingUp, Scan, Users, Layers
+  Lock, Globe, DollarSign, Store, TrendingUp, Scan, Users, Layers, Heart
 } from "lucide-react";
 
 export default function Profile() {
@@ -26,11 +26,29 @@ export default function Profile() {
 
   // Your Stuff cards
   const yourStuff = [
-    { id: 1, icon: Bookmark, label: "Saved Products", count: 24, page: "MyCart" },
-    { id: 2, icon: Layers, label: "Saved Comparisons", count: 8, page: "Compare" },
-    { id: 3, icon: Users, label: "Following", count: 12, page: "FollowingList" },
-    { id: 4, icon: Tag, label: "Favorite Categories", count: 6, page: "More" },
+    { id: 1, icon: Bookmark, label: "Saved Products", page: "MyCart" },
+    { id: 2, icon: Layers, label: "Saved Comparisons", page: "SavedComparisons" },
+    { id: 3, icon: Users, label: "Following", page: "FollowingList" },
   ];
+
+  // Recently viewed/scanned products
+  const recentlyViewed = captures.slice(0, 6);
+  const recentlyScanned = captures.slice(0, 6);
+
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const toggleFavorite = (productId) => {
+    setFavorites(prev => {
+      const newFavorites = prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId];
+      localStorage.setItem('favorites', JSON.stringify(newFavorites));
+      return newFavorites;
+    });
+  };
 
   // Stats
   const stats = [
@@ -89,6 +107,36 @@ export default function Profile() {
             })}
           </div>
 
+          {/* Tracking & Alerts in Settings */}
+          <div className="mb-6">
+            <h2 className="text-sm font-bold text-[#1F2937] mb-3 px-1">Tracking & Alerts</h2>
+            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+              {[
+                { key: 'priceDrop', icon: Tag, label: "Price Drop Alerts" },
+                { key: 'restock', icon: BellRing, label: "Restock Alerts" },
+                { key: 'scan', icon: Camera, label: "Scan Alerts" },
+              ].map((item, idx) => {
+                const Icon = item.icon;
+                const isOn = alerts[item.key];
+                return (
+                  <div 
+                    key={item.key}
+                    className={`flex items-center gap-4 p-4 ${idx < 2 ? 'border-b border-[#F3F4F6]' : ''}`}
+                  >
+                    <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
+                    <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
+                    <button 
+                      onClick={() => setAlerts(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
+                      className={`w-12 h-7 rounded-full p-1 transition-colors ${isOn ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'translate-x-5' : ''}`} />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           <button 
             onClick={() => base44.auth.logout()}
             className="w-full flex items-center justify-center gap-2 py-3 text-red-500 hover:text-red-600 transition-colors"
@@ -104,13 +152,13 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-[#F7F8FA] pb-32">
       {/* Header */}
-      <div className="px-6 pt-6 pb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-[#1F2937]">Account</h1>
+      <div className="px-6 pt-6 pb-3 flex items-center justify-between">
+        <h1 className="text-base font-semibold text-[#1F2937]">Account</h1>
         <button 
           onClick={() => setShowSettings(true)}
-          className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
+          className="w-8 h-8 rounded-full bg-[#E5E7EB] flex items-center justify-center hover:bg-[#D1D5DB] transition-colors"
         >
-          <Settings className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
+          <Settings className="w-4 h-4 text-[#1F2937]" strokeWidth={2} />
         </button>
       </div>
 
@@ -176,82 +224,117 @@ export default function Profile() {
       </div>
 
       {/* Your Stuff Section */}
-      <div className="px-6 mb-8">
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
-          <h2 className="text-lg font-bold text-[#1F2937] mb-4">Your Stuff</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {yourStuff.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button 
-                  key={item.id}
-                  onClick={() => navigate(createPageUrl(item.page))}
-                  className="bg-[#F9FAFB] rounded-xl p-4 text-left hover:bg-[#F3F4F6] transition-colors"
-                  style={{ height: '100px' }}
-                >
-                  <Icon className="w-6 h-6 text-[#00A36C] mb-2" strokeWidth={1.5} />
-                  <p className="text-sm font-medium text-[#1F2937]">{item.label}</p>
-                  <p className="text-xs text-[#9CA3AF]">{item.count} items</p>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Tracking & Alerts Section */}
-      <div className="px-6 mb-8">
-        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Tracking & Alerts</h2>
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {[
-            { key: 'priceDrop', icon: Tag, label: "Price Drop Alerts" },
-            { key: 'restock', icon: BellRing, label: "Restock Alerts" },
-            { key: 'scan', icon: Camera, label: "Scan Alerts" },
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            const isOn = alerts[item.key];
-            return (
-              <div 
-                key={item.key}
-                className={`flex items-center gap-4 p-4 ${idx < 2 ? 'border-b border-[#F3F4F6]' : ''}`}
-              >
-                <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
-                <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
-                <button 
-                  onClick={() => setAlerts(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-                  className={`w-12 h-7 rounded-full p-1 transition-colors ${isOn ? 'bg-[#00A36C]' : 'bg-[#E5E7EB]'}`}
-                >
-                  <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${isOn ? 'translate-x-5' : ''}`} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Your Activity Section */}
-      <div className="px-6 mb-8">
-        <h2 className="text-lg font-bold text-[#1F2937] mb-4">Your Activity</h2>
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {activityRows.map((item, idx) => {
+      <div className="px-6 mb-6">
+        <div className="grid grid-cols-3 gap-2">
+          {yourStuff.map((item) => {
             const Icon = item.icon;
             return (
               <button 
-                key={item.label}
+                key={item.id}
                 onClick={() => navigate(createPageUrl(item.page))}
-                className={`w-full flex items-center gap-4 p-4 text-left hover:bg-[#F9FAFB] transition-colors ${idx < activityRows.length - 1 ? 'border-b border-[#F3F4F6]' : ''}`}
+                className="bg-white rounded-lg p-3 text-center hover:bg-[#F9FAFB] transition-colors shadow-md"
+                style={{ height: '90px' }}
               >
-                <Icon className="w-5 h-5 text-[#6B7280]" strokeWidth={1.5} />
-                <span className="flex-1 text-sm text-[#1F2937]">{item.label}</span>
-                <ChevronRight className="w-4 h-4 text-[#D1D5DB]" />
+                <Icon className="w-5 h-5 text-[#00A36C] mb-2 mx-auto" strokeWidth={1.5} />
+                <p className="text-xs font-medium text-[#1F2937] leading-tight">{item.label}</p>
               </button>
             );
           })}
         </div>
       </div>
 
+      {/* Recently Viewed Section */}
+      <div className="px-6 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-[#1F2937]">Recently Viewed</h2>
+          <button className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {recentlyViewed.map((product) => (
+            <div key={product.id} className="flex-shrink-0" style={{ width: '100px' }}>
+              <button 
+                onClick={() => navigate(createPageUrl("Preview") + `?id=${product.id}`)}
+                className="relative w-full bg-white rounded-lg shadow-md overflow-hidden mb-2"
+                style={{ height: '100px' }}
+              >
+                <img 
+                  src={product.file_url} 
+                  alt={product.title} 
+                  className="w-full h-full object-cover"
+                />
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(product.id);
+                  }}
+                  className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                >
+                  <Heart 
+                    className={`w-3.5 h-3.5 ${favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-[#6B7280]'}`} 
+                    strokeWidth={2}
+                  />
+                </button>
+              </button>
+              <p className="text-xs text-[#1F2937] font-medium line-clamp-2">{product.title}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recently Scanned Section */}
+      <div className="px-6 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-[#1F2937]">Recently Scanned</h2>
+          <button className="w-7 h-7 rounded-full bg-[#E5E7EB] flex items-center justify-center">
+            <ChevronRight className="w-4 h-4 text-[#6B7280]" />
+          </button>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {recentlyScanned.map((product) => (
+            <div key={product.id} className="flex-shrink-0" style={{ width: '100px' }}>
+              <button 
+                onClick={() => navigate(createPageUrl("Preview") + `?id=${product.id}`)}
+                className="relative w-full bg-white rounded-lg shadow-md overflow-hidden mb-2"
+                style={{ height: '100px' }}
+              >
+                <img 
+                  src={product.file_url} 
+                  alt={product.title} 
+                  className="w-full h-full object-cover"
+                />
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(product.id);
+                  }}
+                  className="absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                >
+                  <Heart 
+                    className={`w-3.5 h-3.5 ${favorites.includes(product.id) ? 'fill-red-500 text-red-500' : 'text-[#6B7280]'}`} 
+                    strokeWidth={2}
+                  />
+                </button>
+              </button>
+              <p className="text-xs text-[#1F2937] font-medium line-clamp-2">{product.title}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Footer Padding */}
       <div className="h-24" />
+
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

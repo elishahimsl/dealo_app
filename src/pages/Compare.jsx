@@ -527,7 +527,7 @@ Analyze both products considering these weighted priorities and determine the wi
 
       {/* Add Product Options Modal */}
       {showAddOptions && (
-        <>
+        <div>
           <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowAddOptions(false)} />
           <div 
             className="fixed bottom-20 left-6 right-6 bg-white rounded-3xl p-5 shadow-2xl border border-[#E5E7EB] z-50"
@@ -615,7 +615,7 @@ Analyze both products considering these weighted priorities and determine the wi
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
 
       <style>{`

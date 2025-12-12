@@ -8,20 +8,8 @@ export default function Layout({ children, currentPageName }) {
 
   // Hide nav on splash screen, camera page, and search products
   if (location.pathname === createPageUrl("Splash") || location.pathname === createPageUrl("Snap") || location.pathname === createPageUrl("SearchProducts")) {
-    return (
-      <div className="min-h-screen">
-        {children}
-        <style>{`
-          body { overflow-x: hidden; }
-          ::-webkit-scrollbar { display: none; }
-          * { -ms-overflow-style: none; scrollbar-width: none; }
-        `}</style>
-      <style>{`
-        main::-webkit-scrollbar { display: none; }
-      `}</style>
-      </div>
-      );
-      }
+    return <div className="min-h-screen">{children}</div>;
+  }
 
   const CompareIcon = ({ className, strokeWidth }) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round">
@@ -44,7 +32,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 pb-24 overflow-auto" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+      <main className="flex-1 pb-24 overflow-auto">
         {children}
       </main>
 

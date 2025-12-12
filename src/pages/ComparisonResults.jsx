@@ -11,6 +11,8 @@ export default function ComparisonResults() {
   const [isSaved, setIsSaved] = useState(false);
   const [graphPosition, setGraphPosition] = useState(null);
   const [favoriteAlts, setFavoriteAlts] = useState({});
+  const [activeGraph, setActiveGraph] = useState('item1'); // 'item1' or 'item2'
+  const [timePeriod, setTimePeriod] = useState('1M');
 
   if (!result || !item1 || !item2) {
     return (
@@ -80,23 +82,21 @@ export default function ComparisonResults() {
 
       <div className="px-6 py-6 space-y-4">
         {/* Product Comparison Cards */}
-        <div className="flex items-start gap-2">
+        <div className="flex items-start gap-2 relative">
           {/* Product 1 */}
-          <div className="flex-1 relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-              <div className="bg-[#00A36C] text-white text-[9px] font-bold px-3 py-1 rounded-md shadow-lg">
-                LOWEST PRICE
+          <div className="flex-1">
+            <div className="bg-white rounded-2xl shadow-lg p-4 relative">
+              <div className="absolute -top-2.5 right-3 z-10">
+                <div className="bg-[#00A36C] text-white text-[8px] font-semibold px-2.5 py-1 rounded shadow-md">
+                  LOWEST PRICE
+                </div>
               </div>
-            </div>
-            <div className="bg-white rounded-3xl shadow-lg overflow-hidden" style={{ aspectRatio: '1/1' }}>
-              <div className="w-full h-full flex items-center justify-center p-6">
+              <div className="w-full bg-white flex items-center justify-center mb-3" style={{ height: '140px' }}>
                 <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
               </div>
-            </div>
-            <div className="mt-2 px-1">
               <h3 className="font-bold text-[#1F2937] text-xs mb-1 line-clamp-2">{item1.title}</h3>
               <p className="text-base font-bold text-[#1F2937] mb-1">{item1.price}</p>
-              <div className="flex items-center gap-1 mb-1">
+              <div className="flex items-center gap-1 mb-2">
                 <span className="text-xs font-semibold text-[#1F2937]">4.5 <span className="text-yellow-400">★</span></span>
                 <span className="text-[10px] text-[#6B7280]">(17.4k Reviews)</span>
               </div>
@@ -104,29 +104,27 @@ export default function ComparisonResults() {
             </div>
           </div>
 
-          {/* VS Circle */}
-          <div className="flex-shrink-0" style={{ paddingTop: '80px' }}>
+          {/* VS Circle - overlapping */}
+          <div className="absolute left-1/2 -translate-x-1/2 z-20" style={{ top: '50px' }}>
             <div className="w-9 h-9 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-sm">
               <span className="text-xs font-bold text-[#6B7280]">VS</span>
             </div>
           </div>
 
           {/* Product 2 */}
-          <div className="flex-1 relative">
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-              <div className="bg-[#3B82F6] text-white text-[9px] font-bold px-3 py-1 rounded-md shadow-lg">
-                POPULAR PICK
+          <div className="flex-1">
+            <div className="bg-white rounded-2xl shadow-lg p-4 relative">
+              <div className="absolute -top-2.5 right-3 z-10">
+                <div className="bg-[#3B82F6] text-white text-[8px] font-semibold px-2.5 py-1 rounded shadow-md">
+                  POPULAR PICK
+                </div>
               </div>
-            </div>
-            <div className="bg-white rounded-3xl shadow-lg overflow-hidden" style={{ aspectRatio: '1/1' }}>
-              <div className="w-full h-full flex items-center justify-center p-6">
+              <div className="w-full bg-white flex items-center justify-center mb-3" style={{ height: '140px' }}>
                 <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
               </div>
-            </div>
-            <div className="mt-2 px-1">
               <h3 className="font-bold text-[#1F2937] text-xs mb-1 line-clamp-2">{item2.title}</h3>
               <p className="text-base font-bold text-[#1F2937] mb-1">{item2.price}</p>
-              <div className="flex items-center gap-1 mb-1">
+              <div className="flex items-center gap-1 mb-2">
                 <span className="text-xs font-semibold text-[#1F2937]">4.7 <span className="text-yellow-400">★</span></span>
                 <span className="text-[10px] text-[#6B7280]">(12.1k Reviews)</span>
               </div>
@@ -149,7 +147,7 @@ export default function ComparisonResults() {
             <div className="h-full bg-[#00A36C] rounded-full" style={{ width: `${overallWinner}%` }} />
           </div>
           <p className="text-xs text-[#6B7280]">
-            {winner.title} wins with superior value and performance. It offers {result.winner === "item1" ? "better pricing" : "higher quality features"} and {result.winner === "item1" ? "stronger build quality" : "better brand reputation"}, making it the smarter choice for your needs.
+            {winner.title} excels with {result.winner === "item1" ? `${item1Scores.price}% price rating, ${item1Scores.durability}% durability score, and ${item1Scores.value || 88}% overall value` : `${item2Scores.brand}% brand reputation, ${item2Scores.features}% feature set, and ${item2Scores.design}% design quality`}. Based on your preferences, this product delivers the best combination of quality, value, and performance for your specific needs.
           </p>
         </div>
 
@@ -180,11 +178,47 @@ export default function ComparisonResults() {
 
         {/* Price History Tile */}
         <div className="bg-white rounded-xl p-5 shadow-lg">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Price History</h2>
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">Price History</h2>
+          
+          {/* Border line */}
+          <div className="border-t border-[#E5E7EB] mb-3" />
+          
+          {/* Time period selector - iOS style */}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            {['1W', '1M', '3M', '6M', '1Y'].map((period) => (
+              <button
+                key={period}
+                onClick={() => setTimePeriod(period)}
+                className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  timePeriod === period
+                    ? 'bg-[#E5E7EB] text-[#1F2937]'
+                    : 'text-[#6B7280]'
+                }`}
+              >
+                {period}
+              </button>
+            ))}
+          </div>
           
           {/* Graph with gradient - iOS style */}
           <div 
             className="relative h-40 mb-4 pl-10 pr-2 cursor-crosshair"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX - rect.left - 40;
+              const width = rect.width - 48;
+              const y = e.clientY - rect.top;
+              
+              // Determine which line was clicked based on y position
+              const item1Y = 45 - ((x / width) * 15);
+              const item2Y = 65 + ((x / width) * 8);
+              
+              if (Math.abs(y - item1Y) < Math.abs(y - item2Y)) {
+                setActiveGraph('item1');
+              } else {
+                setActiveGraph('item2');
+              }
+            }}
             onMouseMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left - 40;
@@ -193,6 +227,21 @@ export default function ComparisonResults() {
               setGraphPosition(percent);
             }}
             onMouseLeave={() => setGraphPosition(null)}
+            onTouchStart={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.touches[0].clientX - rect.left - 40;
+              const width = rect.width - 48;
+              const y = e.touches[0].clientY - rect.top;
+              
+              const item1Y = 45 - ((x / width) * 15);
+              const item2Y = 65 + ((x / width) * 8);
+              
+              if (Math.abs(y - item1Y) < Math.abs(y - item2Y)) {
+                setActiveGraph('item1');
+              } else {
+                setActiveGraph('item2');
+              }
+            }}
             onTouchMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.touches[0].clientX - rect.left - 40;
@@ -248,7 +297,7 @@ export default function ComparisonResults() {
                 fill="url(#gradient2)"
               />
               
-              {/* Interactive dot */}
+              {/* Interactive dot - iOS style (only for active graph) */}
               {graphPosition !== null && (
                 <>
                   <line 
@@ -256,24 +305,41 @@ export default function ComparisonResults() {
                     y1="0" 
                     x2={graphPosition * 400} 
                     y2="120" 
-                    stroke="#1F2937" 
+                    stroke={activeGraph === 'item1' ? '#3B82F6' : '#00A36C'}
                     strokeWidth="1.5"
-                    strokeDasharray="3,3"
+                    opacity="0.3"
                   />
-                  <circle cx={graphPosition * 400} cy={45 - (graphPosition * 15)} r="5" fill="white" stroke="#3B82F6" strokeWidth="2.5" />
-                  <circle cx={graphPosition * 400} cy={65 + (graphPosition * 8)} r="5" fill="white" stroke="#00A36C" strokeWidth="2.5" />
+                  {activeGraph === 'item1' && (
+                    <circle 
+                      cx={graphPosition * 400} 
+                      cy={45 - (graphPosition * 15)} 
+                      r="4" 
+                      fill="#3B82F6" 
+                    />
+                  )}
+                  {activeGraph === 'item2' && (
+                    <circle 
+                      cx={graphPosition * 400} 
+                      cy={65 + (graphPosition * 8)} 
+                      r="4" 
+                      fill="#00A36C" 
+                    />
+                  )}
                 </>
               )}
             </svg>
             
-            {/* Price tooltip */}
+            {/* Price tooltip - only for active graph */}
             {graphPosition !== null && (
               <div 
                 className="absolute -top-8 bg-white rounded-lg shadow-lg px-3 py-1.5 border border-[#E5E7EB]"
                 style={{ left: `${graphPosition * 100}%`, transform: 'translateX(-50%)' }}
               >
-                <p className="text-xs font-bold text-[#3B82F6]">${Math.round(350 - graphPosition * 50)}</p>
-                <p className="text-xs font-bold text-[#00A36C]">${Math.round(330 - graphPosition * 40)}</p>
+                {activeGraph === 'item1' ? (
+                  <p className="text-xs font-bold text-[#3B82F6]">${Math.round(350 - graphPosition * 50)}</p>
+                ) : (
+                  <p className="text-xs font-bold text-[#00A36C]">${Math.round(330 - graphPosition * 40)}</p>
+                )}
               </div>
             )}
             
@@ -283,11 +349,22 @@ export default function ComparisonResults() {
             <div className="absolute -left-1 top-2/3 text-xs font-semibold text-[#6B7280]">$300</div>
             <div className="absolute -left-1 bottom-2 text-xs font-semibold text-[#6B7280]">$250</div>
             
-            {/* X-axis day labels */}
-            <div className="absolute -bottom-5 left-10 text-xs text-[#6B7280]">60d</div>
-            <div className="absolute -bottom-5 left-1/3 text-xs text-[#6B7280]">45d</div>
-            <div className="absolute -bottom-5 left-2/3 text-xs text-[#6B7280]">30d</div>
-            <div className="absolute -bottom-5 right-8 text-xs text-[#6B7280]">Today</div>
+            {/* X-axis day labels - iOS style based on time period */}
+            {(timePeriod === '1W' || timePeriod === '1M') ? (
+              <>
+                <div className="absolute -bottom-5 left-10 text-xs text-[#6B7280]">5</div>
+                <div className="absolute -bottom-5 left-1/3 text-xs text-[#6B7280]">12</div>
+                <div className="absolute -bottom-5 left-2/3 text-xs text-[#6B7280]">19</div>
+                <div className="absolute -bottom-5 right-8 text-xs text-[#6B7280]">26</div>
+              </>
+            ) : (
+              <>
+                <div className="absolute -bottom-5 left-10 text-xs text-[#6B7280]">Jul</div>
+                <div className="absolute -bottom-5 left-1/3 text-xs text-[#6B7280]">Sep</div>
+                <div className="absolute -bottom-5 left-2/3 text-xs text-[#6B7280]">Nov</div>
+                <div className="absolute -bottom-5 right-8 text-xs text-[#6B7280]">Dec</div>
+              </>
+            )}
           </div>
 
           {/* Verdicts in boxes */}

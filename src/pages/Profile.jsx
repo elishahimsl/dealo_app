@@ -101,7 +101,7 @@ export default function Profile() {
                   className="bg-white rounded-lg p-4 shadow-md hover:bg-[#F9FAFB] transition-colors text-left"
                   style={{ height: '90px' }}
                 >
-                  <Icon className="w-5 h-5 text-[#00A36C] mb-2" strokeWidth={1.5} />
+                  <Icon className="w-5 h-5 text-[#1F2937] mb-2" strokeWidth={1.5} />
                   <p className="text-xs font-medium text-[#1F2937] leading-tight">{item.label}</p>
                 </button>
               );
@@ -175,12 +175,12 @@ export default function Profile() {
         <div className="grid grid-cols-2 gap-2">
           <button 
             onClick={() => navigate(createPageUrl("EditProfile"))}
-            className="bg-white rounded-lg p-3 shadow-md hover:bg-[#F9FAFB] transition-colors"
+            className="bg-[#F3F4F6] rounded-lg p-3 hover:bg-[#E5E7EB] transition-colors"
           >
             <p className="text-xs font-semibold text-[#1F2937]">Edit Profile</p>
           </button>
           <button 
-            className="bg-white rounded-lg p-3 shadow-md hover:bg-[#F9FAFB] transition-colors"
+            className="bg-[#F3F4F6] rounded-lg p-3 hover:bg-[#E5E7EB] transition-colors"
           >
             <p className="text-xs font-semibold text-[#1F2937]">Share DeaLo</p>
           </button>
@@ -197,7 +197,7 @@ export default function Profile() {
                 key={idx}
                 className="bg-white rounded-lg p-3 shadow-md text-center"
               >
-                <Icon className="w-5 h-5 text-[#00A36C] mx-auto mb-2" strokeWidth={1.5} />
+                <Icon className="w-5 h-5 text-[#1F2937] mx-auto mb-2" strokeWidth={1.5} />
                 <p className="text-base font-bold text-[#1F2937]">{stat.value}</p>
                 <p className="text-[9px] text-[#6B7280] leading-tight">{stat.label}</p>
               </div>
@@ -218,7 +218,7 @@ export default function Profile() {
                 className="bg-white rounded-lg p-3 text-center hover:bg-[#F9FAFB] transition-colors shadow-md"
                 style={{ height: '90px' }}
               >
-                <Icon className="w-5 h-5 text-[#00A36C] mb-2 mx-auto" strokeWidth={1.5} />
+                <Icon className="w-5 h-5 text-[#1F2937] mb-2 mx-auto" strokeWidth={1.5} />
                 <p className="text-xs font-medium text-[#1F2937] leading-tight">{item.label}</p>
               </button>
             );

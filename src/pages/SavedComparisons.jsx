@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, SlidersHorizontal } from "lucide-react";
 
 export default function SavedComparisons() {
   const navigate = useNavigate();
@@ -29,33 +29,40 @@ export default function SavedComparisons() {
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
-      <div className="px-6 pt-8 pb-4 flex items-center justify-between">
+      <div className="px-6 pt-8 pb-2 flex items-center">
         <button onClick={() => navigate(-1)}>
           <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
         </button>
-        <h1 className="text-lg font-semibold text-[#1F2937]">Saved Comparisons</h1>
-        <div className="w-6" />
+        <h1 className="text-sm font-semibold text-[#1F2937] ml-3">Saved Comparisons</h1>
       </div>
 
-      <div className="px-6 space-y-3">
+      <div className="px-6 space-y-3 relative">
+        <button className="absolute -top-1 right-6 z-10">
+          <SlidersHorizontal className="w-5 h-5 text-[#6B7280]" />
+        </button>
+        
         {savedComparisons.map((comp) => (
-          <div key={comp.id} className="bg-white border border-[#E5E7EB] rounded-2xl p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center gap-2 flex-1">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6]">
+          <div key={comp.id} className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-lg">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-2">
                   <img src={comp.product1.image} alt={comp.product1.name} className="w-full h-full object-cover" />
                 </div>
-                <p className="text-xs font-semibold text-[#1F2937] flex-1">{comp.product1.name}</p>
+                <p className="text-xs font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product1.name}</p>
               </div>
-              <span className="text-xs font-bold text-[#6B7280]">vs</span>
-              <div className="flex items-center gap-2 flex-1">
-                <p className="text-xs font-semibold text-[#1F2937] flex-1 text-right">{comp.product2.name}</p>
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F3F4F6]">
+              
+              <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                <span className="text-xs font-bold text-[#6B7280]">VS</span>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="w-24 h-24 rounded-xl overflow-hidden bg-[#F3F4F6] mb-2">
                   <img src={comp.product2.image} alt={comp.product2.name} className="w-full h-full object-cover" />
                 </div>
+                <p className="text-xs font-semibold text-[#1F2937] text-center line-clamp-2">{comp.product2.name}</p>
               </div>
             </div>
-            <p className="text-xs text-[#6B7280] text-center">{comp.date}</p>
+            <p className="text-xs text-[#6B7280] text-center mt-2">{comp.date}</p>
           </div>
         ))}
       </div>

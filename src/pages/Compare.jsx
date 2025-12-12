@@ -527,29 +527,34 @@ Analyze both products considering these weighted priorities and determine the wi
 
       {/* Add Product Options Modal */}
       {showAddOptions && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowAddOptions(false)}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center p-6">
           <div 
-            className="bg-white rounded-t-3xl w-full p-6 pb-8"
-            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl w-full max-w-md p-4 shadow-2xl border border-[#E5E7EB]"
+            style={{ maxHeight: '200px' }}
           >
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-sm font-bold text-[#1F2937]">Add</h2>
+              <button 
+                onClick={() => setShowAddOptions(false)}
+                className="w-7 h-7 rounded-full bg-[#F3F4F6] flex items-center justify-center hover:bg-[#E5E7EB] transition-colors"
+              >
+                <X className="w-4 h-4 text-[#6B7280]" />
+              </button>
             </div>
-            <h2 className="text-lg font-bold text-[#1F2937] mb-6 text-center">Add Product</h2>
             
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button
                 onClick={() => {
                   setShowAddOptions(false);
                   navigate(createPageUrl("Snap") + `?from=Compare&slot=${selectedSlot}`);
                 }}
-                className="w-full bg-[#00A36C] text-white py-4 rounded-2xl font-semibold hover:bg-[#007E52] transition-colors flex items-center justify-center gap-3"
+                className="w-full py-2 px-3 hover:bg-[#F9FAFB] rounded-xl transition-colors flex items-center gap-3 text-left"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-5 h-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                   <circle cx="12" cy="13" r="4"/>
                 </svg>
-                Take Photo
+                <span className="text-sm font-medium text-[#1F2937]">Take Photo</span>
               </button>
               
               <button
@@ -561,7 +566,6 @@ Analyze both products considering these weighted priorities and determine the wi
                   input.onchange = async (e) => {
                     const file = e.target.files[0];
                     if (!file) return;
-                    // Process file similar to Snap page
                     const { file_url } = await base44.integrations.Core.UploadFile({ file });
                     const aiResult = await base44.integrations.Core.InvokeLLM({
                       prompt: 'Identify this product and provide its name, brand, and estimated price.',
@@ -586,14 +590,14 @@ Analyze both products considering these weighted priorities and determine the wi
                   };
                   input.click();
                 }}
-                className="w-full bg-white border-2 border-[#E5E7EB] text-[#1F2937] py-4 rounded-2xl font-semibold hover:bg-[#F9FAFB] transition-colors flex items-center justify-center gap-3"
+                className="w-full py-2 px-3 hover:bg-[#F9FAFB] rounded-xl transition-colors flex items-center gap-3 text-left"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-5 h-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                Choose from Photos
+                <span className="text-sm font-medium text-[#1F2937]">Choose from Photos</span>
               </button>
               
               <button
@@ -601,12 +605,12 @@ Analyze both products considering these weighted priorities and determine the wi
                   setShowAddOptions(false);
                   navigate(createPageUrl("CompareSearch") + `?slot=${selectedSlot}`);
                 }}
-                className="w-full bg-white border-2 border-[#E5E7EB] text-[#1F2937] py-4 rounded-2xl font-semibold hover:bg-[#F9FAFB] transition-colors flex items-center justify-center gap-3"
+                className="w-full py-2 px-3 hover:bg-[#F9FAFB] rounded-xl transition-colors flex items-center gap-3 text-left"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-5 h-5 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
                 </svg>
-                Pick from Saved
+                <span className="text-sm font-medium text-[#1F2937]">Pick from Saved</span>
               </button>
             </div>
           </div>

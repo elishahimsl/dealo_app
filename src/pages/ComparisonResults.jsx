@@ -14,6 +14,21 @@ export default function ComparisonResults() {
   const [activeGraph, setActiveGraph] = useState('item1'); // 'item1' or 'item2'
   const [timePeriod, setTimePeriod] = useState('1M');
 
+  const handleSaveComparison = () => {
+    const savedComparisons = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
+    const newComparison = {
+      id: Date.now(),
+      item1,
+      item2,
+      result,
+      preferences,
+      date: new Date().toISOString()
+    };
+    savedComparisons.push(newComparison);
+    localStorage.setItem('savedComparisons', JSON.stringify(savedComparisons));
+    setIsSaved(true);
+  };
+
   // Price history data points for item1 (blue line)
   const item1Path = [
     { x: 0, y: 45 },
@@ -533,10 +548,10 @@ export default function ComparisonResults() {
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] px-6 py-4 z-30">
         <div className="flex items-center gap-3 max-w-lg mx-auto">
           <Button 
-            onClick={() => setIsSaved(!isSaved)}
+            onClick={handleSaveComparison}
             className="flex-1 bg-white border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#F0FDF4] font-semibold rounded-xl h-12 text-sm"
           >
-            Save Comparison
+            {isSaved ? 'Saved' : 'Save Comparison'}
           </Button>
           <Button className="bg-white border-2 border-[#E5E7EB] hover:bg-[#F9FAFB] h-12 px-4 rounded-xl">
             <Share2 className="w-5 h-5 text-[#6B7280]" />

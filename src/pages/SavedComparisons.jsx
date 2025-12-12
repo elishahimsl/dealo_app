@@ -6,26 +6,31 @@ import { ChevronLeft, SlidersHorizontal } from "lucide-react";
 export default function SavedComparisons() {
   const navigate = useNavigate();
 
-  const savedComparisons = [
-    {
-      id: 1,
-      product1: { name: "M2 MacBook Air", image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200" },
-      product2: { name: "HP Envy", image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=200" },
-      date: "2 days ago"
-    },
-    {
-      id: 2,
-      product1: { name: "iPhone 15 Pro", image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=200" },
-      product2: { name: "Samsung S24 Ultra", image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=200" },
-      date: "1 week ago"
-    },
-    {
-      id: 3,
-      product1: { name: "Sony WH-1000XM5", image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200" },
-      product2: { name: "Bose QC45", image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=200" },
-      date: "2 weeks ago"
-    }
-  ];
+  const savedFromStorage = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
+  
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 60) return `${diffMins} minutes ago`;
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return '1 day ago';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 14) return '1 week ago';
+    return `${Math.floor(diffDays / 7)} weeks ago`;
+  };
+
+  const savedComparisons = savedFromStorage.map(comp => ({
+    id: comp.id,
+    product1: { name: comp.item1.title, image: comp.item1.file_url },
+    product2: { name: comp.item2.title, image: comp.item2.file_url },
+    date: getTimeAgo(comp.date),
+    fullData: comp
+  }));
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -51,10 +56,10 @@ export default function SavedComparisons() {
           <button 
             key={comp.id} 
             onClick={() => navigate(createPageUrl("ComparisonResults"), { 
-              state: { 
+              state: comp.fullData || { 
                 item1: { title: comp.product1.name, file_url: comp.product1.image, price: '$999', brand: 'Brand' },
                 item2: { title: comp.product2.name, file_url: comp.product2.image, price: '$899', brand: 'Brand' },
-                result: { winner: 1, item1_scores: { quality: 85, value: 78, features: 90, design: 88, durability: 82 }, item2_scores: { quality: 80, value: 85, features: 85, design: 82, durability: 80 }, explanation: 'Based on your preferences, this product offers better overall value.' }
+                result: { winner: 'item1' }
               }
             })}
             className="w-full bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-lg hover:shadow-xl transition-shadow"

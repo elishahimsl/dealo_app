@@ -79,29 +79,29 @@ export default function ComparisonResults() {
         <div className="flex items-start gap-3">
           {/* Product 1 */}
           <div className="flex-1">
-            <div className="bg-white rounded-xl shadow-lg relative">
+            <div className="bg-white rounded-3xl shadow-lg relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
               <div className="absolute -top-2 -right-2 z-10">
                 <div className="bg-[#00A36C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
                   LOWEST PRICE
                 </div>
               </div>
-              <div className="w-full h-40 bg-white flex items-center justify-center p-4">
+              <div className="w-full h-full flex items-center justify-center p-4">
                 <img src={item1.file_url} alt={item1.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
-            <div className="mt-3">
-              <h3 className="font-bold text-[#1F2937] text-base mb-1">{item1.title}</h3>
-              <p className="text-2xl font-bold text-[#1F2937] mb-2">{item1.price}</p>
-              <div className="flex items-center gap-2">
-                <span className="text-yellow-400 text-lg">★★★★★</span>
-                <span className="text-sm text-[#6B7280]">(17.4k Reviews)</span>
+            <div className="mt-2 px-1">
+              <h3 className="font-bold text-[#1F2937] text-xs mb-1 line-clamp-2">{item1.title}</h3>
+              <p className="text-base font-bold text-[#1F2937] mb-1">{item1.price}</p>
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-xs font-semibold text-[#1F2937]">4.5 <span className="text-yellow-400">★</span></span>
+                <span className="text-[10px] text-[#6B7280]">(17.4k Reviews)</span>
               </div>
-              <img src="https://logo.clearbit.com/amazon.com" alt="amazon" className="h-5 object-contain mt-2" onError={(e) => e.target.style.display = 'none'} />
+              <img src="https://logo.clearbit.com/amazon.com" alt="amazon" className="h-4 object-contain" onError={(e) => e.target.style.display = 'none'} />
             </div>
           </div>
 
           {/* VS Circle */}
-          <div className="flex-shrink-0" style={{ paddingTop: '80px' }}>
+          <div className="flex-shrink-0" style={{ paddingTop: '60px' }}>
             <div className="w-12 h-12 rounded-full bg-[#E5E7EB] flex items-center justify-center shadow-md">
               <span className="text-sm font-bold text-[#6B7280]">VS</span>
             </div>
@@ -109,24 +109,24 @@ export default function ComparisonResults() {
 
           {/* Product 2 */}
           <div className="flex-1">
-            <div className="bg-white rounded-xl shadow-lg relative">
+            <div className="bg-white rounded-3xl shadow-lg relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
               <div className="absolute -top-2 -right-2 z-10">
                 <div className="bg-[#3B82F6] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md">
                   POPULAR PICK
                 </div>
               </div>
-              <div className="w-full h-40 bg-white flex items-center justify-center p-4">
+              <div className="w-full h-full flex items-center justify-center p-4">
                 <img src={item2.file_url} alt={item2.title} className="max-w-full max-h-full object-contain" />
               </div>
             </div>
-            <div className="mt-3">
-              <h3 className="font-bold text-[#1F2937] text-base mb-1">{item2.title}</h3>
-              <p className="text-2xl font-bold text-[#1F2937] mb-2">{item2.price}</p>
-              <div className="flex items-center gap-2">
-                <span className="text-yellow-400 text-lg">★★★★★</span>
-                <span className="text-sm text-[#6B7280]">(12.1k Reviews)</span>
+            <div className="mt-2 px-1">
+              <h3 className="font-bold text-[#1F2937] text-xs mb-1 line-clamp-2">{item2.title}</h3>
+              <p className="text-base font-bold text-[#1F2937] mb-1">{item2.price}</p>
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-xs font-semibold text-[#1F2937]">4.7 <span className="text-yellow-400">★</span></span>
+                <span className="text-[10px] text-[#6B7280]">(12.1k Reviews)</span>
               </div>
-              <img src="https://logo.clearbit.com/bestbuy.com" alt="Best Buy" className="h-5 object-contain mt-2" onError={(e) => e.target.style.display = 'none'} />
+              <img src="https://logo.clearbit.com/bestbuy.com" alt="Best Buy" className="h-4 object-contain" onError={(e) => e.target.style.display = 'none'} />
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function ComparisonResults() {
 
         {/* Detailed Scores Tile */}
         <div className="bg-white rounded-lg p-6 shadow-lg">
-          <div className="space-y-4">
+          <div>
             {[
               { label: "Price", item1: item1Scores.price, item2: item2Scores.price },
               { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability },
@@ -159,13 +159,16 @@ export default function ComparisonResults() {
               { label: "Brand Reputation", item1: item1Scores.brand, item2: item2Scores.brand },
               { label: "Features", item1: item1Scores.features, item2: item2Scores.features },
               { label: "Design", item1: item1Scores.design, item2: item2Scores.design }
-            ].map((category) => (
-              <div key={category.label} className="flex items-center justify-between">
-                <span className="text-base font-semibold text-[#1F2937]">{category.label}</span>
-                <div className="flex items-center gap-3">
-                  <span className="text-xl font-bold text-[#1F2937]">{category.item1}</span>
-                  <span className="text-base font-bold text-[#9CA3AF]">{category.item2}</span>
+            ].map((category, idx) => (
+              <div key={category.label}>
+                <div className="flex items-center justify-between py-3">
+                  <span className="text-sm font-semibold text-[#1F2937]">{category.label}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-[#1F2937]">{category.item1}</span>
+                    <span className="text-sm font-bold text-[#9CA3AF]">{category.item2}</span>
+                  </div>
                 </div>
+                {idx < 5 && <div className="border-b border-[#E5E7EB]" />}
               </div>
             ))}
           </div>
@@ -209,6 +212,17 @@ export default function ComparisonResults() {
                 fill="url(#gradient1)"
               />
               
+              {/* Product 1 dots */}
+              <circle cx="0" cy="45" r="4" fill="#3B82F6" />
+              <circle cx="50" cy="35" r="4" fill="#3B82F6" />
+              <circle cx="100" cy="42" r="4" fill="#3B82F6" />
+              <circle cx="150" cy="25" r="4" fill="#3B82F6" />
+              <circle cx="200" cy="38" r="4" fill="#3B82F6" />
+              <circle cx="250" cy="30" r="4" fill="#3B82F6" />
+              <circle cx="300" cy="45" r="4" fill="#3B82F6" />
+              <circle cx="350" cy="40" r="4" fill="#3B82F6" />
+              <circle cx="400" cy="50" r="4" fill="#3B82F6" />
+              
               {/* Product 2 area (green) - jagged stock line */}
               <path
                 d="M0,65 L50,72 L100,68 L150,80 L200,70 L250,75 L300,68 L350,72 L400,78"
@@ -222,6 +236,17 @@ export default function ComparisonResults() {
                 d="M0,65 L50,72 L100,68 L150,80 L200,70 L250,75 L300,68 L350,72 L400,78 L400,120 L0,120 Z"
                 fill="url(#gradient2)"
               />
+              
+              {/* Product 2 dots */}
+              <circle cx="0" cy="65" r="4" fill="#00A36C" />
+              <circle cx="50" cy="72" r="4" fill="#00A36C" />
+              <circle cx="100" cy="68" r="4" fill="#00A36C" />
+              <circle cx="150" cy="80" r="4" fill="#00A36C" />
+              <circle cx="200" cy="70" r="4" fill="#00A36C" />
+              <circle cx="250" cy="75" r="4" fill="#00A36C" />
+              <circle cx="300" cy="68" r="4" fill="#00A36C" />
+              <circle cx="350" cy="72" r="4" fill="#00A36C" />
+              <circle cx="400" cy="78" r="4" fill="#00A36C" />
             </svg>
             
             {/* Y-axis price labels */}
@@ -243,9 +268,9 @@ export default function ComparisonResults() {
               <span className="text-[#3B82F6] text-xs">↓</span>
               <span className="text-[#3B82F6] text-xs font-medium">Lowest in 60 days</span>
             </div>
-            <div className="flex-1 bg-[#FEE2E2] rounded-lg p-2 flex items-center gap-1">
-              <span className="text-[#EF4444] text-xs">↓</span>
-              <span className="text-[#EF4444] text-xs font-medium">Likely to drop soon</span>
+            <div className="flex-1 bg-[#D1FAE5] rounded-lg p-2 flex items-center gap-1">
+              <span className="text-[#00A36C] text-xs">↓</span>
+              <span className="text-[#00A36C] text-xs font-medium">Likely to drop soon</span>
             </div>
           </div>
 
@@ -271,11 +296,13 @@ export default function ComparisonResults() {
           {/* Product 1 Stores */}
           <div className="px-5 pb-4">
             <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item1.title}</h3>
-            <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
+            <div className="bg-white">
               {item1Stores.map((store, idx) => (
                 <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
                   <div className="flex items-center gap-2">
-                    <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                      <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    </div>
                     <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
                   </div>
                   <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">
@@ -289,11 +316,13 @@ export default function ComparisonResults() {
           {/* Product 2 Stores */}
           <div className="px-5 pb-5">
             <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item2.title}</h3>
-            <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
+            <div className="bg-white">
               {item2Stores.map((store, idx) => (
                 <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
                   <div className="flex items-center gap-2">
-                    <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                      <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
+                    </div>
                     <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
                   </div>
                   <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">

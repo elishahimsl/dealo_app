@@ -41,7 +41,7 @@ export default function Layout({ children, currentPageName }) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Main Content */}
-      <main className="flex-1 pb-24 overflow-auto">
+      <main className="flex-1 pb-24 overflow-auto" style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
         {children}
       </main>
 

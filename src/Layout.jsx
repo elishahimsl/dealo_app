@@ -12,9 +12,10 @@ export default function Layout({ children, currentPageName }) {
   }
 
   const CompareIcon = ({ className, strokeWidth }) => (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2}>
-      <circle cx="8.5" cy="12" r="6" />
-      <circle cx="15.5" cy="12" r="6" />
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth || 2} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="6" width="7" height="12" rx="1" />
+      <rect x="14" y="6" width="7" height="12" rx="1" />
+      <line x1="12" y1="6" x2="12" y2="18" />
     </svg>
   );
 

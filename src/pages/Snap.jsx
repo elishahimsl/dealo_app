@@ -473,7 +473,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
         </div>
 
         {/* TRUST ZONE */}
-        <div className="px-5".</div>
+        <div className="px-5">
 
         {/* Quality & Trust Breakdown Card */}
         <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
@@ -586,7 +586,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
         </div>
 
         {/* EXPLORE ZONE */}
-        <div className="px-5"
+        <div className="px-5">
 
 
 

@@ -318,467 +318,360 @@ Be specific and accurate. If you cannot identify the exact product, provide your
     setScanning(false);
   };
 
-  // Result View - completely redesigned
+  // Result View - Premium App Store-ready design
   if (result) {
     return (
-      <div className="min-h-screen bg-[#F9FAFB]">
-        {/* Product Image at Top with Header */}
-        <div className="relative bg-white">
-          <div className="h-80 overflow-hidden">
+      <div className="min-h-screen bg-white">
+        {/* Header Section - Above the Fold */}
+        <div className="relative">
+          {/* Large Product Image */}
+          <div className="h-72 bg-[#F9FAFB] flex items-center justify-center">
             <img
               src={result.product_image_url || result.file_url}
               alt={result.title}
               className="w-full h-full object-contain"
             />
           </div>
-          {/* Header overlaid on image */}
-          <div className="absolute top-0 left-0 right-0 px-6 py-4 flex items-center justify-between bg-gradient-to-b from-black/50 to-transparent">
-            <button onClick={() => { setResult(null); startCamera(); }}>
-              <ChevronLeft className="w-6 h-6 text-white" />
+
+          {/* Header Controls */}
+          <div className="absolute top-0 left-0 right-0 px-4 py-3 flex items-center justify-between">
+            <button 
+              onClick={() => { setResult(null); startCamera(); }}
+              className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm"
+            >
+              <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
             </button>
-            <button>
-              <Send className="w-6 h-6 text-white" />
+            <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm">
+              <Send className="w-5 h-5 text-[#1F2937]" />
             </button>
           </div>
         </div>
 
-        <div className="px-6 py-6 space-y-4">
-          {/* First Tile - Product Info + Smart Summary + Subscores + Pros/Cons */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-sm relative">
-            {/* Save icon top right */}
-            <button className="absolute top-4 right-4">
-              <Bookmark className="w-6 h-6 text-[#6B7280]" />
-            </button>
-
-            {/* Product Name - smaller font to fit one line */}
-            <h1 className="text-lg font-bold text-[#1F2937] mb-3 pr-10 line-clamp-1" style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {result.title}
-            </h1>
-
-            {/* Star rating, price, in stock - in a row with small icons */}
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5 flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 text-[#00A36C] fill-[#00A36C]" />
-                <span className="text-sm font-semibold text-[#1F2937]">{result.rating}</span>
-              </div>
-              <div className="bg-[#F9FAFB] rounded-full px-3 py-1.5">
-                <span className="text-sm font-bold text-[#00A36C]">{result.price}</span>
-              </div>
-              <div className={`rounded-full px-3 py-1.5 ${result.in_stock ? 'bg-[#D6F5E9]' : 'bg-red-500/10'}`}>
-                <span className={`text-sm font-semibold ${result.in_stock ? 'text-[#00A36C]' : 'text-red-500'}`}>
-                  {result.in_stock ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
+        {/* Product Info & Score */}
+        <div className="px-5 pt-5 pb-4 border-b border-[#F3F4F6]">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-[#1F2937] mb-1 leading-tight">
+                {result.title}
+              </h1>
+              <p className="text-sm text-[#6B7280] mb-2">{result.brand}</p>
+              <span className="inline-block px-2.5 py-1 bg-[#F3F4F6] rounded-full text-xs font-medium text-[#6B7280]">
+                {result.keywords?.[0] || 'Product'}
+              </span>
             </div>
 
-            {/* Smart Summary with Score */}
-            <div className="mb-6">
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <h3 className="font-bold text-[#1F2937] text-lg">Smart Summary</h3>
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full border-4 border-[#00A36C] flex items-center justify-center">
-                    <span className="text-xl font-bold text-[#1F2937]">{result.overall_score}</span>
-                  </div>
-                  <span className="text-xs text-[#6B7280] mt-1">out of 100</span>
-                </div>
+            {/* DeaLo AI Score */}
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full border-3 border-[#00A36C] flex flex-col items-center justify-center mb-1">
+                <span className="text-2xl font-bold text-[#1F2937] leading-none">{result.overall_score}</span>
+                <span className="text-[9px] text-[#6B7280]">/ 100</span>
               </div>
-              <p className="text-[#6B7280] text-sm leading-relaxed mb-4">
-                {result.smart_summary}
-              </p>
+              <span className="text-[10px] text-[#6B7280] mb-0.5">DeaLo AI Score</span>
+              <span className="text-xs font-semibold text-[#00A36C]">
+                {result.overall_score >= 80 ? 'Great Value' : result.overall_score >= 60 ? 'Good Time to Buy' : 'Consider Alternatives'}
+              </span>
+            </div>
+          </div>
+        </div>
 
-              {/* Subscores in a row */}
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-6 px-6">
-                {result.subscores && Object.entries(result.subscores).map(([key, value]) => (
-                  <div key={key} className="flex-shrink-0 bg-[#F9FAFB] rounded-xl px-4 py-2 flex flex-col items-center min-w-[80px]">
-                    <span className="text-lg font-bold text-[#00A36C]">{value}</span>
-                    <span className="text-xs text-[#6B7280] capitalize mt-0.5">{key}</span>
+        {/* Primary Action Row */}
+        <div className="px-5 py-4 border-b border-[#F3F4F6]">
+          <div className="flex gap-2">
+            <button className="flex-1 h-11 bg-[#00A36C] text-white rounded-full font-semibold text-sm hover:bg-[#007E52] transition-colors">
+              Best Price
+            </button>
+            <button className="flex-1 h-11 bg-[#F3F4F6] text-[#1F2937] rounded-full font-semibold text-sm hover:bg-[#E5E7EB] transition-colors">
+              Compare
+            </button>
+            <button className="w-11 h-11 bg-[#F3F4F6] rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors">
+              <Bookmark className="w-5 h-5 text-[#1F2937]" />
+            </button>
+            <button className="w-11 h-11 bg-[#F3F4F6] rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors">
+              <Send className="w-5 h-5 text-[#1F2937]" />
+            </button>
+          </div>
+        </div>
+
+        {/* Price Snapshot Section */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Price Snapshot</h2>
+
+          {/* Simple Price Graph Placeholder */}
+          <div className="h-32 bg-[#F9FAFB] rounded-2xl mb-4 flex items-end justify-around p-4">
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '60%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '45%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '70%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '55%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '80%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '50%'}}></div>
+            <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '65%'}}></div>
+          </div>
+
+          {/* Price Metrics */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <p className="text-xs text-[#6B7280] mb-1">Current Price</p>
+              <p className="text-lg font-bold text-[#1F2937]">{result.price}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-[#6B7280] mb-1">Average Price</p>
+              <p className="text-lg font-bold text-[#1F2937]">
+                ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 1.15).toFixed(0)}
+              </p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-[#6B7280] mb-1">Lowest Price</p>
+              <p className="text-lg font-bold text-[#00A36C]">
+                ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 0.85).toFixed(0)}
+              </p>
+            </div>
+          </div>
+
+          {/* Status Badge */}
+          <div className="mt-4 text-center">
+            <span className="inline-block px-4 py-2 bg-[#D6F5E9] text-[#00A36C] rounded-full text-sm font-semibold">
+              Good time to buy
+            </span>
+          </div>
+        </div>
+
+        {/* Quality & Trust Breakdown */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Quality & Trust Breakdown</h2>
+
+          <div className="space-y-4">
+            {result.subscores && Object.entries(result.subscores).map(([key, value]) => (
+              <div key={key}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-[#1F2937] capitalize">{key}</span>
+                  <span className="text-sm font-bold text-[#1F2937]">{value}</span>
+                </div>
+                <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-[#00A36C] rounded-full transition-all"
+                    style={{width: `${value}%`}}
+                  ></div>
+                </div>
+                <p className="text-xs text-[#6B7280] mt-1">
+                  {value >= 80 ? 'Excellent performance in this category' : 
+                   value >= 60 ? 'Good performance overall' : 
+                   'Room for improvement'}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pros & Cons */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Pros & Cons</h2>
+
+          <div className="grid grid-cols-2 gap-4">
+            {/* Pros */}
+            <div>
+              <h3 className="text-sm font-semibold text-[#00A36C] mb-3">Pros</h3>
+              <ul className="space-y-2">
+                {result.pros?.slice(0, 4).map((pro, idx) => (
+                  <li key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-[#00A36C] flex-shrink-0 mt-0.5" />
+                    <span>{pro}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Cons */}
+            <div>
+              <h3 className="text-sm font-semibold text-[#EF4444] mb-3">Cons</h3>
+              <ul className="space-y-2">
+                {result.cons?.slice(0, 4).map((con, idx) => (
+                  <li key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
+                    <XIcon className="w-3.5 h-3.5 text-[#EF4444] flex-shrink-0 mt-0.5" />
+                    <span>{con}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* DeaLo AI Insight */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">DeaLo AI Insight</h2>
+          <div className="bg-[#F9FAFB] rounded-2xl p-4">
+            <p className="text-sm text-[#1F2937] leading-relaxed">
+              {result.smart_summary}
+            </p>
+          </div>
+        </div>
+
+        {/* Overview */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">Overview</h2>
+          <p className="text-sm text-[#6B7280] leading-relaxed mb-4">
+            {result.description}
+          </p>
+
+          {/* Key Features */}
+          <h3 className="text-sm font-semibold text-[#1F2937] mb-2">Key Features</h3>
+          <ul className="space-y-2">
+            {result.features?.map((feature, idx) => (
+              <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
+                <span className="text-[#00A36C] mt-0.5">•</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Store Comparison */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Available At</h2>
+
+          <div className="space-y-3">
+            {result.online_deals?.map((deal, idx) => {
+              const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
+              const minPrice = Math.min(...prices);
+              const currentPrice = parseFloat(deal.price.replace(/[^0-9.]/g, ''));
+              const isBestPrice = currentPrice === minPrice;
+
+              return (
+                <div 
+                  key={idx}
+                  className={`flex items-center gap-3 p-3 rounded-2xl border ${
+                    isBestPrice ? 'border-[#00A36C] bg-[#F0FDF4]' : 'border-[#E5E7EB]'
+                  }`}
+                >
+                  <div className="w-12 h-12 bg-white rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    <img 
+                      src={`https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
+                      alt={deal.store}
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => e.target.style.display = 'none'}
+                    />
                   </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[#1F2937]">{deal.store}</p>
+                    <p className="text-xs text-[#6B7280]">{result.in_stock ? 'In Stock' : 'Check Availability'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-[#1F2937]">{deal.price}</p>
+                    {isBestPrice && (
+                      <span className="text-[10px] font-semibold text-[#00A36C]">Best Price</span>
+                    )}
+                  </div>
+                  <button className="px-4 py-2 bg-[#1F2937] text-white rounded-full text-xs font-semibold hover:bg-[#374151] transition-colors">
+                    View
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Reviews Summary */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Reviews</h2>
+
+          <div className="flex items-center gap-4 mb-4">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-[#1F2937]">{result.rating}</div>
+              <div className="flex mt-1">
+                {[...Array(5)].map((_, i) => (
+                  <Star 
+                    key={i} 
+                    className={`w-3 h-3 ${i < Math.floor(result.rating) ? 'text-[#F59E0B] fill-[#F59E0B]' : 'text-[#E5E7EB]'}`}
+                  />
                 ))}
               </div>
             </div>
-
-            {/* Separator */}
-            <div className="border-t border-[#E5E7EB] my-6" />
-
-            {/* Pros and Cons */}
-            <div className="grid grid-cols-2 gap-6">
-              {/* Pros */}
-              <div>
-                <h4 className="font-semibold text-[#1F2937] mb-3 flex items-center gap-2">
-                  <Check className="w-5 h-5 text-[#00A36C]" />
-                  Pros
-                </h4>
-                <ul className="space-y-2">
-                  {result.pros?.map((pro, idx) => (
-                    <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
-                      <Check className="w-4 h-4 text-[#00A36C] flex-shrink-0 mt-0.5" />
-                      <span>{pro}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Cons */}
-              <div>
-                <h4 className="font-semibold text-[#1F2937] mb-3 flex items-center gap-2">
-                  <XIcon className="w-5 h-5 text-red-500" />
-                  Cons
-                </h4>
-                <ul className="space-y-2">
-                  {result.cons?.map((con, idx) => (
-                    <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
-                      <XIcon className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-                      <span>{con}</span>
-                    </li>
-                  ))}
-                </ul>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[#1F2937] mb-2">4,231 reviews</p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#6B7280] w-16">Positive</span>
+                  <div className="flex-1 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#00A36C]" style={{width: '78%'}}></div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#6B7280] w-16">Negative</span>
+                  <div className="flex-1 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                    <div className="h-full bg-[#EF4444]" style={{width: '22%'}}></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Second Tile - Price Comparison - 3 in a row, swipeable */}
-          <div className="bg-white rounded-3xl p-6 border border-[#E5E7EB] shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-[#1F2937] text-lg">Price Comparison</h3>
-              <span className="text-sm font-semibold text-[#00A36C]">Online Deals</span>
+          <div className="space-y-2">
+            <div className="bg-[#F9FAFB] rounded-xl p-3">
+              <p className="text-xs font-medium text-[#00A36C] mb-1">Common Praise</p>
+              <p className="text-sm text-[#1F2937]">Great quality, excellent value, fast shipping</p>
             </div>
-
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-              {result.online_deals?.map((deal, idx) => {
-                // Find cheapest price to mark as smart buy
-                const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
-                const minPrice = Math.min(...prices);
-                const currentPrice = parseFloat(deal.price.replace(/[^0-9.]/g, ''));
-                const isSmartBuy = currentPrice === minPrice && idx === prices.indexOf(minPrice);
-                
-                return (
-                  <div
-                    key={idx}
-                    className={`flex-shrink-0 rounded-2xl p-3 border-2 ${
-                      isSmartBuy
-                        ? 'border-[#00A36C] bg-[#D6F5E9]'
-                        : 'border-[#E5E7EB] bg-white'
-                    }`}
-                    style={{ width: '110px' }}
-                  >
-                    {isSmartBuy && (
-                      <div className="bg-[#00A36C] text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full inline-block mb-2">
-                        Smart Buy
-                      </div>
-                    )}
-                    {/* Square product image */}
-                    <div className="w-full aspect-square bg-gray-100 rounded-xl mb-2 overflow-hidden">
-                      <img 
-                        src={deal.image_url || result.product_image_url || result.file_url} 
-                        alt={deal.store}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {/* Store logo */}
-                    <div className="flex items-center gap-1 mb-1">
-                      <img 
-                        src={`https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
-                        alt=""
-                        className="w-4 h-4 rounded"
-                        onError={(e) => e.target.style.display = 'none'}
-                      />
-                      <p className="text-[10px] font-semibold text-[#1F2937] truncate">{deal.store}</p>
-                    </div>
-                    <p className="text-sm font-bold text-[#00A36C]">{deal.price}</p>
-                  </div>
-                );
-              })}
+            <div className="bg-[#F9FAFB] rounded-xl p-3">
+              <p className="text-xs font-medium text-[#EF4444] mb-1">Common Complaints</p>
+              <p className="text-sm text-[#1F2937]">Sizing runs small, limited color options</p>
             </div>
-          </div>
-
-          {/* Full-width Scrollable Sections Bar */}
-          <div className="bg-white rounded-t-3xl border border-[#E5E7EB] sticky top-0 z-10 -mx-6">
-            <div className="flex px-6 py-3">
-              <button
-                onClick={() => setActiveSection('overview')}
-                className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
-                  activeSection === 'overview'
-                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
-                    : 'text-[#6B7280]'
-                }`}
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveSection('alternatives')}
-                className={`flex-1 text-sm font-semibold pb-2 transition-colors ${
-                  activeSection === 'alternatives'
-                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
-                    : 'text-[#6B7280]'
-                }`}
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                Alternatives
-              </button>
-              <button
-                onClick={() => setActiveSection('smart-insights')}
-                className={`flex-1 text-sm font-semibold pb-2 transition-colors flex items-center justify-center gap-1 ${
-                  activeSection === 'smart-insights'
-                    ? 'text-[#1F2937] border-b-2 border-[#00A36C]'
-                    : 'text-[#6B7280]'
-                }`}
-                style={{ fontFamily: 'Poppins, sans-serif' }}
-              >
-                Smart Insights
-                <Lock className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-
-          {/* Section Content */}
-          <div className="bg-white rounded-b-3xl border-x border-b border-[#E5E7EB] p-6 -mx-6">
-            {activeSection === 'overview' && (
-              <div className="space-y-6">
-                {/* Basic Info Header */}
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-[#1F2937]" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      Basic Info
-                    </h2>
-                    <button className="text-[#6B7280] flex items-center gap-1">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                        <circle cx="4" cy="10" r="1.5"/>
-                        <circle cx="10" cy="10" r="1.5"/>
-                        <circle cx="16" cy="10" r="1.5"/>
-                      </svg>
-                    </button>
-                  </div>
-
-                  {/* Product image and details in a box */}
-                  <div className="bg-[#F9FAFB] rounded-2xl p-4 flex gap-4 mb-6">
-                    <div className="w-24 h-24 bg-white rounded-xl overflow-hidden flex-shrink-0">
-                      <img 
-                        src={result.product_image_url || result.file_url} 
-                        alt={result.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-[#1F2937] mb-2">{result.title}</h3>
-                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${i < Math.floor(result.rating || 0) ? 'text-[#00A36C] fill-[#00A36C]' : 'text-gray-300'}`}
-                          />
-                        ))}
-                        <span className="text-xs text-[#6B7280] ml-1">{result.rating} stars</span>
-                      </div>
-                      <p className="text-xl font-bold text-[#00A36C] mb-2">{result.price}</p>
-                      <Button className="w-full bg-white border-2 border-[#00A36C] text-[#00A36C] hover:bg-[#00A36C] hover:text-white font-semibold rounded-2xl h-10 text-sm">
-                        + Add to Favorites
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Separator line */}
-                  <div className="border-t border-[#E5E7EB] my-6" />
-
-                  {/* Description */}
-                  <div className="mb-6">
-                    <h3 className="font-bold text-[#1F2937] mb-3 text-lg">Description</h3>
-                    <p className="text-[#6B7280] text-sm leading-relaxed mb-3">
-                      {result.description}
-                    </p>
-                    <p className="text-xs text-[#6B7280] mb-2">
-                      <span className="font-semibold">Return Policy:</span> {result.return_policy || '30 days'}
-                    </p>
-                    <button className="text-[#00A36C] text-sm font-semibold flex items-center gap-1">
-                      Ask AI
-                      <ChevronLeft className="w-4 h-4 rotate-180" />
-                    </button>
-                  </div>
-
-                  {/* Separator line */}
-                  <div className="border-t border-[#E5E7EB] my-6" />
-
-                  {/* Reviews - moved above key features */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-bold text-[#1F2937] text-lg">Reviews</h3>
-                      <button className="text-[#00A36C] text-sm font-semibold">View All</button>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="bg-[#F9FAFB] rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`w-3 h-3 ${i < 5 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                            ))}
-                          </div>
-                          <span className="text-xs text-[#6B7280]">John D.</span>
-                        </div>
-                        <p className="text-sm text-[#1F2937]">"Great quality, exactly as described. Fast shipping!"</p>
-                      </div>
-                      <div className="bg-[#F9FAFB] rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                            ))}
-                          </div>
-                          <span className="text-xs text-[#6B7280]">Sarah M.</span>
-                        </div>
-                        <p className="text-sm text-[#1F2937]">"Runs slightly small, recommend sizing up."</p>
-                      </div>
-                      <div className="bg-[#F9FAFB] rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`w-3 h-3 ${i < 5 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                            ))}
-                          </div>
-                          <span className="text-xs text-[#6B7280]">Mike T.</span>
-                        </div>
-                        <p className="text-sm text-[#1F2937]">"Best purchase I've made this year. Highly recommend!"</p>
-                      </div>
-                      <div className="bg-[#F9FAFB] rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-1">
-                          <div className="flex">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className={`w-3 h-3 ${i < 4 ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
-                            ))}
-                          </div>
-                          <span className="text-xs text-[#6B7280]">Lisa K.</span>
-                        </div>
-                        <p className="text-sm text-[#1F2937]">"Good value for the price. Works as expected."</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Separator line */}
-                  <div className="border-t border-[#E5E7EB] my-6" />
-
-                  {/* Key Features */}
-                  <div>
-                    <h3 className="font-bold text-[#1F2937] mb-3 text-lg">Key Features</h3>
-                    <ul className="space-y-2">
-                      {result.features?.map((feature, idx) => (
-                        <li key={idx} className="text-sm text-[#6B7280] flex items-start gap-2">
-                          <span className="text-[#00A36C] mt-1">•</span>
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeSection === 'alternatives' && (
-              <div className="space-y-6">
-                {/* Top Picks - horizontal scroll with rectangular tiles */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-bold text-[#1F2937]">Top Picks</h2>
-                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
-                  </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-                    {result.alternatives?.map((alt, idx) => (
-                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
-                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
-                          <img 
-                            src={alt.image_url || result.file_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'} 
-                            alt={alt.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between py-1">
-                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{alt.name}</h3>
-                          <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
-                          <p className="text-sm font-bold text-[#00A36C]">{alt.price}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Best Deals - horizontal scroll with rectangular tiles */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-bold text-[#1F2937]">Best Deals</h2>
-                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
-                  </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-                    {result.online_deals?.map((deal, idx) => (
-                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
-                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
-                          <img 
-                            src={deal.image_url || result.product_image_url || result.file_url} 
-                            alt={deal.store}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between py-1">
-                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{result.title}</h3>
-                          <p className="text-[10px] text-[#6B7280]">{deal.store}</p>
-                          <p className="text-sm font-bold text-[#00A36C]">{deal.price}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Best Matches - horizontal scroll with rectangular tiles */}
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <h2 className="text-sm font-bold text-[#1F2937]">Best Matches</h2>
-                    <ChevronLeft className="w-4 h-4 text-[#6B7280] rotate-180" />
-                  </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
-                    {result.alternatives?.map((alt, idx) => (
-                      <div key={idx} className="flex-shrink-0 bg-[#F9FAFB] rounded-2xl p-3 flex gap-3" style={{ width: '240px' }}>
-                        <div className="w-20 h-20 bg-white rounded-xl overflow-hidden flex-shrink-0">
-                          <img 
-                            src={alt.image_url || result.file_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300'} 
-                            alt={alt.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between py-1">
-                          <h3 className="font-bold text-[#1F2937] text-xs line-clamp-2">{alt.name}</h3>
-                          <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
-                          <p className="text-sm font-bold text-[#00A36C]">{alt.price}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeSection === 'smart-insights' && (
-              <div className="flex flex-col items-center justify-center py-16">
-                <div className="w-20 h-20 rounded-full bg-[#00A36C] flex items-center justify-center mb-4">
-                  <Lock className="w-10 h-10 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-[#1F2937] mb-2">Premium Feature</h3>
-                <p className="text-[#6B7280] text-sm text-center mb-6">
-                  Unlock Smart Insights to get AI-powered recommendations
-                </p>
-                <Button className="bg-[#00A36C] text-white hover:bg-[#007E52] font-bold rounded-2xl px-8 h-12">
-                  Upgrade to Premium
-                </Button>
-              </div>
-            )}
           </div>
         </div>
 
-        <style>{`
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-        `}</style>
+        {/* Alternatives */}
+        <div className="px-5 py-5 border-b border-[#F3F4F6]">
+          <h2 className="text-base font-bold text-[#1F2937] mb-4">Alternatives / Best Matches</h2>
+
+          <div className="space-y-3">
+            {result.alternatives?.slice(0, 3).map((alt, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-2xl">
+                <div className="w-16 h-16 bg-white rounded-xl overflow-hidden flex-shrink-0">
+                  <img 
+                    src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'} 
+                    alt={alt.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-[#1F2937] mb-1">{alt.name}</p>
+                  <p className="text-xs text-[#6B7280] mb-1">{alt.store}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold text-[#1F2937]">{alt.price}</span>
+                    <span className="text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded-full">
+                      {idx === 0 ? 'Cheaper' : idx === 1 ? 'Higher Quality' : 'Best Match'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Smart Insights - Expandable */}
+        <div className="px-5 py-5 pb-8">
+          <button 
+            onClick={() => setActiveSection(activeSection === 'smart-insights' ? '' : 'smart-insights')}
+            className="w-full flex items-center justify-between"
+          >
+            <h2 className="text-base font-bold text-[#1F2937]">Smart Insights</h2>
+            <ChevronLeft className={`w-5 h-5 text-[#6B7280] transition-transform ${activeSection === 'smart-insights' ? '-rotate-90' : 'rotate-180'}`} />
+          </button>
+
+          {activeSection === 'smart-insights' && (
+            <div className="mt-4 space-y-3">
+              <div className="bg-[#F9FAFB] rounded-xl p-4">
+                <p className="text-xs font-semibold text-[#1F2937] mb-1">Price Volatility</p>
+                <p className="text-sm text-[#6B7280]">Low volatility - prices remain stable</p>
+              </div>
+              <div className="bg-[#F9FAFB] rounded-xl p-4">
+                <p className="text-xs font-semibold text-[#1F2937] mb-1">Return Reasons</p>
+                <p className="text-sm text-[#6B7280]">Size issues (12%), defects (3%)</p>
+              </div>
+              <div className="bg-[#F9FAFB] rounded-xl p-4">
+                <p className="text-xs font-semibold text-[#1F2937] mb-1">Long-term Value</p>
+                <p className="text-sm text-[#6B7280]">High predicted satisfaction over 12 months</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

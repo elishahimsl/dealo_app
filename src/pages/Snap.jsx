@@ -70,6 +70,8 @@ export default function Snap() {
 
   const [capturedImage, setCapturedImage] = useState(null);
   const [showFlash, setShowFlash] = useState(false);
+  const [showBestPriceSheet, setShowBestPriceSheet] = useState(false);
+  const storeComparisonRef = useRef(null);
 
   const capturePhoto = async () => {
     if (!videoRef.current || !cameraReady) return;
@@ -320,9 +322,6 @@ Be specific and accurate. If you cannot identify the exact product, provide your
 
   // Result View - Premium App Store-ready design
   if (result) {
-    const [showBestPriceSheet, setShowBestPriceSheet] = useState(false);
-    const storeComparisonRef = useRef(null);
-
     // Find best price
     const bestDeal = result.online_deals?.reduce((min, deal) => {
       const price = parseFloat(deal.price.replace(/[^0-9.]/g, ''));

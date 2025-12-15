@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Search, Camera, Heart, Tag, Cpu, Store, Bell } from "lucide-react";
 
 export default function DealScanner() {
@@ -88,7 +89,10 @@ export default function DealScanner() {
 
         {/* Tool Buttons */}
         <div className="flex gap-3">
-          <button className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center">
+          <button 
+            onClick={() => navigate(createPageUrl("AIDealFinder"))}
+            className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center"
+          >
             <Cpu className="w-5 h-5 text-[#00A36C]" />
             <span className="text-xs font-semibold text-[#1F2937]">AI Deal Finder</span>
           </button>

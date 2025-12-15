@@ -340,19 +340,19 @@ Be specific and accurate. If you cannot identify the exact product, provide your
       <div className="min-h-screen bg-white pb-6">
         {/* Header with Product Info */}
         <div className="px-4 pt-3">
-          <div className="flex items-center justify-between mb-4">
-            <button 
-              onClick={() => { setResult(null); startCamera(); }}
-              className="p-2"
-            >
-              <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
-            </button>
-            <button className="flex flex-col gap-0.5 p-1">
-              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
-              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
-              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
-            </button>
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <button 
+            onClick={() => { setResult(null); startCamera(); }}
+            className="p-1"
+          >
+            <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
+          </button>
+          <button className="flex flex-col gap-0.5 p-0.5">
+            <div className="w-3 h-0.5 bg-[#1F2937]" />
+            <div className="w-3 h-0.5 bg-[#1F2937]" />
+            <div className="w-3 h-0.5 bg-[#1F2937]" />
+          </button>
+        </div>
 
           <div className="flex gap-3 mb-5">
             {/* Large Product Image */}
@@ -367,7 +367,8 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             {/* Product Info */}
             <div className="flex-1">
               <p className="text-[10px] text-[#6B7280] mb-1">{result.brand}</p>
-              <h1 className="text-sm font-bold text-[#1F2937] mb-2 leading-tight">{result.title}</h1>
+              <h1 className="text-sm font-bold text-[#1F2937] mb-0.5 leading-tight">{result.title}</h1>
+              <p className="text-[9px] text-[#9CA3AF] mb-2">{result.keywords?.[0] || 'Electronics'}</p>
               <button className="text-[10px] text-[#1F2937] font-semibold px-2 py-1 bg-[#F3F4F6] rounded-full">
                 Share
               </button>
@@ -380,9 +381,10 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           {/* Product Overview */}
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Product Overview</h2>
-            <p className="text-sm text-[#1F2937] leading-relaxed mb-3">
+            <p className="text-sm text-[#1F2937] leading-relaxed mb-2 line-clamp-2">
               {result.description || result.smart_summary}
             </p>
+            <button className="text-xs text-[#00A36C] font-semibold mb-3">see more</button>
             <div className="grid grid-cols-2 gap-x-4 gap-y-2">
               {result.features?.slice(0, 6).map((feature, idx) => (
                 <div key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
@@ -394,32 +396,32 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           </div>
 
           {/* Deal Score */}
-          <div className="mb-5 bg-white border border-[#E5E7EB] rounded-xl p-4">
+          <div className="mb-5 bg-white border border-[#E5E7EB] rounded-xl p-4 shadow-md">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Deal Score</h2>
 
-            <div className="flex gap-4 mb-4">
+            <div className="flex gap-3 mb-4">
               <div className="flex flex-col items-center">
-                <div className="relative mb-2">
-                  <svg className="w-20 h-20 transform -rotate-90">
-                    <circle cx="40" cy="40" r="36" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+                <div className="relative mb-1">
+                  <svg className="w-16 h-16 transform -rotate-90">
+                    <circle cx="32" cy="32" r="28" fill="none" stroke="#F3F4F6" strokeWidth="6" />
                     <circle 
-                      cx="40" cy="40" r="36" 
+                      cx="32" cy="32" r="28" 
                       fill="none" 
                       stroke="#00A36C" 
-                      strokeWidth="8"
-                      strokeDasharray={`${2 * Math.PI * 36 * (result.overall_score / 100)} ${2 * Math.PI * 36}`}
+                      strokeWidth="6"
+                      strokeDasharray={`${2 * Math.PI * 28 * (result.overall_score / 100)} ${2 * Math.PI * 28}`}
                       strokeLinecap="round"
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-bold text-[#1F2937]">{result.overall_score}</span>
-                    <span className="text-[9px] text-[#6B7280]">/100</span>
+                    <span className="text-xl font-bold text-[#1F2937]">{result.overall_score}</span>
+                    <span className="text-[8px] text-[#6B7280]">/100</span>
                   </div>
                 </div>
-                <p className="text-sm font-bold text-[#1F2937]">Strong Deal</p>
+                <p className="text-xs font-bold text-[#1F2937]">Strong Deal</p>
               </div>
 
-              <div className="flex-1 space-y-2">
+              <div className="flex-1 space-y-1.5">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
                   const label = getScoreLabel(value);
                   const isExpanded = expandedSubscore === key;
@@ -430,9 +432,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                         onClick={() => setExpandedSubscore(isExpanded ? null : key)}
                         className="w-full"
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-[#1F2937] capitalize w-16">{key}</span>
-                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-semibold text-[#1F2937] capitalize w-14">{key}</span>
+                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden w-20">
                             <div 
                               className="h-full rounded-full"
                               style={{ 
@@ -441,9 +443,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                               }}
                             ></div>
                           </div>
-                          <span className="text-xs font-bold text-[#1F2937] w-8">{value}</span>
+                          <span className="text-[10px] font-bold text-[#1F2937] w-6">{value}</span>
                           <span 
-                            className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
+                            className="text-[8px] font-semibold px-1 py-0.5 rounded whitespace-nowrap"
                             style={{ 
                               color: label.color,
                               backgroundColor: `${label.color}15`
@@ -452,7 +454,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                             {label.text}
                           </span>
                           <svg 
-                            className={`w-3 h-3 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`w-2.5 h-2.5 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                             fill="none" 
                             stroke="currentColor" 
                             viewBox="0 0 24 24"
@@ -494,32 +496,32 @@ Be specific and accurate. If you cannot identify the exact product, provide your
 
             <div className="flex gap-3">
               {/* Market History */}
-              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+              <div className="flex-[1.2] bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
                 <h3 className="text-xs font-bold text-[#1F2937] mb-3">Market History</h3>
                 
                 {/* Time Period Selector */}
-                <div className="relative mb-3">
+                <div className="flex justify-between mb-1">
+                  <button className="text-[10px] font-semibold text-[#00A36C]">90D</button>
+                  <button className="text-[10px] font-semibold text-[#6B7280]">3M</button>
+                  <button className="text-[10px] font-semibold text-[#6B7280]">1Y</button>
+                </div>
+                <div className="relative mb-2">
                   <div className="h-0.5 bg-[#E5E7EB] rounded-full" />
                   <div className="absolute top-0 left-0 w-1/3 h-0.5 bg-[#00A36C] rounded-full" />
-                  <div className="flex justify-between relative -mt-2">
-                    <button className="text-[10px] font-semibold text-[#00A36C]">90D</button>
-                    <button className="text-[10px] font-semibold text-[#6B7280]">3M</button>
-                    <button className="text-[10px] font-semibold text-[#6B7280]">1Y</button>
-                  </div>
                 </div>
 
                 {/* Graph */}
                 <div className="flex gap-2 mb-2">
-                  <div className="flex flex-col justify-between text-[9px] text-[#6B7280]">
+                  <div className="flex flex-col justify-between text-[9px] text-[#6B7280] pt-1">
                     <span>60</span>
                     <span>40</span>
                     <span>20</span>
                   </div>
                   <div className="flex-1">
                     <svg className="w-full h-24" viewBox="0 0 200 80" preserveAspectRatio="none">
-                      <line x1="0" y1="20" x2="200" y2="20" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <line x1="0" y1="13" x2="200" y2="13" stroke="#E5E7EB" strokeWidth="0.5" />
                       <line x1="0" y1="40" x2="200" y2="40" stroke="#E5E7EB" strokeWidth="0.5" />
-                      <line x1="0" y1="60" x2="200" y2="60" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <line x1="0" y1="67" x2="200" y2="67" stroke="#E5E7EB" strokeWidth="0.5" />
                       <polyline
                         fill="none"
                         stroke="#00A36C"
@@ -555,7 +557,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
               </div>
 
               {/* Best Price Vs Market */}
-              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-bold text-[#1F2937]">Best Price vs Market</h3>
                   <button>
@@ -563,23 +565,28 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                   </button>
                 </div>
                 
-                <div className="w-full h-32 rounded-lg bg-[#F9FAFB] flex items-center justify-center mb-3">
-                  <img 
-                    src={result.product_image_url || result.file_url}
-                    alt={result.title}
-                    className="w-full h-full object-contain p-2"
-                  />
+                <div className="flex gap-3">
+                  <div className="w-20 h-20 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src={result.product_image_url || result.file_url}
+                      alt={result.title}
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] text-[#6B7280] mb-0.5">{bestDeal?.store}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{result.title}</p>
+                    <p className="text-sm font-bold text-[#1F2937] mb-1">{bestDeal?.price}</p>
+                    <div className="flex items-center gap-1 mb-1">
+                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-[9px] text-[#1F2937]">{result.rating}</span>
+                    </div>
+                    <p className="text-[8px] text-[#6B7280]">(17.3k)</p>
+                  </div>
                 </div>
                 
-                <p className="text-[9px] text-[#6B7280] mb-0.5">{bestDeal?.store}</p>
-                <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{result.title}</p>
-                <p className="text-sm font-bold text-[#1F2937] mb-0.5">{bestDeal?.price}</p>
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                  <span className="text-[9px] text-[#1F2937]">{result.rating} ({Math.floor(Math.random() * 500) + 100})</span>
-                </div>
-                
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mt-2 mb-2">
                   <span className="text-[9px] font-semibold px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded-full">-$10 Ave Price</span>
                   <span className="text-[9px] text-[#00A36C]">In Stock</span>
                 </div>
@@ -686,25 +693,30 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             <h2 className="text-base font-bold text-[#1F2937] mb-2">Alternatives</h2>
             <p className="text-xs text-[#6B7280] mb-3">Comparable products with better price, value</p>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-3">
               {result.alternatives?.slice(0, 3).map((alt, idx) => (
-                <div key={idx}>
-                  <div className="w-full aspect-square rounded-xl bg-[#F9FAFB] flex items-center justify-center overflow-hidden mb-2">
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="w-20 h-20 rounded-xl bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
                     <img 
                       src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
                       alt={alt.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
-                  <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{alt.name}</p>
-                  <span className="inline-block text-[9px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded-full mb-1 border border-[#00A36C]">
-                    {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
-                  </span>
-                  <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
-                  <div className="flex items-center gap-0.5">
-                    <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                    <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{alt.name}</p>
+                    <p className="text-xs font-bold text-[#1F2937] mb-1">{alt.price}</p>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
+                    </div>
+                    <p className="text-[8px] text-[#6B7280]">(17.3k)</p>
+                  </div>
+                  <div className="text-center flex-shrink-0">
+                    <span className="text-[9px] font-semibold text-[#00A36C]">
+                      {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
+                    </span>
                   </div>
                 </div>
               ))}

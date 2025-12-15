@@ -648,7 +648,6 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 </div>
               </div>
             </div>
-          </div>
 
           {/* Alternatives */}
           <div className="mb-5">

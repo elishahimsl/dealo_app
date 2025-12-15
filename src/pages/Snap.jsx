@@ -490,32 +490,51 @@ Be specific and accurate. If you cannot identify the exact product, provide your
 
           {/* Price Intelligence */}
           <div className="mb-5">
-            <h2 className="text-lg font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
 
-            <div className="grid grid-cols-2 gap-3">
-              {/* Price History */}
-              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3">
-                <div className="flex gap-2 mb-3">
-                  <button className="text-[10px] font-semibold px-2 py-1 bg-[#00A36C] text-white rounded">90D</button>
-                  <button className="text-[10px] font-semibold px-2 py-1 text-[#6B7280]">3M</button>
-                  <button className="text-[10px] font-semibold px-2 py-1 text-[#6B7280]">1Y</button>
-                </div>
-                <div className="mb-2">
-                  <p className="text-[9px] text-[#6B7280] mb-1">Price</p>
-                  <svg className="w-full h-24" viewBox="0 0 200 80" preserveAspectRatio="none">
-                    <polyline
-                      fill="none"
-                      stroke="#00A36C"
-                      strokeWidth="2"
-                      points="0,60 50,45 100,55 150,30 200,40"
-                    />
-                  </svg>
-                  <div className="flex justify-between text-[8px] text-[#6B7280]">
-                    <span>23</span>
-                    <span>15</span>
-                    <span>2</span>
+            <div className="flex gap-3">
+              {/* Market History */}
+              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+                <h3 className="text-xs font-bold text-[#1F2937] mb-3">Market History</h3>
+                
+                {/* Time Period Selector */}
+                <div className="relative mb-3">
+                  <div className="h-0.5 bg-[#E5E7EB] rounded-full" />
+                  <div className="absolute top-0 left-0 w-1/3 h-0.5 bg-[#00A36C] rounded-full" />
+                  <div className="flex justify-between relative -mt-2">
+                    <button className="text-[10px] font-semibold text-[#00A36C]">90D</button>
+                    <button className="text-[10px] font-semibold text-[#6B7280]">3M</button>
+                    <button className="text-[10px] font-semibold text-[#6B7280]">1Y</button>
                   </div>
                 </div>
+
+                {/* Graph */}
+                <div className="flex gap-2 mb-2">
+                  <div className="flex flex-col justify-between text-[9px] text-[#6B7280]">
+                    <span>60</span>
+                    <span>40</span>
+                    <span>20</span>
+                  </div>
+                  <div className="flex-1">
+                    <svg className="w-full h-24" viewBox="0 0 200 80" preserveAspectRatio="none">
+                      <line x1="0" y1="20" x2="200" y2="20" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <line x1="0" y1="40" x2="200" y2="40" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <line x1="0" y1="60" x2="200" y2="60" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <polyline
+                        fill="none"
+                        stroke="#00A36C"
+                        strokeWidth="2"
+                        points="0,60 50,45 100,55 150,30 200,40"
+                      />
+                    </svg>
+                    <div className="flex justify-between text-[8px] text-[#6B7280]">
+                      <span>23</span>
+                      <span>15</span>
+                      <span>2</span>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex gap-2 mb-2">
                   <div className="flex-1 text-center">
                     <p className="text-xs font-bold text-[#1F2937]">${bestDeal?.price?.replace(/[^0-9.]/g, '') || '899'}</p>
@@ -536,28 +555,30 @@ Be specific and accurate. If you cannot identify the exact product, provide your
               </div>
 
               {/* Best Price Vs Market */}
-              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 relative">
-                <button className="absolute top-3 right-3">
-                  <Heart className="w-4 h-4 text-[#6B7280]" />
-                </button>
-                <div className="flex gap-3 mb-2">
-                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
-                    <img 
-                      src={result.product_image_url || result.file_url}
-                      alt={result.title}
-                      className="w-full h-full object-contain p-1"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[9px] text-[#6B7280] mb-0.5">{bestDeal?.store}</p>
-                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{result.title}</p>
-                    <p className="text-sm font-bold text-[#1F2937] mb-0.5">{bestDeal?.price}</p>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                      <span className="text-[9px] text-[#1F2937]">{result.rating} ({Math.floor(Math.random() * 500) + 100})</span>
-                    </div>
-                  </div>
+              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-xs font-bold text-[#1F2937]">Best Price vs Market</h3>
+                  <button>
+                    <Bookmark className="w-4 h-4 text-[#6B7280]" />
+                  </button>
                 </div>
+                
+                <div className="w-full h-32 rounded-lg bg-[#F9FAFB] flex items-center justify-center mb-3">
+                  <img 
+                    src={result.product_image_url || result.file_url}
+                    alt={result.title}
+                    className="w-full h-full object-contain p-2"
+                  />
+                </div>
+                
+                <p className="text-[9px] text-[#6B7280] mb-0.5">{bestDeal?.store}</p>
+                <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{result.title}</p>
+                <p className="text-sm font-bold text-[#1F2937] mb-0.5">{bestDeal?.price}</p>
+                <div className="flex items-center gap-1 mb-2">
+                  <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                  <span className="text-[9px] text-[#1F2937]">{result.rating} ({Math.floor(Math.random() * 500) + 100})</span>
+                </div>
+                
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-[9px] font-semibold px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded-full">-$10 Ave Price</span>
                   <span className="text-[9px] text-[#00A36C]">In Stock</span>
@@ -573,7 +594,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           {/* Store Comparison */}
           <div ref={storeComparisonRef} className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Store Comparison</h2>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {result.online_deals?.slice(0, 3).map((deal, idx) => {
                 const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
                 const minPrice = Math.min(...prices);
@@ -581,18 +602,13 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 const isBest = currentPrice === minPrice;
 
                 return (
-                  <div key={idx} className="flex items-center gap-3 p-2 bg-[#F9FAFB] rounded-lg">
-                    <div className="relative flex-shrink-0">
-                      <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center overflow-hidden">
-                        <img 
-                          src={result.product_image_url || result.file_url}
-                          alt={result.title}
-                          className="w-full h-full object-contain p-1"
-                        />
-                      </div>
-                      <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center">
-                        <Heart className="w-3 h-3 text-[#6B7280]" />
-                      </button>
+                  <div key={idx} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+                    <div className="w-20 h-20 rounded-lg bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
+                      <img 
+                        src={result.product_image_url || result.file_url}
+                        alt={result.title}
+                        className="w-full h-full object-contain p-2"
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{deal.store}</p>
@@ -613,8 +629,8 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 );
               })}
             </div>
-            <button className="w-full py-2.5 mt-2 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
-              View More
+            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+              View More Stores
             </button>
           </div>
 
@@ -670,45 +686,31 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             <h2 className="text-base font-bold text-[#1F2937] mb-2">Alternatives</h2>
             <p className="text-xs text-[#6B7280] mb-3">Comparable products with better price, value</p>
 
-            <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-3">
               {result.alternatives?.slice(0, 3).map((alt, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-2 bg-[#F9FAFB] rounded-lg">
-                  <div className="relative flex-shrink-0">
-                    <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center overflow-hidden">
-                      <img 
-                        src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
-                        alt={alt.name}
-                        className="w-full h-full object-contain p-1"
-                      />
-                    </div>
-                    <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center">
-                      <Heart className="w-3 h-3 text-[#6B7280]" />
-                    </button>
+                <div key={idx}>
+                  <div className="w-full aspect-square rounded-xl bg-[#F9FAFB] flex items-center justify-center overflow-hidden mb-2">
+                    <img 
+                      src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
+                      alt={alt.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{alt.store}</p>
-                    <p className="text-xs text-[#1F2937] mb-1 truncate">{alt.name}</p>
-                    <p className="text-[10px] text-[#6B7280] leading-tight">
-                      {idx === 0 && 'Cheaper, similar specs'}
-                      {idx === 1 && 'Light weight, much bigger'}
-                      {idx === 2 && 'Premium sound & comfort'}
-                    </p>
-                  </div>
-                  <div className="text-center flex-shrink-0 px-2 py-1 bg-white rounded-lg border border-[#E5E7EB]">
-                    <span className="block text-[9px] font-semibold text-[#00A36C] mb-1">
-                      {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
-                    </span>
-                    <p className="text-sm font-bold text-[#1F2937] mb-1">{alt.price}</p>
-                    <div className="flex items-center justify-center gap-0.5">
-                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                      <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
-                    </div>
+                  <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
+                  <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{alt.name}</p>
+                  <span className="inline-block text-[9px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded-full mb-1 border border-[#00A36C]">
+                    {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
+                  </span>
+                  <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
+                  <div className="flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                    <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <button className="w-full py-2.5 mt-2 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
               View all alternatives
             </button>
           </div>

@@ -1,9 +1,10 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Camera, X, Loader2, Sparkles, Bookmark, Send, Image as ImageIcon, Zap, Scan, HelpCircle, Star, Check, XIcon, ChevronLeft, Lock } from "lucide-react";
+import { Camera, X, Loader2, Sparkles, Bookmark, Send, Image as ImageIcon, Zap, Scan, HelpCircle, Star, Check, XIcon, ChevronLeft, Lock, Heart } from "lucide-react";
 
 export default function Snap() {
   const navigate = useNavigate();
@@ -337,80 +338,92 @@ Be specific and accurate. If you cannot identify the exact product, provide your
     };
 
     return (
-      <div className="min-h-screen bg-white">
-        {/* Header */}
-        <div className="relative">
-          {/* Product Image */}
-          <div className="h-64 bg-white flex items-center justify-center p-8">
-            <img
-              src={result.product_image_url || result.file_url}
-              alt={result.title}
-              className="w-full h-full object-contain"
-            />
-          </div>
-
-          {/* Header Controls */}
-          <div className="absolute top-0 left-0 right-0 px-4 py-3 flex items-center justify-between">
+      <div className="min-h-screen bg-white pb-6">
+        {/* Header with Product Info */}
+        <div className="px-4 pt-3">
+          <div className="flex items-center justify-between mb-4">
             <button 
               onClick={() => { setResult(null); startCamera(); }}
-              className="w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center"
+              className="p-2"
             >
-              <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
+              <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
             </button>
-            <button className="w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center">
-              <Send className="w-5 h-5 text-[#1F2937]" />
+            <button className="flex flex-col gap-1 p-2">
+              <div className="w-5 h-0.5 bg-[#1F2937]" />
+              <div className="w-5 h-0.5 bg-[#1F2937]" />
+              <div className="w-5 h-0.5 bg-[#1F2937]" />
             </button>
+          </div>
+
+          <div className="flex gap-4 mb-5">
+            {/* Large Product Image */}
+            <div className="w-32 h-32 bg-[#F9FAFB] rounded-xl flex items-center justify-center flex-shrink-0">
+              <img
+                src={result.product_image_url || result.file_url}
+                alt={result.title}
+                className="w-full h-full object-contain p-2"
+              />
+            </div>
+
+            {/* Product Info */}
+            <div className="flex-1">
+              <h1 className="text-lg font-bold text-[#1F2937] mb-2 leading-tight">{result.title}</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-[#6B7280] px-2 py-1 bg-[#F3F4F6] rounded">
+                  {result.keywords?.[0] || 'Tech'}
+                </span>
+                <button className="text-xs text-[#00A36C] font-semibold flex items-center gap-1">
+                  <Send className="w-3.5 h-3.5" />
+                  Share
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="px-5 pb-24">
-          {/* Product Title */}
-          <div className="mb-4">
-            <h1 className="text-xl font-bold text-[#1F2937] mb-2">{result.title}</h1>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center gap-1">
-                <span className="text-base font-semibold text-[#1F2937]">{result.rating}</span>
-                <Star className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" />
-              </div>
-              <span className="text-sm text-[#6B7280]">(7,382)</span>
-            </div>
-            <span className="inline-block px-3 py-1 bg-[#F3F4F6] rounded-full text-xs font-medium text-[#6B7280]">
-              {result.keywords?.[0] || 'Tech'}
-            </span>
-          </div>
-
+        <div className="px-4">
           {/* Product Overview */}
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Product Overview</h2>
             <p className="text-sm text-[#1F2937] leading-relaxed mb-3">
               {result.description || result.smart_summary}
             </p>
-            <ul className="space-y-2">
-              {result.features?.slice(0, 4).map((feature, idx) => (
-                <li key={idx} className="text-sm text-[#1F2937] flex items-start gap-2">
-                  <span className="text-[#00A36C] mt-1">•</span>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {result.features?.slice(0, 6).map((feature, idx) => (
+                <div key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
+                  <span className="text-[#00A36C] mt-0.5">•</span>
                   <span>{feature}</span>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
           {/* Deal Score */}
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Deal Score</h2>
 
-            {/* Score Circle */}
-            <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-3 mb-4">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full border-4 border-[#00A36C] flex flex-col items-center justify-center">
+                <svg className="w-20 h-20 transform -rotate-90">
+                  <circle cx="40" cy="40" r="36" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+                  <circle 
+                    cx="40" cy="40" r="36" 
+                    fill="none" 
+                    stroke="#00A36C" 
+                    strokeWidth="8"
+                    strokeDasharray={`${2 * Math.PI * 36 * (result.overall_score / 100)} ${2 * Math.PI * 36}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-2xl font-bold text-[#1F2937]">{result.overall_score}</span>
-                  <span className="text-xs text-[#6B7280]">/100</span>
+                  <span className="text-[9px] text-[#6B7280]">/100</span>
                 </div>
               </div>
-              <div>
-                <p className="text-lg font-bold text-[#1F2937]">Strong Deal</p>
-                <p className="text-sm text-[#6B7280]">Great value for money</p>
+              <div className="flex-1">
+                <p className="text-base font-bold text-[#1F2937] mb-0.5">Strong Deal</p>
+                <p className="text-xs text-[#6B7280]">Quality • Price • Reviews</p>
               </div>
             </div>
 
@@ -480,86 +493,65 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             </div>
 
             {/* AI Summary */}
-            <div className="mt-4 p-3 bg-[#F9FAFB] rounded-lg">
-              <p className="text-xs text-[#6B7280]">
-                <span className="font-semibold text-[#1F2937]">AI Summary:</span> Price is well below market average and maintains strong willingness. More info here.
+            <div className="mt-4 bg-[#F0FDF4] border border-[#D1FAE5] rounded-lg p-3">
+              <p className="text-xs text-[#1F2937] leading-relaxed">
+                <span className="font-bold">AI Summary:</span> Price is well below market average and maintains strong willingness. More info here.
               </p>
             </div>
-          </div>
+            </div>
 
           {/* Price Intelligence */}
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
 
-            {/* Price History Graph */}
-            <div className="relative mb-4 p-4 bg-[#F9FAFB] rounded-lg">
-              <div className="flex items-end justify-around h-32">
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '85%'}}></div>
-                  <span className="text-[10px] text-[#6B7280]">$55</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '65%'}}></div>
-                  <span className="text-[10px] text-[#6B7280]">$45</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '95%'}}></div>
-                  <span className="text-[10px] text-[#6B7280]">$75</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="w-8 bg-[#00A36C]/70 rounded-t relative" style={{height: '75%'}}>
-                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-[#00A36C] whitespace-nowrap">
-                      Current
-                    </span>
+            <div className="flex gap-3 mb-4">
+              {/* Price History Graph */}
+              <div className="flex-1 p-3 bg-[#F9FAFB] rounded-lg">
+                <p className="text-xs font-semibold text-[#1F2937] mb-2">Price History</p>
+                <div className="flex items-end justify-around h-24">
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '60%'}}></div>
+                    <span className="text-[9px] text-[#6B7280]">90D</span>
                   </div>
-                  <span className="text-[10px] font-semibold text-[#00A36C]">$15</span>
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '45%'}}></div>
+                    <span className="text-[9px] text-[#6B7280]">60D</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '75%'}}></div>
+                    <span className="text-[9px] text-[#6B7280]">30D</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 flex-1">
+                    <div className="w-full max-w-[30px] bg-[#00A36C]/70 rounded-t mx-auto relative" style={{height: '55%'}}>
+                      <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-[#00A36C] whitespace-nowrap">
+                        Now
+                      </span>
+                    </div>
+                    <span className="text-[9px] text-[#6B7280]">1Y</span>
+                  </div>
+                </div>
+                <div className="text-center mt-2">
+                  <span className="inline-block px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[9px] font-semibold">
+                    Good Time to Buy
+                  </span>
                 </div>
               </div>
-              <div className="flex justify-around mt-2">
-                <span className="text-[10px] text-[#6B7280]">90 Days</span>
-                <span className="text-[10px] text-[#6B7280]">60 Days</span>
-                <span className="text-[10px] text-[#6B7280]">30 Days</span>
-                <span className="text-[10px] text-[#6B7280]">1 Yr</span>
-              </div>
-              <div className="text-center mt-3">
-                <span className="inline-block px-3 py-1 bg-[#D6F5E9] text-[#00A36C] rounded-full text-xs font-semibold">
-                  Good Time to Buy
-                </span>
-              </div>
-            </div>
 
-            {/* Best Price in Market */}
-            <div className="p-4 bg-white border-2 border-[#00A36C] rounded-lg">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-bold text-[#1F2937]">Best Price in Market</h3>
-                <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">
-                  Current Lowest
-                </span>
-              </div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-lg bg-[#F9FAFB] flex items-center justify-center">
+              {/* Best Price Box */}
+              <div className="flex-1 p-3 bg-white border-2 border-[#00A36C] rounded-lg">
+                <p className="text-xs font-semibold text-[#1F2937] mb-2">Best Price in Market</p>
+                <div className="w-10 h-10 rounded-lg bg-[#F9FAFB] flex items-center justify-center mb-2">
                   <img 
                     src={`https://logo.clearbit.com/${bestDeal?.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
                     alt={bestDeal?.store}
-                    className="w-8 h-8 object-contain"
+                    className="w-6 h-6 object-contain"
                     onError={(e) => e.target.style.display = 'none'}
                   />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-[#1F2937]">{bestDeal?.store}</p>
-                  <p className="text-xs text-[#6B7280]">Free shipping • {result.return_policy || '30-day returns'}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xl font-bold text-[#00A36C]">{bestDeal?.price}</p>
-                  <p className="text-[10px] text-[#6B7280]">per item</p>
-                </div>
+                <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{bestDeal?.store}</p>
+                <p className="text-xl font-bold text-[#00A36C] mb-1">{bestDeal?.price}</p>
+                <p className="text-[9px] text-[#6B7280]">Lowest</p>
               </div>
-              <button className="w-full py-2.5 bg-[#1F2937] text-white rounded-lg text-sm font-semibold hover:bg-[#374151] transition-colors">
-                View Store
-              </button>
-              <p className="text-xs text-[#6B7280] text-center mt-2">
-                Summary: Price is 10% lower than market average
-              </p>
             </div>
           </div>
 
@@ -574,34 +566,40 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 const isBest = currentPrice === minPrice;
 
                 return (
-                  <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
-                    <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-                      <img 
-                        src={deal.image_url || `https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
-                        alt={deal.store}
-                        className="w-8 h-8 object-contain"
-                        onError={(e) => e.target.style.display = 'none'}
-                      />
+                  <div key={idx} className="flex items-center gap-3 p-2 bg-[#F9FAFB] rounded-lg">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={result.product_image_url || result.file_url}
+                          alt={result.title}
+                          className="w-full h-full object-contain p-1"
+                        />
+                      </div>
+                      <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center">
+                        <Heart className="w-3 h-3 text-[#6B7280]" />
+                      </button>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#1F2937]">{deal.store}</p>
-                      <p className="text-xs text-[#6B7280]">
-                        {isBest ? 'Free Shipping' : '$15 Shipping'}
-                        {idx === 1 && ' • Free Delivery'}
-                      </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{deal.store}</p>
+                      <p className="text-xs text-[#1F2937] mb-1 truncate">{result.title}</p>
+                      <p className="text-sm font-bold text-[#1F2937]">{deal.price}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <p className="text-base font-bold text-[#1F2937]">{deal.price}</p>
                       {isBest && (
-                        <span className="text-[10px] font-semibold text-[#00A36C]">Best</span>
+                        <span className="block text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded mb-1">
+                          Best
+                        </span>
                       )}
+                      <p className="text-[9px] text-[#6B7280]">
+                        {isBest ? 'Free Ship' : '$5 Ship'}
+                      </p>
                     </div>
                   </div>
                 );
               })}
             </div>
-            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
-              View More Stores
+            <button className="w-full py-2.5 mt-2 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+              View More
             </button>
           </div>
 
@@ -612,20 +610,29 @@ Be specific and accurate. If you cannot identify the exact product, provide your
               Based on 1,312 reviews across major retailers (Amazon, Bestbuy, Walmart...)
             </p>
 
-            <div className="mb-4">
-              <span className="inline-block px-3 py-1.5 bg-[#D6F5E9] text-[#00A36C] rounded-lg text-sm font-semibold mb-3">
+            <div className="bg-[#F0FDF4] border border-[#D1FAE5] rounded-lg p-3 mb-3">
+              <span className="inline-block px-2 py-1 bg-[#00A36C] text-white rounded text-xs font-semibold mb-2">
                 Mostly Positive
               </span>
-              <p className="text-sm text-[#1F2937] leading-relaxed mb-3">
+              <p className="text-xs text-[#1F2937] leading-relaxed">
                 Most praised: sound quality & comfort compliance. Common battery aging after long term use.
               </p>
+            </div>
 
-              <div className="p-3 bg-[#F9FAFB] rounded-lg mb-3">
-                <p className="text-xs font-semibold text-[#1F2937] mb-1">Trust Check</p>
-                <p className="text-xs text-[#6B7280]">
-                  Low likelihood of fake/unverified reviews
+            <div className="mb-3">
+              <div className="flex items-start gap-3">
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-[#1F2937] mb-2">Trust Check</p>
+                  <p className="text-xs font-bold text-[#00A36C] mb-1">High Confidence</p>
+                  <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden mb-2">
+                    <div className="h-full bg-[#00A36C] rounded-full" style={{width: '85%'}}></div>
+                  </div>
+                </div>
+                <p className="flex-1 text-[10px] text-[#6B7280] leading-relaxed">
+                  Low likelihood of fake/unverified reviews based on review patterns and verified purchase data.
                 </p>
               </div>
+            </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -649,59 +656,60 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             <h2 className="text-base font-bold text-[#1F2937] mb-2">Alternatives</h2>
             <p className="text-xs text-[#6B7280] mb-3">Comparable products with better price, value</p>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {result.alternatives?.slice(0, 3).map((alt, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
-                  <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-                    <img 
-                      src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
-                      alt={alt.name}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 bg-[#E5E7EB] text-[#1F2937] rounded text-[10px] font-semibold">
-                        {alt.store}
-                      </span>
-                      <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">
-                        {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium Choice'}
-                      </span>
+                <div key={idx} className="flex items-center gap-3 p-2 bg-[#F9FAFB] rounded-lg">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center overflow-hidden">
+                      <img 
+                        src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
+                        alt={alt.name}
+                        className="w-full h-full object-contain p-1"
+                      />
                     </div>
-                    <p className="text-sm font-semibold text-[#1F2937] mb-0.5">{alt.name}</p>
-                    <p className="text-xs text-[#6B7280] mb-1">
+                    <button className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center">
+                      <Heart className="w-3 h-3 text-[#6B7280]" />
+                    </button>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{alt.store}</p>
+                    <p className="text-xs text-[#1F2937] mb-1 truncate">{alt.name}</p>
+                    <p className="text-[10px] text-[#6B7280] leading-tight">
                       {idx === 0 && 'Cheaper, similar specs'}
                       {idx === 1 && 'Light weight, much bigger'}
                       {idx === 2 && 'Premium sound & comfort'}
                     </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-base font-bold text-[#1F2937]">{alt.price}</span>
-                      <div className="flex items-center gap-0.5">
-                        <span className="text-xs text-[#1F2937]">4.{idx + 2}</span>
-                        <Star className="w-3 h-3 text-[#F59E0B] fill-[#F59E0B]" />
-                      </div>
+                  </div>
+                  <div className="text-center flex-shrink-0 px-2 py-1 bg-white rounded-lg border border-[#E5E7EB]">
+                    <span className="block text-[9px] font-semibold text-[#00A36C] mb-1">
+                      {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
+                    </span>
+                    <p className="text-sm font-bold text-[#1F2937] mb-1">{alt.price}</p>
+                    <div className="flex items-center justify-center gap-0.5">
+                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
 
-            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+            <button className="w-full py-2.5 mt-2 bg-white border border-[#E5E7EB] rounded-lg text-xs font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
               View all alternatives
             </button>
           </div>
         </div>
 
         {/* Bottom Action Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] p-4 z-10">
-          <div className="flex gap-3 max-w-lg mx-auto">
+        <div className="px-4 pt-4 pb-6">
+          <div className="flex gap-3">
             <button 
               onClick={() => { setResult(null); startCamera(); }}
-              className="flex-1 py-3 bg-white border-2 border-[#1F2937] rounded-full text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors"
+              className="flex-1 py-3 bg-[#00A36C] text-white rounded-full text-sm font-semibold hover:bg-[#007E52] transition-colors"
             >
               Scan Again
             </button>
-            <button className="flex-1 py-3 bg-[#1F2937] text-white rounded-full text-sm font-semibold hover:bg-[#374151] transition-colors">
+            <button className="flex-1 py-3 bg-white border-2 border-[#00A36C] text-[#00A36C] rounded-full text-sm font-semibold hover:bg-[#F0FDF4] transition-colors">
               Fix Product
             </button>
           </div>

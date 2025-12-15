@@ -113,7 +113,7 @@ export default function AIDealFinder() {
               onClick={() => setSelectedCategory(category)}
               className={`px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
                 selectedCategory === category
-                  ? "bg-[#3B82F6] text-white"
+                  ? "bg-[#00A36C] text-white"
                   : "bg-[#F3F4F6] text-[#6B7280]"
               }`}
             >
@@ -138,7 +138,7 @@ export default function AIDealFinder() {
               <h3 className="text-base font-bold text-[#1F2937] mb-1">
                 {featuredDeal.name}
               </h3>
-              <button className="px-3 py-1 bg-[#3B82F6] text-white text-xs font-semibold rounded-full mb-2">
+              <button className="px-3 py-1 bg-[#00A36C] text-white text-xs font-semibold rounded-full mb-2">
                 Deal Score
               </button>
               <p className="text-2xl font-bold text-[#1F2937] mb-1">
@@ -151,10 +151,24 @@ export default function AIDealFinder() {
             {featuredDeal.description}
           </p>
           <div className="flex gap-2">
-            <button className="flex-1 py-2.5 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1F2937]">
+            <button 
+              onClick={() => navigate(createPageUrl("AIDealFinderAnalysis"), {
+                state: {
+                  product: {
+                    name: featuredDeal.name,
+                    image: featuredDeal.image,
+                    price: featuredDeal.price,
+                    store: "Amazon",
+                    storeLogo: "https://logo.clearbit.com/amazon.com",
+                    availability: "In Stock"
+                  }
+                }
+              })}
+              className="flex-1 py-2.5 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1F2937]"
+            >
               View Analysis
             </button>
-            <button className="flex-1 py-2.5 bg-[#3B82F6] text-white rounded-full text-sm font-semibold">
+            <button className="flex-1 py-2.5 bg-[#00A36C] text-white rounded-full text-sm font-semibold">
               Save Deal
             </button>
           </div>
@@ -191,7 +205,7 @@ export default function AIDealFinder() {
                     </p>
                     <p className="text-xs text-[#6B7280]">{deal.discount}</p>
                   </div>
-                  <span className="px-2.5 py-1 bg-[#FEF3C7] text-[#92400E] text-xs font-semibold rounded">
+                  <span className="px-2.5 py-1 bg-[#D1FAE5] text-[#065F46] text-xs font-semibold rounded">
                     {deal.badge}
                   </span>
                 </div>

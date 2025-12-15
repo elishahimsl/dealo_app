@@ -697,20 +697,20 @@ Be specific and accurate. If you cannot identify the exact product, provide your
               View all alternatives
             </button>
           </div>
-        </div>
 
-        {/* Bottom Action Buttons */}
-        <div className="px-4 pt-4 pb-6">
-          <div className="flex gap-3">
-            <button 
-              onClick={() => { setResult(null); startCamera(); }}
-              className="flex-1 py-3 bg-[#00A36C] text-white rounded-full text-sm font-semibold hover:bg-[#007E52] transition-colors"
-            >
-              Scan Again
-            </button>
-            <button className="flex-1 py-3 bg-white border-2 border-[#00A36C] text-[#00A36C] rounded-full text-sm font-semibold hover:bg-[#F0FDF4] transition-colors">
-              Fix Product
-            </button>
+          {/* Bottom Action Buttons */}
+          <div className="px-4 pt-4 pb-6">
+            <div className="flex gap-3">
+              <button 
+                onClick={() => { setResult(null); startCamera(); }}
+                className="flex-1 py-3 bg-[#00A36C] text-white rounded-full text-sm font-semibold hover:bg-[#007E52] transition-colors"
+              >
+                Scan Again
+              </button>
+              <button className="flex-1 py-3 bg-white border-2 border-[#00A36C] text-[#00A36C] rounded-full text-sm font-semibold hover:bg-[#F0FDF4] transition-colors">
+                Fix Product
+              </button>
+            </div>
           </div>
         </div>
       </div>

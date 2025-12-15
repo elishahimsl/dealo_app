@@ -421,7 +421,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 <p className="text-xs font-bold text-[#1F2937]">Strong Deal</p>
               </div>
 
-              <div className="flex-1 space-y-2 pr-3">
+              <div className="flex-1 space-y-1.5 pr-2">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
                   const label = getScoreLabel(value);
                   const isExpanded = expandedSubscore === key;
@@ -432,9 +432,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                         onClick={() => setExpandedSubscore(isExpanded ? null : key)}
                         className="w-full"
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-semibold text-[#1F2937] capitalize w-16">{key}</span>
-                          <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-semibold text-[#1F2937] capitalize w-14">{key}</span>
+                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
                             <div 
                               className="h-full rounded-full"
                               style={{ 
@@ -443,9 +443,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                               }}
                             ></div>
                           </div>
-                          <span className="text-xs font-bold text-[#1F2937] w-7">{value}</span>
+                          <span className="text-[10px] font-bold text-[#1F2937] w-6">{value}</span>
                           <span 
-                            className="text-[9px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
+                            className="text-[8px] font-semibold px-1 py-0.5 rounded whitespace-nowrap"
                             style={{ 
                               color: label.color,
                               backgroundColor: `${label.color}15`
@@ -454,7 +454,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                             {label.text}
                           </span>
                           <svg 
-                            className={`w-3 h-3 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`w-2.5 h-2.5 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                             fill="none" 
                             stroke="currentColor" 
                             viewBox="0 0 24 24"

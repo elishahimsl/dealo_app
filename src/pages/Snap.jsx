@@ -381,15 +381,15 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           {/* Product Overview */}
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Product Overview</h2>
-            <p className="text-sm text-[#1F2937] leading-relaxed mb-2 line-clamp-2">
+            <p className="text-sm text-[#1F2937] leading-relaxed line-clamp-2 inline">
               {result.description || result.smart_summary}
             </p>
-            <button className="text-xs text-[#00A36C] font-semibold mb-3">see more</button>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            <button className="text-[10px] text-[#6B7280] font-semibold ml-1">see more</button>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
               {result.features?.slice(0, 6).map((feature, idx) => (
                 <div key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
                   <span className="text-[#00A36C] mt-0.5">•</span>
-                  <span>{feature}</span>
+                  <span>{feature.split(' ').slice(0, 4).join(' ')}</span>
                 </div>
               ))}
             </div>
@@ -421,7 +421,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 <p className="text-xs font-bold text-[#1F2937]">Strong Deal</p>
               </div>
 
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-1.5 pr-2">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
                   const label = getScoreLabel(value);
                   const isExpanded = expandedSubscore === key;
@@ -434,7 +434,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                       >
                         <div className="flex items-center gap-1.5">
                           <span className="text-[10px] font-semibold text-[#1F2937] capitalize w-14">{key}</span>
-                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden w-20">
+                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
                             <div 
                               className="h-full rounded-full"
                               style={{ 
@@ -494,9 +494,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           <div className="mb-5">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
 
-            <div className="flex gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {/* Market History */}
-              <div className="flex-[1.2] bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
+              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
                 <h3 className="text-xs font-bold text-[#1F2937] mb-3">Market History</h3>
                 
                 {/* Time Period Selector */}
@@ -517,11 +517,21 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                     <span>40</span>
                     <span>20</span>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 relative">
                     <svg className="w-full h-24" viewBox="0 0 200 80" preserveAspectRatio="none">
+                      <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="rgba(0, 163, 108, 0.3)" />
+                          <stop offset="100%" stopColor="rgba(0, 163, 108, 0)" />
+                        </linearGradient>
+                      </defs>
                       <line x1="0" y1="13" x2="200" y2="13" stroke="#E5E7EB" strokeWidth="0.5" />
                       <line x1="0" y1="40" x2="200" y2="40" stroke="#E5E7EB" strokeWidth="0.5" />
                       <line x1="0" y1="67" x2="200" y2="67" stroke="#E5E7EB" strokeWidth="0.5" />
+                      <polygon
+                        fill="url(#gradient)"
+                        points="0,80 0,60 50,45 100,55 150,30 200,40 200,80"
+                      />
                       <polyline
                         fill="none"
                         stroke="#00A36C"
@@ -557,7 +567,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
               </div>
 
               {/* Best Price Vs Market */}
-              <div className="flex-1 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
+              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-xs font-bold text-[#1F2937]">Best Price vs Market</h3>
                   <button>
@@ -609,7 +619,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 const isBest = currentPrice === minPrice;
 
                 return (
-                  <div key={idx} className="flex items-center gap-3 bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm">
+                  <div key={idx} className="flex items-center gap-3">
                     <div className="w-20 h-20 rounded-lg bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
                       <img 
                         src={result.product_image_url || result.file_url}
@@ -667,23 +677,23 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                   </div>
                 </div>
                 <p className="flex-1 text-[10px] text-[#6B7280] leading-relaxed">
-                  Low likelihood of fake/unverified reviews based on review patterns and verified purchase data.
+                  Low likelihood of fake/unverified reviews.
                 </p>
               </div>
             </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#1F2937]">Quality</span>
-                  <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-xs font-semibold">Positive</span>
+                  <span className="text-xs text-[#1F2937]">Quality</span>
+                  <span className="px-1.5 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">Positive</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#1F2937]">Warranty</span>
-                  <span className="px-2 py-0.5 bg-[#FEF3C7] text-[#F59E0B] rounded text-xs font-semibold">Fair</span>
+                  <span className="text-xs text-[#1F2937]">Warranty</span>
+                  <span className="px-1.5 py-0.5 bg-[#FEF3C7] text-[#F59E0B] rounded text-[10px] font-semibold">Fair</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-[#1F2937]">Style</span>
-                  <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-xs font-semibold">Very Positive</span>
+                  <span className="text-xs text-[#1F2937]">Style</span>
+                  <span className="px-1.5 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">Very Positive</span>
                 </div>
               </div>
             </div>
@@ -705,18 +715,18 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
-                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{alt.name}</p>
-                    <p className="text-xs font-bold text-[#1F2937] mb-1">{alt.price}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-2 line-clamp-2">{alt.name}</p>
+                    <div className="inline-block px-2 py-1 bg-[#D6F5E9] border border-[#00A36C] rounded mb-1">
+                      <span className="text-[9px] font-semibold text-[#00A36C]">
+                        {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
+                      </span>
+                    </div>
+                    <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
                     <div className="flex items-center gap-1">
                       <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
                       <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
+                      <span className="text-[8px] text-[#6B7280]">(17.3k)</span>
                     </div>
-                    <p className="text-[8px] text-[#6B7280]">(17.3k)</p>
-                  </div>
-                  <div className="text-center flex-shrink-0">
-                    <span className="text-[9px] font-semibold text-[#00A36C]">
-                      {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
-                    </span>
                   </div>
                 </div>
               ))}

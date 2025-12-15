@@ -78,14 +78,11 @@ export default function AIDealFinder() {
           <button onClick={() => navigate(-1)}>
             <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
           </button>
-          <div className="flex items-center gap-3">
-            <button className="flex flex-col gap-0.5">
-              <div className="w-4 h-0.5 bg-[#1F2937]" />
-              <div className="w-4 h-0.5 bg-[#1F2937]" />
-              <div className="w-4 h-0.5 bg-[#1F2937]" />
-            </button>
-            <Info className="w-6 h-6 text-[#1F2937]" />
-          </div>
+          <button className="flex flex-col gap-0.5">
+            <div className="w-4 h-0.5 bg-[#1F2937]" />
+            <div className="w-4 h-0.5 bg-[#1F2937]" />
+            <div className="w-4 h-0.5 bg-[#1F2937]" />
+          </button>
         </div>
 
         <h1 className="text-2xl font-bold text-[#1F2937] mb-2">AI Deal Finder</h1>
@@ -94,120 +91,95 @@ export default function AIDealFinder() {
         </p>
 
         {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9CA3AF]" />
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
           <input
             type="text"
-            placeholder="Search for deals..."
+            placeholder="Search for products"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#F3F4F6] rounded-full pl-12 pr-4 py-3 text-sm text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#00A36C]"
+            className="w-full bg-[#F3F4F6] rounded-full pl-11 pr-4 py-2.5 text-sm text-[#1F2937] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#00A36C]"
           />
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${
-                selectedCategory === category
-                  ? "bg-[#00A36C] text-white"
-                  : "bg-[#F3F4F6] text-[#6B7280]"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
         </div>
       </div>
 
       <div className="px-6 space-y-6">
-        {/* Featured Deal */}
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-md">
-          <div className="flex gap-4 mb-3">
-            <div className="w-28 h-28 rounded-xl bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
-              <img
-                src={featuredDeal.image}
-                alt={featuredDeal.name}
-                className="w-full h-full object-contain p-2"
-              />
+        {/* Deal of the Day */}
+        <div>
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">Deal of the Day</h2>
+          <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-md">
+            <div className="flex gap-4 mb-3">
+              <div className="w-28 h-28 rounded-xl bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                <img
+                  src={featuredDeal.image}
+                  alt={featuredDeal.name}
+                  className="w-full h-full object-contain p-2"
+                />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[#1F2937] mb-1">
+                  {featuredDeal.name}
+                </h3>
+                <span className="inline-block px-3 py-1 bg-[#D1FAE5] text-[#065F46] text-xs font-semibold rounded-full mb-2">
+                  Great Deal
+                </span>
+                <p className="text-2xl font-bold text-[#1F2937] mb-1">
+                  {featuredDeal.price}
+                </p>
+                <p className="text-xs text-[#6B7280]">{featuredDeal.discount}</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-[#1F2937] mb-1">
-                {featuredDeal.name}
-              </h3>
-              <button className="px-3 py-1 bg-[#00A36C] text-white text-xs font-semibold rounded-full mb-2">
-                Deal Score
-              </button>
-              <p className="text-2xl font-bold text-[#1F2937] mb-1">
-                {featuredDeal.price}
-              </p>
-              <p className="text-xs text-[#6B7280]">{featuredDeal.discount}</p>
-            </div>
-          </div>
-          <p className="text-sm text-[#1F2937] mb-3">
-            {featuredDeal.description}
-          </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => navigate(createPageUrl("AIDealFinderAnalysis"), {
-                state: {
-                  product: {
-                    name: featuredDeal.name,
-                    image: featuredDeal.image,
-                    price: featuredDeal.price,
-                    store: "Amazon",
-                    storeLogo: "https://logo.clearbit.com/amazon.com",
-                    availability: "In Stock"
+            <p className="text-sm text-[#1F2937] mb-3">
+              {featuredDeal.description}
+            </p>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => navigate(createPageUrl("AIDealFinderAnalysis"), {
+                  state: {
+                    product: {
+                      name: featuredDeal.name,
+                      image: featuredDeal.image,
+                      price: featuredDeal.price,
+                      store: "Amazon",
+                      storeLogo: "https://logo.clearbit.com/amazon.com",
+                      availability: "In Stock"
+                    }
                   }
-                }
-              })}
-              className="flex-1 py-2.5 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1F2937]"
-            >
-              View Analysis
-            </button>
-            <button className="flex-1 py-2.5 bg-[#00A36C] text-white rounded-full text-sm font-semibold">
-              Save Deal
-            </button>
+                })}
+                className="flex-1 py-2.5 bg-white border border-[#E5E7EB] rounded-full text-sm font-semibold text-[#1F2937]"
+              >
+                View Analysis
+              </button>
+              <button className="flex-1 py-2.5 bg-[#00A36C] text-white rounded-full text-sm font-semibold">
+                Save Deal
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Best Value Right Now */}
         <div>
-          <h2 className="text-lg font-bold text-[#1F2937] mb-2">
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">
             Best Value Right Now
           </h2>
-          <p className="text-sm text-[#6B7280] mb-4">
-            High quality products priced well below their market average
-          </p>
           <div className="space-y-3">
             {bestValueDeals.map((deal, idx) => (
-              <div
-                key={idx}
-                className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
-                    <img
-                      src={deal.image}
-                      alt={deal.name}
-                      className="w-full h-full object-contain p-2"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-bold text-[#1F2937] mb-1">
-                      {deal.name}
-                    </h3>
-                    <p className="text-lg font-bold text-[#1F2937] mb-1">
-                      {deal.price}
-                    </p>
-                    <p className="text-xs text-[#6B7280]">{deal.discount}</p>
-                  </div>
-                  <span className="px-2.5 py-1 bg-[#D1FAE5] text-[#065F46] text-xs font-semibold rounded">
-                    {deal.badge}
-                  </span>
+              <div key={idx} className="flex items-center gap-3">
+                <div className="w-20 h-20 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                  <img
+                    src={deal.image}
+                    alt={deal.name}
+                    className="w-full h-full object-contain p-2"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xs font-semibold text-[#1F2937] mb-0.5">
+                    {deal.name}
+                  </h3>
+                  <p className="text-sm font-bold text-[#1F2937] mb-0.5">
+                    {deal.price}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">{deal.discount}</p>
                 </div>
               </div>
             ))}
@@ -216,34 +188,35 @@ export default function AIDealFinder() {
 
         {/* Recently Dropped in Price */}
         <div>
-          <h2 className="text-lg font-bold text-[#1F2937] mb-4">
+          <h2 className="text-base font-bold text-[#1F2937] mb-3">
             Recently Dropped in Price
           </h2>
-          <div className="space-y-3">
+          <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
             {recentlyDropped.map((item, idx) => (
-              <div
-                key={idx}
-                className="bg-white border border-[#E5E7EB] rounded-xl p-3 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+              <div key={idx} className="flex-shrink-0" style={{ width: '130px' }}>
+                <div className="relative">
+                  <div className="w-full h-32 rounded-xl bg-[#F9FAFB] flex items-center justify-center mb-2">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-full h-full object-contain p-2"
+                      className="w-full h-full object-contain p-3"
                     />
+                    <span className="absolute top-2 left-2 px-2 py-1 bg-[#00A36C] text-white text-xs font-semibold rounded">
+                      {item.discount}
+                    </span>
+                    <button className="absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center">
+                      <svg className="w-4 h-4 text-[#6B7280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-[#1F2937] mb-1">
-                      {item.name}
-                    </h3>
-                    <p className="text-lg font-bold text-[#1F2937]">
-                      {item.price}
-                    </p>
-                  </div>
-                  <span className="text-sm font-semibold text-[#00A36C]">
-                    {item.discount}
-                  </span>
+                  <p className="text-xs font-semibold text-[#1F2937] mb-0.5 line-clamp-2">
+                    {item.name}
+                  </p>
+                  <p className="text-sm font-bold text-[#1F2937] mb-0.5">
+                    {item.price}
+                  </p>
+                  <p className="text-xs text-[#6B7280]">Brand Name</p>
                 </div>
               </div>
             ))}

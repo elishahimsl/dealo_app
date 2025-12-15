@@ -41,6 +41,7 @@ import EditProfile from './pages/EditProfile';
 import AIDealFinder from './pages/AIDealFinder';
 import AIDealFinderAnalysis from './pages/AIDealFinderAnalysis';
 import CompareStores from './pages/CompareStores';
+import CompareStoresResults from './pages/CompareStoresResults';
 import __Layout from './Layout.jsx';
 
 
@@ -88,6 +89,7 @@ export const PAGES = {
     "AIDealFinder": AIDealFinder,
     "AIDealFinderAnalysis": AIDealFinderAnalysis,
     "CompareStores": CompareStores,
+    "CompareStoresResults": CompareStoresResults,
 }
 
 export const pagesConfig = {

@@ -571,20 +571,20 @@ Analyze both products considering these weighted priorities and determine the wi
                     <span className={getSliderLabel(qualityPreference[0]).position === 'high' ? 'text-[#1F2937] font-semibold' : 'text-[#6B7280]'}>High</span>
                   </div>
                 </div>
-              </div>
-            </div>
+                </div>
+                </div>
+                </div>
 
-            <div className="px-6 pb-6 pt-2 border-t border-[#E5E7EB]">
-              <Button 
+                <div className="px-6 pb-6 pt-4 border-t border-[#E5E7EB]">
+                <Button 
                 onClick={() => setShowPreferences(false)}
                 className="w-full h-12 rounded-2xl bg-[#00A36C] hover:bg-[#007E52] text-white font-semibold"
-              >
+                >
                 Apply
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+                </Button>
+                </div>
+                </div>
+                )}
 
       {/* Saved Products Sheet */}
       {showSavedSheet && (

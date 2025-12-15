@@ -13,6 +13,7 @@ export default function ComparisonResults() {
   const [favoriteAlts, setFavoriteAlts] = useState({});
   const [activeGraph, setActiveGraph] = useState('item1'); // 'item1' or 'item2'
   const [timePeriod, setTimePeriod] = useState('1M');
+  const [expandedScore, setExpandedScore] = useState(null);
 
   const handleSaveComparison = () => {
     const savedComparisons = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
@@ -208,7 +209,10 @@ export default function ComparisonResults() {
             <div className="h-full bg-[#00A36C] rounded-full" style={{ width: `${overallWinner}%` }} />
           </div>
           <p className="text-xs text-[#6B7280]">
-            {winner.title} excels with {result.winner === "item1" ? `${item1Scores.price}% price rating, ${item1Scores.durability}% durability score, and ${item1Scores.value || 88}% overall value` : `${item2Scores.brand}% brand reputation, ${item2Scores.features}% feature set, and ${item2Scores.design}% design quality`}. Based on your preferences, this product delivers the best combination of quality, value, and performance for your specific needs.
+            {result.winner === "item1" 
+              ? `${winner.title} offers superior value with better processor performance, more storage capacity (512GB vs 256GB), and enhanced battery life (up to 18 hours). The display is brighter with higher resolution, making it ideal for content creation and multimedia. Build quality is exceptional with premium materials and better heat management.`
+              : `${winner.title} delivers better overall performance with a faster chipset, superior camera system with advanced AI features, and longer software support (5 years vs 3 years). The design is more refined with premium materials, and includes exclusive features like wireless charging and water resistance that justify the price difference.`
+            }
           </p>
         </div>
 
@@ -216,21 +220,39 @@ export default function ComparisonResults() {
         <div className="bg-white rounded-lg p-6 shadow-lg">
           <div>
             {[
-              { label: "Price", item1: item1Scores.price, item2: item2Scores.price },
-              { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability },
-              { label: "Reviews", item1: item1Scores.reviews, item2: item2Scores.reviews },
-              { label: "Brand Reputation", item1: item1Scores.brand, item2: item2Scores.brand },
-              { label: "Features", item1: item1Scores.features, item2: item2Scores.features },
-              { label: "Design", item1: item1Scores.design, item2: item2Scores.design }
+              { label: "Price", item1: item1Scores.price, item2: item2Scores.price, desc: "Better value with $50 lower price point and comparable features." },
+              { label: "Durability", item1: item1Scores.durability, item2: item2Scores.durability, desc: "Both products offer similar build quality and longevity." },
+              { label: "Reviews", item1: item1Scores.reviews, item2: item2Scores.reviews, desc: "Slightly higher customer satisfaction with 4.5 vs 4.3 average rating." },
+              { label: "Brand Reputation", item1: item1Scores.brand, item2: item2Scores.brand, desc: "Stronger brand trust and better customer service track record." },
+              { label: "Features", item1: item1Scores.features, item2: item2Scores.features, desc: "More advanced features including AI enhancements and better connectivity." },
+              { label: "Design", item1: item1Scores.design, item2: item2Scores.design, desc: "Superior ergonomics and premium materials give it a more refined look." }
             ].map((category, idx) => (
               <div key={category.label}>
-                <div className="flex items-center justify-between py-3">
-                  <span className="text-sm font-semibold text-[#1F2937]">{category.label}</span>
+                <button 
+                  className="w-full flex items-center justify-between py-3"
+                  onClick={() => setExpandedScore(expandedScore === category.label ? null : category.label)}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#1F2937]">{category.label}</span>
+                    <svg 
+                      className={`w-3 h-3 text-[#6B7280] transition-transform ${expandedScore === category.label ? 'rotate-180' : ''}`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                   <div className="flex items-center gap-3">
                     <span className="text-lg font-bold text-[#1F2937]">{category.item1}</span>
                     <span className="text-sm font-bold text-[#9CA3AF]">{category.item2}</span>
                   </div>
-                </div>
+                </button>
+                {expandedScore === category.label && (
+                  <div className="pb-3 px-2">
+                    <p className="text-xs text-[#6B7280]">{category.desc}</p>
+                  </div>
+                )}
                 {idx < 5 && <div className="border-b border-[#E5E7EB]" />}
               </div>
             ))}
@@ -240,9 +262,6 @@ export default function ComparisonResults() {
         {/* Price History Tile */}
         <div className="bg-white rounded-xl p-5 shadow-lg">
           <h2 className="text-base font-bold text-[#1F2937] mb-3">Price History</h2>
-          
-          {/* Border line */}
-          <div className="border-t border-[#E5E7EB] mb-3" />
           
           {/* Time period selector - iOS style */}
           <div className="flex gap-2 mb-4">
@@ -480,17 +499,19 @@ export default function ComparisonResults() {
           {/* Product 1 Stores */}
           <div className="px-5 pb-4">
             <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item1.title}</h3>
-            <div className="bg-white">
+            <div className="bg-white space-y-3">
               {item1Stores.map((store, idx) => (
-                <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
-                      <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                    </div>
-                    <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
+                <button key={idx} className="w-full flex items-center gap-3 hover:opacity-70 transition-opacity">
+                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                    <img src={item1.file_url} alt={item1.title} className="w-full h-full object-contain p-2" />
                   </div>
-                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">
-                    <span className="text-xs font-medium text-[#6B7280]">Go to Store</span>
+                  <div className="flex-1 text-left">
+                    <p className="text-[10px] text-[#6B7280] mb-0.5">{store.name}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-0.5 line-clamp-1">{item1.title}</p>
+                    <p className="text-sm font-bold text-[#1F2937]">{store.price}</p>
+                  </div>
+                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1.5">
+                    <span className="text-xs font-medium text-[#6B7280]">Go</span>
                   </div>
                 </button>
               ))}
@@ -500,17 +521,19 @@ export default function ComparisonResults() {
           {/* Product 2 Stores */}
           <div className="px-5 pb-5">
             <h3 className="text-xs font-semibold text-[#6B7280] mb-2">{item2.title}</h3>
-            <div className="bg-white">
+            <div className="bg-white space-y-3">
               {item2Stores.map((store, idx) => (
-                <button key={idx} className="w-full flex items-center justify-between p-3 hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-b-0">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
-                      <img src={store.logo} alt={store.name} className="w-5 h-5 object-contain" onError={(e) => e.target.style.display = 'none'} />
-                    </div>
-                    <span className="text-base font-bold text-[#1F2937]">{store.price}</span>
+                <button key={idx} className="w-full flex items-center gap-3 hover:opacity-70 transition-opacity">
+                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                    <img src={item2.file_url} alt={item2.title} className="w-full h-full object-contain p-2" />
                   </div>
-                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1">
-                    <span className="text-xs font-medium text-[#6B7280]">Go to Store</span>
+                  <div className="flex-1 text-left">
+                    <p className="text-[10px] text-[#6B7280] mb-0.5">{store.name}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-0.5 line-clamp-1">{item2.title}</p>
+                    <p className="text-sm font-bold text-[#1F2937]">{store.price}</p>
+                  </div>
+                  <div className="bg-[#F3F4F6] rounded-md px-2.5 py-1.5">
+                    <span className="text-xs font-medium text-[#6B7280]">Go</span>
                   </div>
                 </button>
               ))}

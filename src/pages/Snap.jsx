@@ -421,7 +421,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                 <p className="text-xs font-bold text-[#1F2937]">Strong Deal</p>
               </div>
 
-              <div className="flex-1 space-y-1.5 pr-2">
+              <div className="flex-1 space-y-2 pr-3">
                 {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
                   const label = getScoreLabel(value);
                   const isExpanded = expandedSubscore === key;
@@ -432,9 +432,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                         onClick={() => setExpandedSubscore(isExpanded ? null : key)}
                         className="w-full"
                       >
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-semibold text-[#1F2937] capitalize w-14">{key}</span>
-                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-[#1F2937] capitalize w-16">{key}</span>
+                          <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
                             <div 
                               className="h-full rounded-full"
                               style={{ 
@@ -443,9 +443,9 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                               }}
                             ></div>
                           </div>
-                          <span className="text-[10px] font-bold text-[#1F2937] w-6">{value}</span>
+                          <span className="text-xs font-bold text-[#1F2937] w-7">{value}</span>
                           <span 
-                            className="text-[8px] font-semibold px-1 py-0.5 rounded whitespace-nowrap"
+                            className="text-[9px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
                             style={{ 
                               color: label.color,
                               backgroundColor: `${label.color}15`
@@ -454,7 +454,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                             {label.text}
                           </span>
                           <svg 
-                            className={`w-2.5 h-2.5 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`w-3 h-3 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                             fill="none" 
                             stroke="currentColor" 
                             viewBox="0 0 24 24"
@@ -705,7 +705,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
 
             <div className="space-y-3">
               {result.alternatives?.slice(0, 3).map((alt, idx) => (
-                <div key={idx} className="flex items-center gap-3">
+                <div key={idx} className="flex items-start gap-3">
                   <div className="w-20 h-20 rounded-xl bg-[#F9FAFB] flex items-center justify-center overflow-hidden flex-shrink-0">
                     <img 
                       src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
@@ -713,19 +713,27 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
-                    <p className="text-xs font-semibold text-[#1F2937] mb-2 line-clamp-2">{alt.name}</p>
-                    <div className="inline-block px-2 py-1 bg-[#D6F5E9] border border-[#00A36C] rounded mb-1">
-                      <span className="text-[9px] font-semibold text-[#00A36C]">
+                  <div className="flex-1 min-w-0 flex items-start gap-2">
+                    <div className="flex-1">
+                      <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
+                      <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-block text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded mb-1">
                         {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
                       </span>
-                    </div>
-                    <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                      <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
-                      <span className="text-[8px] text-[#6B7280]">(17.3k)</span>
+                      <p className="text-xs font-semibold text-[#1F2937] mb-0.5 text-right" style={{ maxWidth: '100px', wordWrap: 'break-word' }}>
+                        {alt.name.split(' ').reduce((acc, word, i, arr) => {
+                          if (i < 4) return acc + (i > 0 ? ' ' : '') + word;
+                          if (i === 4) return acc + '...';
+                          return acc;
+                        }, '')}
+                      </p>
+                      <div className="flex items-center gap-1 justify-end">
+                        <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                        <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
+                        <span className="text-[8px] text-[#6B7280]">(17.3k)</span>
+                      </div>
                     </div>
                   </div>
                 </div>

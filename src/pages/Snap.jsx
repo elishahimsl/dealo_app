@@ -347,16 +347,16 @@ Be specific and accurate. If you cannot identify the exact product, provide your
             >
               <ChevronLeft className="w-6 h-6 text-[#1F2937]" />
             </button>
-            <button className="flex flex-col gap-1 p-2">
-              <div className="w-5 h-0.5 bg-[#1F2937]" />
-              <div className="w-5 h-0.5 bg-[#1F2937]" />
-              <div className="w-5 h-0.5 bg-[#1F2937]" />
+            <button className="flex flex-col gap-0.5 p-1">
+              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
+              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
+              <div className="w-3.5 h-0.5 bg-[#1F2937]" />
             </button>
           </div>
 
-          <div className="flex gap-4 mb-5">
+          <div className="flex gap-3 mb-5">
             {/* Large Product Image */}
-            <div className="w-32 h-32 bg-[#F9FAFB] rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-40 h-40 bg-[#F9FAFB] rounded-xl flex items-center justify-center flex-shrink-0">
               <img
                 src={result.product_image_url || result.file_url}
                 alt={result.title}
@@ -366,16 +366,11 @@ Be specific and accurate. If you cannot identify the exact product, provide your
 
             {/* Product Info */}
             <div className="flex-1">
-              <h1 className="text-lg font-bold text-[#1F2937] mb-2 leading-tight">{result.title}</h1>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-[#6B7280] px-2 py-1 bg-[#F3F4F6] rounded">
-                  {result.keywords?.[0] || 'Tech'}
-                </span>
-                <button className="text-xs text-[#00A36C] font-semibold flex items-center gap-1">
-                  <Send className="w-3.5 h-3.5" />
-                  Share
-                </button>
-              </div>
+              <p className="text-[10px] text-[#6B7280] mb-1">{result.brand}</p>
+              <h1 className="text-sm font-bold text-[#1F2937] mb-2 leading-tight">{result.title}</h1>
+              <button className="text-[10px] text-[#1F2937] font-semibold px-2 py-1 bg-[#F3F4F6] rounded-full">
+                Share
+              </button>
             </div>
           </div>
         </div>
@@ -399,50 +394,65 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           </div>
 
           {/* Deal Score */}
-          <div className="mb-5">
+          <div className="mb-5 bg-white border border-[#E5E7EB] rounded-xl p-4">
             <h2 className="text-base font-bold text-[#1F2937] mb-3">Deal Score</h2>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative">
-                <svg className="w-20 h-20 transform -rotate-90">
-                  <circle cx="40" cy="40" r="36" fill="none" stroke="#F3F4F6" strokeWidth="8" />
-                  <circle 
-                    cx="40" cy="40" r="36" 
-                    fill="none" 
-                    stroke="#00A36C" 
-                    strokeWidth="8"
-                    strokeDasharray={`${2 * Math.PI * 36 * (result.overall_score / 100)} ${2 * Math.PI * 36}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-[#1F2937]">{result.overall_score}</span>
-                  <span className="text-[9px] text-[#6B7280]">/100</span>
+            <div className="flex gap-4 mb-4">
+              <div className="flex flex-col items-center">
+                <div className="relative mb-2">
+                  <svg className="w-20 h-20 transform -rotate-90">
+                    <circle cx="40" cy="40" r="36" fill="none" stroke="#F3F4F6" strokeWidth="8" />
+                    <circle 
+                      cx="40" cy="40" r="36" 
+                      fill="none" 
+                      stroke="#00A36C" 
+                      strokeWidth="8"
+                      strokeDasharray={`${2 * Math.PI * 36 * (result.overall_score / 100)} ${2 * Math.PI * 36}`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-bold text-[#1F2937]">{result.overall_score}</span>
+                    <span className="text-[9px] text-[#6B7280]">/100</span>
+                  </div>
                 </div>
+                <p className="text-sm font-bold text-[#1F2937]">Strong Deal</p>
               </div>
-              <div className="flex-1">
-                <p className="text-base font-bold text-[#1F2937] mb-0.5">Strong Deal</p>
-                <p className="text-xs text-[#6B7280]">Quality • Price • Reviews</p>
-              </div>
-            </div>
 
-            {/* Subscores */}
-            <div className="space-y-3">
-              {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
-                const label = getScoreLabel(value);
-                const isExpanded = expandedSubscore === key;
+              <div className="flex-1 space-y-2">
+                {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
+                  const label = getScoreLabel(value);
+                  const isExpanded = expandedSubscore === key;
 
-                return (
-                  <div key={key} className="border border-[#E5E7EB] rounded-lg p-3">
-                    <button 
-                      onClick={() => setExpandedSubscore(isExpanded ? null : key)}
-                      className="w-full"
-                    >
-                      <div className="flex items-center justify-between mb-2">
+                  return (
+                    <div key={key}>
+                      <button 
+                        onClick={() => setExpandedSubscore(isExpanded ? null : key)}
+                        className="w-full"
+                      >
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-[#1F2937] capitalize">{key}</span>
+                          <span className="text-xs font-semibold text-[#1F2937] capitalize w-16">{key}</span>
+                          <div className="h-1 bg-[#F3F4F6] rounded-full overflow-hidden flex-1">
+                            <div 
+                              className="h-full rounded-full"
+                              style={{ 
+                                width: `${value}%`,
+                                backgroundColor: label.color
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-bold text-[#1F2937] w-8">{value}</span>
+                          <span 
+                            className="text-[10px] font-semibold px-1.5 py-0.5 rounded whitespace-nowrap"
+                            style={{ 
+                              color: label.color,
+                              backgroundColor: `${label.color}15`
+                            }}
+                          >
+                            {label.text}
+                          </span>
                           <svg 
-                            className={`w-4 h-4 text-[#6B7280] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            className={`w-3 h-3 text-[#6B7280] transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
                             fill="none" 
                             stroke="currentColor" 
                             viewBox="0 0 24 24"
@@ -450,106 +460,112 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-[#1F2937]">{value}</span>
-                          <span 
-                            className="text-xs font-semibold px-2 py-0.5 rounded"
-                            style={{ 
-                              color: label.color,
-                              backgroundColor: `${label.color}15`
-                            }}
-                          >
-                            {label.text} ✓
-                          </span>
-                        </div>
-                      </div>
-                      <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all"
-                          style={{ 
-                            width: `${value}%`,
-                            backgroundColor: label.color
-                          }}
-                        ></div>
-                      </div>
-                    </button>
+                      </button>
 
-                    {isExpanded && (
-                      <div className="mt-3 pt-3 border-t border-[#E5E7EB]">
-                        <p className="text-xs text-[#6B7280] leading-relaxed">
-                          {key === 'price' && 'Price is well below market average, offering excellent value for this product category.'}
-                          {key === 'quality' && 'High-quality construction and materials based on verified customer reviews and manufacturer specifications.'}
-                          {key === 'durability' && 'Built to last with premium components and solid build quality reported by long-term users.'}
-                          {key === 'features' && 'Comprehensive feature set that matches or exceeds competitors in this price range.'}
-                          {key === 'design' && 'Modern, ergonomic design praised by users for both aesthetics and functionality.'}
-                          {key === 'value' && 'Outstanding value proposition considering price, quality, and feature set combined.'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                      {isExpanded && (
+                        <div className="mt-2 pt-2 border-t border-[#E5E7EB] ml-2">
+                          <p className="text-xs text-[#6B7280] leading-relaxed">
+                            {key === 'price' && 'Price is well below market average, offering excellent value for this product category.'}
+                            {key === 'quality' && 'High-quality construction and materials based on verified customer reviews and manufacturer specifications.'}
+                            {key === 'durability' && 'Built to last with premium components and solid build quality reported by long-term users.'}
+                            {key === 'features' && 'Comprehensive feature set that matches or exceeds competitors in this price range.'}
+                            {key === 'design' && 'Modern, ergonomic design praised by users for both aesthetics and functionality.'}
+                            {key === 'value' && 'Outstanding value proposition considering price, quality, and feature set combined.'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* AI Summary */}
-            <div className="mt-4 bg-[#F0FDF4] border border-[#D1FAE5] rounded-lg p-3">
-              <p className="text-xs text-[#1F2937] leading-relaxed">
-                <span className="font-bold">AI Summary:</span> Price is well below market average and maintains strong willingness. More info here.
+            <div className="border-t border-[#E5E7EB] pt-3 mt-3">
+              <p className="text-xs font-bold text-[#1F2937] mb-2">AI Summary</p>
+              <p className="text-xs text-[#6B7280] leading-relaxed">
+                Price is well below market average and maintains strong willingness. More info here.
               </p>
             </div>
-            </div>
+          </div>
 
           {/* Price Intelligence */}
           <div className="mb-5">
-            <h2 className="text-base font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
+            <h2 className="text-lg font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
 
-            <div className="flex gap-3 mb-4">
-              {/* Price History Graph */}
-              <div className="flex-1 p-3 bg-[#F9FAFB] rounded-lg">
-                <p className="text-xs font-semibold text-[#1F2937] mb-2">Price History</p>
-                <div className="flex items-end justify-around h-24">
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '60%'}}></div>
-                    <span className="text-[9px] text-[#6B7280]">90D</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '45%'}}></div>
-                    <span className="text-[9px] text-[#6B7280]">60D</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-full max-w-[30px] bg-[#00A36C] rounded-t mx-auto" style={{height: '75%'}}></div>
-                    <span className="text-[9px] text-[#6B7280]">30D</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-full max-w-[30px] bg-[#00A36C]/70 rounded-t mx-auto relative" style={{height: '55%'}}>
-                      <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-[#00A36C] whitespace-nowrap">
-                        Now
-                      </span>
-                    </div>
-                    <span className="text-[9px] text-[#6B7280]">1Y</span>
+            <div className="grid grid-cols-2 gap-3">
+              {/* Price History */}
+              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3">
+                <div className="flex gap-2 mb-3">
+                  <button className="text-[10px] font-semibold px-2 py-1 bg-[#00A36C] text-white rounded">90D</button>
+                  <button className="text-[10px] font-semibold px-2 py-1 text-[#6B7280]">3M</button>
+                  <button className="text-[10px] font-semibold px-2 py-1 text-[#6B7280]">1Y</button>
+                </div>
+                <div className="mb-2">
+                  <p className="text-[9px] text-[#6B7280] mb-1">Price</p>
+                  <svg className="w-full h-24" viewBox="0 0 200 80" preserveAspectRatio="none">
+                    <polyline
+                      fill="none"
+                      stroke="#00A36C"
+                      strokeWidth="2"
+                      points="0,60 50,45 100,55 150,30 200,40"
+                    />
+                  </svg>
+                  <div className="flex justify-between text-[8px] text-[#6B7280]">
+                    <span>23</span>
+                    <span>15</span>
+                    <span>2</span>
                   </div>
                 </div>
-                <div className="text-center mt-2">
-                  <span className="inline-block px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[9px] font-semibold">
-                    Good Time to Buy
-                  </span>
+                <div className="flex gap-2 mb-2">
+                  <div className="flex-1 text-center">
+                    <p className="text-xs font-bold text-[#1F2937]">${bestDeal?.price?.replace(/[^0-9.]/g, '') || '899'}</p>
+                    <p className="text-[9px] text-[#6B7280]">current</p>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <p className="text-xs font-bold text-[#1F2937]">$999</p>
+                    <p className="text-[9px] text-[#6B7280]">average</p>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <p className="text-xs font-bold text-[#1F2937]">$849</p>
+                    <p className="text-[9px] text-[#6B7280]">lowest</p>
+                  </div>
                 </div>
+                <p className="text-[10px] text-center px-2 py-1 bg-[#D6F5E9] text-[#00A36C] rounded-full font-semibold">
+                  Good time to buy
+                </p>
               </div>
 
-              {/* Best Price Box */}
-              <div className="flex-1 p-3 bg-white border-2 border-[#00A36C] rounded-lg">
-                <p className="text-xs font-semibold text-[#1F2937] mb-2">Best Price in Market</p>
-                <div className="w-10 h-10 rounded-lg bg-[#F9FAFB] flex items-center justify-center mb-2">
-                  <img 
-                    src={`https://logo.clearbit.com/${bestDeal?.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
-                    alt={bestDeal?.store}
-                    className="w-6 h-6 object-contain"
-                    onError={(e) => e.target.style.display = 'none'}
-                  />
+              {/* Best Price Vs Market */}
+              <div className="bg-white border border-[#E5E7EB] rounded-xl p-3 relative">
+                <button className="absolute top-3 right-3">
+                  <Heart className="w-4 h-4 text-[#6B7280]" />
+                </button>
+                <div className="flex gap-3 mb-2">
+                  <div className="w-16 h-16 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src={result.product_image_url || result.file_url}
+                      alt={result.title}
+                      className="w-full h-full object-contain p-1"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[9px] text-[#6B7280] mb-0.5">{bestDeal?.store}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{result.title}</p>
+                    <p className="text-sm font-bold text-[#1F2937] mb-0.5">{bestDeal?.price}</p>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-[9px] text-[#1F2937]">{result.rating} ({Math.floor(Math.random() * 500) + 100})</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs font-semibold text-[#1F2937] mb-0.5">{bestDeal?.store}</p>
-                <p className="text-xl font-bold text-[#00A36C] mb-1">{bestDeal?.price}</p>
-                <p className="text-[9px] text-[#6B7280]">Lowest</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[9px] font-semibold px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded-full">-$10 Ave Price</span>
+                  <span className="text-[9px] text-[#00A36C]">In Stock</span>
+                </div>
+                <p className="text-[9px] text-[#6B7280] mb-2 line-clamp-2">Best value for premium quality and features in this category.</p>
+                <button className="w-full py-1.5 bg-[#00A36C] text-white rounded-full text-[10px] font-semibold">
+                  Visit Store
+                </button>
               </div>
             </div>
           </div>

@@ -38,6 +38,7 @@ import StoreNewArrivals from './pages/StoreNewArrivals';
 import SavedComparisons from './pages/SavedComparisons';
 import CompareSearch from './pages/CompareSearch';
 import EditProfile from './pages/EditProfile';
+import AIDealFinder from './pages/AIDealFinder';
 import __Layout from './Layout.jsx';
 
 
@@ -82,6 +83,7 @@ export const PAGES = {
     "SavedComparisons": SavedComparisons,
     "CompareSearch": CompareSearch,
     "EditProfile": EditProfile,
+    "AIDealFinder": AIDealFinder,
 }
 
 export const pagesConfig = {

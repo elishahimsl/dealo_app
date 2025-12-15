@@ -96,7 +96,10 @@ export default function DealScanner() {
             <Cpu className="w-5 h-5 text-[#00A36C]" />
             <span className="text-xs font-semibold text-[#1F2937]">AI Deal Finder</span>
           </button>
-          <button className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center">
+          <button 
+            onClick={() => navigate(createPageUrl("CompareStores"))}
+            className="flex-1 bg-[#E5E7EB] rounded-2xl p-3 flex items-center gap-2 justify-center"
+          >
             <Store className="w-5 h-5 text-[#00A36C]" />
             <span className="text-xs font-semibold text-[#1F2937]">Compare Stores</span>
           </button>

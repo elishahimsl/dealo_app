@@ -1,48 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ChevronLeft, Share2, ChevronDown, MapPin } from "lucide-react";
+import { ChevronLeft, HelpCircle, ChevronDown } from "lucide-react";
 
 export default function CompareStoresResults() {
   const navigate = useNavigate();
   const location = useLocation();
   const product = location.state?.product || {
     name: "Sony WH-1000XM5",
+    brand: "Sony",
     image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200"
   };
 
-  const [sortBy, setSortBy] = useState("price");
-  const [filterInStock, setFilterInStock] = useState(false);
-  const [filterNearby, setFilterNearby] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
+  // Top 5 trusted retailers only
   const stores = [
-    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: 278, inStock: true, type: "Online", distance: null },
-    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: 289, inStock: true, type: "In-store pickup", distance: "2.3 mi" },
-    { name: "Target", logo: "https://logo.clearbit.com/target.com", price: 299, inStock: true, type: "Online", distance: null },
-    { name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", price: 304, inStock: false, type: "Online", distance: null },
-    { name: "B&H Photo", logo: "https://logo.clearbit.com/bhphotovideo.com", price: 312, inStock: true, type: "Online", distance: null },
-    { name: "Costco", logo: "https://logo.clearbit.com/costco.com", price: 329, inStock: true, type: "In-store pickup", distance: "5.8 mi" },
-    { name: "Newegg", logo: "https://logo.clearbit.com/newegg.com", price: 339, inStock: true, type: "Online", distance: null }
+    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", price: 278, inStock: true, shipping: "Free shipping" },
+    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", price: 289, inStock: true, shipping: "Pickup today" },
+    { name: "Target", logo: "https://logo.clearbit.com/target.com", price: 299, inStock: true, shipping: "Free shipping" },
+    { name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", price: 304, inStock: false, shipping: "Online" },
+    { name: "B&H Photo", logo: "https://logo.clearbit.com/bhphotovideo.com", price: 312, inStock: true, shipping: "Free shipping" }
   ];
 
-  const sortedStores = [...stores]
-    .filter(store => !filterInStock || store.inStock)
-    .filter(store => !filterNearby || store.distance)
-    .sort((a, b) => {
-      if (sortBy === "price") return a.price - b.price;
-      if (sortBy === "distance") {
-        if (!a.distance) return 1;
-        if (!b.distance) return -1;
-        return parseFloat(a.distance) - parseFloat(b.distance);
-      }
-      return 0;
-    });
-
-  const bestPrice = Math.min(...stores.map(s => s.price));
-  const bestStore = stores.find(s => s.price === bestPrice);
-  const priceRange = `$${bestPrice} – $${Math.max(...stores.map(s => s.price))}`;
-  const avgPrice = Math.round(stores.reduce((sum, s) => sum + s.price, 0) / stores.length);
+  const lowestPrice = Math.min(...stores.map(s => s.price));
 
   return (
     <div className="min-h-screen bg-white pb-32">
@@ -54,166 +35,105 @@ export default function CompareStoresResults() {
           </button>
           <h1 className="text-base font-semibold text-[#1F2937]">Compare Stores</h1>
           <button>
-            <Share2 className="w-5 h-5 text-[#6B7280]" />
+            <HelpCircle className="w-5 h-5 text-[#6B7280]" />
           </button>
         </div>
       </div>
 
-      {/* Product Header (Sticky) */}
-      <div className="sticky top-[57px] z-10 bg-white border-b border-[#E5E7EB] px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
-            <img src={product.image} alt={product.name} className="w-full h-full object-contain p-1" />
+      {/* Product Header (Context Lock) */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-start gap-4">
+          <div className="w-24 h-24 rounded-xl bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+            <img src={product.image} alt={product.name} className="w-full h-full object-contain p-2" />
           </div>
           <div className="flex-1">
-            <h2 className="text-sm font-semibold text-[#1F2937] line-clamp-2">{product.name}</h2>
-            <p className="text-xs text-[#6B7280]">Prices from {stores.length} stores</p>
+            <p className="text-xs text-[#6B7280] mb-1">{product.brand || "Brand"}</p>
+            <h2 className="text-base font-bold text-[#1F2937] mb-1">{product.name}</h2>
+            {product.variant && (
+              <p className="text-xs text-[#6B7280]">{product.variant}</p>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="px-6 py-6 space-y-6">
-        {/* Best Price Summary */}
-        <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-5">
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-xs text-[#6B7280] mb-1">Lowest Price</p>
-              <p className="text-3xl font-bold text-[#1F2937]">${bestPrice}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <img 
-                src={bestStore.logo} 
-                alt={bestStore.name} 
-                className="h-6 object-contain"
-                onError={(e) => e.target.style.display = 'none'}
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-[#00A36C] font-semibold">In stock</span>
-            <span className="text-[#6B7280]">{bestStore.type}</span>
-          </div>
-          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-            <p className="text-xs text-[#6B7280]">Compared across {stores.length} stores • Updated moments ago</p>
-          </div>
-        </div>
+      <div className="px-6 space-y-6">
+        {/* Primary Store Comparison Section */}
+        <div>
+          <h3 className="text-base font-bold text-[#1F2937] mb-1">Available From Top Retailers</h3>
+          <p className="text-xs text-[#6B7280] mb-4">Showing the most reliable stores with verified pricing.</p>
 
-        {/* Filters & Sorting */}
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 bg-white border border-[#E5E7EB] rounded-full text-xs font-medium text-[#1F2937]"
-          >
-            <option value="price">Price</option>
-            <option value="distance">Distance</option>
-          </select>
-          <button
-            onClick={() => setFilterInStock(!filterInStock)}
-            className={`px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-              filterInStock
-                ? "bg-[#1F2937] text-white"
-                : "bg-white border border-[#E5E7EB] text-[#1F2937]"
-            }`}
-          >
-            In stock only
-          </button>
-          <button
-            onClick={() => setFilterNearby(!filterNearby)}
-            className={`px-3 py-2 rounded-full text-xs font-medium whitespace-nowrap ${
-              filterNearby
-                ? "bg-[#1F2937] text-white"
-                : "bg-white border border-[#E5E7EB] text-[#1F2937]"
-            }`}
-          >
-            Nearby stores
-          </button>
-        </div>
+          <div className="space-y-3">
+            {stores.map((store, idx) => {
+              const isLowest = store.price === lowestPrice;
 
-        {/* Store Comparison List */}
-        <div className="space-y-3">
-          {sortedStores.map((store, idx) => {
-            const isLowest = store.price === bestPrice;
-            const priceDiff = store.price - bestPrice;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white border border-[#E5E7EB] rounded-xl p-4"
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-lg bg-[#F9FAFB] flex items-center justify-center flex-shrink-0">
+                      <img 
+                        src={store.logo} 
+                        alt={store.name} 
+                        className="w-10 h-10 object-contain p-1"
+                        onError={(e) => e.target.style.display = 'none'}
+                      />
+                    </div>
 
-            return (
-              <div
-                key={idx}
-                className={`bg-white border rounded-xl p-4 ${
-                  isLowest ? "border-[#1F2937] bg-[#F9FAFB]" : "border-[#E5E7EB]"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center flex-shrink-0">
-                    <img 
-                      src={store.logo} 
-                      alt={store.name} 
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-sm font-semibold text-[#1F2937]">{store.name}</p>
-                      {isLowest && (
-                        <span className="px-2 py-0.5 bg-[#1F2937] text-white text-xs font-semibold rounded">
-                          Lowest Price
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#1F2937] mb-1">{store.name}</p>
+                      <div className="flex items-center gap-2 text-xs mb-1">
+                        <span className={store.inStock ? "text-[#1F2937]" : "text-[#9CA3AF]"}>
+                          {store.inStock ? "In stock" : "Out of stock"}
                         </span>
-                      )}
+                        {store.inStock && store.shipping && (
+                          <>
+                            <span className="text-[#D1D5DB]">•</span>
+                            <span className="text-[#6B7280]">{store.shipping}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-[#6B7280]">
-                      <span className={store.inStock ? "text-[#00A36C]" : "text-[#EF4444]"}>
-                        {store.inStock ? "In stock" : "Out of stock"}
-                      </span>
-                      <span>•</span>
-                      <span>{store.type}</span>
-                      {store.distance && (
-                        <>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {store.distance}
-                          </span>
-                        </>
+
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-xl font-bold text-[#1F2937]">${store.price}</p>
+                      {isLowest && (
+                        <p className="text-xs text-[#6B7280] mt-0.5">Lowest price</p>
                       )}
+                      <p className="text-xs text-[#9CA3AF] mt-1">Before tax</p>
                     </div>
                   </div>
 
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-lg font-bold text-[#1F2937]">${store.price}</p>
-                    {priceDiff > 0 && (
-                      <p className="text-xs text-[#6B7280]">+${priceDiff}</p>
-                    )}
-                  </div>
+                  <button className="w-full py-2.5 bg-[#1F2937] text-white rounded-lg text-sm font-semibold">
+                    Visit Store
+                  </button>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <p className="text-xs text-[#9CA3AF] text-center mt-4">
+            Stores are ranked by price, availability, and customer trust.
+          </p>
         </div>
 
-        {/* Price Context */}
-        <div className="bg-[#F9FAFB] rounded-xl p-4">
-          <p className="text-xs text-[#6B7280] mb-1">Price range today: {priceRange}</p>
-          <p className="text-xs text-[#6B7280]">Average price: ${avgPrice}</p>
-        </div>
-
-        {/* Store Trust & Info */}
+        {/* Why This Works Section */}
         <div className="border border-[#E5E7EB] rounded-xl overflow-hidden">
           <button
             onClick={() => setShowInfo(!showInfo)}
             className="w-full px-4 py-3 flex items-center justify-between bg-white"
           >
-            <span className="text-sm font-semibold text-[#1F2937]">How prices are compared</span>
+            <span className="text-sm font-semibold text-[#1F2937]">Why These Stores?</span>
             <ChevronDown className={`w-5 h-5 text-[#6B7280] transition-transform ${showInfo ? 'rotate-180' : ''}`} />
           </button>
           {showInfo && (
-            <div className="px-4 py-3 bg-[#F9FAFB] border-t border-[#E5E7EB]">
+            <div className="px-4 py-3 bg-white border-t border-[#E5E7EB]">
               <ul className="space-y-2 text-xs text-[#6B7280]">
-                <li>• Prices pulled from official store listings</li>
-                <li>• Updated regularly throughout the day</li>
-                <li>• Taxes and shipping may vary by location</li>
-                <li>• Availability subject to change</li>
+                <li>• Verified pricing sources from official retailer websites</li>
+                <li>• Trusted retailer list based on customer satisfaction and reliability</li>
+                <li>• Real-time availability checks across all locations</li>
+                <li>• Prices updated regularly to ensure accuracy</li>
               </ul>
             </div>
           )}
@@ -223,11 +143,17 @@ export default function CompareStoresResults() {
       {/* Action Bar (Bottom, Sticky) */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] px-6 py-4 z-30">
         <div className="flex gap-3 max-w-lg mx-auto">
-          <button className="flex-1 py-3 bg-[#1F2937] text-white rounded-full text-sm font-semibold">
-            Go to Best Store
+          <button 
+            onClick={() => navigate(createPageUrl("CompareStores"))}
+            className="flex-1 py-3 bg-[#1F2937] text-white rounded-full text-sm font-semibold"
+          >
+            Change Product
           </button>
-          <button className="flex-1 py-3 bg-white border-2 border-[#E5E7EB] text-[#1F2937] rounded-full text-sm font-semibold">
-            Save Comparison
+          <button 
+            onClick={() => navigate(createPageUrl("CompareStores"))}
+            className="flex-1 py-3 bg-white border-2 border-[#E5E7EB] text-[#1F2937] rounded-full text-sm font-semibold"
+          >
+            Search Another Item
           </button>
         </div>
       </div>

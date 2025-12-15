@@ -17,6 +17,7 @@ export default function Compare() {
   const [showPreferences, setShowPreferences] = useState(false);
   const [showAddOptions, setShowAddOptions] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [showSavedSheet, setShowSavedSheet] = useState(false);
 
   const [pricePreference, setPricePreference] = useState([50]);
   const [qualityPreference, setQualityPreference] = useState([50]);
@@ -45,12 +46,21 @@ export default function Compare() {
     queryFn: () => base44.entities.Capture.list(),
   });
 
-  // Filter products based on search
+  // Featured products for search
+  const featuredProducts = [
+    { id: 'f1', title: 'iPhone 16 Pro', brand: 'Apple', price: '$999', file_url: 'https://images.unsplash.com/photo-1696446702592-006b59370cea?w=200' },
+    { id: 'f2', title: 'Samsung Galaxy S24', brand: 'Samsung', price: '$899', file_url: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=200' },
+    { id: 'f3', title: 'Sony WH-1000XM5', brand: 'Sony', price: '$349', file_url: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200' },
+    { id: 'f4', title: 'Apple AirPods Pro', brand: 'Apple', price: '$249', file_url: 'https://images.unsplash.com/photo-1606841837239-c5a1a4a07af7?w=200' },
+    { id: 'f5', title: 'MacBook Air M2', brand: 'Apple', price: '$1199', file_url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200' },
+  ];
+
+  // Filter featured products based on search
   const filteredProducts = searchQuery.trim() 
-    ? savedProducts.filter(p => 
+    ? featuredProducts.filter(p => 
         p.title?.toLowerCase().includes(searchQuery.toLowerCase())
       )
-    : [];
+    : featuredProducts;
 
   const trendingComparisons = [
     { 
@@ -177,24 +187,75 @@ Analyze both products considering these weighted priorities and determine the wi
         
         {/* Search Bar */}
         <div className="relative">
-          <button
-            onClick={() => navigate(createPageUrl("CompareSearch"))}
-            className="w-full bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-3"
-          >
+          <div className="w-full bg-[#F3F4F6] rounded-full px-4 py-2 flex items-center gap-3">
             <Search className="w-5 h-5 text-[#9CA3AF]" />
-            <span className="flex-1 text-left text-sm text-[#9CA3AF]">Search a product to compare...</span>
-          </button>
+            <input
+              type="text"
+              placeholder="Search a product to compare..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setShowSearchResults(true);
+              }}
+              onFocus={() => setShowSearchResults(true)}
+              className="flex-1 text-sm text-[#1F2937] bg-transparent outline-none placeholder:text-[#9CA3AF]"
+            />
+            {searchQuery && (
+              <button onClick={() => { setSearchQuery(""); setShowSearchResults(false); }}>
+                <X className="w-4 h-4 text-[#6B7280]" />
+              </button>
+            )}
+          </div>
 
+          {/* Search Results Dropdown */}
+          {showSearchResults && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setShowSearchResults(false)} />
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-[#E5E7EB] max-h-80 overflow-y-auto z-40">
+                {filteredProducts.length > 0 ? (
+                  <div className="p-2">
+                    {filteredProducts.map((product) => (
+                      <button
+                        key={product.id}
+                        onClick={() => {
+                          const itemData = {
+                            title: product.title,
+                            price: product.price,
+                            brand: product.brand,
+                            file_url: product.file_url
+                          };
+                          if (!item1) setItem1(itemData);
+                          else if (!item2) setItem2(itemData);
+                          setSearchQuery("");
+                          setShowSearchResults(false);
+                        }}
+                        className="w-full flex items-center gap-3 p-3 hover:bg-[#F9FAFB] rounded-xl transition-colors"
+                      >
+                        <div className="w-12 h-12 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                          <img src={product.file_url} alt={product.title} className="w-full h-full object-contain p-1" />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-semibold text-[#1F2937]">{product.title}</p>
+                          <p className="text-xs text-[#6B7280]">{product.brand} • {product.price}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-sm text-[#6B7280]">
+                    No products found
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
       <div className="px-6 space-y-6">
         {/* Trending Comparisons */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-bold text-[#1F2937]">Trending Comparisons</h2>
-            <button className="text-xs font-semibold text-[#00A36C]">View All</button>
-          </div>
+          <h2 className="text-sm font-bold text-[#1F2937] mb-3">Trending Comparisons</h2>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {trendingComparisons.map((comp, idx) => (
               <button 
@@ -525,6 +586,71 @@ Analyze both products considering these weighted priorities and determine the wi
         </div>
       )}
 
+      {/* Saved Products Sheet */}
+      {showSavedSheet && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowSavedSheet(false)}>
+          <div 
+            className="bg-white rounded-t-3xl w-full overflow-hidden" 
+            style={{ height: '70vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-center py-3">
+              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+            </div>
+
+            <div className="px-6 pb-3">
+              <h2 className="text-base font-bold text-[#1F2937] mb-1">Saved Products</h2>
+              <p className="text-xs text-[#6B7280]">Choose a product to compare</p>
+            </div>
+            
+            <div className="overflow-y-auto px-6 pb-6" style={{ height: 'calc(70vh - 80px)' }}>
+              {savedProducts.length > 0 ? (
+                <div className="space-y-3">
+                  {savedProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      onClick={() => {
+                        const itemData = {
+                          title: product.title,
+                          price: product.ai_summary || "$999",
+                          brand: product.keywords?.[0] || "Brand",
+                          file_url: product.file_url
+                        };
+                        if (selectedSlot === 1) setItem1(itemData);
+                        else setItem2(itemData);
+                        setShowSavedSheet(false);
+                      }}
+                      className="w-full flex items-center gap-3 p-3 bg-white border border-[#E5E7EB] rounded-xl hover:bg-[#F9FAFB] transition-colors"
+                    >
+                      <div className="w-16 h-16 rounded-lg bg-[#F3F4F6] flex items-center justify-center flex-shrink-0">
+                        <img src={product.file_url} alt={product.title} className="w-full h-full object-contain p-2" />
+                      </div>
+                      <div className="flex-1 text-left">
+                        <p className="text-sm font-semibold text-[#1F2937] line-clamp-2">{product.title}</p>
+                        <p className="text-xs text-[#6B7280]">{product.keywords?.[0] || 'Product'}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <p className="text-sm text-[#6B7280] mb-4">No saved products yet</p>
+                  <Button 
+                    onClick={() => {
+                      setShowSavedSheet(false);
+                      navigate(createPageUrl("Snap"));
+                    }}
+                    className="bg-[#00A36C] hover:bg-[#007E52] text-white"
+                  >
+                    Scan Product
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Product Options Modal */}
       {showAddOptions && (
         <div>
@@ -604,7 +730,7 @@ Analyze both products considering these weighted priorities and determine the wi
               <button
                 onClick={() => {
                   setShowAddOptions(false);
-                  navigate(createPageUrl("CompareSearch") + `?slot=${selectedSlot}`);
+                  setShowSavedSheet(true);
                 }}
                 className="w-full py-2 px-3 hover:bg-[#F9FAFB] rounded-xl transition-colors flex items-center gap-3 text-left"
               >

@@ -713,27 +713,19 @@ Be specific and accurate. If you cannot identify the exact product, provide your
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="flex-1 min-w-0 flex items-start gap-2">
-                    <div className="flex-1">
-                      <p className="text-[10px] text-[#6B7280]">{alt.store}</p>
-                      <p className="text-xs font-bold text-[#1F2937] mb-0.5">{alt.price}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="inline-block text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded mb-1">
-                        {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
-                      </span>
-                      <p className="text-xs font-semibold text-[#1F2937] mb-0.5 text-right" style={{ maxWidth: '100px', wordWrap: 'break-word' }}>
-                        {alt.name.split(' ').reduce((acc, word, i, arr) => {
-                          if (i < 4) return acc + (i > 0 ? ' ' : '') + word;
-                          if (i === 4) return acc + '...';
-                          return acc;
-                        }, '')}
-                      </p>
-                      <div className="flex items-center gap-1 justify-end">
-                        <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
-                        <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
-                        <span className="text-[8px] text-[#6B7280]">(17.3k)</span>
-                      </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-[#6B7280] mb-0.5">{alt.store}</p>
+                    <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2">{alt.name}</p>
+                    <p className="text-xs font-bold text-[#1F2937]">{alt.price}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <span className="inline-block text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded mb-1">
+                      {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium'}
+                    </span>
+                    <div className="flex items-center gap-1 justify-end mt-1">
+                      <Star className="w-2.5 h-2.5 text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-[9px] text-[#1F2937]">4.{idx + 2}</span>
+                      <span className="text-[8px] text-[#6B7280]">(17.3k)</span>
                     </div>
                   </div>
                 </div>

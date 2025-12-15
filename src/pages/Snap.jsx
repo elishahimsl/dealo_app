@@ -14,7 +14,7 @@ export default function Snap() {
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState('identify');
   const [scanningPhrase, setScanningPhrase] = useState('Detecting your item...');
-  const [activeSection, setActiveSection] = useState('overview');
+  const [expandedSubscore, setExpandedSubscore] = useState(null);
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -320,7 +320,7 @@ Be specific and accurate. If you cannot identify the exact product, provide your
     setScanning(false);
   };
 
-  // Result View - Premium App Store-ready design
+  // Result View - Mockup-based design
   if (result) {
     // Find best price
     const bestDeal = result.online_deals?.reduce((min, deal) => {
@@ -329,12 +329,19 @@ Be specific and accurate. If you cannot identify the exact product, provide your
       return price < minPrice ? deal : min;
     }, result.online_deals[0]);
 
+    const getScoreLabel = (score) => {
+      if (score >= 80) return { text: 'Very Good', color: '#00A36C' };
+      if (score >= 60) return { text: 'Good', color: '#00A36C' };
+      if (score >= 40) return { text: 'Fair', color: '#F59E0B' };
+      return { text: 'Poor', color: '#EF4444' };
+    };
+
     return (
-      <div className="min-h-screen bg-[#F9FAFB]">
-        {/* Header Section - Above the Fold */}
+      <div className="min-h-screen bg-white">
+        {/* Header */}
         <div className="relative">
-          {/* Large Product Image */}
-          <div className="h-72 bg-white flex items-center justify-center">
+          {/* Product Image */}
+          <div className="h-64 bg-white flex items-center justify-center p-8">
             <img
               src={result.product_image_url || result.file_url}
               alt={result.title}
@@ -346,446 +353,359 @@ Be specific and accurate. If you cannot identify the exact product, provide your
           <div className="absolute top-0 left-0 right-0 px-4 py-3 flex items-center justify-between">
             <button 
               onClick={() => { setResult(null); startCamera(); }}
-              className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm"
+              className="w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center"
             >
               <ChevronLeft className="w-5 h-5 text-[#1F2937]" />
             </button>
-            <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm">
+            <button className="w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center">
               <Send className="w-5 h-5 text-[#1F2937]" />
             </button>
           </div>
         </div>
 
-        {/* DECISION ZONE */}
-        <div className="px-5 pt-5">
-          {/* Product Info & Score Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex-1">
-                <h1 className="text-xl font-bold text-[#1F2937] mb-1 leading-tight">
-                  {result.title}
-                </h1>
-                <p className="text-sm text-[#6B7280] mb-2">{result.brand}</p>
-                <span className="inline-block px-2.5 py-1 bg-[#F3F4F6] rounded-full text-xs font-medium text-[#6B7280]">
-                  {result.keywords?.[0] || 'Product'}
-                </span>
+        {/* Content */}
+        <div className="px-5 pb-24">
+          {/* Product Title */}
+          <div className="mb-4">
+            <h1 className="text-xl font-bold text-[#1F2937] mb-2">{result.title}</h1>
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-1">
+                <span className="text-base font-semibold text-[#1F2937]">{result.rating}</span>
+                <Star className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" />
               </div>
-
-              {/* DeaLo AI Score */}
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 rounded-full border-3 border-[#00A36C] flex flex-col items-center justify-center mb-1">
-                  <span className="text-2xl font-bold text-[#1F2937] leading-none">{result.overall_score}</span>
-                  <span className="text-[9px] text-[#6B7280]">/ 100</span>
-                </div>
-                <span className="text-[10px] text-[#6B7280] mb-0.5">DeaLo AI Score</span>
-                <span className="text-xs font-semibold text-[#00A36C]">
-                  {result.overall_score >= 80 ? 'Great Value' : result.overall_score >= 60 ? 'Good Time to Buy' : 'Consider Alternatives'}
-                </span>
-              </div>
+              <span className="text-sm text-[#6B7280]">(7,382)</span>
             </div>
-
-            {/* Primary Action Row */}
-            <div className="flex gap-2 pt-3 border-t border-[#F3F4F6]">
-              <button 
-                onClick={() => setShowBestPriceSheet(true)}
-                className="flex-1 h-11 bg-[#00A36C] text-white rounded-full font-semibold text-sm hover:bg-[#007E52] transition-colors"
-              >
-                Best Price
-              </button>
-              <button 
-                onClick={() => storeComparisonRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                className="flex-1 h-11 bg-[#F3F4F6] text-[#1F2937] rounded-full font-semibold text-sm hover:bg-[#E5E7EB] transition-colors"
-              >
-                Compare Stores
-              </button>
-              <button className="w-11 h-11 bg-[#F3F4F6] rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors">
-                <Bookmark className="w-5 h-5 text-[#1F2937]" />
-              </button>
-              <button className="w-11 h-11 bg-[#F3F4F6] rounded-full flex items-center justify-center hover:bg-[#E5E7EB] transition-colors">
-                <Send className="w-5 h-5 text-[#1F2937]" />
-              </button>
-            </div>
-          </div>
-
-        {/* Price Snapshot Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Price Snapshot</h2>
-
-          {/* Price Graph with Labels */}
-          <div className="relative mb-4">
-            {/* Y-axis labels */}
-            <div className="absolute left-0 top-0 text-xs text-[#6B7280]">
-              ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 1.2).toFixed(0)}
-            </div>
-            <div className="absolute left-0 bottom-0 text-xs text-[#6B7280]">
-              ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 0.8).toFixed(0)}
-            </div>
-
-            {/* Graph */}
-            <div className="h-32 bg-[#F9FAFB] rounded-2xl flex items-end justify-around p-4 ml-8">
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '60%'}}></div>
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '45%'}}></div>
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '70%'}}></div>
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '55%'}}></div>
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '80%'}}></div>
-              <div className="w-2 bg-[#00A36C] rounded-t" style={{height: '50%'}}></div>
-              <div className="w-2 bg-[#00A36C]/70 rounded-t relative" style={{height: '65%'}}>
-                <span className="absolute -top-6 -left-3 text-xs font-bold text-[#00A36C]">Now</span>
-              </div>
-            </div>
-
-            {/* X-axis labels */}
-            <div className="flex justify-around text-xs text-[#6B7280] mt-2 ml-8">
-              <span>90D</span>
-              <span>60D</span>
-              <span>30D</span>
-            </div>
-          </div>
-
-          {/* Price Metrics */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="text-center">
-              <p className="text-xs text-[#6B7280] mb-1">Current</p>
-              <p className="text-lg font-bold text-[#1F2937]">{result.price}</p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-[#6B7280] mb-1">Average</p>
-              <p className="text-lg font-bold text-[#1F2937]">
-                ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 1.15).toFixed(0)}
-              </p>
-            </div>
-            <div className="text-center">
-              <p className="text-xs text-[#6B7280] mb-1">Lowest</p>
-              <p className="text-lg font-bold text-[#00A36C]">
-                ${(parseFloat(result.price.replace(/[^0-9.]/g, '')) * 0.85).toFixed(0)}
-              </p>
-            </div>
-          </div>
-
-          {/* Status Badge */}
-          <div className="text-center">
-            <span className="inline-block px-4 py-2 bg-[#D6F5E9] text-[#00A36C] rounded-full text-sm font-semibold">
-              Price is 12% lower than usual
+            <span className="inline-block px-3 py-1 bg-[#F3F4F6] rounded-full text-xs font-medium text-[#6B7280]">
+              {result.keywords?.[0] || 'Tech'}
             </span>
           </div>
-        </div>
-        </div>
 
-        {/* TRUST ZONE */}
-        <div className="px-5">
+          {/* Product Overview */}
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Product Overview</h2>
+            <p className="text-sm text-[#1F2937] leading-relaxed mb-3">
+              {result.description || result.smart_summary}
+            </p>
+            <ul className="space-y-2">
+              {result.features?.slice(0, 4).map((feature, idx) => (
+                <li key={idx} className="text-sm text-[#1F2937] flex items-start gap-2">
+                  <span className="text-[#00A36C] mt-1">•</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        {/* Quality & Trust Breakdown Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Quality & Trust Breakdown</h2>
+          {/* Deal Score */}
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Deal Score</h2>
 
-          <div className="space-y-4">
-            {result.subscores && Object.entries(result.subscores).map(([key, value]) => (
-              <div key={key}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-[#1F2937] capitalize">{key}</span>
-                  <span className="text-sm font-bold text-[#1F2937]">{value}</span>
+            {/* Score Circle */}
+            <div className="flex items-center gap-4 mb-4">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full border-4 border-[#00A36C] flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold text-[#1F2937]">{result.overall_score}</span>
+                  <span className="text-xs text-[#6B7280]">/100</span>
                 </div>
-                <div className="h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-[#00A36C] rounded-full transition-all"
-                    style={{width: `${value}%`}}
-                  ></div>
-                </div>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  {value >= 80 ? 'Excellent performance' : 
-                   value >= 60 ? 'Good performance' : 
-                   'Room for improvement'}
-                </p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pros & Cons Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Pros & Cons</h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Pros */}
-            <div>
-              <h3 className="text-sm font-semibold text-[#00A36C] mb-3">Pros</h3>
-              <ul className="space-y-2">
-                {result.pros?.slice(0, 4).map((pro, idx) => (
-                  <li key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-[#00A36C] flex-shrink-0 mt-0.5" />
-                    <span>{pro}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Cons */}
-            <div>
-              <h3 className="text-sm font-semibold text-[#EF4444] mb-3">Cons</h3>
-              <ul className="space-y-2">
-                {result.cons?.slice(0, 4).map((con, idx) => (
-                  <li key={idx} className="text-xs text-[#1F2937] flex items-start gap-2">
-                    <XIcon className="w-3.5 h-3.5 text-[#EF4444] flex-shrink-0 mt-0.5" />
-                    <span>{con}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Deal Intelligence Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Deal Intelligence</h2>
-
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 bg-[#F0FDF4] rounded-xl">
-              <div className="w-8 h-8 rounded-full bg-[#00A36C] flex items-center justify-center flex-shrink-0">
-                <Check className="w-4 h-4 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1F2937] mb-1">
-                  Price is 12% lower than usual
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  {result.smart_summary}
-                </p>
+              <div>
+                <p className="text-lg font-bold text-[#1F2937]">Strong Deal</p>
+                <p className="text-sm text-[#6B7280]">Great value for money</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-[#FEF3C7] rounded-xl">
-              <div className="w-8 h-8 rounded-full bg-[#F59E0B] flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xs font-bold">!</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1F2937] mb-1">
-                  Often returned due to sizing
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  12% of buyers report size issues
-                </p>
-              </div>
-            </div>
+            {/* Subscores */}
+            <div className="space-y-3">
+              {result.subscores && Object.entries(result.subscores).map(([key, value]) => {
+                const label = getScoreLabel(value);
+                const isExpanded = expandedSubscore === key;
 
-            <div className="flex items-start gap-3 p-3 bg-[#EFF6FF] rounded-xl">
-              <div className="w-8 h-8 rounded-full bg-[#3B82F6] flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-xs font-bold">📊</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1F2937] mb-1">
-                  Price drops every 6-8 weeks
-                </p>
-                <p className="text-xs text-[#6B7280]">
-                  Historical pattern shows regular discounts
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div>
+                return (
+                  <div key={key} className="border border-[#E5E7EB] rounded-lg p-3">
+                    <button 
+                      onClick={() => setExpandedSubscore(isExpanded ? null : key)}
+                      className="w-full"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-[#1F2937] capitalize">{key}</span>
+                          <svg 
+                            className={`w-4 h-4 text-[#6B7280] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                            fill="none" 
+                            stroke="currentColor" 
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-[#1F2937]">{value}</span>
+                          <span 
+                            className="text-xs font-semibold px-2 py-0.5 rounded"
+                            style={{ 
+                              color: label.color,
+                              backgroundColor: `${label.color}15`
+                            }}
+                          >
+                            {label.text} ✓
+                          </span>
+                        </div>
+                      </div>
+                      <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${value}%`,
+                            backgroundColor: label.color
+                          }}
+                        ></div>
+                      </div>
+                    </button>
 
-        {/* EXPLORE ZONE */}
-        <div className="px-5">
-
-
-
-        {/* Store Comparison Card */}
-        <div ref={storeComparisonRef} className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Available At</h2>
-
-          <div className="space-y-3">
-            {result.online_deals?.map((deal, idx) => {
-              const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
-              const minPrice = Math.min(...prices);
-              const currentPrice = parseFloat(deal.price.replace(/[^0-9.]/g, ''));
-              const isBestPrice = currentPrice === minPrice;
-
-              return (
-                <div 
-                  key={idx}
-                  className={`flex items-center gap-3 p-3 rounded-xl border ${
-                    isBestPrice ? 'border-[#00A36C] bg-[#F0FDF4]' : 'border-[#E5E7EB] bg-[#F9FAFB]'
-                  }`}
-                >
-                  <div className="w-12 h-12 bg-white rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <img 
-                      src={`https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
-                      alt={deal.store}
-                      className="w-8 h-8 object-contain"
-                      onError={(e) => e.target.style.display = 'none'}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#1F2937]">{deal.store}</p>
-                    <p className="text-xs text-[#6B7280]">{result.in_stock ? 'In Stock • Free returns' : 'Check Availability'}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-[#1F2937]">{deal.price}</p>
-                    {isBestPrice && (
-                      <span className="text-[10px] font-semibold text-[#00A36C]">Best Price</span>
+                    {isExpanded && (
+                      <div className="mt-3 pt-3 border-t border-[#E5E7EB]">
+                        <p className="text-xs text-[#6B7280] leading-relaxed">
+                          {key === 'price' && 'Price is well below market average, offering excellent value for this product category.'}
+                          {key === 'quality' && 'High-quality construction and materials based on verified customer reviews and manufacturer specifications.'}
+                          {key === 'durability' && 'Built to last with premium components and solid build quality reported by long-term users.'}
+                          {key === 'features' && 'Comprehensive feature set that matches or exceeds competitors in this price range.'}
+                          {key === 'design' && 'Modern, ergonomic design praised by users for both aesthetics and functionality.'}
+                          {key === 'value' && 'Outstanding value proposition considering price, quality, and feature set combined.'}
+                        </p>
+                      </div>
                     )}
                   </div>
-                  <button className="px-4 py-2 bg-[#1F2937] text-white rounded-full text-xs font-semibold hover:bg-[#374151] transition-colors">
-                    View
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Reviews Summary Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-4">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Reviews</h2>
-
-          <div className="flex items-center gap-4 mb-4">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-[#1F2937]">{result.rating}</div>
-              <div className="flex mt-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-3 h-3 ${i < Math.floor(result.rating) ? 'text-[#F59E0B] fill-[#F59E0B]' : 'text-[#E5E7EB]'}`}
-                  />
-                ))}
-              </div>
+                );
+              })}
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-[#1F2937] mb-2">4,231 reviews</p>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#6B7280] w-16">Positive</span>
-                  <div className="flex-1 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#00A36C]" style={{width: '78%'}}></div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[#6B7280] w-16">Negative</span>
-                  <div className="flex-1 h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#EF4444]" style={{width: '22%'}}></div>
-                  </div>
-                </div>
-              </div>
+
+            {/* AI Summary */}
+            <div className="mt-4 p-3 bg-[#F9FAFB] rounded-lg">
+              <p className="text-xs text-[#6B7280]">
+                <span className="font-semibold text-[#1F2937]">AI Summary:</span> Price is well below market average and maintains strong willingness. More info here.
+              </p>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="bg-[#F0FDF4] rounded-xl p-3 border border-[#D1FAE5]">
-              <p className="text-xs font-semibold text-[#00A36C] mb-1">Common Praise</p>
-              <p className="text-sm text-[#1F2937]">Great quality, excellent value, fast shipping</p>
-            </div>
-            <div className="bg-[#FEF2F2] rounded-xl p-3 border border-[#FECACA]">
-              <p className="text-xs font-semibold text-[#EF4444] mb-1">Common Complaints</p>
-              <p className="text-sm text-[#1F2937]">Sizing runs small, limited color options</p>
-            </div>
-          </div>
-        </div>
+          {/* Price Intelligence */}
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Price Intelligence</h2>
 
-        {/* Alternatives Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-5 mb-6">
-          <h2 className="text-base font-bold text-[#1F2937] mb-4">Alternatives / Best Matches</h2>
-
-          <div className="space-y-3">
-            {result.alternatives?.slice(0, 3).map((alt, idx) => (
-              <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-xl border border-[#F3F4F6]">
-                <div className="w-16 h-16 bg-white rounded-xl overflow-hidden flex-shrink-0">
-                  <img 
-                    src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'} 
-                    alt={alt.name}
-                    className="w-full h-full object-cover"
-                  />
+            {/* Price History Graph */}
+            <div className="relative mb-4 p-4 bg-[#F9FAFB] rounded-lg">
+              <div className="flex items-end justify-around h-32">
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '85%'}}></div>
+                  <span className="text-[10px] text-[#6B7280]">$55</span>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-[#1F2937] mb-1">{alt.name}</p>
-                  <p className="text-xs text-[#6B7280] mb-1">{alt.store}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-[#1F2937]">{alt.price}</span>
-                    <span className="text-[10px] font-semibold text-[#00A36C] px-2 py-0.5 bg-[#D6F5E9] rounded-full">
-                      {idx === 0 ? 'Cheaper' : idx === 1 ? 'Higher Quality' : 'Best Match'}
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '65%'}}></div>
+                  <span className="text-[10px] text-[#6B7280]">$45</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-8 bg-[#00A36C] rounded-t" style={{height: '95%'}}></div>
+                  <span className="text-[10px] text-[#6B7280]">$75</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-8 bg-[#00A36C]/70 rounded-t relative" style={{height: '75%'}}>
+                    <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-semibold text-[#00A36C] whitespace-nowrap">
+                      Current
                     </span>
                   </div>
+                  <span className="text-[10px] font-semibold text-[#00A36C]">$15</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-        </div>
-
-        {/* Best Price Bottom Sheet */}
-        {showBestPriceSheet && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end" onClick={() => setShowBestPriceSheet(false)}>
-          <div 
-            className="bg-white rounded-t-3xl w-full p-6 shadow-2xl animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-center mb-4">
-              <div className="w-10 h-1 bg-[#D1D5DB] rounded-full" />
+              <div className="flex justify-around mt-2">
+                <span className="text-[10px] text-[#6B7280]">90 Days</span>
+                <span className="text-[10px] text-[#6B7280]">60 Days</span>
+                <span className="text-[10px] text-[#6B7280]">30 Days</span>
+                <span className="text-[10px] text-[#6B7280]">1 Yr</span>
+              </div>
+              <div className="text-center mt-3">
+                <span className="inline-block px-3 py-1 bg-[#D6F5E9] text-[#00A36C] rounded-full text-xs font-semibold">
+                  Good Time to Buy
+                </span>
+              </div>
             </div>
 
-            <h2 className="text-lg font-bold text-[#1F2937] mb-4">Best Price Available</h2>
-
-            <div className="bg-[#F0FDF4] rounded-2xl p-5 border-2 border-[#00A36C] mb-4">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-white rounded-xl flex items-center justify-center">
+            {/* Best Price in Market */}
+            <div className="p-4 bg-white border-2 border-[#00A36C] rounded-lg">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-[#1F2937]">Best Price in Market</h3>
+                <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">
+                  Current Lowest
+                </span>
+              </div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 rounded-lg bg-[#F9FAFB] flex items-center justify-center">
                   <img 
                     src={`https://logo.clearbit.com/${bestDeal?.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
                     alt={bestDeal?.store}
-                    className="w-12 h-12 object-contain"
+                    className="w-8 h-8 object-contain"
                     onError={(e) => e.target.style.display = 'none'}
                   />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-[#1F2937]">{bestDeal?.store}</p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Star className="w-3 h-3 text-[#F59E0B] fill-[#F59E0B]" />
-                    <span className="text-xs text-[#6B7280]">4.8 • Trusted seller</span>
-                  </div>
+                  <p className="text-xs text-[#6B7280]">Free shipping • {result.return_policy || '30-day returns'}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold text-[#00A36C]">{bestDeal?.price}</p>
-                  <span className="text-xs text-[#6B7280]">Best price</span>
+                  <p className="text-xl font-bold text-[#00A36C]">{bestDeal?.price}</p>
+                  <p className="text-[10px] text-[#6B7280]">per item</p>
                 </div>
               </div>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#6B7280]">Shipping</span>
-                  <span className="font-semibold text-[#1F2937]">Free delivery</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#6B7280]">Returns</span>
-                  <span className="font-semibold text-[#1F2937]">30-day free returns</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#6B7280]">Arrives</span>
-                  <span className="font-semibold text-[#1F2937]">2-3 business days</span>
-                </div>
-              </div>
-
-              <button className="w-full h-12 bg-[#00A36C] text-white rounded-full font-bold hover:bg-[#007E52] transition-colors">
-                Go to {bestDeal?.store}
+              <button className="w-full py-2.5 bg-[#1F2937] text-white rounded-lg text-sm font-semibold hover:bg-[#374151] transition-colors">
+                View Store
               </button>
+              <p className="text-xs text-[#6B7280] text-center mt-2">
+                Summary: Price is 10% lower than market average
+              </p>
+            </div>
+          </div>
+
+          {/* Store Comparison */}
+          <div ref={storeComparisonRef} className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Store Comparison</h2>
+            <div className="space-y-2">
+              {result.online_deals?.slice(0, 3).map((deal, idx) => {
+                const prices = result.online_deals.map(d => parseFloat(d.price.replace(/[^0-9.]/g, '')));
+                const minPrice = Math.min(...prices);
+                const currentPrice = parseFloat(deal.price.replace(/[^0-9.]/g, ''));
+                const isBest = currentPrice === minPrice;
+
+                return (
+                  <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
+                    <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+                      <img 
+                        src={deal.image_url || `https://logo.clearbit.com/${deal.store.toLowerCase().replace(/[^a-z]/g, '')}.com`}
+                        alt={deal.store}
+                        className="w-8 h-8 object-contain"
+                        onError={(e) => e.target.style.display = 'none'}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#1F2937]">{deal.store}</p>
+                      <p className="text-xs text-[#6B7280]">
+                        {isBest ? 'Free Shipping' : '$15 Shipping'}
+                        {idx === 1 && ' • Free Delivery'}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-base font-bold text-[#1F2937]">{deal.price}</p>
+                      {isBest && (
+                        <span className="text-[10px] font-semibold text-[#00A36C]">Best</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+              View More Stores
+            </button>
+          </div>
+
+          {/* Review Summary */}
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-3">Review Summary</h2>
+            <p className="text-xs text-[#6B7280] mb-3">
+              Based on 1,312 reviews across major retailers (Amazon, Bestbuy, Walmart...)
+            </p>
+
+            <div className="mb-4">
+              <span className="inline-block px-3 py-1.5 bg-[#D6F5E9] text-[#00A36C] rounded-lg text-sm font-semibold mb-3">
+                Mostly Positive
+              </span>
+              <p className="text-sm text-[#1F2937] leading-relaxed mb-3">
+                Most praised: sound quality & comfort compliance. Common battery aging after long term use.
+              </p>
+
+              <div className="p-3 bg-[#F9FAFB] rounded-lg mb-3">
+                <p className="text-xs font-semibold text-[#1F2937] mb-1">Trust Check</p>
+                <p className="text-xs text-[#6B7280]">
+                  Low likelihood of fake/unverified reviews
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[#1F2937]">Quality</span>
+                  <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-xs font-semibold">Positive</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[#1F2937]">Warranty</span>
+                  <span className="px-2 py-0.5 bg-[#FEF3C7] text-[#F59E0B] rounded text-xs font-semibold">Fair</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-[#1F2937]">Style</span>
+                  <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-xs font-semibold">Very Positive</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Alternatives */}
+          <div className="mb-5">
+            <h2 className="text-base font-bold text-[#1F2937] mb-2">Alternatives</h2>
+            <p className="text-xs text-[#6B7280] mb-3">Comparable products with better price, value</p>
+
+            <div className="space-y-3">
+              {result.alternatives?.slice(0, 3).map((alt, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
+                  <div className="w-16 h-16 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src={alt.image_url || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200'}
+                      alt={alt.name}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="px-2 py-0.5 bg-[#E5E7EB] text-[#1F2937] rounded text-[10px] font-semibold">
+                        {alt.store}
+                      </span>
+                      <span className="px-2 py-0.5 bg-[#D6F5E9] text-[#00A36C] rounded text-[10px] font-semibold">
+                        {idx === 0 ? 'Best Value' : idx === 1 ? 'Cheapest' : 'Premium Choice'}
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-[#1F2937] mb-0.5">{alt.name}</p>
+                    <p className="text-xs text-[#6B7280] mb-1">
+                      {idx === 0 && 'Cheaper, similar specs'}
+                      {idx === 1 && 'Light weight, much bigger'}
+                      {idx === 2 && 'Premium sound & comfort'}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-base font-bold text-[#1F2937]">{alt.price}</span>
+                      <div className="flex items-center gap-0.5">
+                        <span className="text-xs text-[#1F2937]">4.{idx + 2}</span>
+                        <Star className="w-3 h-3 text-[#F59E0B] fill-[#F59E0B]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <button 
-              onClick={() => setShowBestPriceSheet(false)}
-              className="w-full text-sm text-[#6B7280] font-medium"
-            >
-              Close
+            <button className="w-full py-2.5 mt-3 bg-white border border-[#E5E7EB] rounded-lg text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors">
+              View all alternatives
             </button>
           </div>
         </div>
-        )}
 
-        <style>{`
-        @keyframes slide-up {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-        `}</style>
+        {/* Bottom Action Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] p-4 z-10">
+          <div className="flex gap-3 max-w-lg mx-auto">
+            <button 
+              onClick={() => { setResult(null); startCamera(); }}
+              className="flex-1 py-3 bg-white border-2 border-[#1F2937] rounded-full text-sm font-semibold text-[#1F2937] hover:bg-[#F9FAFB] transition-colors"
+            >
+              Scan Again
+            </button>
+            <button className="flex-1 py-3 bg-[#1F2937] text-white rounded-full text-sm font-semibold hover:bg-[#374151] transition-colors">
+              Fix Product
+            </button>
+          </div>
+        </div>
         </div>
         );
         }

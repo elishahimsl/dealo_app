@@ -8,6 +8,31 @@ export default function SavedComparisons() {
 
   const savedFromStorage = JSON.parse(localStorage.getItem('savedComparisons') || '[]');
   
+  // Example saved comparisons if no data in storage
+  const exampleComparisons = [
+    {
+      id: 'example1',
+      item1: { title: 'iPhone 16 Pro', file_url: 'https://images.unsplash.com/photo-1696446702592-006b59370cea?w=200', price: '$999', brand: 'Apple' },
+      item2: { title: 'Samsung Galaxy S24', file_url: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=200', price: '$899', brand: 'Samsung' },
+      date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      result: { winner: 'item1', confidence: 85 }
+    },
+    {
+      id: 'example2',
+      item1: { title: 'Sony WH-1000XM5', file_url: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=200', price: '$349', brand: 'Sony' },
+      item2: { title: 'Bose QuietComfort', file_url: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=200', price: '$329', brand: 'Bose' },
+      date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      result: { winner: 'item1', confidence: 78 }
+    },
+    {
+      id: 'example3',
+      item1: { title: 'MacBook Air M2', file_url: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200', price: '$1199', brand: 'Apple' },
+      item2: { title: 'Dell XPS 13', file_url: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=200', price: '$1099', brand: 'Dell' },
+      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      result: { winner: 'item2', confidence: 72 }
+    }
+  ];
+  
   const getTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -24,7 +49,9 @@ export default function SavedComparisons() {
     return `${Math.floor(diffDays / 7)} weeks ago`;
   };
 
-  const savedComparisons = savedFromStorage.map(comp => ({
+  const dataToDisplay = savedFromStorage.length > 0 ? savedFromStorage : exampleComparisons;
+
+  const savedComparisons = dataToDisplay.map(comp => ({
     id: comp.id,
     product1: { name: comp.item1.title, image: comp.item1.file_url },
     product2: { name: comp.item2.title, image: comp.item2.file_url },

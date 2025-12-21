@@ -37,13 +37,13 @@ export default function Discover() {
   ];
 
   const storesAndBrands = [
-    { name: "Amazon", logo: "https://logo.clearbit.com/amazon.com", size: "large" },
-    { name: "Walmart", logo: "https://logo.clearbit.com/walmart.com", size: "medium" },
-    { name: "Apple", logo: "https://logo.clearbit.com/apple.com", size: "small" },
-    { name: "Target", logo: "https://logo.clearbit.com/target.com", size: "large" },
-    { name: "Samsung", logo: "https://logo.clearbit.com/samsung.com", size: "medium" },
-    { name: "Nike", logo: "https://logo.clearbit.com/nike.com", size: "small" },
-    { name: "Best Buy", logo: "https://logo.clearbit.com/bestbuy.com", size: "medium" }
+    { name: "amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg", size: "large" },
+    { name: "walmart", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Walmart_logo.svg", size: "medium" },
+    { name: "apple", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", size: "small" },
+    { name: "target", logo: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Target_logo.svg", size: "large" },
+    { name: "samsung", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg", size: "medium" },
+    { name: "nike", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg", size: "small" },
+    { name: "bestbuy", logo: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Best_Buy_Logo.svg", size: "medium" }
   ];
 
   return (
@@ -114,9 +114,9 @@ export default function Discover() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-2 py-1 flex items-center gap-1">
-                      <BadgeIcon className="w-3 h-3 text-white" />
-                      <span className="text-xs font-semibold text-white">{deal.badge}</span>
+                    <div className="absolute top-2 left-2 bg-[#00A36C] rounded px-1.5 py-0.5 flex items-center gap-1 w-fit">
+                      <BadgeIcon className="w-2.5 h-2.5 text-white" />
+                      <span className="text-[9px] font-semibold text-white whitespace-nowrap">{deal.badge}</span>
                     </div>
                   </div>
                   <p className="text-xs font-semibold text-[#1F2937] line-clamp-2 px-1">{deal.title}</p>
@@ -128,37 +128,28 @@ export default function Discover() {
 
         {/* Smart Tools */}
         <div>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-[#1F2937]">Smart tools</h2>
-            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left shadow-md hover:shadow-xl transition-shadow">
-              <div className="w-10 h-10 rounded-xl bg-[#00A36C]/10 flex items-center justify-center mb-3">
+          <h2 className="text-lg font-bold text-[#1F2937] mb-3">Smart tools</h2>
+          <div className="grid grid-cols-3 gap-2">
+            <button className="bg-[#E8F5F1] rounded-2xl p-3 text-center shadow-md hover:shadow-xl transition-shadow">
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mx-auto">
                 <Zap className="w-5 h-5 text-[#00A36C]" />
               </div>
-              <p className="text-sm font-semibold text-[#1F2937] mb-1">PriceDrop</p>
-              <p className="text-xs text-[#6B7280]">Get notified when prices fall.</p>
             </button>
             <button 
               onClick={() => navigate(createPageUrl("AIDealFinder"))}
-              className="bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left shadow-md hover:shadow-xl transition-shadow"
+              className="bg-[#F0F4F8] rounded-2xl p-3 text-center shadow-md hover:shadow-xl transition-shadow"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#00A36C]/10 flex items-center justify-center mb-3">
-                <Sparkles className="w-5 h-5 text-[#00A36C]" />
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mx-auto">
+                <Sparkles className="w-5 h-5 text-[#6B7280]" />
               </div>
-              <p className="text-sm font-semibold text-[#1F2937] mb-1">DeaLo AI</p>
-              <p className="text-xs text-[#6B7280]">AI-powered deal recommendations.</p>
             </button>
             <button 
               onClick={() => navigate(createPageUrl("DealScanner"))}
-              className="bg-white border border-[#E5E7EB] rounded-2xl p-4 text-left shadow-md hover:shadow-xl transition-shadow"
+              className="bg-[#F8F9FA] rounded-2xl p-3 text-center shadow-md hover:shadow-xl transition-shadow"
             >
-              <div className="w-10 h-10 rounded-xl bg-[#00A36C]/10 flex items-center justify-center mb-3">
-                <Search className="w-5 h-5 text-[#00A36C]" />
+              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mx-auto">
+                <Search className="w-5 h-5 text-[#9CA3AF]" />
               </div>
-              <p className="text-sm font-semibold text-[#1F2937] mb-1">Deal Scanner</p>
-              <p className="text-xs text-[#6B7280]">Discover daily deals and offers.</p>
             </button>
           </div>
         </div>
@@ -182,10 +173,7 @@ export default function Discover() {
                   />
                 </div>
                 <p className="text-xs font-semibold text-[#1F2937] mb-1 line-clamp-2 px-1">{product.name}</p>
-                <div className="flex items-center gap-1 px-1">
-                  <span className="text-xs">{product.categoryIcon}</span>
-                  <span className="text-xs text-[#6B7280]">{product.category}</span>
-                </div>
+                <p className="text-xs text-[#6B7280] px-1">{product.category}</p>
               </div>
             ))}
           </div>

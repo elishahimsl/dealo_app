@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./mobile/*"]
     },
     "jsx": "react-jsx",
     "module": "esnext",
@@ -16,6 +16,6 @@
     "resolveJsonModule": true,
     "types": []
   },
-  "include": ["src/components/**/*.js", "src/pages/**/*.jsx", "src/Layout.jsx"],
-  "exclude": ["node_modules", "dist", "src/vite-plugins", "src/components/ui", "src/api", "src/lib"]
-} 
+  "include": ["mobile/**/*", "vite-plugins/**/*", "*.js", "*.jsx", "*.ts", "*.tsx"],
+  "exclude": ["node_modules", "mobile/node_modules", "dist", "mobile/dist", ".expo"]
+}

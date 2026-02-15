@@ -7,6 +7,7 @@ import { Platform } from 'react-native';
 import { useAccountProfile } from '../_layout';
 
 const { width } = Dimensions.get('window');
+const HALF_TILE_WIDTH = (width - 18 * 2 - 12) / 2;
 
 export default function Account() {
   const router = useRouter();
@@ -27,12 +28,9 @@ export default function Account() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.upgradeHeaderButton} activeOpacity={0.9}>
-            <Ionicons name="rocket-outline" size={18} color="#FFFFFF" />
-            <Text style={styles.upgradeHeaderText}>Upgrade</Text>
-          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Account</Text>
           <View style={styles.headerIcons}>
-            <TouchableOpacity style={styles.notificationButton}>
+            <TouchableOpacity style={styles.notificationButton} onPress={() => router.push('/home/notifications' as any)}>
               <Ionicons name="notifications-outline" size={24} color="#111827" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.settingsButton} onPress={() => router.push('/account/settings' as Href)}>
@@ -42,82 +40,112 @@ export default function Account() {
         </View>
 
         {/* Account Icon and Upgrade */}
-        <View style={styles.accountSection}>
-          <View style={styles.avatarContainer}>
+        <View style={styles.profileHeaderCard}>
+          <View style={styles.profileTopRow}>
             <View style={styles.avatar}>
               {initial ? (
                 <Text style={[styles.avatarInitial, { color: BRAND_GREEN }]}>{initial}</Text>
               ) : (
-                <Ionicons name="person-outline" size={40} color="#111827" />
+                <Ionicons name="person-outline" size={30} color="#111827" />
               )}
             </View>
-          </View>
-        </View>
 
-        {/* Name and Manage Account */}
-        <View style={styles.nameSection}>
-          {hasName ? <Text style={styles.userName}>{userName}</Text> : null}
-          <TouchableOpacity style={styles.manageAccountButton} activeOpacity={0.85} onPress={() => router.push('/account/manageAccount' as Href)}>
-            <Text style={[styles.manageAccountText, { color: BRAND_GREEN }]}>Manage account</Text>
-            <Ionicons name="chevron-forward" size={16} color={BRAND_GREEN} />
-          </TouchableOpacity>
+            <View style={styles.profileMeta}>
+              <Text style={styles.userName}>{hasName ? userName : 'Welcome'}</Text>
+              <TouchableOpacity
+                style={styles.editProfileButton}
+                activeOpacity={0.85}
+                onPress={() => router.push('/account/manageAccount' as Href)}
+              >
+                <Text style={styles.editProfileButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
 
         {/* Standard Member Tile */}
-        <View style={styles.memberTile}>
+        <TouchableOpacity style={styles.memberTile} activeOpacity={0.9} onPress={() => router.push('/account/premium' as Href)}>
           <View style={styles.memberContent}>
-            <Ionicons name="person-outline" size={20} color="#111827" />
+            <Ionicons name="rocket-outline" size={20} color={BRAND_GREEN} />
             <View style={styles.memberText}>
-              <Text style={styles.memberTitle}>Standard member</Text>
+              <Text style={styles.memberTitle}>Upgrade to Premium</Text>
+              <Text style={styles.memberSubtitle}>Unlimited comparisons</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Two Tiles Row */}
-        <View style={styles.twoTilesRow}>
-          <TouchableOpacity style={styles.insightTile}>
+        <View style={[styles.twoTilesRow, styles.twoTilesRowTight]}>
+          <TouchableOpacity style={styles.insightTile} activeOpacity={0.85} onPress={() => router.push('/account/insights' as Href)}>
             <Ionicons name="stats-chart-outline" size={24} color={BRAND_GREEN} />
             <Text style={styles.insightTileText}>Insights</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.recentTile}>
+          <TouchableOpacity style={styles.recentTile} activeOpacity={0.85} onPress={() => router.push('/account/recents' as Href)}>
             <Ionicons name="time-outline" size={24} color="#111827" />
             <Text style={styles.recentTileText}>Recents</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Help Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help</Text>
-          <View style={styles.lineList}>
-            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85}>
-              <Ionicons name="help-circle-outline" size={20} color="#111827" />
-              <Text style={styles.lineText}>Help Center</Text>
-            </TouchableOpacity>
-            <View style={styles.lineDivider} />
-            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85}>
-              <Ionicons name="chatbubble-outline" size={20} color="#111827" />
-              <Text style={styles.lineText}>Contact Support</Text>
-            </TouchableOpacity>
-            <View style={styles.lineDivider} />
-            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85}>
-              <Ionicons name="create-outline" size={20} color="#111827" />
-              <Text style={styles.lineText}>Customer feedback</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.twoTilesRow}>
+          <TouchableOpacity style={styles.savedTile} activeOpacity={0.85} onPress={() => router.push('/home/saved' as Href)}>
+            <Ionicons name="bookmark-outline" size={24} color="#111827" />
+            <Text style={styles.insightTileText}>Saved</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.savedTile}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push({ pathname: '/compare/discoverProducts', params: { returnTo: '/(tabs)/account' } } as unknown as Href)
+            }
+          >
+            <Ionicons name="search" size={24} color="#111827" />
+            <Text style={styles.insightTileText}>Discover</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Benefits Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Benefits</Text>
           <View style={styles.lineList}>
-            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85} onPress={() => router.push('/account/benefits/invite' as Href)}>
               <Ionicons name="share-social-outline" size={20} color="#111827" />
-              <Text style={styles.lineText}>Share DeaLo</Text>
+              <Text style={styles.lineText}>Invite and earn</Text>
             </TouchableOpacity>
             <View style={styles.lineDivider} />
-            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85} onPress={() => router.push('/account/benefits/redeemRewards' as Href)}>
               <Ionicons name="gift-outline" size={20} color="#111827" />
-              <Text style={styles.lineText}>Earn benefits</Text>
+              <Text style={styles.lineText}>Redeem rewards</Text>
+            </TouchableOpacity>
+            <View style={styles.lineDivider} />
+            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85} onPress={() => router.push('/account/benefits/badges' as Href)}>
+              <Ionicons name="ribbon-outline" size={20} color="#111827" />
+              <Text style={styles.lineText}>Earn badges</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Help Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Help</Text>
+          <View style={styles.lineList}>
+            <TouchableOpacity
+              style={styles.lineRow}
+              activeOpacity={0.85}
+              onPress={() => router.push('/account/settings/helpCenter' as Href)}
+            >
+              <Ionicons name="help-circle-outline" size={20} color="#111827" />
+              <Text style={styles.lineText}>Help Center</Text>
+            </TouchableOpacity>
+            <View style={styles.lineDivider} />
+            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85} onPress={() => router.push('/account/contactSupport' as Href)}>
+              <Ionicons name="chatbubble-outline" size={20} color="#111827" />
+              <Text style={styles.lineText}>Contact Support</Text>
+            </TouchableOpacity>
+            <View style={styles.lineDivider} />
+            <TouchableOpacity style={styles.lineRow} activeOpacity={0.85} onPress={() => router.push('/account/customerFeedback' as Href)}>
+              <Ionicons name="create-outline" size={20} color="#111827" />
+              <Text style={styles.lineText}>Customer feedback</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -146,7 +174,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: '800',
     color: '#111827',
     fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
   },
@@ -195,7 +223,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.08,
@@ -204,7 +232,7 @@ const styles = StyleSheet.create({
   },
   avatarInitial: {
     fontSize: 36,
-    fontWeight: '900',
+    fontWeight: '700',
     fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
   },
   upgradeButton: {
@@ -219,49 +247,40 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
   },
-  nameSection: {
-    alignItems: 'center',
+  profileHeaderCard: {
     paddingHorizontal: 18,
-    marginBottom: 24,
+    marginTop: 6,
+    marginBottom: 18,
+  },
+  profileTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  profileMeta: {
+    flex: 1,
+    alignItems: 'flex-start',
   },
   userName: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#111827',
-    marginBottom: 8,
+    marginBottom: 4,
     fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
   },
-  manageAccountButton: {
-    flexDirection: 'row',
+  editProfileButton: {
+    marginTop: 6,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: '#111827',
+    paddingHorizontal: 14,
     alignItems: 'center',
-    paddingVertical: 8,
+    justifyContent: 'center',
   },
-  manageAccountText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
-    marginRight: 8,
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-  },
-  threeTilesRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    marginBottom: 24,
-  },
-  actionTile: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  actionTileText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#6B7280',
-    marginTop: 8,
+  editProfileButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
     fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
   },
   memberTile: {
@@ -272,7 +291,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     marginHorizontal: 18,
-    marginBottom: 24,
+    marginTop: 6,
+    marginBottom: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.06,
@@ -287,6 +307,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   memberText: {
+    marginLeft: 12,
+  },
+  twoTilesRowTight: {
+    marginBottom: 8,
+  },
+  savedTile: {
+    width: HALF_TILE_WIDTH,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    paddingVertical: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#EEF2F7',
+  },
+  nameSection: {
+    alignItems: 'flex-start',
     marginLeft: 12,
   },
   memberTitle: {

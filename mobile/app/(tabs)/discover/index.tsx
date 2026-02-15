@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, FlatList, Dimensions, Image, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, FlatList, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Href, useRouter } from 'expo-router';
@@ -30,65 +30,148 @@ const tools = [
   },
 ];
 
+const mens = [
+  {
+    id: 'm1',
+    brand: 'Nike',
+    product: 'Everyday Hoodie',
+    category: 'Mens',
+    image: 'https://images.unsplash.com/photo-1520975958221-b36dd9b8a6bd?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'm2',
+    brand: 'Adidas',
+    product: 'Running Sneakers',
+    category: 'Mens',
+    image: 'https://images.unsplash.com/photo-1542291026-f7367b8c5c5?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'm3',
+    brand: 'Casio',
+    product: 'Classic Watch',
+    category: 'Mens',
+    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
+const womens = [
+  {
+    id: 'w1',
+    brand: 'Coach',
+    product: 'Everyday Tote',
+    category: 'Womens',
+    image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'w2',
+    brand: 'Uniqlo',
+    product: 'Cozy Sweater',
+    category: 'Womens',
+    image: 'https://images.unsplash.com/photo-1520975958221-b36dd9b8a6bd?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'w3',
+    brand: 'Chanel',
+    product: 'Signature Perfume',
+    category: 'Womens',
+    image: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
+const fashion = [
+  {
+    id: 'f1',
+    brand: 'Zara',
+    product: 'Street Style',
+    category: 'Fashion',
+    image: 'https://images.unsplash.com/photo-1520975958221-b36dd9b8a6bd?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'f2',
+    brand: 'Levi\'s',
+    product: 'Denim Jacket',
+    category: 'Fashion',
+    image: 'https://images.unsplash.com/photo-1520975869017-a7f1f8fefe7b?auto=format&fit=crop&w=1200&q=80',
+  },
+  {
+    id: 'f3',
+    brand: 'H&M',
+    product: 'Fresh Drops',
+    category: 'Fashion',
+    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1200&q=80',
+  },
+];
+
 const interestTiles = [
   {
     id: 'men',
     label: 'Men',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Essentials',
+    icon: 'man-outline' as const,
   },
   {
     id: 'women',
     label: 'Women',
-    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Trending',
+    icon: 'woman-outline' as const,
   },
   {
     id: 'fashion',
     label: 'Fashion',
-    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'New drops',
+    icon: 'shirt-outline' as const,
   },
   {
     id: 'tech',
     label: 'Tech',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Smart picks',
+    icon: 'laptop-outline' as const,
   },
   {
     id: 'health',
     label: 'Health',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Wellness',
+    icon: 'fitness-outline' as const,
   },
   {
     id: 'sports',
     label: 'Sports',
-    image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Gear',
+    icon: 'football-outline' as const,
   },
   {
     id: 'home',
     label: 'Home',
-    image: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Decor',
+    icon: 'home-outline' as const,
   },
   {
     id: 'gifts',
     label: 'Gifts',
-    image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&h=300&q=80&crop=right',
+    subheader: 'Top picks',
+    icon: 'gift-outline' as const,
   },
 ];
 
 const trending = [
   {
     id: 't1',
-    title: 'Smart Fitness\nWatch',
+    brand: 'Apple',
+    product: 'Smart Fitness Watch',
     category: 'Tech',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 't2',
-    title: 'Noise-Cancelling\nEarbuds',
+    brand: 'Sony',
+    product: 'Noise-Cancelling Earbuds',
     category: 'Tech',
     image: 'https://images.unsplash.com/photo-1585386959984-a41552231693?auto=format&fit=crop&w=1200&q=80',
   },
   {
     id: 't3',
-    title: 'Wireless\nVacuum',
+    brand: 'Dyson',
+    product: 'Wireless Vacuum',
     category: 'Home',
     image: 'https://images.unsplash.com/photo-1581578029523-3f5b3c52db64?auto=format&fit=crop&w=1200&q=80',
   },
@@ -123,6 +206,12 @@ export default function Discover() {
   const [logoPage, setLogoPage] = useState(0);
   const router = useRouter();
 
+  const truncate = (text: string, maxLen: number) => {
+    const t = text.trim();
+    if (t.length <= maxLen) return t;
+    return `${t.slice(0, Math.max(0, maxLen - 1))}…`;
+  };
+
   const logoPages = useMemo(() => {
     const pages: (typeof logos)[] = [];
     for (let i = 0; i < logos.length; i += logosPerPage) {
@@ -143,27 +232,86 @@ export default function Discover() {
     }
   };
 
-  const half = useMemo(() => (width - 20 * 2 - 12) / 2, []);
+  const onPressInterest = (id: string) => {
+    if (id === 'men') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Mens', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'women') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Womens', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'fashion') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Fashion', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'tech') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Tech', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'health') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Health', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'sports') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Sports', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'home') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Home', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+    if (id === 'gifts') {
+      router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Gifts', returnTo: '/(tabs)/discover' } } as unknown as Href);
+      return;
+    }
+
+    router.push({ pathname: '/compare/discoverProducts', params: { returnTo: '/(tabs)/discover' } } as unknown as Href);
+  };
+
+  const half = useMemo(() => (width - 20 * 2 - 10) / 2, []);
   const full = useMemo(() => width - 20 * 2, []);
-  const renderTrending = ({ item }: { item: (typeof trending)[number] }) => (
+
+  const logoGap = 12;
+  const logoTileW = useMemo(() => (width - 20 * 2 - logoGap * 2) / 3, []);
+
+  const renderTrending = ({ item }: { item: { id: string; brand: string; product: string; category: string; image: string } }) => (
     <View style={styles.trendingWrapper}>
       <TouchableOpacity style={styles.trendingCard} activeOpacity={0.9}>
         <Image source={{ uri: item.image }} style={styles.trendingImage} />
       </TouchableOpacity>
-      <Text style={styles.trendingTitle} numberOfLines={2}>
-        {item.title}
-      </Text>
-      <Text style={styles.trendingCategory}>{item.category}</Text>
+
+      <View style={styles.tileMetaRow}>
+        <View style={styles.tileBrandCircle}>
+          <Text style={styles.tileBrandCircleText}>{item.brand.slice(0, 1).toUpperCase()}</Text>
+        </View>
+
+        <View style={styles.tileMetaTextWrap}>
+          <Text style={styles.tileBrand} numberOfLines={1}>
+            {item.brand}
+          </Text>
+          <Text style={styles.tileProduct} numberOfLines={1}>
+            {truncate(item.product, 26)}
+          </Text>
+          <Text style={styles.tileCategory} numberOfLines={1}>
+            {item.category}
+          </Text>
+        </View>
+      </View>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <View style={styles.topHeader}>
+          <Text style={styles.discoverTitle}>Discover</Text>
+        </View>
+
         <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/search' as Href)}>
           <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
           <Text style={styles.searchInput}>Search</Text>
-          <TouchableOpacity style={styles.searchCameraButton} onPress={() => router.push('/camera' as Href)}>
+          <TouchableOpacity style={styles.searchCameraButton} onPress={() => router.push('/(tabs)/camera' as Href)}>
             <Ionicons name="camera-outline" size={18} color="#0E9F6E" />
           </TouchableOpacity>
         </TouchableOpacity>
@@ -172,12 +320,53 @@ export default function Discover() {
           <Text style={styles.sectionHeaderTitle}>Explore by interest</Text>
           <View style={styles.interestGrid}>
             {interestTiles.map((t) => (
-              <TouchableOpacity key={t.id} style={[styles.interestTile, { width: half }]} activeOpacity={0.9}>
-                <ImageBackground source={{ uri: t.image }} style={styles.interestBg} imageStyle={styles.interestBgImage}>
-                  <View style={styles.interestOverlay} />
-                  <Text style={styles.interestLabel}>{t.label}</Text>
-                </ImageBackground>
+              <TouchableOpacity key={t.id} style={[styles.interestTile, { width: half }]} activeOpacity={0.9} onPress={() => onPressInterest(t.id)}>
+                <View style={styles.interestTileInner}>
+                  <View style={styles.interestTileTopRow}>
+                    <Text style={styles.interestCornerLabel}>{t.label}</Text>
+                    <View style={styles.interestIconBadge}>
+                      <Ionicons name={t.icon} size={18} color="#0E9F6E" />
+                    </View>
+                  </View>
+                </View>
               </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.sectionPad}>
+          <Text style={styles.sectionHeaderTitle}>Explore Stores & Brands</Text>
+          <FlatList
+            data={logoPages}
+            keyExtractor={(_item, idx) => `logos-page-${idx}`}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={full}
+            snapToAlignment="start"
+            disableIntervalMomentum
+            bounces={false}
+            onMomentumScrollEnd={(e) => {
+              const next = Math.round(e.nativeEvent.contentOffset.x / full);
+              setLogoPage(Math.max(0, Math.min(totalPages - 1, next)));
+            }}
+            renderItem={({ item }) => (
+              <View style={[styles.logoPage, { width: full }]}>
+                <View style={[styles.logoGrid, { columnGap: logoGap }]}>
+                  {item.map((l) => (
+                    <View key={l.id} style={[styles.logoTile, { width: logoTileW }]}>
+                      <Image source={{ uri: `https://logo.clearbit.com/${l.domain}` }} style={styles.logoImage} />
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+          />
+
+          <View style={styles.dotsContainer}>
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <View key={`dot-${idx}`} style={[styles.dot, idx === logoPage && styles.dotActive]} />
             ))}
           </View>
         </View>
@@ -219,41 +408,65 @@ export default function Discover() {
         </View>
 
         <View style={styles.sectionPad}>
-          <Text style={styles.sectionHeaderTitle}>Explore Stores & Brands</Text>
-          <FlatList
-            data={logoPages}
-            keyExtractor={(_item, idx) => `logos-page-${idx}`}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            decelerationRate="fast"
-            snapToInterval={width}
-            snapToAlignment="start"
-            disableIntervalMomentum
-            bounces={false}
-            onMomentumScrollEnd={(e) => {
-              const next = Math.round(e.nativeEvent.contentOffset.x / width);
-              setLogoPage(Math.max(0, Math.min(totalPages - 1, next)));
-            }}
-            renderItem={({ item }) => (
-              <View style={[styles.logoPage, { width }]}> 
-                <View style={styles.logoGrid}>
-                  {item.map((l) => (
-                    <View key={l.id} style={styles.logoTile}>
-                      <Image source={{ uri: `https://logo.clearbit.com/${l.domain}` }} style={styles.logoImage} />
-                    </View>
-                  ))}
-                </View>
-              </View>
-            )}
-          />
-
-          <View style={styles.dotsContainer}>
-            {Array.from({ length: totalPages }).map((_, idx) => (
-              <View key={`dot-${idx}`} style={[styles.dot, idx === logoPage && styles.dotActive]} />
-            ))}
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeaderTitle}>Mens</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Mens', returnTo: '/(tabs)/discover' } } as unknown as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
           </View>
+          <FlatList
+            data={mens}
+            renderItem={renderTrending}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trendingList}
+          />
         </View>
+
+        <View style={styles.sectionPad}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeaderTitle}>Womens</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Womens', returnTo: '/(tabs)/discover' } } as unknown as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={womens}
+            renderItem={renderTrending}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trendingList}
+          />
+        </View>
+
+        <View style={styles.sectionPad}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeaderTitle}>Fashion</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push({ pathname: '/compare/discoverProducts', params: { pill: 'Fashion', returnTo: '/(tabs)/discover' } } as unknown as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={fashion}
+            renderItem={renderTrending}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.trendingList}
+          />
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -270,36 +483,46 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 96,
   },
+  topHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 2,
+  },
+  discoverTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#111827',
+    fontFamily: 'Manrope-Regular',
+  },
   searchContainer: {
-    marginHorizontal: 20,
-    marginTop: 8,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    marginHorizontal: 16,
+    marginTop: 12,
+    height: 48,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.04,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
     shadowRadius: 16,
-    elevation: 2,
+    elevation: 3,
   },
   searchIcon: {
     marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     color: '#111827',
-    fontWeight: '600',
+    fontWeight: '500',
+    fontFamily: 'Manrope-Regular',
   },
   searchCameraButton: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -354,6 +577,7 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 4,
     textAlign: 'center',
+    fontFamily: 'Manrope-Regular',
   },
   toolSubtitle: {
     fontSize: 12,
@@ -374,7 +598,7 @@ const styles = StyleSheet.create({
   },
   logoPage: {
     paddingTop: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -387,6 +611,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#111827',
     marginBottom: 12,
+    fontFamily: 'Manrope-Regular',
   },
   seeAllBtn: {
     flexDirection: 'row',
@@ -402,16 +627,56 @@ const styles = StyleSheet.create({
   interestGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
+    justifyContent: 'flex-start',
+    gap: 10,
     marginTop: 12,
   },
   interestTile: {
     height: 80,
-    width: '48%',
-    marginBottom: 12,
+    marginBottom: 0,
     borderRadius: 8,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  interestTileInner: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'space-between',
+  },
+  interestTileTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  interestSubheader: {
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B7280',
+    paddingRight: 10,
+  },
+  interestCorner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  interestCornerLabel: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#111827',
+    fontFamily: 'Manrope-Regular',
+  },
+  interestIconBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dotsContainer: {
     flexDirection: 'row',
@@ -429,46 +694,20 @@ const styles = StyleSheet.create({
   },
   dotActive: {
     width: 22,
+    height: 6,
+    borderRadius: 999,
     backgroundColor: '#0E9F6E',
   },
-  interestBg: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    padding: 12,
-    alignItems: 'flex-start',
-  },
-  interestBgImage: {
-    borderRadius: 6,
-    width: 86,
-    height: 86,
-    position: 'absolute',
-    right: -14,
-    bottom: -14,
-    transform: [{ rotate: '15deg' }],
-    opacity: 0.7,
-  },
-  interestOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-  },
-  interestLabel: {
-    color: '#000000',
-    fontSize: 14,
-    fontWeight: '600',
-    position: 'absolute',
-    bottom: 10,
-    left: 10,
-  },
   trendingList: {
-    paddingRight: 20,
+    paddingRight: 14,
     paddingBottom: 10,
   },
   trendingWrapper: {
-    marginRight: 20,
+    marginRight: 14,
   },
   trendingCard: {
-    width: 140,
-    borderRadius: 12,
+    width: 150,
+    borderRadius: 8,
     overflow: 'hidden',
     backgroundColor: 'white',
     shadowColor: '#000',
@@ -480,26 +719,76 @@ const styles = StyleSheet.create({
   },
   trendingImage: {
     width: '100%',
-    height: 140,
+    height: 130,
   },
   trendingTitle: {
     fontSize: 13,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#111827',
     marginBottom: 4,
+    fontFamily: 'Manrope-Regular',
   },
   trendingCategory: {
     fontSize: 12,
     color: '#6B7280',
+    fontFamily: 'Manrope-Regular',
+  },
+  tileMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 8,
+  },
+  tileBrandCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tileBrandCircleText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#111827',
+    fontFamily: 'Manrope-Regular',
+  },
+  tileMetaTextWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  tileBrand: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: -0.15,
+    fontFamily: 'Manrope-Regular',
+  },
+  tileProduct: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+    letterSpacing: -0.15,
+    fontFamily: 'Manrope-Regular',
+  },
+  tileCategory: {
+    marginTop: 2,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: -0.15,
+    fontFamily: 'Manrope-Regular',
   },
   logoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     rowGap: 10,
   },
   logoTile: {
-    width: (width - 60) / 3,
     height: 70,
     borderRadius: 10,
     backgroundColor: '#F3F4F6',
@@ -542,7 +831,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontSize: 20,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#111827',
   },
   dealsBanner: {
@@ -589,7 +878,7 @@ const styles = StyleSheet.create({
   },
   topicLabel: {
     fontSize: 26,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#111827',
   },
   moreTopicsButton: {
@@ -606,14 +895,14 @@ const styles = StyleSheet.create({
   },
   moreTopicsText: {
     fontSize: 24,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#0E9F6E',
   },
   footerBrand: {
     textAlign: 'center',
     marginTop: 36,
     fontSize: 34,
-    fontWeight: '900',
+    fontWeight: '600',
     color: '#9CA3AF',
     opacity: 0.55,
   },

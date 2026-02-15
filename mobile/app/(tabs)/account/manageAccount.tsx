@@ -89,12 +89,17 @@ export default function ManageAccount() {
     multiline?: boolean;
   }) => {
     const isFocused = focusedField === args.keyName;
+    const isMultiline = !!args.multiline;
 
     return (
       <View>
-        <TouchableOpacity style={styles.row} activeOpacity={0.85} onPress={() => focusField(args.keyName)}>
+        <TouchableOpacity
+          style={[styles.row, isMultiline ? styles.rowMultiline : null]}
+          activeOpacity={0.85}
+          onPress={() => focusField(args.keyName)}
+        >
           <View style={styles.rowLeft}>
-            <View style={styles.rowIcon}>
+            <View style={[styles.rowIcon, isMultiline ? styles.rowIconMultiline : null]}>
               <Ionicons name={args.icon} size={18} color="#111827" />
             </View>
             <View style={styles.rowTextBlock}>
@@ -251,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '800',
     color: '#111827',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   headerRight: {
     width: 40,
@@ -282,13 +287,13 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 34,
     fontWeight: '900',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   topTitle: {
     fontSize: 18,
     fontWeight: '900',
     color: '#111827',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   topSubtitle: {
     marginTop: 6,
@@ -296,7 +301,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
     textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   sectionTitle: {
     marginTop: 14,
@@ -305,7 +310,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#111827',
     letterSpacing: 0.2,
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   list: {
     backgroundColor: '#FFFFFF',
@@ -323,6 +328,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingVertical: 14,
   },
+  rowMultiline: {
+    alignItems: 'flex-start',
+  },
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -339,6 +347,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
+  rowIconMultiline: {
+    marginTop: 2,
+  },
   rowTextBlock: {
     flex: 1,
   },
@@ -347,13 +358,13 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#111827',
     marginBottom: 4,
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   rowValue: {
     fontSize: 13,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   rowValuePlaceholder: {
     color: '#9CA3AF',
@@ -364,7 +375,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#374151',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   inlineInputMultiline: {
     minHeight: 64,
@@ -391,7 +402,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '800',
     color: '#FFFFFF',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   discardButton: {
     flex: 1,
@@ -407,7 +418,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '800',
     color: '#111827',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
   buttonDisabled: {
     opacity: 0.5,

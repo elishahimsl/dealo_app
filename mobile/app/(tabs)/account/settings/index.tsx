@@ -2,18 +2,28 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { type Href, useRouter } from 'expo-router';
+
+function FilterGlyph() {
+  return (
+    <View style={[styles.filterGlyph, styles.filterGlyphFlipped]}>
+      <View style={[styles.filterLine, styles.filterLine1]} />
+      <View style={[styles.filterLine, styles.filterLine2]} />
+      <View style={[styles.filterLine, styles.filterLine3]} />
+    </View>
+  );
+}
 
 export default function Settings() {
   const router = useRouter();
 
   const settingsTiles = [
+    { id: 'about', icon: 'information-circle-outline', name: 'About' },
+    { id: 'preferences', icon: 'preferences', name: 'Preferences' },
+    { id: 'account', icon: 'person-outline', name: 'Account & Login' },
+    { id: 'privacy', icon: 'shield-outline', name: 'Privacy' },
     { id: 'notifications', icon: 'notifications-outline', name: 'Notifications' },
-    { id: 'personalization', icon: 'palette-outline', name: 'Personalization' },
-    { id: 'account', icon: 'person-outline', name: 'Account and Login' },
-    { id: 'privacy', icon: 'shield-outline', name: 'Data and Privacy' },
     { id: 'appearance', icon: 'color-palette-outline', name: 'Appearance' },
-    { id: 'help', icon: 'help-circle-outline', name: 'Help Center' },
   ];
 
   return (
@@ -29,8 +39,19 @@ export default function Settings() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.tilesContainer}>
           {settingsTiles.map((tile, index) => (
-            <TouchableOpacity key={tile.id} style={styles.tile}>
-              <Ionicons name={tile.icon as any} size={24} color="#000000" />
+            <TouchableOpacity
+              key={tile.id}
+              style={styles.tile}
+              onPress={() => {
+                if (tile.id === 'about') router.push('/account/settings/about' as Href);
+                if (tile.id === 'preferences') router.push('/account/settings/preferences' as Href);
+                if (tile.id === 'account') router.push('/account/settings/accountLogin' as Href);
+                if (tile.id === 'privacy') router.push('/account/settings/privacy' as Href);
+                if (tile.id === 'notifications') router.push('/account/settings/notifications' as Href);
+                if (tile.id === 'appearance') router.push('/account/settings/appearance' as Href);
+              }}
+            >
+              {tile.id === 'preferences' ? <FilterGlyph /> : <Ionicons name={tile.icon as any} size={24} color="#000000" />}
               <Text style={styles.tileText}>{tile.name}</Text>
             </TouchableOpacity>
           ))}
@@ -154,5 +175,30 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     marginHorizontal: 12,
+  },
+  filterGlyph: {
+    width: 18,
+    height: 14,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: 2,
+  },
+  filterGlyphFlipped: {
+    transform: [{ scaleX: -1 }],
+  },
+  filterLine: {
+    height: 2,
+    borderRadius: 0,
+    backgroundColor: '#111827',
+    opacity: 0.75,
+  },
+  filterLine1: {
+    width: 18,
+  },
+  filterLine2: {
+    width: 13,
+  },
+  filterLine3: {
+    width: 10,
   },
 });

@@ -3,10 +3,16 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, FlatList, 
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 const { width } = Dimensions.get('window');
 
+const DEALO_FONT_FAMILY = 'Manrope-Regular';
+const BRAND_GREEN = '#0E9F6E';
+const ACCENT_COLOR = '#2563EB';
+
 const defaultProductLeft = {
+  brand: 'Apple',
   name: 'iPhone 16',
   price: '$999',
   rating: 4.5,
@@ -15,6 +21,7 @@ const defaultProductLeft = {
 };
 
 const defaultProductRight = {
+  brand: 'Samsung',
   name: 'Samsung S24',
   price: '$899',
   rating: 4.7,
@@ -68,13 +75,71 @@ const alternatives = [
   },
 ];
 
-type RangeKey = '1W' | '1M' | '3M' | '6M' | '1Y';
-const ranges: RangeKey[] = ['1W', '1M', '3M', '6M', '1Y'];
+type RangeKey = '30D' | '90D' | '1Y';
+const ranges: RangeKey[] = ['30D', '90D', '1Y'];
+
+const PRICE_HISTORY_POINTS: Record<RangeKey, { a: number[]; b: number[]; xTicks: string[] }> = {
+  '30D': { a: [229, 225, 221, 219, 210, 214, 205, 206, 199], b: [249, 246, 240, 236, 231, 229, 223, 226, 218], xTicks: ['2', '12', '21', '31'] },
+  '90D': { a: [249, 244, 235, 229, 221, 219, 210, 214, 205], b: [269, 264, 260, 252, 245, 240, 231, 229, 223], xTicks: ['1', '30', '60', '90'] },
+  '1Y': { a: [289, 281, 275, 269, 262, 258, 249, 244, 235], b: [309, 300, 295, 289, 282, 276, 269, 264, 260], xTicks: ['1', '120', '240', '365'] },
+};
+
+function getInitial(label: string) {
+  const trimmed = label.trim();
+  return trimmed ? trimmed[0]?.toUpperCase() ?? '' : '';
+}
+
+function toNiceCeil(n: number, step: number) {
+  return Math.ceil(n / step) * step;
+}
+
+function toNiceFloor(n: number, step: number) {
+  return Math.floor(n / step) * step;
+}
+
+function TwoLineChart({ aPoints, bPoints, w, h }: { aPoints: number[]; bPoints: number[]; w: number; h: number }) {
+  const pad = 10;
+  const all = [...aPoints, ...bPoints];
+  const minRaw = Math.min(...all);
+  const maxRaw = Math.max(...all);
+  const max = toNiceCeil(maxRaw, 10);
+  const min = toNiceFloor(minRaw, 10);
+  const span = Math.max(1, max - min);
+
+  const xs = aPoints.map((_, i) => pad + (i * (w - pad * 2)) / Math.max(1, aPoints.length - 1));
+  const yA = aPoints.map((p) => pad + ((max - p) * (h - pad * 2)) / span);
+  const yB = bPoints.map((p) => pad + ((max - p) * (h - pad * 2)) / span);
+  const dA = xs.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${yA[i].toFixed(1)}`).join(' ');
+  const dB = xs.map((x, i) => `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${yB[i].toFixed(1)}`).join(' ');
+  const areaA = `${dA} L ${(pad + (w - pad * 2)).toFixed(1)} ${(h - pad).toFixed(1)} L ${pad.toFixed(1)} ${(h - pad).toFixed(1)} Z`;
+  const areaB = `${dB} L ${(pad + (w - pad * 2)).toFixed(1)} ${(h - pad).toFixed(1)} L ${pad.toFixed(1)} ${(h - pad).toFixed(1)} Z`;
+
+  return (
+    <Svg width={w} height={h}>
+      <Defs>
+        <LinearGradient id="gA" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={BRAND_GREEN} stopOpacity="0.24" />
+          <Stop offset="1" stopColor={BRAND_GREEN} stopOpacity="0.03" />
+        </LinearGradient>
+        <LinearGradient id="gB" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={ACCENT_COLOR} stopOpacity="0.18" />
+          <Stop offset="1" stopColor={ACCENT_COLOR} stopOpacity="0.02" />
+        </LinearGradient>
+      </Defs>
+      <Path d={areaB} fill="url(#gB)" />
+      <Path d={areaA} fill="url(#gA)" />
+      <Path d={dB} stroke={ACCENT_COLOR} strokeWidth={3} fill="none" strokeLinecap="round" />
+      <Path d={dA} stroke={BRAND_GREEN} strokeWidth={3} fill="none" strokeLinecap="round" />
+    </Svg>
+  );
+}
 
 export default function CompareResults() {
   const router = useRouter();
   const params = useLocalSearchParams<{ aName?: string; aImage?: string; bName?: string; bImage?: string }>();
-  const [range, setRange] = useState<RangeKey>('1M');
+  const [range, setRange] = useState<RangeKey>('30D');
+  const [bestOverviewOpen, setBestOverviewOpen] = useState(false);
+  const [aiOverviewOpen, setAiOverviewOpen] = useState(false);
 
   const productLeft = useMemo(() => {
     return {
@@ -92,7 +157,33 @@ export default function CompareResults() {
     };
   }, [params.bImage, params.bName]);
 
+  const scoreA = useMemo(() => Math.round(metrics.reduce((s, m) => s + m.a, 0) / metrics.length), []);
+  const scoreB = useMemo(() => Math.round(metrics.reduce((s, m) => s + m.b, 0) / metrics.length), []);
+  const winner = scoreA >= scoreB ? 'A' : 'B';
+
+  const bestProduct = winner === 'A' ? productLeft : productRight;
+  const otherProduct = winner === 'A' ? productRight : productLeft;
+  const bestColor = winner === 'A' ? BRAND_GREEN : ACCENT_COLOR;
+
   const storeOptions = useMemo(() => getStoreOptions(productLeft, productRight), [productLeft, productRight]);
+
+  const otherStores = useMemo(() => {
+    const left = (storeOptions[productLeft.name] ?? []).map((o) => ({
+      id: `a-${o.id}`,
+      save: 'Save $20',
+      store: o.store,
+      name: o.name,
+      price: o.price,
+    }));
+    const right = (storeOptions[productRight.name] ?? []).map((o) => ({
+      id: `b-${o.id}`,
+      save: 'Save $15',
+      store: o.store,
+      name: o.name,
+      price: o.price,
+    }));
+    return [...left, ...right];
+  }, [productLeft.name, productRight.name, storeOptions]);
 
   const cardWidth = useMemo(() => {
     const padding = 18;
@@ -100,215 +191,362 @@ export default function CompareResults() {
     return (width - padding * 2 - gap) / 2;
   }, []);
 
+  const bestBrand = (bestProduct as any).brand ?? bestProduct.name.split(' ')[0];
+  const otherBrand = (otherProduct as any).brand ?? otherProduct.name.split(' ')[0];
+  const bestPricePoints = PRICE_HISTORY_POINTS[range][winner === 'A' ? 'a' : 'b'];
+  const bestAvg = Math.round(bestPricePoints.reduce((s, p) => s + p, 0) / bestPricePoints.length);
+  const bestToday = bestPricePoints[bestPricePoints.length - 1] ?? bestPricePoints[0] ?? 0;
+  const bestLow = Math.min(...bestPricePoints);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.headerIconBtn} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={22} color="#111827" />
+            <Ionicons name="chevron-back" size={22} color="#111827" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>Comparison Results</Text>
+          <Text style={styles.headerTitle}>Compare Results</Text>
           <TouchableOpacity style={styles.headerIconBtn}>
-            <Ionicons name="bookmark-outline" size={22} color="#111827" />
+            <Ionicons name="ellipsis-vertical" size={20} color="#111827" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.vsWrap}>
-          <View style={styles.vsRow}>
-            <View style={[styles.productCard, { width: cardWidth }]}>
-              <View style={[styles.badge, styles.badgeGreen]}>
-                <Text style={styles.badgeText}>LOWEST PRICE</Text>
-              </View>
-              <View style={styles.productImageArea}>
-                <Image source={{ uri: productLeft.image }} style={styles.productImage} />
-              </View>
-              <Text style={styles.productName} numberOfLines={1}>
-                {productLeft.name}
-              </Text>
-              <Text style={styles.productPrice}>{productLeft.price}</Text>
-              <View style={styles.ratingRow}>
-                <Text style={styles.ratingValue}>{productLeft.rating.toFixed(1)}</Text>
-                <Ionicons name="star" size={16} color="#F59E0B" style={styles.starIcon} />
-                <Text style={styles.reviewsText}>({productLeft.reviews})</Text>
-              </View>
-            </View>
-
-            <View style={[styles.productCard, { width: cardWidth }]}>
-              <View style={[styles.badge, styles.badgeBlue]}>
-                <Text style={styles.badgeText}>POPULAR PICK</Text>
-              </View>
-              <View style={styles.productImageArea}>
-                <Image source={{ uri: productRight.image }} style={styles.productImage} />
-              </View>
-              <Text style={styles.productName} numberOfLines={1}>
-                {productRight.name}
-              </Text>
-              <Text style={styles.productPrice}>{productRight.price}</Text>
-              <View style={styles.ratingRow}>
-                <Text style={styles.ratingValue}>{productRight.rating.toFixed(1)}</Text>
-                <Ionicons name="star" size={16} color="#F59E0B" style={styles.starIcon} />
-                <Text style={styles.reviewsText}>({productRight.reviews})</Text>
+          <View style={styles.compareRowWrap}>
+            <View style={styles.compareRow}>
+            <View style={[styles.compareTile, { width: cardWidth, marginRight: 14 }]}>
+              <View style={styles.compareProductBlank} />
+              <View style={styles.compareMetaRow}>
+                <View style={styles.logoCircle}>
+                  <Text style={styles.logoInitial}>{getInitial((productLeft as any).brand ?? productLeft.name)}</Text>
+                </View>
+                <View style={styles.topMetaRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.brandText}>{(productLeft as any).brand ?? productLeft.name.split(' ')[0]}</Text>
+                    <Text style={styles.productText} numberOfLines={1}>
+                      {productLeft.name}
+                    </Text>
+                  </View>
+                  <Text style={styles.priceInline}>{productLeft.price}</Text>
+                </View>
               </View>
             </View>
 
-            <View style={styles.vsPill}>
-              <Text style={styles.vsPillText}>VS</Text>
+            <View style={[styles.compareTile, { width: cardWidth }]}>
+              <View style={styles.compareProductBlank} />
+              <View style={styles.compareMetaRow}>
+                <View style={styles.logoCircle}>
+                  <Text style={styles.logoInitial}>{getInitial((productRight as any).brand ?? productRight.name)}</Text>
+                </View>
+                <View style={styles.topMetaRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.brandText}>{(productRight as any).brand ?? productRight.name.split(' ')[0]}</Text>
+                    <Text style={styles.productText} numberOfLines={1}>
+                      {productRight.name}
+                    </Text>
+                  </View>
+                  <Text style={styles.priceInline}>{productRight.price}</Text>
+                </View>
+              </View>
+            </View>
             </View>
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardKicker}>Best Choice For You</Text>
-          <View style={styles.bestRow}>
-            <Text style={styles.bestName}>{productLeft.name}</Text>
-            <View style={styles.scoreWrap}>
-              <Text style={styles.scoreValue}>87</Text>
-              <Text style={styles.scoreSuffix}>/100</Text>
+        <View style={styles.bestDealCard}>
+          <View style={styles.bestDealHeader}>
+            <Text style={styles.bestDealTitle}>Best Deal for You</Text>
+          </View>
+          <View style={styles.bestDealBody}>
+            <View style={styles.bestDealThumb} />
+            <View style={{ flex: 1 }}>
+              <View style={styles.bestDealMetaRow}>
+                <View style={styles.logoCircleSm}>
+                  <Text style={styles.logoInitialSm}>{getInitial(bestBrand)}</Text>
+                </View>
+                <View style={styles.bestDealTopRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.bestDealBrand}>{bestBrand}</Text>
+                    <Text style={styles.bestDealProduct} numberOfLines={1}>
+                      {bestProduct.name}
+                    </Text>
+                  </View>
+                  <Text style={styles.bestDealPriceInline}>{bestProduct.price}</Text>
+                </View>
+              </View>
+              <Text style={styles.bestDealReviews}>{bestProduct.reviews}</Text>
+              <TouchableOpacity activeOpacity={0.9} style={[styles.visitBtn, { backgroundColor: bestColor }]}>
+                <Text style={styles.visitText}>Visit Store</Text>
+              </TouchableOpacity>
             </View>
           </View>
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: '87%' }]} />
-          </View>
-          <Text style={styles.bestDescription}>
-            iPhone 16 offers superior value with better processor performance, more storage capacity (512GB vs 256GB), and enhanced
-            battery life (up to 18 hours). The display is brighter with higher resolution, making it ideal for content creation and
-            multimedia. Build quality is exceptional with premium materials and better heat management.
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            style={styles.overviewHeaderRow}
+            onPress={() => setBestOverviewOpen((v) => !v)}
+          >
+            <View style={styles.overviewInline}>
+              <Text style={styles.overviewHeader}>Overview</Text>
+              <Ionicons name={bestOverviewOpen ? 'chevron-up' : 'chevron-down'} size={18} color={BRAND_GREEN} style={styles.overviewChevron} />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.overviewText} numberOfLines={bestOverviewOpen ? undefined : 2}>
+            {bestBrand} {bestProduct.name} offers better overall value based on price, feature balance, and recent pricing trends compared to {otherBrand} {otherProduct.name}.
           </Text>
         </View>
 
-        <View style={styles.card}>
-          {metrics.map((m, idx) => (
-            <View key={m.id} style={[styles.metricRow, idx !== metrics.length - 1 && styles.metricRowBorder]}>
-              <View style={styles.metricLeft}>
-                <Text style={styles.metricLabel}>{m.label}</Text>
-                <Ionicons name="chevron-down" size={18} color="#9CA3AF" style={styles.metricChevron} />
+        <View style={styles.scoreSection}>
+          <Text style={styles.aiDealScoreTitle}>AI deal score</Text>
+          <View style={styles.scoreCircleRow}>
+            <View style={styles.scoreCircleWrap}>
+              <View style={[styles.scoreCircle, { borderColor: BRAND_GREEN }]}>
+                <Text style={styles.scoreCircleNum}>{scoreA}</Text>
+                <Text style={styles.scoreCircleOut}>/100</Text>
               </View>
-              <View style={styles.metricRight}>
-                <Text style={styles.metricScoreA}>{m.a}</Text>
-                <Text style={styles.metricScoreB}>{m.b}</Text>
-              </View>
+              <Text style={styles.scoreCircleLabel}>{(productLeft as any).brand ?? productLeft.name.split(' ')[0]}</Text>
             </View>
-          ))}
+
+            <Text style={styles.scoreVersus}>versus</Text>
+
+            <View style={styles.scoreCircleWrap}>
+              <View style={[styles.scoreCircle, { borderColor: ACCENT_COLOR }]}>
+                <Text style={styles.scoreCircleNum}>{scoreB}</Text>
+                <Text style={styles.scoreCircleOut}>/100</Text>
+              </View>
+              <Text style={styles.scoreCircleLabel}>{(productRight as any).brand ?? productRight.name.split(' ')[0]}</Text>
+            </View>
+          </View>
+
+          <View style={styles.miniScoresBlock}>
+            {metrics.map((m) => (
+              <View key={m.id} style={styles.miniScoreRow}>
+                <Text style={styles.miniScoreLabel}>{m.label}</Text>
+                <View style={styles.miniScoreRight}>
+                  <View style={[styles.miniScoreDot, styles.miniScoreDotA]}>
+                    <Text style={[styles.miniScoreDotText, styles.miniScoreDotTextA]}>{m.a}</Text>
+                  </View>
+                  <View style={[styles.miniScoreDot, styles.miniScoreDotB]}>
+                    <Text style={[styles.miniScoreDotText, styles.miniScoreDotTextB]}>{m.b}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.aiSeparator} />
+
+          <TouchableOpacity activeOpacity={0.85} style={styles.aiOverviewHeaderRow} onPress={() => setAiOverviewOpen((v) => !v)}>
+            <Text style={styles.aiOverviewHeader}>AI Overview</Text>
+            <Ionicons name={aiOverviewOpen ? 'chevron-up' : 'chevron-down'} size={18} color={BRAND_GREEN} />
+          </TouchableOpacity>
+          <Text style={styles.aiOverviewText} numberOfLines={aiOverviewOpen ? undefined : 3}>
+            Based on aggregate public data and feature/value scoring, {bestBrand} {bestProduct.name} wins due to stronger performance across the most important categories, with a better price-to-feature balance.
+          </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.priceHistoryTitle}>Price History</Text>
+        <View style={styles.cardTight}>
+          <View style={styles.bestStoreHeaderRow}>
+            <Text style={styles.bestStoreTitle}>Best Store</Text>
+            <Ionicons name="bookmark-outline" size={18} color="#111827" />
+          </View>
+          <View style={styles.bestStoreCompareRow}>
+            <View style={styles.bestStoreHalf}>
+              <View style={styles.bestStoreRow}>
+                <View style={styles.bestStoreThumb} />
+                <View style={styles.bestStoreTextCol}>
+                  <View style={styles.bestStoreMetaRow}>
+                    <View style={styles.bestStoreLogoCircle}>
+                      <Text style={styles.bestStoreLogoText}>{getInitial(bestBrand)}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.bestStoreProductName} numberOfLines={1}>
+                        {bestProduct.name}
+                      </Text>
+                      <Text style={styles.bestStoreMeta}>In-Stock</Text>
+                    </View>
+                    <Text style={styles.bestStorePrice}>{bestProduct.price}</Text>
+                  </View>
+                  <TouchableOpacity activeOpacity={0.9} style={[styles.bestStoreBtn, { backgroundColor: bestColor }]}>
+                    <Text style={styles.bestStoreBtnText}>Visit Store</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.bestStoreHeart} activeOpacity={0.85}>
+                <Ionicons name="heart-outline" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.bestStoreHalf}>
+              <View style={styles.bestStoreRow}>
+                <View style={styles.bestStoreThumb} />
+                <View style={styles.bestStoreTextCol}>
+                  <View style={styles.bestStoreMetaRow}>
+                    <View style={styles.bestStoreLogoCircle}>
+                      <Text style={styles.bestStoreLogoText}>{getInitial(otherBrand)}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.bestStoreProductName} numberOfLines={1}>
+                        {otherProduct.name}
+                      </Text>
+                      <Text style={styles.bestStoreMeta}>In-Stock</Text>
+                    </View>
+                    <Text style={styles.bestStorePrice}>{otherProduct.price}</Text>
+                  </View>
+                  <TouchableOpacity activeOpacity={0.9} style={[styles.bestStoreBtn, { backgroundColor: winner === 'A' ? ACCENT_COLOR : BRAND_GREEN }]}>
+                    <Text style={styles.bestStoreBtnText}>Visit Store</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.bestStoreHeart} activeOpacity={0.85}>
+                <Ionicons name="heart-outline" size={16} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
-          <View style={styles.rangeRow}>
+        <View style={styles.priceSection}>
+          <View style={styles.priceHeaderCol}>
+            <Text style={styles.priceHistoryTitle}>Price History</Text>
+            <Text style={styles.priceGraphSubtitle}>Price graph</Text>
+          </View>
+
+          <View style={styles.rangeRowAboveChart}>
             {ranges.map((r) => (
               <TouchableOpacity
                 key={r}
                 activeOpacity={0.9}
                 onPress={() => setRange(r)}
-                style={[styles.rangePill, r === range && styles.rangePillActive]}
+                style={[styles.rangeTab, r === range && styles.rangeTabActive]}
               >
-                <Text style={[styles.rangeText, r === range && styles.rangeTextActive]}>{r}</Text>
+                <Text style={[styles.rangeTabText, r === range && styles.rangeTabTextActive]}>{r}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
-          <View style={styles.chartWrap}>
-            <View style={styles.chartGridLine} />
-            <View style={[styles.chartGridLine, { top: '50%' }]} />
-            <View style={[styles.chartGridLine, { top: '75%' }]} />
+          <View style={styles.priceHistoryRow}>
+            <View style={styles.priceChartCol}>
+              <View style={styles.chartWrapMock}>
+                <View style={styles.chartWithYAxisRight}>
+                  <View style={styles.chartSvgWrap}>
+                    <View pointerEvents="none" style={styles.chartGridLines}>
+                      <View style={styles.chartGridLine} />
+                      <View style={styles.chartGridLine} />
+                      <View style={styles.chartGridLine} />
+                    </View>
+                    <TwoLineChart aPoints={PRICE_HISTORY_POINTS[range].a} bPoints={PRICE_HISTORY_POINTS[range].b} w={140} h={92} />
+                  </View>
 
-            <View style={styles.chartLineBlueA} />
-            <View style={styles.chartLineBlueB} />
-            <View style={styles.chartLineBlueC} />
-
-            <View style={styles.chartLineGreenA} />
-            <View style={styles.chartLineGreenB} />
-            <View style={styles.chartLineGreenC} />
-
-            <View style={styles.chartFadeBlue} />
-            <View style={styles.chartFadeGreen} />
-          </View>
-
-          <View style={styles.chipsRow}>
-            <View style={[styles.chip, styles.chipBlue]}>
-              <Text style={styles.chipTextBlue}>↓ Lowest in 60 days</Text>
-            </View>
-            <View style={[styles.chip, styles.chipGreen]}>
-              <Text style={styles.chipTextGreen}>↓ Likely to drop soon</Text>
-            </View>
-          </View>
-
-          <View style={styles.legendRow}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#3B82F6' }]} />
-              <Text style={styles.legendText}>{productLeft.name}</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#059669' }]} />
-              <Text style={styles.legendText}>{productRight.name}</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Store Options</Text>
-
-          <Text style={styles.storeProductTitle}>{productLeft.name}</Text>
-          {storeOptions[productLeft.name].map((o) => (
-            <View key={o.id} style={styles.storeRow}>
-              <View style={styles.storeThumb}>
-                <Image source={{ uri: o.image }} style={styles.storeThumbImg} />
-              </View>
-              <View style={styles.storeText}>
-                <Text style={styles.storeName}>{o.store}</Text>
-                <Text style={styles.storeProductName}>{o.name}</Text>
-                <Text style={styles.storePrice}>{o.price}</Text>
-              </View>
-              <TouchableOpacity style={styles.goButton} activeOpacity={0.9}>
-                <Text style={styles.goText}>Go</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-
-          <Text style={[styles.storeProductTitle, { marginTop: 14 }]}>{productRight.name}</Text>
-          {storeOptions[productRight.name].map((o) => (
-            <View key={o.id} style={styles.storeRow}>
-              <View style={styles.storeThumb}>
-                <Image source={{ uri: o.image }} style={styles.storeThumbImg} />
-              </View>
-              <View style={styles.storeText}>
-                <Text style={styles.storeName}>{o.store}</Text>
-                <Text style={styles.storeProductName}>{o.name}</Text>
-                <Text style={styles.storePrice}>{o.price}</Text>
-              </View>
-              <TouchableOpacity style={styles.goButton} activeOpacity={0.9}>
-                <Text style={styles.goText}>Go</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>AI Alternatives</Text>
-          <FlatList
-            data={alternatives}
-            keyExtractor={(i) => i.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.altList}
-            renderItem={({ item }) => (
-              <View style={styles.altCard}>
-                <View style={styles.altImageWrap}>
-                  <Image source={{ uri: item.image }} style={styles.altImage} />
-                  <TouchableOpacity style={styles.altHeart}>
-                    <Ionicons name="heart-outline" size={18} color="#6B7280" />
-                  </TouchableOpacity>
+                  <View style={styles.chartYAxisRight}>
+                    {(() => {
+                      const pts = PRICE_HISTORY_POINTS[range];
+                      const all = [...pts.a, ...pts.b];
+                      const maxRaw = Math.max(...all);
+                      const minRaw = Math.min(...all);
+                      const max = toNiceCeil(maxRaw, 10);
+                      const min = toNiceFloor(minRaw, 10);
+                      const mid = Math.round((max + min) / 2);
+                      return (
+                        <>
+                          <Text style={styles.chartYAxisText}>{`$${max}`}</Text>
+                          <Text style={styles.chartYAxisText}>{`$${mid}`}</Text>
+                          <Text style={styles.chartYAxisText}>{`$${min}`}</Text>
+                        </>
+                      );
+                    })()}
+                  </View>
                 </View>
-                <Text style={styles.altPrice}>{item.price}</Text>
-                <Text style={styles.altName} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text style={styles.altNote} numberOfLines={2}>
-                  {item.note}
-                </Text>
+
+                <View style={styles.chartXRowSmall}>
+                  {PRICE_HISTORY_POINTS[range].xTicks.map((t) => (
+                    <Text key={t} style={styles.chartAxisText}>{t}</Text>
+                  ))}
+                </View>
               </View>
-            )}
-          />
+            </View>
+            <View style={styles.priceDivider} />
+            <View style={styles.priceOverviewCol}>
+              <Text style={styles.priceOverviewTitle}>Price Overview</Text>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{`$${bestAvg}`}</Text>
+                <Text style={styles.priceOverviewRight}>Avg</Text>
+              </View>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{`$${bestToday}`}</Text>
+                <View style={styles.todayDot} />
+                <Text style={styles.priceOverviewRight}>Today</Text>
+              </View>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{`$${bestLow}`}</Text>
+                <Text style={styles.priceOverviewRight}>Low</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.sectionHeaderRowMock}>
+          <Text style={styles.sectionTitleMockNoTop}>Other Stores</Text>
+          <Ionicons name="chevron-forward" size={18} color="#111827" />
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
+          {otherStores.map((item) => (
+            <View key={item.id} style={styles.hItem}>
+              <View style={styles.gridCard}>
+                <View style={styles.gridImgPlaceholder} />
+                <View style={styles.savePill}>
+                  <Text style={styles.savePillText}>{item.save}</Text>
+                </View>
+                <TouchableOpacity style={styles.heartBtn} activeOpacity={0.85}>
+                  <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.gridMetaRow}>
+                <View style={styles.storeLogoBlank} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.gridStore}>{item.store}</Text>
+                  <Text style={styles.gridName} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.gridPrice}>{item.price}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+
+        <View style={styles.sectionHeaderRowMock}>
+          <Text style={styles.sectionTitleMockNoTop}>Alternatives</Text>
+          <Ionicons name="chevron-forward" size={18} color="#111827" />
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
+          {alternatives.map((item) => (
+            <View key={item.id} style={styles.hItem}>
+              <View style={styles.gridCard}>
+                <View style={styles.gridImgPlaceholder} />
+                <TouchableOpacity style={styles.heartBtn} activeOpacity={0.85}>
+                  <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.gridMetaRow}>
+                <View style={styles.storeLogoBlank} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.gridStore}>{item.price}</Text>
+                  <Text style={styles.gridName} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.gridPrice}>{item.note.replace('\n', ' ')}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+
+        <View style={styles.bottomActions}>
+          <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary}>
+            <Text style={styles.bottomBtnSecondaryText}>Save Comparison</Text>
+          </TouchableOpacity>
+          <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnPrimary}>
+            <Text style={styles.bottomBtnPrimaryText}>View Offer</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -318,7 +556,7 @@ export default function CompareResults() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
@@ -335,10 +573,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerTitle: {
-    fontSize: 20,
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 16,
     fontWeight: '900',
     color: '#111827',
+    fontFamily: DEALO_FONT_FAMILY,
   },
+  headerCenter: { flex: 1 },
   headerIconBtn: {
     width: 44,
     height: 44,
@@ -350,388 +592,156 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     marginTop: 8,
   },
-  vsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 14,
-  },
-  vsPill: {
-    position: 'absolute',
-    left: '50%',
-    top: 90,
-    marginLeft: -24,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 6,
-    borderColor: '#F9FAFB',
-  },
-  vsPillText: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#6B7280',
-  },
-  productCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: '#EEF2F7',
-    paddingTop: 22,
-  },
-  badge: {
-    position: 'absolute',
-    top: -14,
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    height: 30,
-    borderRadius: 10,
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  badgeGreen: {
-    backgroundColor: '#059669',
-  },
-  badgeBlue: {
-    backgroundColor: '#3B82F6',
-  },
-  badgeText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 12,
-  },
-  productImageArea: {
-    height: 110,
+  compareRowWrap: {
+    backgroundColor: '#F9FAFB',
     borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    overflow: 'hidden',
-    marginBottom: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
   },
-  productImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
-  productName: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#111827',
-    marginBottom: 6,
-  },
-  productPrice: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ratingValue: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: '#111827',
-    marginRight: 6,
-  },
-  starIcon: {
-    marginRight: 6,
-  },
-  reviewsText: {
-    color: '#6B7280',
-    fontWeight: '600',
-  },
-  card: {
-    marginTop: 18,
-    marginHorizontal: 18,
+  compareRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 },
+  compareTile: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 18,
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
+    shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.06,
-    shadowRadius: 20,
-    elevation: 6,
-    borderWidth: 1,
-    borderColor: '#EEF2F7',
+    shadowRadius: 16,
+    elevation: 4,
   },
-  cardKicker: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#6B7280',
-    marginBottom: 10,
-  },
-  bestRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  bestName: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#111827',
-  },
-  scoreWrap: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  scoreValue: {
-    fontSize: 40,
-    fontWeight: '900',
-    color: '#111827',
-    lineHeight: 40,
-  },
-  scoreSuffix: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#9CA3AF',
-    marginLeft: 4,
-    marginBottom: 4,
-  },
-  progressTrack: {
-    height: 12,
-    borderRadius: 999,
-    backgroundColor: '#E5E7EB',
-    overflow: 'hidden',
-    marginBottom: 14,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#059669',
-    borderRadius: 999,
-  },
-  bestDescription: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#6B7280',
-    fontWeight: '500',
-  },
-  metricRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 18,
-  },
-  metricRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  metricLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metricLabel: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#111827',
-    marginRight: 10,
-  },
-  metricChevron: {
-    marginTop: 2,
-  },
-  metricRight: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 16,
-  },
-  metricScoreA: {
-    fontSize: 34,
-    fontWeight: '900',
-    color: '#111827',
-  },
-  metricScoreB: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#9CA3AF',
-  },
-  priceHistoryTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#111827',
-    marginBottom: 10,
-  },
-  rangeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  rangePill: {
-    paddingHorizontal: 12,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  rangePillActive: {
-    backgroundColor: '#E5E7EB',
-  },
-  rangeText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#6B7280',
-  },
-  rangeTextActive: {
-    color: '#111827',
-  },
-  chartWrap: {
-    height: 260,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
-    overflow: 'hidden',
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  chartGridLine: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: '25%',
-    height: 2,
-    backgroundColor: '#E5E7EB',
-    opacity: 0.7,
-  },
-  chartFadeBlue: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(59,130,246,0.10)',
-  },
-  chartFadeGreen: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: '40%',
-    bottom: 0,
-    backgroundColor: 'rgba(5,150,105,0.10)',
-  },
-  chartLineBlueA: {
-    position: 'absolute',
-    left: 14,
-    top: 70,
-    width: 110,
-    height: 4,
-    backgroundColor: '#3B82F6',
-    borderRadius: 2,
-    transform: [{ rotate: '-10deg' }],
-  },
-  chartLineBlueB: {
-    position: 'absolute',
-    left: 114,
-    top: 52,
-    width: 120,
-    height: 4,
-    backgroundColor: '#3B82F6',
-    borderRadius: 2,
-    transform: [{ rotate: '12deg' }],
-  },
-  chartLineBlueC: {
-    position: 'absolute',
-    left: 226,
-    top: 78,
-    width: 120,
-    height: 4,
-    backgroundColor: '#3B82F6',
-    borderRadius: 2,
-    transform: [{ rotate: '-8deg' }],
-  },
-  chartLineGreenA: {
-    position: 'absolute',
-    left: 14,
-    top: 120,
-    width: 120,
-    height: 4,
-    backgroundColor: '#059669',
-    borderRadius: 2,
-    transform: [{ rotate: '8deg' }],
-  },
-  chartLineGreenB: {
-    position: 'absolute',
-    left: 126,
-    top: 142,
-    width: 110,
-    height: 4,
-    backgroundColor: '#059669',
-    borderRadius: 2,
-    transform: [{ rotate: '-12deg' }],
-  },
-  chartLineGreenC: {
-    position: 'absolute',
-    left: 226,
-    top: 132,
-    width: 120,
-    height: 4,
-    backgroundColor: '#059669',
-    borderRadius: 2,
-    transform: [{ rotate: '6deg' }],
-  },
-  chipsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  chip: {
-    flex: 1,
-    height: 48,
-    borderRadius: 14,
-    justifyContent: 'center',
-    paddingHorizontal: 14,
-  },
-  chipBlue: {
-    backgroundColor: 'rgba(59,130,246,0.14)',
-  },
-  chipGreen: {
-    backgroundColor: 'rgba(5,150,105,0.14)',
-  },
-  chipTextBlue: {
-    color: '#2563EB',
-    fontWeight: '900',
-    fontSize: 18,
-  },
-  chipTextGreen: {
-    color: '#059669',
-    fontWeight: '900',
-    fontSize: 18,
-  },
-  legendRow: {
-    flexDirection: 'row',
-    gap: 22,
-    alignItems: 'center',
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  legendDot: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-  },
-  legendText: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#6B7280',
-  },
+  compareProductBlank: { width: '100%', height: 108, borderRadius: 12, backgroundColor: '#F3F4F6', marginBottom: 12 },
+  compareMetaRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  topMetaRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logoCircle: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', alignItems: 'center', justifyContent: 'center' },
+  logoInitial: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  brandText: { fontSize: 11, fontWeight: '800', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  productText: { fontSize: 11, fontWeight: '600', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY, marginTop: 1 },
+  priceText: { fontSize: 16, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginTop: 4 },
+  priceInline: { fontSize: 16, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+
+  bestDealCard: { marginTop: 14, marginHorizontal: 16, backgroundColor: '#FFFFFF', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#EEF2F7' },
+  bestDealHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  bestDealTitle: { fontSize: 15, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestDealBody: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  bestDealThumb: { width: 112, height: 112, borderRadius: 16, backgroundColor: '#F3F4F6' },
+  bestDealMetaRow: { flexDirection: 'row', gap: 10, alignItems: 'center', marginBottom: 8 },
+  bestDealTopRow: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  bestDealBrand: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestDealProduct: { fontSize: 11, fontWeight: '700', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY, marginTop: 1 },
+  bestDealPriceInline: { fontSize: 18, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  logoCircleSm: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', alignItems: 'center', justifyContent: 'center' },
+  logoInitialSm: { fontSize: 11, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestDealPrice: { fontSize: 18, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginBottom: 2 },
+  bestDealReviews: { fontSize: 11, fontWeight: '600', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY, marginBottom: 10 },
+  visitBtn: { height: 38, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  visitText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', fontFamily: DEALO_FONT_FAMILY },
+  overviewHeaderRow: { marginTop: 12 },
+  overviewInline: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start' },
+  overviewChevron: { marginLeft: 4, marginTop: 1 },
+  overviewHeader: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  overviewText: { marginTop: 6, fontSize: 11, lineHeight: 16, color: '#6B7280', fontWeight: '600', fontFamily: DEALO_FONT_FAMILY },
+
+  scoreSection: { paddingHorizontal: 16, marginTop: 14 },
+  aiDealScoreTitle: { fontSize: 14, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginBottom: 12 },
+  scoreCircleRow: { flexDirection: 'row', gap: 14, justifyContent: 'space-between', alignItems: 'center' },
+  scoreCircleWrap: { flex: 1, alignItems: 'center' },
+  scoreVersus: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, opacity: 0.7, marginTop: -10 },
+  scoreCircle: { width: 78, height: 78, borderRadius: 39, borderWidth: 8, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
+  scoreCircleNum: { fontSize: 20, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginTop: 2 },
+  scoreCircleOut: { fontSize: 9, fontWeight: '800', color: '#9CA3AF', fontFamily: DEALO_FONT_FAMILY, marginTop: -2 },
+  scoreCircleLabel: { marginTop: 8, fontSize: 11, fontWeight: '800', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  miniScoresBlock: { marginTop: 14, gap: 10 },
+  miniScoreRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  miniScoreLabel: { fontSize: 11, fontWeight: '700', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  miniScoreRight: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  miniScoreDot: { width: 30, height: 30, borderRadius: 15, backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' },
+  miniScoreDotA: { backgroundColor: 'rgba(14,159,110,0.14)' },
+  miniScoreDotB: { backgroundColor: 'rgba(37,99,235,0.14)' },
+  miniScoreDotWin: { backgroundColor: '#111827' },
+  miniScoreDotText: { fontSize: 10, fontWeight: '800', color: '#9CA3AF', fontFamily: DEALO_FONT_FAMILY },
+  miniScoreDotTextA: { color: BRAND_GREEN, fontWeight: '900' },
+  miniScoreDotTextB: { color: ACCENT_COLOR, fontWeight: '900' },
+  miniScoreDotTextWin: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
+  aiSeparator: { height: 1, backgroundColor: 'rgba(0,0,0,0.08)', marginTop: 16, marginBottom: 12 },
+  aiOverviewHeaderRow: { marginTop: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  aiOverviewHeader: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  aiOverviewText: { marginTop: 6, fontSize: 11, lineHeight: 16, color: '#6B7280', fontWeight: '600', fontFamily: DEALO_FONT_FAMILY },
+
+  cardTight: { marginTop: 14, marginHorizontal: 16, backgroundColor: '#FFFFFF', borderRadius: 16, padding: 14, borderWidth: 1, borderColor: '#EEF2F7' },
+  bestStoreHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  bestStoreTitle: { fontSize: 13, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestStoreCompareRow: { flexDirection: 'row', gap: 12 },
+  bestStoreHalf: { flex: 1, borderRadius: 14, backgroundColor: '#F9FAFB', padding: 12, borderWidth: 1, borderColor: '#EEF2F7', overflow: 'hidden', minHeight: 170 },
+  bestStoreRow: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
+  bestStoreThumb: { width: 86, height: 86, borderRadius: 14, backgroundColor: '#F3F4F6' },
+  bestStoreTextCol: { flex: 1 },
+  bestStoreMetaRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  bestStoreLogoCircle: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0,0,0,0.08)', alignItems: 'center', justifyContent: 'center' },
+  bestStoreLogoText: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestStoreProductName: { fontSize: 11, fontWeight: '800', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestStorePrice: { fontSize: 16, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  bestStoreMeta: { fontSize: 10, fontWeight: '700', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY, marginTop: 2, marginBottom: 10 },
+  bestStoreBtn: { height: 36, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  bestStoreBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '800', fontFamily: DEALO_FONT_FAMILY },
+  bestStoreHeart: { position: 'absolute', right: 10, bottom: 10, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(17,24,39,0.55)', justifyContent: 'center', alignItems: 'center' },
+
+  priceHistoryTitle: { fontSize: 14, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  priceSection: { marginTop: 14, paddingHorizontal: 16 },
+  priceHeaderCol: { marginBottom: 10 },
+  priceGraphSubtitle: { marginTop: 4, fontSize: 12, fontWeight: '800', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY },
+  rangeRowAboveChart: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  rangeRowCompact: { flexDirection: 'row', gap: 8 },
+  rangeTab: { paddingHorizontal: 10, height: 26, borderRadius: 999, justifyContent: 'center', backgroundColor: '#F3F4F6' },
+  rangeTabActive: { backgroundColor: '#111827' },
+  rangeTabText: { fontSize: 10, fontWeight: '800', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY },
+  rangeTabTextActive: { color: '#FFFFFF' },
+  priceHistoryRow: { flexDirection: 'row', alignItems: 'center' },
+  priceChartCol: { flex: 1 },
+  priceDivider: { width: 1, height: 120, backgroundColor: '#EEF2F7', marginHorizontal: 12 },
+  priceOverviewCol: { width: 110 },
+  priceOverviewTitle: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginBottom: 8 },
+  priceOverviewRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  priceOverviewLeft: { fontSize: 12, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY, marginRight: 6 },
+  priceOverviewRight: { fontSize: 10, fontWeight: '700', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY },
+  todayDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: BRAND_GREEN, marginRight: 6 },
+
+  chartWrapMock: { alignItems: 'stretch', marginBottom: 8 },
+  chartWithYAxis: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
+  chartWithYAxisRight: { flexDirection: 'row', alignItems: 'center' },
+  chartYAxis: { height: 92, justifyContent: 'space-between', paddingVertical: 8, marginRight: 6 },
+  chartYAxisRight: { height: 92, justifyContent: 'space-between', paddingVertical: 8, marginLeft: 6 },
+  chartYAxisText: { fontSize: 10, color: '#9CA3AF', fontWeight: '600', fontFamily: DEALO_FONT_FAMILY },
+  chartSvgWrap: { position: 'relative' },
+  chartGridLines: { ...StyleSheet.absoluteFillObject, justifyContent: 'space-between', paddingVertical: 8 },
+  chartGridLine: { height: 1, backgroundColor: 'rgba(0,0,0,0.06)' },
+  chartXRow: { marginTop: 4, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 38, paddingRight: 12 },
+  chartXRowSmall: { marginTop: 2, flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 32, paddingRight: 6 },
+  chartAxisText: { fontSize: 10, color: '#9CA3AF', fontWeight: '600', fontFamily: DEALO_FONT_FAMILY },
+
+  sectionHeaderRowMock: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 18, marginBottom: 10 },
+  sectionTitleMockNoTop: { fontSize: 16, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  hScroll: { paddingHorizontal: 16 },
+  hScrollContent: { gap: 14, paddingRight: 16 },
+  hItem: { width: Math.min(180, Math.round(width * 0.46)) },
+  gridCard: { borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#EEF2F7', padding: 12, overflow: 'hidden' },
+  gridImgPlaceholder: { width: '100%', height: 110, borderRadius: 12, backgroundColor: '#F3F4F6' },
+  savePill: { position: 'absolute', left: 12, top: 12, height: 22, borderRadius: 6, backgroundColor: BRAND_GREEN, paddingHorizontal: 10, justifyContent: 'center' },
+  savePillText: { color: '#FFFFFF', fontSize: 10, fontWeight: '700', fontFamily: DEALO_FONT_FAMILY },
+  heartBtn: { position: 'absolute', right: 12, bottom: 12, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(17,24,39,0.55)', justifyContent: 'center', alignItems: 'center' },
+  gridMetaRow: { marginTop: 10, flexDirection: 'row', gap: 10, alignItems: 'center' },
+  gridStore: { fontSize: 12, fontWeight: '600', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  gridName: { fontSize: 12, fontWeight: '400', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  gridPrice: { fontSize: 12, fontWeight: '600', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  storeLogoBlank: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#E5E7EB', borderWidth: 1, borderColor: 'rgba(0,0,0,0.06)' },
+
+  bottomActions: { paddingHorizontal: 16, marginTop: 18, marginBottom: 22, flexDirection: 'row', gap: 14 },
+  bottomBtnSecondary: { flex: 1, height: 54, borderRadius: 999, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E5E7EB', justifyContent: 'center', alignItems: 'center' },
+  bottomBtnSecondaryText: { color: BRAND_GREEN, fontSize: 15, fontWeight: '700', fontFamily: DEALO_FONT_FAMILY },
+  bottomBtnPrimary: { flex: 1, height: 54, borderRadius: 999, backgroundColor: BRAND_GREEN, justifyContent: 'center', alignItems: 'center', shadowColor: BRAND_GREEN, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.33, shadowRadius: 26, elevation: 12 },
+  bottomBtnPrimaryText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', fontFamily: DEALO_FONT_FAMILY },
   sectionTitle: {
     fontSize: 26,
     fontWeight: '900',

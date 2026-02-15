@@ -3,7 +3,6 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { type Href, useRouter } from 'expo-router';
-import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import DealoWordmarkWhite from '../../assets/images/logos/dealo-wordmark-white';
 
 export default function GetStartedScreen() {
@@ -13,40 +12,30 @@ export default function GetStartedScreen() {
     <View style={styles.root}>
       <StatusBar style="light" />
 
-      <View style={styles.bgCircleTopLeft} />
-      <View style={styles.bgCircleBottomRight}>
-        <View style={styles.bgCircleBottomRightOverlay} />
-      </View>
+      <View pointerEvents="none" style={styles.bgCircleTopLeft} />
+      <View pointerEvents="none" style={styles.bgCircleBottomRight} />
 
       <View style={styles.content}>
-        <View style={styles.brandContainer}>
-          <DealoWordmarkWhite width={200} height={43} />
+        <View style={styles.brandGroup}>
+          <View style={styles.brandContainer}>
+            <DealoWordmarkWhite width={250} height={50} color="#FFFFFF" />
+          </View>
+
+          <Text style={styles.tagline}>Shop Smart Save Big</Text>
         </View>
 
-        <Text style={styles.tagline}>Shop Smart Save Big</Text>
-
         <View style={styles.ctaShadow}>
-          <Pressable style={styles.cta} onPress={() => router.push('/(onboarding)/create-account' as Href)}>
-            <Svg
-              pointerEvents="none"
-              style={StyleSheet.absoluteFillObject}
-              width="100%"
-              height="100%"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-            >
-              <Defs>
-                <LinearGradient id="ctaBg" x1="0" y1="0" x2="0" y2="1">
-                  <Stop offset="0" stopColor="#89C745" />
-                  <Stop offset="0.5" stopColor="#6EBF35" />
-                  <Stop offset="1" stopColor="#53982B" />
-                </LinearGradient>
-              </Defs>
-              <Rect x="0" y="0" width="100" height="100" fill="url(#ctaBg)" />
-            </Svg>
+          <Pressable
+            style={({ pressed, hovered }) => [styles.cta, (pressed || hovered) && styles.ctaPressed]}
+            onPress={() => router.replace('/(onboarding)/create-account' as Href)}
+          >
             <Text style={styles.ctaText}>Get Started</Text>
           </Pressable>
         </View>
+
+        <Pressable hitSlop={10} onPress={() => router.replace('/(onboarding)/login' as Href)}>
+          <Text style={styles.alreadyText}>I already have an account</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -55,32 +44,26 @@ export default function GetStartedScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#1B2618',
+    backgroundColor: '#1e2c11ff',
     overflow: 'hidden',
   },
   bgCircleTopLeft: {
     position: 'absolute',
-    width: 640,
-    height: 640,
-    borderRadius: 640 / 2,
+    width: 580,
+    height: 580,
+    borderRadius: 560 / 2,
+    top: -330,
+    left: -250,
     backgroundColor: '#89C745',
-    top: -360,
-    left: -360,
   },
   bgCircleBottomRight: {
     position: 'absolute',
-    width: 640,
-    height: 640,
-    borderRadius: 640 / 2,
-    backgroundColor: '#89C745',
-    overflow: 'hidden',
-    bottom: -360,
-    right: -360,
-  },
-  bgCircleBottomRightOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    width: 580,
+    height: 580,
+    borderRadius: 560 / 2,
+    bottom: -320,
+    right: -250,
     backgroundColor: '#53982B',
-    opacity: 0.5,
   },
   content: {
     flex: 1,
@@ -88,39 +71,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 24,
   },
+  brandGroup: {
+    alignItems: 'center',
+    transform: [{ translateY: -5 }],
+  },
   brandContainer: {
     alignItems: 'center',
     marginBottom: 20,
   },
   tagline: {
-    fontSize: 17,
-    fontWeight: '400',
+    fontSize: 20,
+    fontWeight: '600',
     color: '#FFFFFF',
-    opacity: 0.95,
-    marginBottom: 26,
+    opacity: 0.92,
+    marginBottom: 10,
   },
   cta: {
-    height: 44,
+    height: 45,
     paddingHorizontal: 26,
-    borderRadius: 6,
-    backgroundColor: '#53982B',
+    borderRadius: 8,
+    backgroundColor: 'rgba(115,207,62,0.7)',
+    borderWidth: 1,
+    borderColor: 'rgba(137,199,69,0.3)',
     overflow: 'hidden',
     position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  ctaPressed: {
+    opacity: 0.9,
+  },
   ctaShadow: {
-    borderRadius: 6,
+    borderRadius: 8,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
   ctaText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  alreadyText: {
+    marginTop: 16,
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#FFFFFF',
+    opacity: 0.92,
   },
 });
 

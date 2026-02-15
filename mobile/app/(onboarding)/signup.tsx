@@ -4,8 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
 
-const BG = '#E6FBE6';
+const BG = '#EDFFE8';
 const TEXT = '#111827';
 
 export default function SignupScreen() {
@@ -61,7 +62,7 @@ export default function SignupScreen() {
             disabled={!canContinue}
             onPress={() => {
               if (!canContinue) return;
-              router.push({ pathname: '/(onboarding)/verify-email', params: { email: maskedEmail } } as unknown as Href);
+              router.replace({ pathname: '/(onboarding)/verify-email', params: { email: maskedEmail } } as unknown as Href);
             }}
           >
             <Text style={[styles.buttonText, styles.primaryText]}>Continue</Text>
@@ -76,7 +77,10 @@ export default function SignupScreen() {
           <Pressable style={[styles.buttonBase, styles.secondary]} onPress={() => {}}>
             <Text style={[styles.buttonText, styles.secondaryText]}>Continue with Apple</Text>
           </Pressable>
-          <Pressable style={[styles.buttonBase, styles.secondary]} onPress={() => {}}>
+          <Pressable
+            style={[styles.buttonBase, styles.secondary]}
+            onPress={() => WebBrowser.openBrowserAsync('https://accounts.google.com/signin/v2/identifier?prompt=select_account')}
+          >
             <Text style={[styles.buttonText, styles.secondaryText]}>Continue with Google</Text>
           </Pressable>
         </View>

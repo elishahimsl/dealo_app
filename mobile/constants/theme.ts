@@ -5,25 +5,59 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+const BRAND_GREEN = '#0E9F6E';
+
+const tintColorLight = BRAND_GREEN;
+const tintColorDark = '#5FBF9A';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#111827',
+    background: '#FFFFFF',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
+    icon: 'rgba(17,24,39,0.7)',
+    tabIconDefault: 'rgba(17,24,39,0.55)',
     tabIconSelected: tintColorLight,
+
+    bgPrimary: '#FFFFFF',
+    surface1: '#FFFFFF',
+    surface2: '#F3F4F6',
+    surface3: '#E5E7EB',
+
+    textPrimary: '#111827',
+    textSecondary: '#6B7280',
+    textMuted: '#9CA3AF',
+
+    brandPrimary: BRAND_GREEN,
+    brandPressed: '#0B7F58',
+    brandSubtle: '#CDEFE2',
+
+    divider: 'rgba(17,24,39,0.08)',
+    border: 'rgba(17,24,39,0.12)',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
+    text: '#E6ECE9',
+    background: '#0F1412',
     tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
+    icon: 'rgba(230,236,233,0.7)',
+    tabIconDefault: 'rgba(230,236,233,0.55)',
     tabIconSelected: tintColorDark,
+
+    bgPrimary: '#0F1412',
+    surface1: '#151B18',
+    surface2: '#1B2320',
+    surface3: '#212B26',
+
+    textPrimary: '#E6ECE9',
+    textSecondary: '#A7B2AC',
+    textMuted: '#7F8A84',
+
+    brandPrimary: '#5FBF9A',
+    brandPressed: '#4AAE8A',
+    brandSubtle: '#3A6F5A',
+
+    divider: 'rgba(255,255,255,0.06)',
+    border: 'rgba(255,255,255,0.08)',
   },
 };
 

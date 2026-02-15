@@ -5,9 +5,9 @@ import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DealoMarkGreen from '../../assets/images/logos/dealo-mark-green';
 
-const BG = '#E6FBE6';
+const BG = '#EDFFE8';
 const TEXT = '#111827';
-const GREEN = '#0E9F6E';
+const GREEN = '#168600';
 
 export default function CreateAccountScreen() {
   const router = useRouter();
@@ -38,11 +38,11 @@ export default function CreateAccountScreen() {
         </View>
 
         <View style={styles.ctaWrap}>
-          <Pressable style={[styles.buttonBase, styles.primary]} onPress={() => router.push('/(onboarding)/signup' as Href)}>
+          <Pressable style={[styles.buttonBase, styles.primary]} onPress={() => router.replace('/(onboarding)/signup' as Href)}>
             <Text style={[styles.buttonText, styles.primaryText]}>Sign up</Text>
           </Pressable>
 
-          <Pressable style={[styles.buttonBase, styles.secondary]} onPress={() => router.push('/(onboarding)/login' as Href)}>
+          <Pressable style={[styles.buttonBase, styles.secondary]} onPress={() => router.replace('/(onboarding)/login' as Href)}>
             <Text style={[styles.buttonText, styles.secondaryText]}>Log in</Text>
           </Pressable>
         </View>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 18,
-    paddingTop: 6,
+    paddingTop: 18,
     paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',

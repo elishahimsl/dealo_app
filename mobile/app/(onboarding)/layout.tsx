@@ -9,8 +9,8 @@ export default function OnboardingLayout() {
         animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen name="splash" />
-      <Stack.Screen name="get-started" />
+      <Stack.Screen name="splash" options={{ animation: 'none' }} />
+      <Stack.Screen name="get-started" options={{ animation: 'none' }} />
       <Stack.Screen name="create-account" />
       <Stack.Screen name="login" />
       <Stack.Screen name="signup" />

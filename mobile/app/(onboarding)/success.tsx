@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const BG = '#E6FBE6';
+const BG = '#EDFFE8';
 const TEXT = '#111827';
 
 export default function SuccessScreen() {
@@ -18,7 +18,7 @@ export default function SuccessScreen() {
       <StatusBar style="dark" />
 
       <View style={styles.topRow}>
-        <Pressable hitSlop={10} onPress={() => router.canGoBack() && router.back()}>
+        <Pressable hitSlop={10} onPress={() => router.replace('/(onboarding)/create-account' as Href)}>
           <Ionicons name="chevron-back" size={22} color={TEXT} />
         </Pressable>
       </View>

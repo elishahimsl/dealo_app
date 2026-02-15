@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TextInput, TouchableOpacity, FlatList, Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { type Href, useRouter } from 'expo-router';
+import React, { useState, useRef, useCallback } from 'react';
+import { 
+  Animated,
+  View, 
+  Text, 
+  StyleSheet, 
+  ScrollView, 
+  Image, 
+  TextInput, 
+  TouchableOpacity, 
+  FlatList, 
+  Dimensions 
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { type Href, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import DealoWordmarkGreenBlack from '../../../assets/images/logos/dealo-wordmark-greenblack';
 import DealoMarkGreen from '../../../assets/images/logos/dealo-mark-green';
 
@@ -33,6 +45,65 @@ const trendingProducts = [
     image: 'https://images.unsplash.com/photo-1518441315630-3cb2f5223d82?auto=format&fit=crop&w=800&q=80',
   },
 ];
+
+const popularComparisons = [
+  { id: 'pc1', title: 'Samsung v. iPhone' },
+  { id: 'pc2', title: 'AirPods v. Beats' },
+  { id: 'pc3', title: 'Adidas v. Nike' },
+  { id: 'pc4', title: 'Lenovo v. HP' },
+];
+
+function MiniStack() {
+  const frontSize = 108;
+  const backSize = 104;
+  const backX = 72;
+  const frontY = 0;
+  const backY = 20;
+  const stackW = backX + backSize;
+  const stackH = Math.max(backY + backSize, frontY + frontSize);
+
+  return (
+    <View style={[styles.homeMiniStackWrap, { width: stackW, height: stackH }]}>
+      <View
+        pointerEvents="none"
+        style={[styles.homeMiniBackCard, { width: backSize, height: backSize, left: backX, top: backY }]}
+      />
+      <View style={[styles.homeMiniFront, { width: frontSize, height: frontSize, left: 0, top: frontY }]} />
+    </View>
+  );
+}
+
+function PopularComparisonTile({ title }: { title: string }) {
+  return (
+    <TouchableOpacity activeOpacity={0.9} style={styles.homePopularTileWrap}>
+      <View style={styles.homePopularTileCard}>
+        <MiniStack />
+        <TouchableOpacity activeOpacity={0.85} style={styles.homePopularTileHeart}>
+          <Ionicons name="heart-outline" size={16} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.homePopularTileTitle} numberOfLines={1}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function RecentlyComparedTile({ title }: { title: string }) {
+  return (
+    <TouchableOpacity activeOpacity={0.9} style={styles.homePopularTileWrap}>
+      <View style={styles.homePopularTileCard}>
+        <MiniStack />
+        <TouchableOpacity activeOpacity={0.85} style={styles.homePopularTileHeart}>
+          <Ionicons name="heart-outline" size={16} color="#FFFFFF" />
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.homePopularTileTitle} numberOfLines={1}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+}
 
 const storeProducts = [
   {
@@ -112,9 +183,42 @@ const navItems = [
   { label: 'Saved', icon: 'bookmark-outline' as const },
 ];
 
+const followChips = [
+  { id: 'follow-nike', label: 'Nike', logo: 'N' },
+  { id: 'follow-walmart', label: 'Walmart', logo: 'W' },
+  { id: 'follow-dyson', label: 'Dyson', logo: 'D' },
+];
+
+const dealProducts = [
+  { id: 'dp1', name: 'Running Shoes', store: 'Nike', price: '$109.99', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80', badge: '25% Off' },
+  { id: 'dp2', name: 'AirPods Pro', store: 'Apple', price: '$249.99', image: 'https://images.unsplash.com/photo-1588156979435-379b9d802b0a?auto=format&fit=crop&w=800&q=80', badge: '$10 Off' },
+  { id: 'dp3', name: 'Denim Jacket', store: "Levi's", price: '$89.99', image: 'https://images.unsplash.com/photo-1520975869017-a7f1f8fefe7b?auto=format&fit=crop&w=800&q=80', badge: '15% Off' },
+  { id: 'dp4', name: 'Smart Speaker', store: 'Amazon', price: '$99.99', image: 'https://images.unsplash.com/photo-1543512214-318c7553f230?auto=format&fit=crop&w=800&q=80', badge: '$20 Off' },
+];
+
+const categoryTiles = [
+  { id: 'cat-electronics', label: 'Electronics', icon: 'tv-outline' as const },
+  { id: 'cat-furniture', label: 'Furniture', icon: 'bed-outline' as const },
+  { id: 'cat-mens', label: "Men's", icon: 'man-outline' as const },
+  { id: 'cat-womens', label: "Women's", icon: 'woman-outline' as const },
+  { id: 'cat-fashion', label: 'Fashion', icon: 'shirt-outline' as const },
+  { id: 'cat-sports', label: 'Sports', icon: 'football-outline' as const },
+  { id: 'cat-beauty', label: 'Health & Beauty', icon: 'sparkles-outline' as const },
+  { id: 'cat-luxury', label: 'Luxury', icon: 'diamond-outline' as const },
+];
+
 export default function Home() {
   const router = useRouter();
   const [activeNav, setActiveNav] = useState<string>('Categories');
+  const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [following, setFollowing] = useState<Record<string, boolean>>({});
+  const dealScrollX = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    useCallback(() => {
+      setActiveNav('Categories');
+    }, [])
+  );
 
   interface Product {
     id: string;
@@ -124,21 +228,46 @@ export default function Home() {
     image: string;
   }
 
+  const dealsForYou = [
+    { id: 'deal-1', title: '50% Off all Electronics' },
+    { id: 'deal-2', title: 'Buy 1 Get 1 on Shoes' },
+    { id: 'deal-3', title: 'Extra 20% Off Clearance' },
+    { id: 'deal-4', title: 'Weekend Flash Sale' },
+  ];
+
+  const dealCardWidth = width - 64;
+  const dotStep = 14;
+  const dotsWrapWidth = 18 + (dealsForYou.length - 1) * dotStep;
+  const activeDotTranslateX = dealScrollX.interpolate({
+    inputRange: dealsForYou.map((_, i) => i * dealCardWidth),
+    outputRange: dealsForYou.map((_, i) => i * dotStep),
+    extrapolate: 'clamp',
+  });
+
   const renderProductCard = ({ item }: { item: Product }) => (
-    <View style={styles.productCard}>
+    <TouchableOpacity activeOpacity={0.9} onPress={() => router.push('/(tabs)/products' as Href)} style={styles.productCard}>
       <View style={styles.imageContainer}>
         <Image source={{ uri: item.image }} style={styles.productImage} />
-        <TouchableOpacity style={styles.heartIcon}>
-          <Ionicons name="heart-outline" size={16} color="#fff" />
+        <TouchableOpacity
+          style={[styles.heartIcon, liked[item.id] ? styles.heartIconActive : null]}
+          activeOpacity={0.85}
+          onPress={() => setLiked((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
+        >
+          <Ionicons name={liked[item.id] ? 'heart' : 'heart-outline'} size={16} color="#fff" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.productName} numberOfLines={1}>
-        {item.name}
-      </Text>
-      <Text style={styles.productStore} numberOfLines={1}>
-        {item.store}
-      </Text>
-    </View>
+      <View style={styles.productMetaRow}>
+        <View style={styles.productLogoPlaceholder} />
+        <View style={styles.productTextCol}>
+          <Text style={styles.productName} numberOfLines={1}>
+            {item.name}
+          </Text>
+          <Text style={styles.productStore} numberOfLines={1}>
+            {item.store}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -166,7 +295,7 @@ export default function Home() {
             editable={false}
             pointerEvents="none"
           />
-          <TouchableOpacity style={styles.searchCameraButton} onPress={() => router.push('/camera' as Href)}>
+          <TouchableOpacity style={styles.searchCameraButton} onPress={() => router.push('/(tabs)/camera' as Href)}>
             <Ionicons name="camera-outline" size={20} color="#6B7280" />
           </TouchableOpacity>
         </TouchableOpacity>
@@ -179,9 +308,9 @@ export default function Home() {
               style={[styles.navItem, activeNav === item.label && styles.activeNavItem]}
               onPress={() => {
                 setActiveNav(item.label);
-                if (item.label === 'Notifications') router.push('/(tabs)/home/notifications' as any);
-                if (item.label === 'Saved') router.push('/(tabs)/home/saved');
-                if (item.label === 'Following') router.push('/(tabs)/home/following');
+                if (item.label === 'Notifications') router.push('/home/notifications' as any);
+                if (item.label === 'Saved') router.push('/home/saved');
+                if (item.label === 'Following') router.push('/home/following');
               }}
               activeOpacity={0.85}
             >
@@ -197,7 +326,7 @@ export default function Home() {
         </ScrollView>
 
         {/* Snap to Search Card */}
-        <TouchableOpacity style={styles.snapCard} activeOpacity={0.9} onPress={() => router.push('/(tabs)/camera')}>
+        <TouchableOpacity style={styles.snapCard} activeOpacity={0.9} onPress={() => router.replace('/(tabs)/camera' as Href)}>
           <View style={styles.snapTop}>
             <View style={styles.snapIllustration}>
               <View style={[styles.starDot, { top: 18, left: 24, opacity: 0.35 }]} />
@@ -219,10 +348,10 @@ export default function Home() {
           </View>
         </TouchableOpacity>
 
-        {/* Trending Products */}
+        {/* Try Scanning These */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitleNoPad}>Trending Products</Text>
+            <Text style={styles.sectionTitleNoPad}>Try Scanning These</Text>
           </View>
           <FlatList
             data={trendingProducts}
@@ -232,6 +361,60 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.productsContainer}
           />
+        </View>
+
+        <View style={[styles.section, { marginTop: 18 }]}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitleNoPad}>Popular comparisons</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push('/compare/popularComparisons?returnTo=/home' as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homePopularRowContent}>
+            {popularComparisons.map((c) => (
+              <PopularComparisonTile key={c.id} title={c.title} />
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitleNoPad}>Recently Scanned</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push('/account/recents?filter=scanned&returnTo=/home' as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={similarProducts}
+            renderItem={renderProductCard}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.productsContainer}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitleNoPad}>Recently Compared</Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => router.push('/account/recents?filter=compared&returnTo=/home' as Href)}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homePopularRowContent}>
+            {popularComparisons.map((c) => (
+              <RecentlyComparedTile key={`rc-${c.id}`} title={c.title} />
+            ))}
+          </ScrollView>
         </View>
 
         {/* Smart Suggestions */}
@@ -251,7 +434,7 @@ export default function Home() {
         </View>
 
         {/* Similar to What You Liked */}
-        <View style={[styles.section, { marginBottom: 10 }]}>
+        <View style={[styles.section, { marginTop: 10, marginBottom: 6 }]}>
           <Text style={styles.smallSectionTitle}>Similar to What You Liked</Text>
           <FlatList
             data={similarProducts}
@@ -263,7 +446,7 @@ export default function Home() {
           />
         </View>
 
-        <View style={[styles.section, { marginBottom: 10 }]}>
+        <View style={[styles.section, { marginTop: 18, marginBottom: 24 }]}>
           <Text style={styles.smallSectionTitle}>From Brands you liked</Text>
           <FlatList
             data={brandProducts}
@@ -273,6 +456,104 @@ export default function Home() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.productsContainer}
           />
+        </View>
+
+        <View style={styles.homeMockSection}>
+          <View style={styles.homeMockHeaderRow}>
+            <Text style={styles.homeMockTitle}>Deals For You</Text>
+            <View style={styles.homeMockHeaderRight}>
+              <View style={styles.homeMockLogoStack}>
+                <View style={[styles.homeMockLogoCircle, styles.homeMockLogoCircleBack]}>
+                  <Ionicons name="logo-apple" size={16} color="#111827" />
+                </View>
+                <View style={[styles.homeMockLogoCircle, styles.homeMockLogoCircleMid]}>
+                  <Ionicons name="logo-amazon" size={16} color="#111827" />
+                </View>
+                <View style={[styles.homeMockLogoCircle, styles.homeMockLogoCircleFront]}>
+                  <Ionicons name="logo-google" size={16} color="#111827" />
+                </View>
+              </View>
+              <TouchableOpacity activeOpacity={0.85} onPress={() => router.replace('/(tabs)/deals' as Href)}>
+                <Ionicons name="chevron-forward" size={18} color="#111827" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <Animated.FlatList
+            data={dealsForYou}
+            keyExtractor={(d) => d.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+            decelerationRate="fast"
+            snapToInterval={dealCardWidth}
+            disableIntervalMomentum
+            bounces={false}
+            onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: dealScrollX } } }], { useNativeDriver: true })}
+            scrollEventThrottle={16}
+            contentContainerStyle={styles.homeMockDealCarousel}
+            renderItem={({ item }) => (
+              <View style={[styles.homeMockDealCard, { width: dealCardWidth }]}>
+                <View style={styles.homeMockDealPin}>
+                  <Ionicons name="pricetag" size={14} color="#111827" />
+                </View>
+                <Text style={styles.homeMockDealText}>{item.title}</Text>
+              </View>
+            )}
+          />
+
+          {/* Deal Product Tiles - 2 rows of 2 */}
+          <View style={styles.dealProductsGrid}>
+            {dealProducts.map((dp) => (
+              <View key={dp.id} style={styles.dealProductTile}>
+                <View style={styles.dealProductImageWrap}>
+                  <Image source={{ uri: dp.image }} style={styles.dealProductImage} />
+                  <View style={styles.dealBadge}>
+                    <Text style={styles.dealBadgeText}>{dp.badge}</Text>
+                  </View>
+                  <TouchableOpacity
+                    style={[styles.dealHeartIcon, liked[dp.id] ? styles.heartIconActive : null]}
+                    activeOpacity={0.85}
+                    onPress={() => setLiked((prev) => ({ ...prev, [dp.id]: !prev[dp.id] }))}
+                  >
+                    <Ionicons name={liked[dp.id] ? 'heart' : 'heart-outline'} size={16} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.productMetaRow}>
+                  <View style={styles.productLogoPlaceholder} />
+                  <View style={styles.productTextCol}>
+                    <Text style={styles.productName} numberOfLines={1}>{dp.name}</Text>
+                    <Text style={styles.productStore} numberOfLines={1}>{dp.store}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.homeMockHeaderRowTight}>
+            <Text style={styles.homeMockSubTitle}>Stores and Brands</Text>
+            <TouchableOpacity activeOpacity={0.85} onPress={() => router.replace('/discover' as Href)}>
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homeMockFollowRow}>
+            {followChips.map((c) => (
+              <View key={c.id} style={styles.homeMockFollowTile}>
+                <View style={styles.homeMockFollowTileRow}>
+                  <View style={styles.homeMockFollowLogoCircle}>
+                    <Text style={styles.homeMockFollowLogoText}>{c.logo}</Text>
+                  </View>
+                  <View style={styles.homeMockFollowInfo}>
+                    <Text style={styles.homeMockFollowLabel}>{c.label}</Text>
+                    <TouchableOpacity activeOpacity={0.85} style={[styles.homeMockFollowBtnGreen, following[c.id] && { backgroundColor: '#E5E7EB' }]} onPress={() => setFollowing((prev) => ({ ...prev, [c.id]: !prev[c.id] }))}>
+                      <Text style={[styles.homeMockFollowBtnGreenText, following[c.id] && { color: '#6B7280' }]}>{following[c.id] ? 'Following' : 'Follow'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         <View style={styles.footer}>
@@ -494,10 +775,10 @@ const styles = StyleSheet.create({
   smallSectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#9CA3AF',
-    paddingHorizontal: 20,
-    marginTop: 14,
-    marginBottom: 12,
+    color: '#6B7280',
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 8,
   },
   sectionSubtitle: {
     fontSize: 12,
@@ -507,6 +788,351 @@ const styles = StyleSheet.create({
   productsContainer: {
     paddingLeft: 20,
     paddingRight: 6,
+  },
+  homePopularRowContent: {
+    paddingLeft: 18,
+    paddingRight: 18,
+    gap: 16,
+  },
+  homePopularTileWrap: {
+    width: 238,
+    marginBottom: 0,
+  },
+  homePopularTileCard: {
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    padding: 12,
+    height: 140,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  homePopularTileHeart: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(17,24,39,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 6,
+  },
+  homePopularTileTitle: {
+    marginTop: 8,
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#111827',
+    fontFamily: 'Manrope-Regular',
+  },
+  homeMiniStackWrap: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  homeMiniBackCard: {
+    position: 'absolute',
+    borderRadius: 20,
+    backgroundColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.05)',
+    opacity: 0.75,
+    transform: [{ rotate: '0deg' }],
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.03,
+    shadowRadius: 14,
+    elevation: 2,
+  },
+  homeMiniFront: {
+    position: 'absolute',
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    elevation: 7,
+    overflow: 'hidden',
+  },
+  homeMockSection: {
+    marginHorizontal: 16,
+    marginTop: 22,
+    marginBottom: 6,
+  },
+  homeMockHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  homeMockHeaderRowTight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 18,
+    marginBottom: 14,
+  },
+  homeMockTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  homeMockSubTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 6,
+    marginBottom: 0,
+  },
+  homeMockViewAll: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: BRAND_GREEN,
+    opacity: 0.9,
+  },
+  homeMockHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  homeMockLogoStack: {
+    width: 70,
+    height: 26,
+    position: 'relative',
+  },
+  homeMockLogoCircle: {
+    position: 'absolute',
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  homeMockLogoCircleBack: {
+    left: 0,
+    top: 0,
+  },
+  homeMockLogoCircleMid: {
+    left: 17,
+    top: 0,
+  },
+  homeMockLogoCircleFront: {
+    left: 34,
+    top: 0,
+  },
+  homeMockDealCard: {
+    borderRadius: 18,
+    backgroundColor: '#F3F4F6',
+    padding: 18,
+    marginRight: 12,
+    height: 120,
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+  homeMockDealCarousel: {
+    paddingRight: 16,
+  },
+  homeMockDealPin: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  homeMockDealText: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 12,
+  },
+  dealProductsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 0,
+    gap: 12,
+    marginTop: 22,
+    marginBottom: 6,
+  },
+  dealProductTile: {
+    width: (width - 32 - 12) / 2,
+    marginBottom: 4,
+  },
+  dealProductImageWrap: {
+    width: '100%',
+    height: 142,
+    borderRadius: 8,
+    marginBottom: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  dealProductImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  dealBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: BRAND_GREEN,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  dealBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  homeMockDotsWrap: {
+    height: 6,
+    alignSelf: 'center',
+    position: 'relative',
+  },
+  homeMockDotsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    justifyContent: 'center',
+    paddingLeft: 6,
+  },
+  homeMockDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(17,24,39,0.25)',
+  },
+  homeMockDotActive: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: 18,
+    height: 6,
+    borderRadius: 99,
+    backgroundColor: BRAND_GREEN,
+  },
+  homeMockFollowRow: {
+    paddingRight: 12,
+    gap: 12,
+  },
+  homeMockFollowTile: {
+    width: 176,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+  },
+  homeMockFollowTileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  homeMockFollowLogoCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  homeMockFollowLogoText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  homeMockFollowInfo: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 8,
+  },
+  homeMockFollowLabel: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  homeMockFollowBtnGreen: {
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: BRAND_GREEN,
+    alignSelf: 'flex-start',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+  },
+  homeMockFollowBtnGreenText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  homeMockCategoriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  homeMockCategoriesFrame: {
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  homeMockCategoryCell: {
+    width: '25%',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  homeMockCategoryCellRight: {
+    borderRightWidth: 0,
+    borderRightColor: 'transparent',
+  },
+  homeMockCategoryCellBottom: {
+    borderBottomWidth: 0,
+    borderBottomColor: 'transparent',
+  },
+  homeMockCategoryIconBare: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.10)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  homeMockCategoryLabelBare: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#111827',
+    opacity: 0.85,
+    textAlign: 'center',
   },
   productCard: {
     width: 150,
@@ -537,6 +1163,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  dealHeartIcon: {
+    position: 'absolute',
+    bottom: 6,
+    right: 6,
+    backgroundColor: 'rgba(17,24,39,0.45)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heartIconActive: {
+    backgroundColor: BRAND_GREEN,
+  },
   productName: {
     fontSize: 12,
     fontWeight: '600',
@@ -546,6 +1186,23 @@ const styles = StyleSheet.create({
   productStore: {
     fontSize: 10,
     color: '#6B7280',
+  },
+  productMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  productLogoPlaceholder: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#E5E7EB',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.10)',
+    marginTop: 0,
+  },
+  productTextCol: {
+    flex: 1,
   },
   footer: {
     alignItems: 'center',

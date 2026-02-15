@@ -27,8 +27,8 @@ export default function Logo({ width = 120, height = 130 }: LogoProps) {
           y2="674.7"
           gradientUnits="userSpaceOnUse"
         >
-          <Stop offset="0" stopColor="#89c745" />
-          <Stop offset="1" stopColor="#53982b" />
+          <Stop offset="0" stopColor="#89C745" />
+          <Stop offset="1" stopColor="#53982B" />
         </LinearGradient>
       </Defs>
 

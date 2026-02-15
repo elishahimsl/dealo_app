@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const BG = '#E6FBE6';
+const BG = '#EDFFE8';
 const TEXT = '#111827';
 
 export default function VerifyEmailScreen() {
@@ -43,7 +43,7 @@ export default function VerifyEmailScreen() {
       <StatusBar style="dark" />
 
       <View style={styles.topRow}>
-        <Pressable hitSlop={10} onPress={() => router.canGoBack() && router.back()}>
+        <Pressable hitSlop={10} onPress={() => router.replace('/(onboarding)/signup' as Href)}>
           <Ionicons name="chevron-back" size={22} color={TEXT} />
         </Pressable>
         <Text style={styles.topTitle}>Confirm Email</Text>
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     height: 56,
     borderRadius: 6,
     borderWidth: 2,
-    backgroundColor: BG,
+    backgroundColor: '#FFFFFF',
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '700',

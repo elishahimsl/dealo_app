@@ -64,7 +64,7 @@ export default function Following() {
         ListHeaderComponent={
           <View style={styles.header}>
             <TouchableOpacity activeOpacity={0.85} onPress={() => router.back()} style={styles.backBtn}>
-              <Ionicons name="arrow-back" size={22} color="#111827" />
+              <Ionicons name="chevron-back" size={22} color="#111827" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>Following</Text>
             <TouchableOpacity activeOpacity={0.85} style={styles.manageBtn}>

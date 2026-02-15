@@ -405,7 +405,6 @@ export default function CameraScreen() {
           router.push({
             pathname: '/camera/results',
             params: {
-              identifyOnly: '1',
               objectName: detected.name,
               category: detected.category,
               confidence: detected.confidence.toString(),

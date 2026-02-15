@@ -4,10 +4,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-const BG = '#2D4B17';
-const CARD_OFF = '#6B7280';
-const CARD_ON = '#4E8D2C';
+const BG = '#1e2c11ff';
 
 type Item = {
   id: string;
@@ -17,24 +16,40 @@ type Item = {
 
 function HeartCard({ item, selected, onToggle, size }: { item: Item; selected: boolean; onToggle: () => void; size: { w: number; h: number } }) {
   return (
-    <Pressable
-      onPress={onToggle}
-      style={[styles.card, { width: size.w, height: size.h }, selected ? styles.cardOn : styles.cardOff]}
-    >
-      <View style={styles.heartWrap}>
-        <Ionicons name={selected ? 'heart' : 'heart-outline'} size={18} color={selected ? '#FFFFFF' : '#111111'} />
-      </View>
+    <View style={[styles.card, { width: size.w, height: size.h }]}>
+      <Svg
+        pointerEvents="none"
+        style={StyleSheet.absoluteFillObject}
+        width="100%"
+        height="100%"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+      >
+        <Defs>
+          <LinearGradient id={`cardGrad-${item.id}`} x1="0" y1="0" x2="0" y2="1">
+            <Stop offset="0" stopColor="#4C4C4C" />
+            <Stop offset="1" stopColor="#53982B" />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width="100" height="100" fill={`url(#cardGrad-${item.id})`} />
+      </Svg>
 
-      <View style={styles.cardCenter}>
-        {item.icon ? (
-          <Ionicons name={item.icon} size={44} color={selected ? '#FFFFFF' : '#111111'} />
-        ) : (
-          <Text style={[styles.cardInitial, selected ? styles.cardInitialOn : styles.cardInitialOff]}>{item.label.slice(0, 1)}</Text>
-        )}
-      </View>
+      <View style={styles.cardContent}>
+        <Pressable hitSlop={10} onPress={onToggle} style={[styles.heartWrap, selected ? styles.heartWrapOn : null]}>
+          <Ionicons name={selected ? 'heart' : 'heart-outline'} size={18} color="#FFFFFF" />
+        </Pressable>
 
-      <Text style={styles.cardLabel}>{item.label}</Text>
-    </Pressable>
+        <View style={styles.cardCenter}>
+          {item.icon ? (
+            <Ionicons name={item.icon} size={44} color="#FFFFFF" style={styles.cardGlyph} />
+          ) : (
+            <Text style={styles.cardInitial}>{item.label.slice(0, 1)}</Text>
+          )}
+        </View>
+
+        <Text style={styles.cardLabel}>{item.label}</Text>
+      </View>
+    </View>
   );
 }
 
@@ -111,6 +126,12 @@ export default function SuggestionsScreen() {
       { id: 'brand-gap', label: 'GAP' },
       { id: 'brand-puma', label: 'Puma' },
       { id: 'brand-uniqlo', label: 'Uniqlo' },
+      { id: 'brand-samsung', label: 'Samsung' },
+      { id: 'brand-sony', label: 'Sony' },
+      { id: 'brand-microsoft', label: 'Microsoft' },
+      { id: 'brand-lg', label: 'LG' },
+      { id: 'brand-dell', label: 'Dell' },
+      { id: 'brand-lenovo', label: 'Lenovo' },
     ],
     [],
   );
@@ -143,18 +164,23 @@ export default function SuggestionsScreen() {
 
   const { width } = Dimensions.get('window');
   const pagePad = 18;
-  const gap = 12;
+  const gap = 8;
   const brandCardW = Math.floor((width - pagePad * 2 - gap * 2) / 3);
-  const brandCardH = 132;
-  const smallCard = { w: brandCardW, h: 92 };
+  const brandCardH = 180;
+  const smallCard = { w: brandCardW + 26, h: 92 };
 
   return (
     <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
       <StatusBar style="light" />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <Svg pointerEvents="none" height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
+        <Rect x="0" y="0" width="100%" height="100%" fill="rgba(83,152,43,0.2)" />
+        <Rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.2)" />
+      </Svg>
+
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
-          <Pressable hitSlop={10} onPress={() => router.replace('/(tabs)/home/index' as Href)} style={styles.skipBtn}>
+          <Pressable hitSlop={10} onPress={() => router.replace('/(tabs)/home' as Href)} style={styles.skipBtn}>
             <Text style={styles.skip}>Skip</Text>
           </Pressable>
         </View>
@@ -180,7 +206,7 @@ export default function SuggestionsScreen() {
         <TwoRowHorizontal title="Topics" items={topics} selected={selected} onToggle={toggle} cardSize={smallCard} />
 
         <View style={styles.bottomCtaWrap}>
-          <Pressable style={styles.primaryCta} onPress={() => router.replace('/(tabs)/home/index' as Href)}>
+          <Pressable style={styles.primaryCta} onPress={() => router.replace('/(tabs)/home' as Href)}>
             <Text style={styles.primaryCtaText}>Continue</Text>
           </Pressable>
         </View>
@@ -194,7 +220,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: BG,
   },
+  scroll: {
+    flex: 1,
+    backgroundColor: BG,
+  },
   scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 18,
     paddingTop: 10,
     paddingBottom: 22,
@@ -216,17 +247,18 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 10,
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: '800',
     color: '#FFFFFF',
-    lineHeight: 34,
+    lineHeight: 24,
+    textAlign: 'center',
     marginBottom: 22,
   },
   section: {
     marginBottom: 18,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
     opacity: 0.95,
@@ -235,36 +267,43 @@ const styles = StyleSheet.create({
   brandGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 8,
   },
   hScrollContent: {
-    gap: 12,
+    gap: 8,
     paddingRight: 18,
   },
   column: {
-    gap: 12,
+    gap: 8,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 28,
     overflow: 'hidden',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
+    elevation: 14,
+  },
+  cardContent: {
+    flex: 1,
     padding: 12,
     justifyContent: 'space-between',
-  },
-  cardOff: {
-    backgroundColor: CARD_OFF,
-    opacity: 0.85,
-  },
-  cardOn: {
-    backgroundColor: CARD_ON,
   },
   heartWrap: {
     alignSelf: 'flex-end',
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    backgroundColor: '#2C2C2C',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  heartWrapOn: {
+    backgroundColor: '#2C2C2C',
   },
   cardCenter: {
     flex: 1,
@@ -272,20 +311,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardInitial: {
-    fontSize: 38,
+    fontSize: 34,
     fontWeight: '900',
-  },
-  cardInitialOff: {
-    color: '#111111',
-  },
-  cardInitialOn: {
     color: '#FFFFFF',
+    textShadowColor: 'rgba(0,0,0,0.55)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  cardGlyph: {
+    textShadowColor: 'rgba(0,0,0,0.55)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
   cardLabel: {
     marginTop: 4,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
+    textShadowColor: 'rgba(0,0,0,0.55)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   bottomCtaWrap: {
     marginTop: 8,
@@ -294,8 +339,15 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 14,
     backgroundColor: '#111111',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 14 },
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 10,
   },
   primaryCtaText: {
     color: '#FFFFFF',

@@ -3,10 +3,12 @@ import { Tabs, useRouter, useSegments } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Animated, PanResponder, StyleSheet, View, TouchableOpacity, Image } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { StackActions, TabActions } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type LeftTabKey = 'home/index' | 'compare/index' | 'discover/index';
-type RightTabKey = 'account/index' | 'camera/index';
+type LeftTabKey = 'home' | 'compare' | 'discover';
+type RightTabKey = 'account' | 'camera';
+type TabKey = LeftTabKey | 'deals' | RightTabKey;
 
 const BRAND_GREEN = '#0E9F6E';
 const INACTIVE = '#374151';
@@ -203,17 +205,45 @@ function HomeIcon({ size, focused }: { size: number; focused: boolean }) {
 }
 
 const LEFT_TABS: { key: LeftTabKey }[] = [
-  { key: 'home/index' },
-  { key: 'discover/index' },
-  { key: 'compare/index' },
+  { key: 'home' },
+  { key: 'discover' },
+  { key: 'compare' },
 ];
 
-const CAMERA_TAB: RightTabKey = 'camera/index';
+const CAMERA_TAB: RightTabKey = 'camera';
 
 function CustomTabBar(props: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const segments = useSegments() as unknown as string[];
+
+  const goToTabRoot = (key: TabKey) => {
+    const tabRoute = props.state.routes.find((r) => r.name === key);
+
+    if (!tabRoute) {
+      if (key === 'deals') {
+        router.replace('/(tabs)/deals' as any);
+      }
+      return;
+    }
+
+    try {
+      props.navigation.dispatch(TabActions.jumpTo(key as any));
+    } catch {
+      if (key === 'deals') {
+        router.replace('/(tabs)/deals' as any);
+        return;
+      }
+    }
+
+    const nestedState = tabRoute?.state as any;
+    const nestedKey: string | undefined = nestedState?.key;
+    const nestedIndex: number = nestedState?.index ?? 0;
+
+    if (nestedKey && nestedIndex > 0) {
+      props.navigation.dispatch({ ...StackActions.popToTop(), target: nestedKey });
+    }
+  };
 
   const [leftWidth, setLeftWidth] = useState(0);
   const segmentW = useMemo(() => {
@@ -280,12 +310,12 @@ function CustomTabBar(props: BottomTabBarProps) {
             stiffness: 220,
             mass: 0.9,
           }).start();
-          props.navigation.navigate(LEFT_TABS[idx].key as never);
+          goToTabRoot(LEFT_TABS[idx].key);
         });
       },
       onPanResponderTerminate: () => {},
     });
-  }, [indicatorX, props.navigation, segmentW]);
+  }, [goToTabRoot, indicatorX, segmentW]);
 
   const dealsFocused = segments.includes('deals');
   const cameraFocused = segments.includes('camera') || currentRouteName === CAMERA_TAB;
@@ -296,7 +326,7 @@ function CustomTabBar(props: BottomTabBarProps) {
   }
 
   return (
-    <View pointerEvents="box-none" style={[styles.root, { paddingBottom: Math.max(10, insets.bottom + 6) }]}>
+    <View style={[styles.root, { paddingBottom: Math.max(10, insets.bottom + 6) }]}>
       <View style={styles.row}>
         <View
           style={styles.leftPill}
@@ -321,12 +351,12 @@ function CustomTabBar(props: BottomTabBarProps) {
                 key={t.key}
                 activeOpacity={0.85}
                 style={styles.leftItem}
-                onPress={() => props.navigation.navigate(t.key as never)}
+                onPress={() => goToTabRoot(t.key)}
               >
                 <View style={styles.leftIconWrap}>
-                  {t.key === 'home/index' ? (
+                  {t.key === 'home' ? (
                     <HomeIcon size={LEFT_ICON_SIZE} focused={focused} />
-                  ) : t.key === 'discover/index' ? (
+                  ) : t.key === 'discover' ? (
                     <DiscoverIcon size={LEFT_ICON_SIZE} focused={focused} />
                   ) : (
                     <CompareIcon size={LEFT_ICON_SIZE} focused={focused} />
@@ -340,7 +370,7 @@ function CustomTabBar(props: BottomTabBarProps) {
         <View style={styles.rightGroup}>
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={() => router.push('/(tabs)/home/deals')}
+            onPress={() => goToTabRoot('deals')}
             style={[styles.profileBtn, dealsFocused && styles.profileBtnActive]}
           >
             <Ionicons name="pricetag" size={ICON_SIZE + 2} color={ACTIVE_ICON} />
@@ -374,37 +404,49 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="home/index"
+          name="home"
           options={{
             title: 'Home',
           }}
         />
         <Tabs.Screen
-          name="search/index"
+          name="search"
           options={{
             href: null,
           }}
         />
         <Tabs.Screen
-          name="discover/index"
+          name="products"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="discover"
           options={{
             title: 'Discover',
           }}
         />
         <Tabs.Screen
-          name="compare/index"
+          name="deals"
+          options={{
+            title: 'Deals',
+          }}
+        />
+        <Tabs.Screen
+          name="compare"
           options={{
             title: 'Compare',
           }}
         />
         <Tabs.Screen
-          name="camera/index"
+          name="camera"
           options={{
             title: 'Camera',
           }}
         />
         <Tabs.Screen
-          name="account/index"
+          name="account"
           options={{
             title: 'Account',
           }}
@@ -427,6 +469,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingHorizontal: 8,
+    zIndex: 999,
+    elevation: 999,
   },
   row: {
     flexDirection: 'row',

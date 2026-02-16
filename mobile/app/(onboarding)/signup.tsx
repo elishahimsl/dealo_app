@@ -1,18 +1,22 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 
+import { useAuth } from '../../lib/hooks/use-auth';
+
 const BG = '#EDFFE8';
 const TEXT = '#111827';
 
 export default function SignupScreen() {
   const router = useRouter();
+  const { signUp, signInWithGoogle, signInWithApple } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const canContinue = email.trim().length > 0 && password.trim().length > 0;
 
@@ -23,6 +27,20 @@ export default function SignupScreen() {
     const head = u.slice(0, 1) || 'e';
     return `${head}${'-'.repeat(Math.max(1, Math.min(6, u.length - 1)))}@${d}`;
   }, [email]);
+
+  const handleSignup = async () => {
+    if (!canContinue) return;
+
+    setIsLoading(true);
+    const { error } = await signUp(email, password);
+    
+    if (error) {
+      Alert.alert('Signup Failed', error.message);
+    } else {
+      router.replace({ pathname: '/(onboarding)/verify-email', params: { email: maskedEmail } } as unknown as Href);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
@@ -59,13 +77,12 @@ export default function SignupScreen() {
 
           <Pressable
             style={[styles.buttonBase, styles.primary, !canContinue && styles.primaryDisabled]}
-            disabled={!canContinue}
-            onPress={() => {
-              if (!canContinue) return;
-              router.replace({ pathname: '/(onboarding)/verify-email', params: { email: maskedEmail } } as unknown as Href);
-            }}
+            disabled={!canContinue || isLoading}
+            onPress={handleSignup}
           >
-            <Text style={[styles.buttonText, styles.primaryText]}>Continue</Text>
+            <Text style={[styles.buttonText, styles.primaryText]}>
+              {isLoading ? 'Creating account...' : 'Continue'}
+            </Text>
           </Pressable>
 
           <View style={styles.dividerRow}>

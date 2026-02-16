@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
@@ -7,14 +7,58 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from 'expo-web-browser';
 
 import DealoWordmarkGreenBlack from '../../assets/images/logos/dealo-wordmark-greenblack';
+import { useAuth } from '../../lib/hooks/use-auth';
 
 const BG = '#EDFFE8';
 const TEXT = '#111827';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { signIn, signInWithGoogle, signInWithApple, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    setIsLoading(true);
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      Alert.alert('Login Failed', error.message);
+    } else {
+      router.replace('/(onboarding)/suggestions' as Href);
+    }
+    setIsLoading(false);
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsLoading(true);
+    const { error } = await signInWithGoogle();
+    
+    if (error) {
+      Alert.alert('Google Login Failed', error.message);
+    } else {
+      router.replace('/(onboarding)/suggestions' as Href);
+    }
+    setIsLoading(false);
+  };
+
+  const handleAppleLogin = async () => {
+    setIsLoading(true);
+    const { error } = await signInWithApple();
+    
+    if (error) {
+      Alert.alert('Apple Login Failed', error.message);
+    } else {
+      router.replace('/(onboarding)/suggestions' as Href);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <SafeAreaView style={styles.root} edges={['top', 'bottom']}>
@@ -56,8 +100,10 @@ export default function LoginScreen() {
             <Text style={styles.forgot}>Forgot Password?</Text>
           </Pressable>
 
-          <Pressable style={[styles.buttonBase, styles.primary]} onPress={() => router.replace('/(onboarding)/suggestions' as Href)}>
-            <Text style={[styles.buttonText, styles.primaryText]}>Log in</Text>
+          <Pressable style={[styles.buttonBase, styles.primary]} onPress={handleLogin} disabled={isLoading}>
+            <Text style={[styles.buttonText, styles.primaryText]}>
+              {isLoading ? 'Logging in...' : 'Log in'}
+            </Text>
           </Pressable>
 
           <View style={styles.dividerRow}>
@@ -66,17 +112,22 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <Pressable style={[styles.buttonBase, styles.social]} onPress={() => {}}>
+          <Pressable style={[styles.buttonBase, styles.social]} onPress={handleAppleLogin} disabled={isLoading}>
             <Ionicons name="logo-apple" size={22} color="#111111" style={styles.socialIcon} />
-            <Text style={[styles.buttonText, styles.socialText]}>Log in using Apple</Text>
+            <Text style={[styles.buttonText, styles.socialText]}>
+              {isLoading ? 'Signing in...' : 'Log in using Apple'}
+            </Text>
           </Pressable>
 
           <Pressable
             style={[styles.buttonBase, styles.social]}
-            onPress={() => WebBrowser.openBrowserAsync('https://accounts.google.com/signin/v2/identifier?prompt=select_account')}
+            onPress={handleGoogleLogin}
+            disabled={isLoading}
           >
             <Ionicons name="logo-google" size={20} color="#111111" style={styles.socialIcon} />
-            <Text style={[styles.buttonText, styles.socialText]}>Log in using Google</Text>
+            <Text style={[styles.buttonText, styles.socialText]}>
+              {isLoading ? 'Signing in...' : 'Log in using Google'}
+            </Text>
           </Pressable>
         </View>
       </View>

@@ -1,18 +1,20 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "DeaLo",
     "slug": "dealo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "dealo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "jsEngine": "hermes",
     "ios": {
+      "bundleIdentifier": "com.dealo.app",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.dealo.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

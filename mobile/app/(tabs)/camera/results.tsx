@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform, ActivityIndicator, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
+import { useProductLookup } from '../../../lib/hooks/use-product-lookup';
 
 const { width } = Dimensions.get('window');
 
@@ -12,123 +13,6 @@ const DEALO_FONT_FAMILY = 'Manrope-Regular'; // This matches the clean, modern s
 const BRAND_GREEN = '#0E9F6E';
 
 type RangeKey = '90D' | '3M' | '1Y';
-
-interface DetectedProduct {
-  objectName: string;
-  category: string;
-  confidence: string;
-  description: string;
-  features: string;
-  priceRange: string;
-  alternatives: string;
-  imageUri: string;
-}
-
-// Product data with extended properties
-interface ExtendedProductData {
-  specs?: Record<string, any>;
-  reviews?: {
-    average: number;
-    total: number;
-    sentiment: number;
-    summary: string;
-    common: string;
-    pros: string[];
-    cons: string[];
-  };
-  retailers?: Record<string, {
-    price: number;
-    stock: boolean;
-    rating: number;
-    shipping: string;
-  }>;
-  alternatives?: {
-    name: string;
-    price: number;
-    rating: number;
-    image: string;
-  }[];
-  currentPrice?: number;
-}
-
-const MOCK_CAMERA_RESULTS = {
-  product: {
-    name: 'Beats Solo 4',
-    subtitle: 'Beats Solo 4 - Black',
-    dealPill: 'Good Deal',
-    matchDots: 4,
-    image:
-      'https://images.unsplash.com/photo-1518441902117-f0a6a8efb6f3?auto=format&fit=crop&w=1200&q=80',
-  },
-  overview: {
-    description:
-      'The Beats Solo 4 are on-ear wireless headphones designed for everyday listening with strong bass',
-    tags: ['Wireless Headphones', '40 Hr Battery', 'On Ear-comfort', 'Built in Mic'],
-    strengths: [
-      'Sleek and modern aesthetics that fit well with everyday wear',
-      'Strong bass response — satisfying for pop, hip-hop',
-      'Adjustable headband and foldable design improve portability',
-    ],
-    weaknesses: [
-      "On-ear design doesn't provide as tight a seal as over-ear models",
-      'Premium pricing compared with similar feature sets from competitors',
-      'Bass-forward tuning can overshadow mids and highs for some',
-    ],
-  },
-  aiScore: {
-    score: 85,
-    label: 'Strong Deal',
-    breakdown: [
-      { key: 'Price', value: 78 },
-      { key: 'Features', value: 80 },
-      { key: 'Value', value: 82 },
-      { key: 'Durability', value: 82 },
-    ],
-    rundown:
-      'The 83 score reflects strong popularity, reliable performance, and positive reviews, balanced against higher pricing and the lack of premium noise cancellation.',
-  },
-  bestPrice: {
-    discount: '25% Off',
-    store: 'Target',
-    rating: 4.2,
-    price: '$149.99',
-    stock: 'In-Stock',
-  },
-  market: {
-    avg: '$199.99',
-    today: '$149.99',
-    low: '$79.99',
-    range: ['30D', '90D', '1Y'] as const,
-    points: [210, 210, 180, 185, 175, 170, 200, 200, 150],
-  },
-  reviews: {
-    overall: 'Positive',
-    rows: [
-      { k: 'Overall Sentiment', v: 'Positive', tone: 'good' as const },
-      { k: 'Battery Life', v: 'Fair', tone: 'warn' as const },
-      { k: 'Comfort', v: 'Very Positive', tone: 'good' as const },
-      { k: 'Sound', v: 'Positive', tone: 'good' as const },
-      { k: 'Build Quality', v: 'Positive', tone: 'good' as const },
-    ],
-  },
-  reviewOverview: {
-    sentiment: 'Mostly Positive',
-    body:
-      'Across public reviews, the Beats Solo 4 are consistently praised for their comfortable on-ear fit, long battery life, and reliable everyday performance.',
-  },
-  otherStores: [
-    { id: 'os1', save: 'Save $70', store: 'Best Buy', name: 'Beats Solo 4-Black', price: '$129.99', logo: 'bestbuy' as const },
-    { id: 'os2', save: 'Save $70', store: 'Beats', name: 'Beats Solo 4', price: '$199.99', logo: 'beats' as const },
-  ],
-  alternatives: [
-    { id: 'alt1', save: 'Save $78', store: 'Best Buy', name: 'Sony - WHCH720N', price: '$99.99', logo: 'bestbuy' as const },
-    { id: 'alt2', save: 'Save $180', store: 'Walmart', name: 'Sony - WHCH720N', price: '$169.95', logo: 'walmart' as const },
-  ],
-} as const;
-
-const MOCK_MARKET_MAX = Math.max(...MOCK_CAMERA_RESULTS.market.points);
-const MOCK_MARKET_MIN = Math.min(...MOCK_CAMERA_RESULTS.market.points);
-const MOCK_MARKET_MID = Math.round((MOCK_MARKET_MAX + MOCK_MARKET_MIN) / 2);
 
 type StoreLogoKey = 'target' | 'bestbuy' | 'beats' | 'walmart';
 
@@ -211,167 +95,6 @@ function MarketChart({ points }: { points: number[] }) {
   );
 }
 
-// Enhanced realistic product database
-const REAL_PRODUCT_DATABASE = {
-  'Apple iPhone 15 Pro': {
-    category: 'Electronics',
-    specs: {
-      display: '6.1\" Super Retina XDR',
-      processor: 'A17 Pro chip',
-      camera: '48MP Main, 12MP Ultra Wide',
-      battery: 'Up to 29 hours video playback',
-      storage: '128GB, 256GB, 512GB, 1TB',
-      dimensions: '5.81 x 2.82 x 0.32 inches',
-      weight: '221 grams'
-    },
-    priceHistory: [1199, 1099, 999, 949, 899],
-    currentPrice: 949,
-    priceRange: '$899-$1199',
-    reviews: {
-      average: 4.6,
-      total: 15432,
-      sentiment: 0.84,
-      summary: 'Users praise the camera system and A17 performance. Battery life significantly improved from previous models.',
-      common: 'Battery life improvement and camera quality most mentioned',
-      pros: ['Excellent camera system', 'Fast A17 performance', 'Bright Super Retina display'],
-      cons: ['High price point', 'Limited charging speed vs competitors']
-    },
-    retailers: {
-      'Apple Store': { price: 999, stock: true, rating: 4.8, shipping: 'Free shipping' },
-      'Amazon': { price: 949, stock: true, rating: 4.5, shipping: 'Free shipping' },
-      'Best Buy': { price: 999, stock: true, rating: 4.4, shipping: '$5.99 shipping' },
-      'Target': { price: 979, stock: true, rating: 4.3, shipping: 'Free shipping' }
-    },
-    alternatives: [
-      { name: 'Samsung Galaxy S24', price: 799, rating: 4.3, image: 'https://images.unsplash.com/photo-1610945412018-78e5d418742?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'Google Pixel 8 Pro', price: 899, rating: 4.4, image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'OnePlus 12', price: 699, rating: 4.2, image: 'https://images.unsplash.com/photo-1601784559577-72cfa9958b9?auto=format&fit=crop&w=1200&q=80' }
-    ]
-  },
-  'Nike Air Max 90': {
-    category: 'Footwear',
-    specs: {
-      upper: 'Leather, mesh, and synthetic materials',
-      sole: 'Rubber Waffle outsole',
-      cushioning: 'Visible Air-Sole unit',
-      weight: '13.4 ounces',
-      sizes: 'US 7-13, UK 6-12, EU 40-46'
-    },
-    priceHistory: [150, 139, 129, 119, 109],
-    currentPrice: 119,
-    priceRange: '$109-$150',
-    reviews: {
-      average: 4.3,
-      total: 8932,
-      sentiment: 0.79,
-      summary: 'Classic comfort and style. Users love the retro look but some mention durability concerns with regular wear.',
-      common: 'Comfort and style most praised',
-      pros: ['Classic design', 'Good cushioning', 'Versatile styling'],
-      cons: ['Durability issues', 'Sizing inconsistencies']
-    },
-    retailers: {
-      'Nike': { price: 150, stock: true, rating: 4.6, shipping: 'Free shipping' },
-      'Foot Locker': { price: 139, stock: true, rating: 4.4, shipping: '$6.99 shipping' },
-      'Finish Line': { price: 129, stock: true, rating: 4.2, shipping: 'Free shipping' }
-    },
-    alternatives: [
-      { name: 'Adidas UltraBoost', price: 139, rating: 4.2, image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'New Balance 574', price: 89, rating: 4.1, image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'Jordan 1 Retro', price: 119, rating: 4.5, image: 'https://images.unsplash.com/photo-1542291026-f7367b8c5c5?auto=format&fit=crop&w=1200&q=80' }
-    ]
-  },
-  'Keurig K-Classic Coffee Maker': {
-    category: 'Appliances',
-    specs: {
-      capacity: '48 oz removable water reservoir',
-      brewing: 'Single-serve brewing system',
-      compatibility: 'K-Cup pods (over 400 varieties)',
-      dimensions: '13.3 x 9.8 x 13.8 inches',
-      weight: '7.6 lbs'
-    },
-    priceHistory: [89, 79, 69, 59, 49],
-    currentPrice: 59,
-    priceRange: '$49-$89',
-    reviews: {
-      average: 4.1,
-      total: 12453,
-      sentiment: 0.76,
-      summary: 'Convenient and reliable for daily coffee. Users appreciate the speed and variety of K-Cups, though some mention environmental concerns.',
-      common: 'Convenience and speed most mentioned',
-      pros: ['Fast brewing', 'Easy to use', 'Wide variety of flavors'],
-      cons: ['Environmental waste', 'Limited to K-Cup ecosystem']
-    },
-    retailers: {
-      'Amazon': { price: 59, stock: true, rating: 4.2, shipping: 'Free shipping' },
-      'Target': { price: 69, stock: true, rating: 4.0, shipping: 'Free shipping' },
-      'Walmart': { price: 49, stock: true, rating: 3.9, shipping: 'Free shipping' },
-      'Bed Bath & Beyond': { price: 79, stock: true, rating: 4.1, shipping: '$4.99 shipping' }
-    },
-    alternatives: [
-      { name: 'Cuisinart DCC-1200', price: 79, rating: 4.2, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'Nespresso VertuoPlus', price: 129, rating: 4.3, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'Breville Bambino', price: 99, rating: 4.4, image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80' }
-    ]
-  }
-};
-
-// Smart product matching function
-const buildFallbackProductData = (category: string) => {
-  const safeCategory = (category || 'General').trim() || 'General';
-  return {
-    category: safeCategory,
-    specs: {
-      display: 'High quality display',
-      processor: 'Fast processor',
-      camera: 'Quality camera system',
-      battery: 'Long lasting battery',
-      storage: 'Multiple storage options',
-    },
-    priceHistory: [299, 249, 199, 149],
-    currentPrice: 199,
-    priceRange: '$149-$299',
-    reviews: {
-      average: 4.2,
-      total: Math.floor(Math.random() * 10000) + 5000,
-      sentiment: 0.78,
-      summary: `Quality ${safeCategory.toLowerCase()} with good user reviews and reliable performance.`,
-      common: 'Users appreciate the quality and value',
-      pros: ['Good quality', 'Reliable performance', 'Great value'],
-      cons: ['Limited availability', 'Generic brand'],
-    },
-    retailers: {
-      'Amazon': { price: 199, stock: true, rating: 4.1, shipping: 'Free shipping' },
-      'Best Buy': { price: 229, stock: true, rating: 4.0, shipping: '$4.99 shipping' },
-      'Target': { price: 179, stock: true, rating: 3.9, shipping: 'Free shipping' },
-    },
-    alternatives: [
-      { name: 'Premium Alternative', price: 179, rating: 4.0, image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80' },
-      { name: 'Budget Option', price: 149, rating: 3.8, image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=1200&q=80' },
-    ],
-  };
-};
-
-const findProductInDatabase = (detectedName: string) => {
-  const name = (detectedName || '').trim().toLowerCase();
-  if (!name) return null;
-
-  const searchTerms = name.split(' ').filter(Boolean);
-
-  for (const [key, product] of Object.entries(REAL_PRODUCT_DATABASE)) {
-    const productName = key.toLowerCase();
-
-    if (
-      productName.includes(name) ||
-      name.includes(productName) ||
-      searchTerms.some((term) => productName.includes(term))
-    ) {
-      return product;
-    }
-  }
-
-  return null;
-};
-
 export default function CameraResults() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -381,90 +104,64 @@ export default function CameraResults() {
   const [range, setRange] = useState<RangeKey>('90D');
   const half = useMemo(() => (width - 16 * 2 - 12) / 2, []);
 
-      // Parse detected object data and find in realistic database
-  const detectedProduct = useMemo(() => {
-    const objectName = typeof params.objectName === 'string' ? params.objectName : '';
-    const category = typeof params.category === 'string' ? params.category : 'General';
+  // Parse params
+  const objectName = typeof params.objectName === 'string' ? params.objectName : '';
+  const categoryParam = typeof params.category === 'string' ? params.category : 'General';
+  const imageUri = (params.imageUri as string) || '';
 
-    const matched = findProductInDatabase(objectName);
-    const realProduct = matched ?? buildFallbackProductData(category);
+  // Real data lookup: searches prices, stores in DB, calculates DLO score
+  const { status, data: productData, dloScore, error, retry } = useProductLookup(
+    objectName,
+    categoryParam,
+    imageUri
+  );
 
-    const rawName = objectName.trim();
-    const isBarcodeOnly = !!rawName && /^[0-9]{8,14}$/.test(rawName);
-    const displayName = matched
-      ? rawName || 'Unknown Product'
-      : rawName && rawName.toLowerCase() !== 'unknown product' && !isBarcodeOnly
-        ? rawName
-        : 'Sample Product';
+  // Derive display data from real results
+  const displayName = objectName.trim() || 'Unknown Product';
+  const displayImage = imageUri || productData?.priceResults?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80';
+  const dealLabel = dloScore?.label || 'Analyzing...';
+  const confidence = (params.confidence as string) || '0.85';
+  const matchDots = Math.min(5, Math.max(1, Math.round(parseFloat(confidence) * 5)));
 
-    return {
-      objectName: displayName,
-      category: realProduct.category || category || 'General',
-      confidence: (params.confidence as string) || '0.85',
-      description: realProduct.reviews?.summary || 'Product detected but not identified',
-      features: realProduct.specs ? JSON.stringify(Object.values(realProduct.specs)) : JSON.stringify(['Feature 1', 'Feature 2']),
-      priceRange: realProduct.priceRange || '$50-$100',
-      alternatives: JSON.stringify(realProduct.alternatives?.map((alt: any) => alt.name) || ['Alternative 1', 'Alternative 2']),
-      imageUri: (params.imageUri as string) || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80',
-    };
-  }, [params]);
+  // Price data
+  const bestPrice = productData?.bestPrice || null;
+  const avgPrice = productData?.avgPrice;
+  const lowestPrice = productData?.lowestPrice;
+  const highestPrice = productData?.highestPrice;
+  const pricedResults = (productData?.priceResults || []).filter((r) => r.price !== null);
 
-  // Get extended product data for internal use
-  const extendedProductData = useMemo(() => {
-    const objectName = typeof params.objectName === 'string' ? params.objectName : '';
-    const category = typeof params.category === 'string' ? params.category : 'General';
-    return findProductInDatabase(objectName) ?? buildFallbackProductData(category);
-  }, [params]);
+  // Build "Other Stores" from real price results
+  const otherStores = useMemo(() => {
+    if (!pricedResults.length) return [];
+    return pricedResults.slice(0, 6).map((r, i) => ({
+      id: `os${i}`,
+      store: r.store,
+      name: r.title,
+      price: r.price !== null ? `$${r.price.toFixed(2)}` : 'See site',
+      url: r.affiliateUrl || r.url,
+      imageUrl: r.imageUrl,
+      save: bestPrice && r.price && avgPrice && avgPrice > r.price
+        ? `Save $${Math.round(avgPrice - r.price)}`
+        : null,
+    }));
+  }, [pricedResults, bestPrice, avgPrice]);
 
-  // Generate dynamic data based on realistic product
-  const stores = useMemo(() => {
-    if (extendedProductData.retailers) {
-      return Object.entries(extendedProductData.retailers).map(([store, data], index) => ({
-        id: `s${index}`,
-        store,
-        name: detectedProduct.objectName,
-        price: `$${data.price}`,
-        ship: data.shipping || '$5 Ship',
-        image: detectedProduct.imageUri,
-        rating: data.rating,
-        stock: data.stock
-      }));
+  // Overview description from snippets
+  const overviewDescription = useMemo(() => {
+    if (pricedResults.length > 0) {
+      const longestSnippet = [...pricedResults].sort((a, b) => (b.snippet?.length || 0) - (a.snippet?.length || 0))[0];
+      return longestSnippet?.snippet || `${displayName} found across ${pricedResults.length} retailers.`;
     }
-    return [];
-  }, [extendedProductData]);
-  
-  const alternatives = useMemo(() => {
-    if (extendedProductData.alternatives) {
-      return extendedProductData.alternatives.map((alt: any, index: number) => ({
-        ...alt,
-        id: `a${index}`,
-        store: 'Various',
-        reviews: `(${Math.floor(Math.random() * 20 + 10)}k)`
-      }));
-    }
-    return [];
-  }, [extendedProductData]);
-  
-  const dealRows = useMemo(() => {
-    if (extendedProductData.reviews) {
-      const baseScore = Math.round(extendedProductData.reviews.sentiment * 100);
-      return [
-        { id: 'q', label: 'Quality', value: baseScore, pill: baseScore > 85 ? 'Excellent' : baseScore > 70 ? 'Good' : 'Fair' },
-        { id: 'v', label: 'Value', value: baseScore - 10, pill: baseScore > 85 ? 'Great Deal' : baseScore > 70 ? 'Fair' : 'Poor' },
-        { id: 'f', label: 'Features', value: baseScore - 5, pill: baseScore > 80 ? 'Rich' : 'Basic' },
-        { id: 'd', label: 'Design', value: baseScore + 5, pill: baseScore > 85 ? 'Stunning' : 'Average' },
-        { id: 'du', label: 'Durability', value: baseScore - 8, pill: baseScore > 80 ? 'Built to Last' : 'Standard' },
-      ];
-    }
-    return [];
-  }, [extendedProductData.reviews]);
-  
-  const features = useMemo(() => {
-    if (extendedProductData.specs) {
-      return Object.values(extendedProductData.specs);
-    }
-    return ['Feature 1', 'Feature 2'];
-  }, [extendedProductData.specs]);
+    return `Searching for the best deals on ${displayName}...`;
+  }, [pricedResults, displayName]);
+
+  // For backward compat with identifyOnly view
+  const detectedProduct = {
+    objectName: displayName,
+    category: categoryParam,
+    confidence,
+    imageUri: displayImage,
+  };
 
   if (identifyOnly) {
     return (
@@ -502,6 +199,67 @@ export default function CameraResults() {
     );
   }
 
+  // Loading state
+  if (status === 'loading') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.headerRowMock}>
+          <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
+            <Ionicons name="chevron-back" size={24} color="#111827" />
+          </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 }}>
+          <ActivityIndicator size="large" color={BRAND_GREEN} />
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>Finding best deals...</Text>
+          <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', paddingHorizontal: 40 }}>
+            Searching retailers for {displayName}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (status === 'error') {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.headerRowMock}>
+          <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
+            <Ionicons name="chevron-back" size={24} color="#111827" />
+          </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+        </View>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, paddingHorizontal: 32 }}>
+          <Ionicons name="alert-circle-outline" size={48} color="#F59E0B" />
+          <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>Search Failed</Text>
+          <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center' }}>{error || 'Could not find price data'}</Text>
+          <TouchableOpacity onPress={retry} style={{ height: 44, borderRadius: 999, backgroundColor: BRAND_GREEN, paddingHorizontal: 24, justifyContent: 'center' }}>
+            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Try Again</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Derive chart data from real prices
+  const chartPrices = pricedResults.map((r) => r.price!);
+  const chartMax = chartPrices.length > 0 ? Math.max(...chartPrices) : 200;
+  const chartMin = chartPrices.length > 0 ? Math.min(...chartPrices) : 100;
+  const chartMid = Math.round((chartMax + chartMin) / 2);
+
+  // Build review rows from DLO breakdown
+  const reviewRows = (dloScore?.breakdown || []).map((b) => ({
+    k: b.label,
+    v: b.value >= 85 ? 'Very Positive' : b.value >= 75 ? 'Positive' : b.value >= 65 ? 'Fair' : 'Mixed',
+    tone: (b.value >= 70 ? 'good' : 'warn') as 'good' | 'warn',
+  }));
+
+  // Best price discount
+  const bestDiscount = bestPrice && avgPrice && avgPrice > bestPrice.price!
+    ? `${Math.round(((avgPrice - bestPrice.price!) / avgPrice) * 100)}% Off`
+    : null;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.page}>
@@ -518,18 +276,18 @@ export default function CameraResults() {
 
           <View style={styles.topHeroRow}>
             <View style={styles.heroImageWrapMock}>
-              <Image source={{ uri: MOCK_CAMERA_RESULTS.product.image }} style={styles.heroImageMock} />
+              <Image source={{ uri: displayImage }} style={styles.heroImageMock} />
             </View>
             <View style={styles.heroRight}>
-              <Text style={styles.heroTitleMock}>{MOCK_CAMERA_RESULTS.product.name}</Text>
+              <Text style={styles.heroTitleMock}>{displayName}</Text>
               <View style={styles.goodDealPill}>
-                <Text style={styles.goodDealText}>{MOCK_CAMERA_RESULTS.product.dealPill}</Text>
+                <Text style={styles.goodDealText}>{dealLabel}</Text>
               </View>
 
               <Text style={styles.productMatchLabel}>Product Match</Text>
               <View style={styles.matchDotsRow}>
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <View key={i} style={[styles.matchDot, i < MOCK_CAMERA_RESULTS.product.matchDots ? styles.matchDotOn : styles.matchDotOff]} />
+                  <View key={i} style={[styles.matchDot, i < matchDots ? styles.matchDotOn : styles.matchDotOff]} />
                 ))}
               </View>
             </View>
@@ -539,225 +297,225 @@ export default function CameraResults() {
 
           <Text style={styles.sectionTitleMock}>Product Overview</Text>
           <View style={styles.overviewRow}>
-            <Text style={styles.overviewText}>{MOCK_CAMERA_RESULTS.overview.description}</Text>
+            <Text style={styles.overviewText}>{overviewDescription}</Text>
             <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={{ marginTop: 2 }} />
           </View>
-          <View style={styles.overviewTagsRow}>
-            <Text style={styles.overviewTagsText}>{MOCK_CAMERA_RESULTS.overview.tags.join('   •   ')}</Text>
-          </View>
+          {pricedResults.length > 0 && (
+            <View style={styles.overviewTagsRow}>
+              <Text style={styles.overviewTagsText}>
+                {[
+                  categoryParam,
+                  pricedResults.length > 0 ? `${pricedResults.length} Stores` : null,
+                  bestPrice?.price ? `From $${bestPrice.price.toFixed(2)}` : null,
+                ].filter(Boolean).join('   •   ')}
+              </Text>
+            </View>
+          )}
 
-          <View style={styles.strengthCard}>
-            <View pointerEvents="none" style={styles.strengthTint} />
-            <Text style={styles.cardHeader}>Strengths</Text>
-            <View style={styles.bulletList}>
-              {MOCK_CAMERA_RESULTS.overview.strengths.map((t, i) => (
-                <View key={i} style={styles.bulletRowMock}>
-                  <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
-                  <Text style={styles.bulletTextMock}>{t}</Text>
+          {dloScore && dloScore.breakdown.length > 0 && (
+            <>
+              <View style={styles.strengthCard}>
+                <View pointerEvents="none" style={styles.strengthTint} />
+                <Text style={styles.cardHeader}>Strengths</Text>
+                <View style={styles.bulletList}>
+                  {dloScore.breakdown.filter((b) => b.value >= 75).slice(0, 3).map((b, i) => (
+                    <View key={i} style={styles.bulletRowMock}>
+                      <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
+                      <Text style={styles.bulletTextMock}>{`Strong ${b.label.toLowerCase()} score of ${b.value} — above average for this category`}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.weakCardWrap}>
-            <View pointerEvents="none" style={styles.weakUnderlay} />
-            <View style={styles.weakCard}>
-              <View pointerEvents="none" style={styles.weakTint} />
-              <Text style={styles.cardHeader}>Weaknesses</Text>
-              <View style={styles.bulletList}>
-                {MOCK_CAMERA_RESULTS.overview.weaknesses.map((t, i) => (
-                  <View key={i} style={styles.bulletRowMock}>
-                    <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
-                    <Text style={styles.bulletTextMock}>{t}</Text>
-                  </View>
-                ))}
               </View>
-            </View>
-          </View>
+
+              <View style={styles.weakCardWrap}>
+                <View pointerEvents="none" style={styles.weakUnderlay} />
+                <View style={styles.weakCard}>
+                  <View pointerEvents="none" style={styles.weakTint} />
+                  <Text style={styles.cardHeader}>Areas to Watch</Text>
+                  <View style={styles.bulletList}>
+                    {dloScore.breakdown.filter((b) => b.value < 75).slice(0, 3).map((b, i) => (
+                      <View key={i} style={styles.bulletRowMock}>
+                        <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
+                        <Text style={styles.bulletTextMock}>{`${b.label} scored ${b.value} — consider comparing alternatives`}</Text>
+                      </View>
+                    ))}
+                    {dloScore.breakdown.filter((b) => b.value < 75).length === 0 && (
+                      <View style={styles.bulletRowMock}>
+                        <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
+                        <Text style={styles.bulletTextMock}>No major concerns detected for this product</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              </View>
+            </>
+          )}
 
           <Text style={styles.sectionTitleMock}>Deal Overview</Text>
           <View style={styles.aiScoreWrap}>
             <Text style={styles.aiScoreTitle}>
-              AI Score <Text style={styles.aiScoreValue}>{MOCK_CAMERA_RESULTS.aiScore.score}</Text> {MOCK_CAMERA_RESULTS.aiScore.label}
+              AI Score <Text style={styles.aiScoreValue}>{dloScore?.overallScore || '--'}</Text> {dealLabel}
             </Text>
             <View style={styles.aiTrack}>
-              <View style={[styles.aiFill, { width: `${MOCK_CAMERA_RESULTS.aiScore.score}%` }]} />
+              <View style={[styles.aiFill, { width: `${dloScore?.overallScore || 0}%` }]} />
             </View>
             <View style={styles.aiBreakRow}>
-              {MOCK_CAMERA_RESULTS.aiScore.breakdown.map((b) => (
+              {(dloScore?.breakdown || []).map((b) => (
                 <View key={b.key} style={styles.aiBreakItem}>
                   <View style={styles.aiDot} />
                   <Text style={styles.aiBreakText}>
-                    {b.key} <Text style={styles.aiBreakNum}>{b.value}</Text>
+                    {b.label} <Text style={styles.aiBreakNum}>{b.value}</Text>
                   </Text>
                 </View>
               ))}
             </View>
             <Text style={styles.aiRundownTitle}>AI Rundown</Text>
             <View style={styles.aiRundownRow}>
-              <Text style={styles.aiRundownText}>{MOCK_CAMERA_RESULTS.aiScore.rundown}</Text>
+              <Text style={styles.aiRundownText}>{dloScore?.rundown || 'Analyzing product data...'}</Text>
               <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} />
             </View>
           </View>
 
-          <View style={styles.bestPriceGlass}>
-            <View style={styles.bestPriceHeaderRow}>
-              <Text style={styles.bestPriceTitle}>Best Price</Text>
-              <Ionicons name="bookmark-outline" size={20} color="#111827" />
-            </View>
-            <View style={styles.bestPriceBody}>
-              <View style={styles.bestPriceThumbWrap}>
-                <Image source={{ uri: MOCK_CAMERA_RESULTS.product.image }} style={styles.bestPriceThumb} />
-                <View style={styles.discountPill}>
-                  <Text style={styles.discountText}>{MOCK_CAMERA_RESULTS.bestPrice.discount}</Text>
-                </View>
+          {bestPrice && (
+            <View style={styles.bestPriceGlass}>
+              <View style={styles.bestPriceHeaderRow}>
+                <Text style={styles.bestPriceTitle}>Best Price</Text>
+                <Ionicons name="bookmark-outline" size={20} color="#111827" />
               </View>
-              <View style={{ flex: 1 }}>
-                <View style={styles.bestStoreRow}>
-                  <StoreLogo kind="target" />
-                  <Text style={styles.bestStoreName}>{MOCK_CAMERA_RESULTS.bestPrice.store}</Text>
+              <View style={styles.bestPriceBody}>
+                <View style={styles.bestPriceThumbWrap}>
+                  <Image source={{ uri: bestPrice.imageUrl || displayImage }} style={styles.bestPriceThumb} />
+                  {bestDiscount && (
+                    <View style={styles.discountPill}>
+                      <Text style={styles.discountText}>{bestDiscount}</Text>
+                    </View>
+                  )}
                 </View>
-                <Text style={styles.bestSubtitle}>{MOCK_CAMERA_RESULTS.product.subtitle}</Text>
-                <View style={styles.bestRatingRow}>
-                  <StarRating value={MOCK_CAMERA_RESULTS.bestPrice.rating} />
-                  <Text style={styles.bestRatingValue}>{MOCK_CAMERA_RESULTS.bestPrice.rating.toFixed(1)}</Text>
-                </View>
-                <Text style={styles.bestPriceValue}>{MOCK_CAMERA_RESULTS.bestPrice.price}</Text>
-                <Text style={styles.bestStock}>{MOCK_CAMERA_RESULTS.bestPrice.stock}</Text>
-                <TouchableOpacity activeOpacity={0.9} style={styles.visitBtnMock}>
-                  <Text style={styles.visitTextMock}>Visit Store</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-
-          <Text style={styles.sectionTitleMock}>Market Price</Text>
-          <View style={styles.marketRow}>
-            <View style={styles.marketLeftCard}>
-              <View style={styles.marketRangeRow}>
-                {MOCK_CAMERA_RESULTS.market.range.map((r) => (
-                  <View key={r} style={[styles.rangePillMock, r === '30D' && styles.rangePillActiveMock]}>
-                    <Text style={[styles.rangePillTextMock, r === '30D' && styles.rangePillTextActiveMock]}>{r}</Text>
+                <View style={{ flex: 1 }}>
+                  <View style={styles.bestStoreRow}>
+                    <View style={[styles.storeLogoCircle, { backgroundColor: BRAND_GREEN }]}>
+                      <Text style={styles.storeLogoText}>{bestPrice.store.charAt(0)}</Text>
+                    </View>
+                    <Text style={styles.bestStoreName}>{bestPrice.store}</Text>
                   </View>
+                  <Text style={styles.bestSubtitle}>{bestPrice.title}</Text>
+                  <Text style={styles.bestPriceValue}>${bestPrice.price!.toFixed(2)}</Text>
+                  <Text style={styles.bestStock}>Available</Text>
+                  <TouchableOpacity
+                    activeOpacity={0.9}
+                    style={styles.visitBtnMock}
+                    onPress={() => Linking.openURL(bestPrice.affiliateUrl || bestPrice.url)}
+                  >
+                    <Text style={styles.visitTextMock}>Visit Store</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {pricedResults.length > 0 && (
+            <>
+              <Text style={styles.sectionTitleMock}>Market Price</Text>
+              <View style={styles.marketRow}>
+                <View style={styles.marketLeftCard}>
+                  <View style={styles.chartWrapMock}>
+                    <View style={styles.chartWithYAxis}>
+                      <View style={styles.chartYAxis}>
+                        <Text style={styles.chartYAxisText}>{`$${chartMax}`}</Text>
+                        <Text style={styles.chartYAxisText}>{`$${chartMid}`}</Text>
+                        <Text style={styles.chartYAxisText}>{`$${chartMin}`}</Text>
+                      </View>
+                      <View style={styles.chartSvgWrap}>
+                        <MarketChart points={chartPrices.length >= 2 ? chartPrices : [chartMax, chartMid, chartMin]} />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+
+                <View style={styles.marketDivider} />
+                <View style={styles.marketRightCard}>
+                  <Text style={styles.priceOverviewTitle}>Price Overview</Text>
+                  <View style={styles.priceOverviewRow}>
+                    <Text style={styles.priceOverviewLeft}>${avgPrice?.toFixed(2) || '--'}</Text>
+                    <Text style={styles.priceOverviewRight}>Avg</Text>
+                  </View>
+                  <View style={styles.priceOverviewRow}>
+                    <Text style={styles.priceOverviewLeft}>${lowestPrice?.toFixed(2) || '--'}</Text>
+                    <View style={styles.todayDot} />
+                    <Text style={styles.priceOverviewRight}>Best</Text>
+                  </View>
+                  <View style={styles.priceOverviewRow}>
+                    <Text style={styles.priceOverviewLeft}>${highestPrice?.toFixed(2) || '--'}</Text>
+                    <Text style={styles.priceOverviewRight}>High</Text>
+                  </View>
+                </View>
+              </View>
+            </>
+          )}
+
+          {reviewRows.length > 0 && (
+            <View style={styles.reviewsGlass}>
+              <View style={styles.reviewsHeader}>
+                <Text style={styles.reviewsTitle}>Score Breakdown</Text>
+              </View>
+              {reviewRows.map((r, i) => (
+                <View key={r.k} style={[styles.reviewRow, i !== reviewRows.length - 1 && styles.reviewRowBorder]}>
+                  <Text style={[styles.reviewKey, i === 0 && styles.reviewKeyBold]}>{r.k}</Text>
+                  <Text style={[styles.reviewVal, r.tone === 'warn' ? styles.reviewValWarn : styles.reviewValGood]}>{r.v}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {dloScore?.rundown && (
+            <View style={styles.reviewOverviewSection}>
+              <Text style={styles.reviewOverviewHeader}>AI Analysis</Text>
+              <TouchableOpacity activeOpacity={0.85} style={styles.reviewOverviewRow}>
+                <Text style={styles.reviewOverviewTextInline}>{dloScore.rundown}</Text>
+                <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={styles.reviewOverviewChevron} />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {otherStores.length > 0 && (
+            <>
+              <View style={styles.sectionHeaderRowMock}>
+                <Text style={styles.sectionTitleMockNoTop}>All Retailers ({otherStores.length})</Text>
+                <Ionicons name="chevron-forward" size={18} color="#111827" />
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
+                {otherStores.map((item) => (
+                  <TouchableOpacity key={item.id} style={styles.hItem} onPress={() => Linking.openURL(item.url)} activeOpacity={0.85}>
+                    <View style={styles.gridCard}>
+                      {item.imageUrl ? (
+                        <Image source={{ uri: item.imageUrl }} style={[styles.gridImgPlaceholder, { resizeMode: 'contain' }]} />
+                      ) : (
+                        <View style={styles.gridImgPlaceholder} />
+                      )}
+                      {item.save && (
+                        <View style={styles.savePill}>
+                          <Text style={styles.savePillText}>{item.save}</Text>
+                        </View>
+                      )}
+                      <TouchableOpacity style={styles.heartBtn}>
+                        <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.gridMetaRow}>
+                      <View style={[styles.storeLogoCircle, { backgroundColor: BRAND_GREEN, width: 34, height: 34, borderRadius: 17 }]}>
+                        <Text style={[styles.storeLogoText, { fontSize: 14 }]}>{item.store.charAt(0)}</Text>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.gridStore}>{item.store}</Text>
+                        <Text style={styles.gridName} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.gridPrice}>{item.price}</Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 ))}
-              </View>
-              <View style={styles.chartWrapMock}>
-                <View style={styles.chartWithYAxis}>
-                  <View style={styles.chartYAxis}>
-                    <Text style={styles.chartYAxisText}>{`$${MOCK_MARKET_MAX}`}</Text>
-                    <Text style={styles.chartYAxisText}>{`$${MOCK_MARKET_MID}`}</Text>
-                    <Text style={styles.chartYAxisText}>{`$${MOCK_MARKET_MIN}`}</Text>
-                  </View>
-                  <View style={styles.chartSvgWrap}>
-                    <MarketChart points={[...MOCK_CAMERA_RESULTS.market.points]} />
-                  </View>
-                </View>
-                <View style={styles.chartXRow}>
-                  {['2', '12', '21', '31'].map((t) => (
-                    <Text key={t} style={styles.chartAxisText}>{t}</Text>
-                  ))}
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.marketDivider} />
-            <View style={styles.marketRightCard}>
-              <Text style={styles.priceOverviewTitle}>Price Overview</Text>
-              <View style={styles.priceOverviewRow}>
-                <Text style={styles.priceOverviewLeft}>{MOCK_CAMERA_RESULTS.market.avg}</Text>
-                <Text style={styles.priceOverviewRight}>Avg</Text>
-              </View>
-              <View style={styles.priceOverviewRow}>
-                <Text style={styles.priceOverviewLeft}>{MOCK_CAMERA_RESULTS.market.today}</Text>
-                <View style={styles.todayDot} />
-                <Text style={styles.priceOverviewRight}>Today</Text>
-              </View>
-              <View style={styles.priceOverviewRow}>
-                <Text style={styles.priceOverviewLeft}>{MOCK_CAMERA_RESULTS.market.low}</Text>
-                <Text style={styles.priceOverviewRight}>Low</Text>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.reviewsGlass}>
-            <View style={styles.reviewsHeader}>
-              <Text style={styles.reviewsTitle}>Reviews</Text>
-            </View>
-            {MOCK_CAMERA_RESULTS.reviews.rows.map((r, i) => (
-              <View key={r.k} style={[styles.reviewRow, i !== MOCK_CAMERA_RESULTS.reviews.rows.length - 1 && styles.reviewRowBorder]}>
-                <Text style={[styles.reviewKey, r.k === 'Overall Sentiment' && styles.reviewKeyBold]}>{r.k}</Text>
-                <Text style={[styles.reviewVal, r.tone === 'warn' ? styles.reviewValWarn : styles.reviewValGood]}>{r.v}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.reviewOverviewSection}>
-            <Text style={styles.reviewOverviewHeader}>Review Overview</Text>
-            <TouchableOpacity activeOpacity={0.85} style={styles.reviewOverviewRow}>
-              <Text style={styles.reviewOverviewTextInline}>{MOCK_CAMERA_RESULTS.reviewOverview.body}</Text>
-              <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={styles.reviewOverviewChevron} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.sectionHeaderRowMock}>
-            <Text style={styles.sectionTitleMockNoTop}>Other Stores</Text>
-            <Ionicons name="chevron-forward" size={18} color="#111827" />
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
-            {MOCK_CAMERA_RESULTS.otherStores.map((item) => (
-              <View key={item.id} style={styles.hItem}>
-                <View style={styles.gridCard}>
-                  <View style={styles.gridImgPlaceholder} />
-                  <View style={styles.savePill}>
-                    <Text style={styles.savePillText}>{item.save}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.heartBtn}>
-                    <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.gridMetaRow}>
-                  <View style={styles.storeLogoBlank} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.gridStore}>{item.store}</Text>
-                    <Text style={styles.gridName} numberOfLines={1}>
-                      {item.name}
-                    </Text>
-                    <Text style={styles.gridPrice}>{item.price}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
-
-          <View style={styles.sectionHeaderRowMock}>
-            <Text style={styles.sectionTitleMockNoTop}>Alternatives</Text>
-            <Ionicons name="chevron-forward" size={18} color="#111827" />
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
-            {MOCK_CAMERA_RESULTS.alternatives.map((item) => (
-              <View key={item.id} style={styles.hItem}>
-                <View style={styles.gridCard}>
-                  <View style={styles.gridImgPlaceholder} />
-                  <View style={styles.savePill}>
-                    <Text style={styles.savePillText}>{item.save}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.heartBtn}>
-                    <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.gridMetaRow}>
-                  <View style={styles.storeLogoBlank} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.gridStore}>{item.store}</Text>
-                    <Text style={styles.gridName} numberOfLines={1}>
-                      {item.name}
-                    </Text>
-                    <Text style={styles.gridPrice}>{item.price}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
+              </ScrollView>
+            </>
+          )}
 
           <View style={styles.offRow}>
             <Text style={styles.offText}>Something seem off?</Text>
@@ -768,8 +526,15 @@ export default function CameraResults() {
             <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary}>
               <Text style={styles.bottomBtnSecondaryText}>Save for Later</Text>
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnPrimary}>
-              <Text style={styles.bottomBtnPrimaryText}>View Offer</Text>
+            <TouchableOpacity
+              activeOpacity={0.9}
+              style={styles.bottomBtnPrimary}
+              onPress={() => {
+                const url = bestPrice?.affiliateUrl || bestPrice?.url;
+                if (url) Linking.openURL(url);
+              }}
+            >
+              <Text style={styles.bottomBtnPrimaryText}>{bestPrice ? 'View Offer' : 'Scan Again'}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

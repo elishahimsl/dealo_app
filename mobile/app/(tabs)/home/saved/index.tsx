@@ -12,10 +12,15 @@ import {
   Image,
   TouchableOpacity,
   ListRenderItemInfo,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
+import { useSavedProducts } from '../../../../lib/hooks/use-saved-products';
+import { useRecentScans } from '../../../../lib/hooks/use-recent-scans';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 const BRAND_GREEN = '#0E9F6E';
 const { width } = Dimensions.get('window');
@@ -34,66 +39,6 @@ type SavedComparison = {
   scoreA: number;
   scoreB: number;
 };
-
-const SAVED_ITEMS: SavedItem[] = [
-  {
-    id: '1',
-    brand: 'Nike',
-    title: 'Alphabete Athletics Nike Killer Pants',
-    image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: '2',
-    brand: 'Nike',
-    title: 'Alphabete Athletic Black Backpack',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: '3',
-    brand: 'Adidas',
-    title: 'Sport Shoes Running Edition',
-    image: 'https://images.unsplash.com/photo-1528701800489-20be3c3ea7aa?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: '4',
-    brand: 'Puma',
-    title: 'Training Jacket Premium',
-    image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: '5',
-    brand: 'Under Armour',
-    title: 'Compression Shirt Tech',
-    image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1200&q=80',
-  },
-];
-
-const SAVED_SCANS: SavedItem[] = [
-  {
-    id: 'scan-1',
-    brand: 'Samsung',
-    title: '75" Smart TV',
-    image: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'scan-2',
-    brand: 'Apple',
-    title: 'MacBook Pro',
-    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'scan-3',
-    brand: 'KitchenAid',
-    title: 'Stand Mixer',
-    image: 'https://images.unsplash.com/photo-1514516430039-0f2b57d4f2e8?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'scan-4',
-    brand: 'Bose',
-    title: 'Wireless Speaker',
-    image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=1200&q=80',
-  },
-];
 
 const SAVED_COMPARISONS: SavedComparison[] = [
   { id: 'cmp-1', title: 'Samsung v. iPhone', brand: 'Samsung', scoreA: 90, scoreB: 82 },
@@ -186,7 +131,40 @@ function ComparisonTile({ item }: { item: SavedComparison }) {
 
 export default function Saved() {
   const router = useRouter();
-  const collectionThumbs = useMemo(() => SAVED_ITEMS.slice(0, 3), []);
+
+  // Real data hooks
+  const { items: savedItems, loading: savedLoading, refresh: refreshSaved } = useSavedProducts();
+  const { scans: recentScans, loading: scansLoading, refresh: refreshScans } = useRecentScans();
+
+  // Refresh on focus
+  useFocusEffect(
+    useCallback(() => {
+      refreshSaved();
+      refreshScans();
+    }, [])
+  );
+
+  // Convert saved products to SavedItem format
+  const favoritesData: SavedItem[] = useMemo(() => {
+    return savedItems.map((s) => ({
+      id: s.id,
+      brand: s.product?.brand || 'Unknown',
+      title: s.product?.title || 'Saved Product',
+      image: s.product?.image_urls?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80',
+    }));
+  }, [savedItems]);
+
+  // Convert recent scans to SavedItem format
+  const scansData: SavedItem[] = useMemo(() => {
+    return recentScans.map((s) => ({
+      id: s.id,
+      brand: s.product?.brand || 'Unknown',
+      title: s.product?.title || 'Scanned Product',
+      image: s.product?.image_urls?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80',
+    }));
+  }, [recentScans]);
+
+  const collectionThumbs = useMemo(() => favoritesData.slice(0, 3), [favoritesData]);
 
   const [activeFilter, setActiveFilter] = useState<SavedFilter>('all');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -214,6 +192,8 @@ export default function Saved() {
       </View>
     );
   };
+
+  const isLoading = savedLoading || scansLoading;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -243,7 +223,7 @@ export default function Saved() {
                 <Text style={styles.createText}>+ Create collection</Text>
 
                 <View style={styles.booksStack}>
-                  {collectionThumbs.map((t, idx) => (
+                  {collectionThumbs.map((t: SavedItem, idx: number) => (
                     <View
                       key={t.id}
                       style={[
@@ -267,7 +247,7 @@ export default function Saved() {
                       {c.name}
                     </Text>
                     <View style={styles.booksStack}>
-                      {collectionThumbs.map((t) => (
+                      {collectionThumbs.map((t: SavedItem) => (
                         <View key={`${c.id}-${t.id}`} style={styles.book}>
                           <Image source={{ uri: t.image }} style={styles.bookImg} />
                         </View>
@@ -281,6 +261,12 @@ export default function Saved() {
             <View style={styles.allItemsRow}>
               <Text style={[styles.sectionTitle, { marginTop: 22 }]}>All Items</Text>
             </View>
+
+            {isLoading ? (
+              <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={BRAND_GREEN} />
+              </View>
+            ) : null}
 
             {filterOpen ? (
               <View style={styles.filterMenuWrap}>
@@ -332,7 +318,7 @@ export default function Saved() {
             {activeFilter === 'all' || activeFilter === 'favorites' ? (
               <>
                 <View style={styles.subheaderRow}>
-                  <Text style={styles.subheader}>Favorites</Text>
+                  <Text style={styles.subheader}>Favorites ({favoritesData.length})</Text>
                   <TouchableOpacity
                     activeOpacity={0.85}
                     style={styles.iconOnlyBtn}
@@ -341,33 +327,51 @@ export default function Saved() {
                     <FilterGlyph />
                   </TouchableOpacity>
                 </View>
-                <FlatList
-                  data={SAVED_ITEMS}
-                  keyExtractor={(i) => i.id}
-                  numColumns={2}
-                  scrollEnabled={false}
-                  columnWrapperStyle={styles.column}
-                  renderItem={renderItem}
-                />
+                {favoritesData.length > 0 ? (
+                  <FlatList
+                    data={favoritesData}
+                    keyExtractor={(i) => i.id}
+                    numColumns={2}
+                    scrollEnabled={false}
+                    columnWrapperStyle={styles.column}
+                    renderItem={renderItem}
+                  />
+                ) : !isLoading ? (
+                  <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+                    <Ionicons name="heart-outline" size={32} color="#D1D5DB" />
+                    <Text style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8, fontFamily: 'Manrope-Regular' }}>
+                      No saved products yet — tap the heart on any product
+                    </Text>
+                  </View>
+                ) : null}
               </>
             ) : null}
 
             {activeFilter === 'all' || activeFilter === 'scans' ? (
               <>
                 <View style={styles.subheaderRow}>
-                  <Text style={styles.subheader}>Scans</Text>
+                  <Text style={styles.subheader}>Scans ({scansData.length})</Text>
                   <TouchableOpacity activeOpacity={0.85} style={styles.iconOnlyBtn}>
                     <FilterGlyph />
                   </TouchableOpacity>
                 </View>
-                <FlatList
-                  data={SAVED_SCANS}
-                  keyExtractor={(i) => i.id}
-                  numColumns={2}
-                  scrollEnabled={false}
-                  columnWrapperStyle={styles.column}
-                  renderItem={renderItem}
-                />
+                {scansData.length > 0 ? (
+                  <FlatList
+                    data={scansData}
+                    keyExtractor={(i) => i.id}
+                    numColumns={2}
+                    scrollEnabled={false}
+                    columnWrapperStyle={styles.column}
+                    renderItem={renderItem}
+                  />
+                ) : !isLoading ? (
+                  <View style={{ paddingVertical: 20, alignItems: 'center' }}>
+                    <Ionicons name="camera-outline" size={32} color="#D1D5DB" />
+                    <Text style={{ color: '#9CA3AF', fontSize: 13, marginTop: 8, fontFamily: 'Manrope-Regular' }}>
+                      No scans yet — use the camera to scan products
+                    </Text>
+                  </View>
+                ) : null}
               </>
             ) : null}
 

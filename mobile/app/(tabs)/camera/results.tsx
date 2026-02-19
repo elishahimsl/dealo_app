@@ -1,10 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform, ActivityIndicator, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { useProductLookup } from '../../../lib/hooks/use-product-lookup';
+import { useSaveToggle } from '../../../lib/hooks/use-saved-products';
+import { trackInteraction } from '../../../lib/services/user-interactions';
 
 const { width } = Dimensions.get('window');
 
@@ -115,6 +117,17 @@ export default function CameraResults() {
     categoryParam,
     imageUri
   );
+
+  // Save toggle for this product
+  const productId = productData?.product?.id;
+  const { saved, toggling, toggle: toggleSave } = useSaveToggle(productId);
+
+  // Track scan interaction when product data loads
+  useEffect(() => {
+    if (productId && status === 'done') {
+      trackInteraction({ productId, type: 'scan', metadata: { source: 'camera', name: objectName } });
+    }
+  }, [productId, status]);
 
   // Derive display data from real results
   const displayName = objectName.trim() || 'Unknown Product';
@@ -523,8 +536,8 @@ export default function CameraResults() {
           </View>
 
           <View style={styles.bottomActionsInFlow}>
-            <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary}>
-              <Text style={styles.bottomBtnSecondaryText}>Save for Later</Text>
+            <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary} onPress={toggleSave} disabled={toggling || !productId}>
+              <Text style={styles.bottomBtnSecondaryText}>{saved ? '♥ Saved' : 'Save for Later'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.9}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { 
   Animated,
   View, 
@@ -17,6 +17,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import DealoWordmarkGreenBlack from '../../../assets/images/logos/dealo-wordmark-greenblack';
 import DealoMarkGreen from '../../../assets/images/logos/dealo-mark-green';
+import { useRecentScans } from '../../../lib/hooks/use-recent-scans';
+import { useSavedProducts } from '../../../lib/hooks/use-saved-products';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -214,11 +216,28 @@ export default function Home() {
   const [following, setFollowing] = useState<Record<string, boolean>>({});
   const dealScrollX = useRef(new Animated.Value(0)).current;
 
+  // Real data hooks
+  const { scans, refresh: refreshScans } = useRecentScans(6);
+  const { items: savedItems, refresh: refreshSaved } = useSavedProducts();
+
   useFocusEffect(
     useCallback(() => {
       setActiveNav('Categories');
+      refreshScans();
+      refreshSaved();
     }, [])
   );
+
+  // Convert recent scans to product card format
+  const recentScannedProducts = useMemo(() => {
+    return scans.map((s) => ({
+      id: `scan-${s.id}`,
+      name: s.product?.title || 'Scanned Product',
+      store: s.product?.brand || 'Unknown',
+      price: '',
+      image: s.product?.image_urls?.[0] || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80',
+    }));
+  }, [scans]);
 
   interface Product {
     id: string;
@@ -385,13 +404,13 @@ export default function Home() {
             <Text style={styles.sectionTitleNoPad}>Recently Scanned</Text>
             <TouchableOpacity
               activeOpacity={0.85}
-              onPress={() => router.push('/account/recents?filter=scanned&returnTo=/home' as Href)}
+              onPress={() => router.push('/home/saved' as Href)}
             >
               <Ionicons name="chevron-forward" size={18} color="#111827" />
             </TouchableOpacity>
           </View>
           <FlatList
-            data={similarProducts}
+            data={recentScannedProducts.length > 0 ? recentScannedProducts : similarProducts}
             renderItem={renderProductCard}
             keyExtractor={(item) => item.id}
             horizontal

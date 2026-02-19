@@ -4,8 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as WebBrowser from 'expo-web-browser';
-
 import { useAuth } from '../../lib/hooks/use-auth';
 
 const BG = '#EDFFE8';
@@ -91,14 +89,19 @@ export default function SignupScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <Pressable style={[styles.buttonBase, styles.secondary]} onPress={() => {}}>
-            <Text style={[styles.buttonText, styles.secondaryText]}>Continue with Apple</Text>
+          <Pressable style={[styles.buttonBase, styles.secondary]} onPress={async () => { setIsLoading(true); const { error } = await signInWithApple(); if (error) Alert.alert('Apple Sign-In Failed', error.message); setIsLoading(false); }} disabled={isLoading}>
+            <Text style={[styles.buttonText, styles.secondaryText]}>
+              {isLoading ? 'Signing in...' : 'Continue with Apple'}
+            </Text>
           </Pressable>
           <Pressable
             style={[styles.buttonBase, styles.secondary]}
-            onPress={() => WebBrowser.openBrowserAsync('https://accounts.google.com/signin/v2/identifier?prompt=select_account')}
+            onPress={async () => { setIsLoading(true); const { error } = await signInWithGoogle(); if (error) Alert.alert('Google Sign-In Failed', error.message); setIsLoading(false); }}
+            disabled={isLoading}
           >
-            <Text style={[styles.buttonText, styles.secondaryText]}>Continue with Google</Text>
+            <Text style={[styles.buttonText, styles.secondaryText]}>
+              {isLoading ? 'Signing in...' : 'Continue with Google'}
+            </Text>
           </Pressable>
         </View>
       </View>

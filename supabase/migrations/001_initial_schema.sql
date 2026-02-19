@@ -131,6 +131,12 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.saved_products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_interactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.offers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.merchants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.dlo_scores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.price_snapshots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.score_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Users can only access their own data
 CREATE POLICY "Users can view own profile" ON public.users FOR SELECT USING (auth.uid() = id);

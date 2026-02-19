@@ -2,7 +2,7 @@
 
 -- Insert initial merchants
 INSERT INTO public.merchants (name, domain, logo_url, affiliate_network, affiliate_tag) VALUES
-('Amazon', 'amazon.com', 'https://logo.clearbit.com/amazon.com', 'amazon', 'dealo-20'),
+('Amazon', 'amazon.com', 'https://logo.clearbit.com/amazon.com', 'amazon', 'dealo0b-20'),
 ('Target', 'target.com', 'https://logo.clearbit.com/target.com', 'impact', NULL),
 ('Walmart', 'walmart.com', 'https://logo.clearbit.com/walmart.com', 'impact', NULL),
 ('Best Buy', 'bestbuy.com', 'https://logo.clearbit.com/bestbuy.com', 'impact', NULL),

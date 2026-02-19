@@ -19,6 +19,7 @@ import DealoWordmarkGreenBlack from '../../../assets/images/logos/dealo-wordmark
 import DealoMarkGreen from '../../../assets/images/logos/dealo-mark-green';
 import { useRecentScans } from '../../../lib/hooks/use-recent-scans';
 import { useSavedProducts } from '../../../lib/hooks/use-saved-products';
+import AdBanner from '../../../components/AdBanner';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -435,6 +436,8 @@ export default function Home() {
             ))}
           </ScrollView>
         </View>
+
+        <AdBanner style={{ marginHorizontal: 16, marginVertical: 4 }} />
 
         {/* Smart Suggestions */}
         <View style={styles.section}>

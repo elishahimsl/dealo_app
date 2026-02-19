@@ -9,9 +9,15 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "jsEngine": "hermes",
+    "description": "DeaLo helps you find the best deals instantly. Snap a photo of any product and get real-time price comparisons, DLO scores, and direct links to the best offers across retailers.",
     "ios": {
       "bundleIdentifier": "com.dealo.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "DeaLo uses the camera to scan products and find the best prices.",
+        "NSPhotoLibraryUsageDescription": "DeaLo accesses your photos so you can scan products from your gallery.",
+        "GADApplicationIdentifier": "ca-app-pub-3940256099942544~1458002511"
+      }
     },
     "android": {
       "package": "com.dealo.app",
@@ -22,7 +28,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
     },
     "web": {
       "output": "static",
@@ -40,6 +47,12 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "DeaLo needs camera access to scan products and find deals."
         }
       ]
     ],

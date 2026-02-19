@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Href, useRouter } from 'expo-router';
+import { supabase } from '../../../../lib/supabase';
 
 function FilterGlyph() {
   return (
@@ -58,16 +59,31 @@ export default function Settings() {
         </View>
 
         <View style={styles.bottomSection}>
-          <TouchableOpacity style={styles.signOutTextButton}>
+          <TouchableOpacity
+            style={styles.signOutTextButton}
+            onPress={() => {
+              Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Sign Out',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await supabase.auth.signOut();
+                    router.replace('/(onboarding)' as Href);
+                  },
+                },
+              ]);
+            }}
+          >
             <Text style={styles.signOutText}>Sign Out</Text>
           </TouchableOpacity>
           <Text style={styles.versionText}>Version 1.0.0</Text>
           <View style={styles.linksRow}>
-            <TouchableOpacity style={styles.linkButton}>
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/account/settings/terms' as Href)}>
               <Text style={styles.linkText}>Terms</Text>
             </TouchableOpacity>
             <Text style={styles.separator}>•</Text>
-            <TouchableOpacity style={styles.linkButton}>
+            <TouchableOpacity style={styles.linkButton} onPress={() => router.push('/account/settings/privacy' as Href)}>
               <Text style={styles.linkText}>Privacy</Text>
             </TouchableOpacity>
           </View>

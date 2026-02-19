@@ -7,6 +7,7 @@ import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { useProductLookup } from '../../../lib/hooks/use-product-lookup';
 import { useSaveToggle } from '../../../lib/hooks/use-saved-products';
 import { trackInteraction } from '../../../lib/services/user-interactions';
+import AdBanner from '../../../components/AdBanner';
 
 const { width } = Dimensions.get('window');
 
@@ -534,6 +535,8 @@ export default function CameraResults() {
             <Text style={styles.offText}>Something seem off?</Text>
             <Text style={styles.offLink}> Let us know</Text>
           </View>
+
+          <AdBanner style={{ marginHorizontal: 16, marginVertical: 8 }} />
 
           <View style={styles.bottomActionsInFlow}>
             <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary} onPress={toggleSave} disabled={toggling || !productId}>

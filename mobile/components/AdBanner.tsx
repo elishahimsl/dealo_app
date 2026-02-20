@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { AD_UNIT_IDS } from '../lib/services/ad-service';
+
+// Dynamically require native ads SDK — fails gracefully in Expo Go
+let BannerAd: any = null;
+let BannerAdSize: any = null;
+try {
+  const ads = require('react-native-google-mobile-ads');
+  BannerAd = ads.BannerAd;
+  BannerAdSize = ads.BannerAdSize;
+} catch {
+  // Native module not available (Expo Go)
+}
 
 /**
  * AdBanner component — displays a Google AdMob adaptive banner ad.
- * Falls back to a subtle placeholder if the ad fails to load.
+ * Falls back to a subtle placeholder if native SDK unavailable or ad fails.
  */
 export default function AdBanner({ style }: { style?: any }) {
   const [adLoaded, setAdLoaded] = useState(false);
@@ -14,8 +24,8 @@ export default function AdBanner({ style }: { style?: any }) {
   const unitId = AD_UNIT_IDS.banner;
   if (!unitId) return null;
 
-  // Show fallback if ad failed
-  if (adError) {
+  // Fallback for Expo Go or ad load failure
+  if (!BannerAd || adError) {
     return (
       <View style={[styles.container, style]}>
         <View style={styles.fallbackBanner}>
@@ -35,7 +45,7 @@ export default function AdBanner({ style }: { style?: any }) {
           requestNonPersonalizedAdsOnly: false,
         }}
         onAdLoaded={() => setAdLoaded(true)}
-        onAdFailedToLoad={(error) => {
+        onAdFailedToLoad={(error: any) => {
           console.warn('Ad failed to load:', error);
           setAdError(true);
         }}

@@ -1,13 +1,15 @@
 // app/(tabs)/compare/index.tsx
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Dimensions, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { Alert, Animated, Dimensions, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Href, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 
 import * as ImagePicker from 'expo-image-picker';
 
 import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
+import { fetchAllProducts, DiscoveryProduct } from '../../../lib/services/discovery-service';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -46,40 +48,33 @@ export default function Compare() {
     image: string;
   };
 
-  const selectSuggestions = useMemo<ProductSuggestion[]>(
-    () => [
-      {
-        id: 's1',
-        title: 'Adidas®\nShort sleeve t-shirt',
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 's2',
-        title: 'Nike®\nCrew neck tee',
-        image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 's3',
-        title: 'Uniqlo®\nAirism tee',
-        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 's4',
-        title: 'Polo Ralph Lauren®\nButton down',
-        image: 'https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 's5',
-        title: 'Banana Republic®\nOxford shirt',
-        image: 'https://images.unsplash.com/photo-1520975869017-a7f1f8fefe7b?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        id: 's6',
-        title: 'J.Crew®\nSlim button-down',
-        image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    []
+  const MOCK_SUGGESTIONS: ProductSuggestion[] = [
+    { id: 's1', title: 'Adidas®\nShort sleeve t-shirt', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80' },
+    { id: 's2', title: 'Nike®\nCrew neck tee', image: 'https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1000&q=80' },
+    { id: 's3', title: 'Uniqlo®\nAirism tee', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80' },
+    { id: 's4', title: 'Polo Ralph Lauren®\nButton down', image: 'https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=1000&q=80' },
+    { id: 's5', title: 'Banana Republic®\nOxford shirt', image: 'https://images.unsplash.com/photo-1520975869017-a7f1f8fefe7b?auto=format&fit=crop&w=1000&q=80' },
+    { id: 's6', title: 'J.Crew®\nSlim button-down', image: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=1000&q=80' },
+  ];
+
+  const [selectSuggestions, setSelectSuggestions] = useState<ProductSuggestion[]>(MOCK_SUGGESTIONS);
+
+  // Fetch real products from Supabase on focus, fall back to mocks
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      fetchAllProducts(12).then((products) => {
+        if (!active || products.length === 0) return;
+        setSelectSuggestions(
+          products.map((p) => ({
+            id: p.id,
+            title: `${p.store}\n${p.name}`,
+            image: p.image || MOCK_SUGGESTIONS[0].image,
+          }))
+        );
+      });
+      return () => { active = false; };
+    }, [])
   );
 
   const [intentShown, setIntentShown] = useState(false);

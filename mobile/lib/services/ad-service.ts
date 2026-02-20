@@ -66,3 +66,40 @@ export function shouldShowInterstitial(): boolean {
 export function resetAdCounter(): void {
   scansSinceLastAd = 0;
 }
+
+/**
+ * Load and show an interstitial ad if the counter threshold is met.
+ * Safe for Expo Go — silently no-ops if native module unavailable.
+ */
+export async function maybeShowInterstitial(): Promise<void> {
+  if (!shouldShowInterstitial()) return;
+
+  try {
+    const { InterstitialAd, AdEventType } = require('react-native-google-mobile-ads');
+    const unitId = AD_UNIT_IDS.interstitial;
+    if (!unitId) return;
+
+    const interstitial = InterstitialAd.createForAdRequest(unitId, {
+      requestNonPersonalizedAdsOnly: false,
+    });
+
+    return new Promise<void>((resolve) => {
+      const timeout = setTimeout(() => resolve(), 8000);
+
+      interstitial.addAdEventListener(AdEventType.LOADED, () => {
+        interstitial.show();
+      });
+      interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+        clearTimeout(timeout);
+        resolve();
+      });
+      interstitial.addAdEventListener(AdEventType.ERROR, () => {
+        clearTimeout(timeout);
+        resolve();
+      });
+      interstitial.load();
+    });
+  } catch {
+    // Native module not available (Expo Go)
+  }
+}

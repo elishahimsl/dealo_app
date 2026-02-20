@@ -16,8 +16,49 @@ export interface DloScoreResult {
 }
 
 /**
+ * Extract review sentiment signals from search result snippets.
+ * Looks for positive/negative keywords to derive a sentiment score (0-100).
+ */
+function extractReviewSentiment(snippets: string[]): { score: number; positiveCount: number; negativeCount: number } {
+  const positiveWords = [
+    'excellent', 'amazing', 'great', 'love', 'best', 'perfect', 'fantastic',
+    'awesome', 'outstanding', 'superb', 'highly rated', 'top rated', 'premium',
+    'comfortable', 'durable', 'reliable', 'worth', 'recommend', 'impressive',
+    'quality', 'solid', 'smooth', 'fast', 'lightweight', 'stylish', 'beautiful',
+    '5 star', '4.5 star', '4 star', 'well made', 'well built', 'good value',
+  ];
+  const negativeWords = [
+    'poor', 'bad', 'worst', 'terrible', 'awful', 'disappointing', 'cheap',
+    'broke', 'broken', 'flimsy', 'defective', 'overpriced', 'waste', 'avoid',
+    'returned', 'refund', 'complaint', 'problem', 'issue', 'fail', 'weak',
+    '1 star', '2 star', 'not worth', 'low quality', 'falls apart',
+  ];
+
+  let positiveCount = 0;
+  let negativeCount = 0;
+
+  for (const snippet of snippets) {
+    const lower = snippet.toLowerCase();
+    for (const word of positiveWords) {
+      if (lower.includes(word)) positiveCount++;
+    }
+    for (const word of negativeWords) {
+      if (lower.includes(word)) negativeCount++;
+    }
+  }
+
+  const total = positiveCount + negativeCount;
+  if (total === 0) return { score: 72, positiveCount: 0, negativeCount: 0 };
+
+  const ratio = positiveCount / total;
+  const score = Math.round(Math.min(95, Math.max(35, 40 + ratio * 55)));
+  return { score, positiveCount, negativeCount };
+}
+
+/**
  * Calculate the DLO score for a product based on real data.
  * Uses category-adaptive sub-scores from the score_profiles table.
+ * Integrates review sentiment analysis from search snippets.
  */
 export async function calculateDloScore(params: {
   category: string;
@@ -48,6 +89,12 @@ export async function calculateDloScore(params: {
   const pricedResults = priceResults.filter((r) => r.price !== null);
   const prices = pricedResults.map((r) => r.price!);
 
+  // Extract review sentiment from search snippets
+  const snippets = priceResults
+    .map((r) => r.snippet)
+    .filter((s): s is string => !!s && s.length > 10);
+  const sentiment = extractReviewSentiment(snippets);
+
   const breakdown: DloScoreBreakdown[] = [];
   let weightedSum = 0;
   let totalWeight = 0;
@@ -57,7 +104,6 @@ export async function calculateDloScore(params: {
 
     if (key === 'price' && prices.length > 0 && lowestPrice && highestPrice) {
       // Price score: how good is the best available price?
-      // If best price is near the lowest historical, score is high
       const bestAvailable = Math.min(...prices);
       if (avgPrice && avgPrice > 0) {
         const savingsPercent = ((avgPrice - bestAvailable) / avgPrice) * 100;
@@ -71,26 +117,31 @@ export async function calculateDloScore(params: {
       const storeScore = Math.min(95, 50 + availableStores * 8);
       score = storeScore;
     } else if (key === 'features' || key === 'performance') {
-      // Features/performance inferred from number of search results and snippets
+      // Features/performance: blend snippet detail count with review sentiment
       const hasDetailedListings = priceResults.filter(
         (r) => r.snippet && r.snippet.length > 50
       ).length;
-      score = Math.min(92, 60 + hasDetailedListings * 5);
+      const baseFeatureScore = Math.min(92, 60 + hasDetailedListings * 5);
+      score = Math.round(baseFeatureScore * 0.6 + sentiment.score * 0.4);
     } else if (key === 'durability' || key === 'quality') {
-      // Durability/quality: higher-priced products tend to have better build
-      if (avgPrice && avgPrice > 200) score = 82;
-      else if (avgPrice && avgPrice > 100) score = 76;
-      else if (avgPrice && avgPrice > 50) score = 72;
-      else score = 68;
+      // Durability/quality: blend price-tier heuristic with review sentiment
+      let priceBasedScore = 68;
+      if (avgPrice && avgPrice > 200) priceBasedScore = 82;
+      else if (avgPrice && avgPrice > 100) priceBasedScore = 76;
+      else if (avgPrice && avgPrice > 50) priceBasedScore = 72;
+      score = Math.round(priceBasedScore * 0.5 + sentiment.score * 0.5);
     } else if (key === 'battery') {
-      score = 75; // Neutral without real battery data
+      // Battery: use sentiment as proxy for battery satisfaction in reviews
+      score = Math.round(70 * 0.4 + sentiment.score * 0.6);
     } else if (key === 'comfort' || key === 'style' || key === 'ease_of_use') {
-      score = 78; // Neutral without review sentiment data
+      // These subjective scores are driven primarily by review sentiment
+      score = sentiment.score;
     } else if (key === 'brand') {
-      // Brand reputation: known brands get higher scores
+      // Brand reputation: known brands get higher scores, boosted by sentiment
       const knownBrands = ['apple', 'samsung', 'sony', 'nike', 'adidas', 'beats', 'bose', 'lg', 'google', 'microsoft', 'dell', 'hp', 'lenovo'];
       const isKnownBrand = knownBrands.some((b) => productName.toLowerCase().includes(b));
-      score = isKnownBrand ? 88 : 70;
+      const brandBase = isKnownBrand ? 88 : 70;
+      score = Math.round(brandBase * 0.7 + sentiment.score * 0.3);
     }
 
     score = Math.round(Math.min(98, Math.max(30, score)));

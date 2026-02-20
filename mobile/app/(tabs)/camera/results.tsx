@@ -8,6 +8,7 @@ import { useProductLookup } from '../../../lib/hooks/use-product-lookup';
 import { useSaveToggle } from '../../../lib/hooks/use-saved-products';
 import { trackInteraction } from '../../../lib/services/user-interactions';
 import AdBanner from '../../../components/AdBanner';
+import { maybeShowInterstitial } from '../../../lib/services/ad-service';
 
 const { width } = Dimensions.get('window');
 
@@ -123,10 +124,11 @@ export default function CameraResults() {
   const productId = productData?.product?.id;
   const { saved, toggling, toggle: toggleSave } = useSaveToggle(productId);
 
-  // Track scan interaction when product data loads
+  // Track scan interaction and maybe show interstitial when product data loads
   useEffect(() => {
     if (productId && status === 'done') {
       trackInteraction({ productId, type: 'scan', metadata: { source: 'camera', name: objectName } });
+      maybeShowInterstitial();
     }
   }, [productId, status]);
 

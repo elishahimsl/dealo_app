@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, FlatList, Dimensions, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { type Href, useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
+import { fetchTrendingProducts, fetchProductsByCategory, DiscoveryProduct } from '../../../lib/services/discovery-service';
 
 const { width } = Dimensions.get('window');
 
@@ -201,10 +203,48 @@ const logos = [
 const logosPerPage = 6;
 const totalPages = Math.ceil(logos.length / logosPerPage);
 
+type MockProduct = { id: string; brand: string; product: string; category: string; image: string };
+
+function toMockProduct(dp: DiscoveryProduct, fallbackCategory: string): MockProduct {
+  return { id: dp.id, brand: dp.store, product: dp.name, category: dp.category || fallbackCategory, image: dp.image };
+}
+
 export default function Discover() {
   const [searchQuery, setSearchQuery] = useState('');
   const [logoPage, setLogoPage] = useState(0);
   const router = useRouter();
+
+  // Real data state with mock fallbacks
+  const [realTrending, setRealTrending] = useState<MockProduct[]>([]);
+  const [realMens, setRealMens] = useState<MockProduct[]>([]);
+  const [realWomens, setRealWomens] = useState<MockProduct[]>([]);
+  const [realFashion, setRealFashion] = useState<MockProduct[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      (async () => {
+        const [t, m, w, f] = await Promise.all([
+          fetchTrendingProducts(6),
+          fetchProductsByCategory('Mens', 6),
+          fetchProductsByCategory('Womens', 6),
+          fetchProductsByCategory('Fashion', 6),
+        ]);
+        if (!active) return;
+        if (t.length > 0) setRealTrending(t.map((p) => toMockProduct(p, 'Trending')));
+        if (m.length > 0) setRealMens(m.map((p) => toMockProduct(p, 'Mens')));
+        if (w.length > 0) setRealWomens(w.map((p) => toMockProduct(p, 'Womens')));
+        if (f.length > 0) setRealFashion(f.map((p) => toMockProduct(p, 'Fashion')));
+      })();
+      return () => { active = false; };
+    }, [])
+  );
+
+  // Use real data when available, fall back to mocks
+  const trendingData = realTrending.length > 0 ? realTrending : trending;
+  const mensData = realMens.length > 0 ? realMens : mens;
+  const womensData = realWomens.length > 0 ? realWomens : womens;
+  const fashionData = realFashion.length > 0 ? realFashion : fashion;
 
   const truncate = (text: string, maxLen: number) => {
     const t = text.trim();
@@ -398,7 +438,7 @@ export default function Discover() {
             <Text style={styles.sectionHeaderTitle}>Trending Right Now</Text>
           </View>
           <FlatList
-            data={trending}
+            data={trendingData}
             renderItem={renderTrending}
             keyExtractor={(item) => item.id}
             horizontal
@@ -418,7 +458,7 @@ export default function Discover() {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={mens}
+            data={mensData}
             renderItem={renderTrending}
             keyExtractor={(item) => item.id}
             horizontal
@@ -438,7 +478,7 @@ export default function Discover() {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={womens}
+            data={womensData}
             renderItem={renderTrending}
             keyExtractor={(item) => item.id}
             horizontal
@@ -458,7 +498,7 @@ export default function Discover() {
             </TouchableOpacity>
           </View>
           <FlatList
-            data={fashion}
+            data={fashionData}
             renderItem={renderTrending}
             keyExtractor={(item) => item.id}
             horizontal

@@ -1,37 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-
-const BRAND_GREEN = '#0E9F6E';
+import { View, Text, StyleSheet } from 'react-native';
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { AD_UNIT_IDS } from '../lib/services/ad-service';
 
 /**
- * AdBanner component — placeholder that will display a Google AdMob banner.
- *
- * Once `react-native-google-mobile-ads` is installed and configured,
- * replace the placeholder View with the real BannerAd component:
- *
- * ```tsx
- * import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
- * import { AD_UNIT_IDS } from '../lib/services/ad-service';
- *
- * <BannerAd
- *   unitId={AD_UNIT_IDS.banner}
- *   size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
- *   requestOptions={{ requestNonPersonalizedAdsOnly: !personalizedAds }}
- * />
- * ```
- *
- * For now, this shows a styled placeholder so the UI layout is correct.
+ * AdBanner component — displays a Google AdMob adaptive banner ad.
+ * Falls back to a subtle placeholder if the ad fails to load.
  */
 export default function AdBanner({ style }: { style?: any }) {
   const [adLoaded, setAdLoaded] = useState(false);
+  const [adError, setAdError] = useState(false);
 
-  // Placeholder banner — swap for real BannerAd when AdMob SDK is installed
-  return (
-    <View style={[styles.container, style]}>
-      <View style={styles.placeholderBanner}>
-        <Text style={styles.adLabel}>Ad</Text>
-        <Text style={styles.adText}>Sponsored</Text>
+  const unitId = AD_UNIT_IDS.banner;
+  if (!unitId) return null;
+
+  // Show fallback if ad failed
+  if (adError) {
+    return (
+      <View style={[styles.container, style]}>
+        <View style={styles.fallbackBanner}>
+          <Text style={styles.adLabel}>Ad</Text>
+          <Text style={styles.adText}>Sponsored</Text>
+        </View>
       </View>
+    );
+  }
+
+  return (
+    <View style={[styles.container, style, !adLoaded && styles.hidden]}>
+      <BannerAd
+        unitId={unitId}
+        size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
+        requestOptions={{
+          requestNonPersonalizedAdsOnly: false,
+        }}
+        onAdLoaded={() => setAdLoaded(true)}
+        onAdFailedToLoad={(error) => {
+          console.warn('Ad failed to load:', error);
+          setAdError(true);
+        }}
+      />
     </View>
   );
 }
@@ -41,7 +49,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
   },
-  placeholderBanner: {
+  hidden: {
+    height: 0,
+    overflow: 'hidden',
+  },
+  fallbackBanner: {
     width: '100%',
     height: 52,
     backgroundColor: '#F3F4F6',

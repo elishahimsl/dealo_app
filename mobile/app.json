@@ -16,7 +16,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "DeaLo uses the camera to scan products and find the best prices.",
         "NSPhotoLibraryUsageDescription": "DeaLo accesses your photos so you can scan products from your gallery.",
-        "GADApplicationIdentifier": "ca-app-pub-3940256099942544~1458002511"
+        "GADApplicationIdentifier": "ca-app-pub-7768131514876444~2821443026"
       }
     },
     "android": {
@@ -53,6 +53,13 @@
         "expo-camera",
         {
           "cameraPermission": "DeaLo needs camera access to scan products and find deals."
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-7768131514876444~1368760553",
+          "iosAppId": "ca-app-pub-7768131514876444~2821443026"
         }
       ]
     ],

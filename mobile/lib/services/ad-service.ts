@@ -19,11 +19,11 @@ const TEST_BANNER_IOS = 'ca-app-pub-3940256099942544/2934735716';
 const TEST_INTERSTITIAL_ANDROID = 'ca-app-pub-3940256099942544/1033173712';
 const TEST_INTERSTITIAL_IOS = 'ca-app-pub-3940256099942544/4411468910';
 
-// TODO: Replace with real AdMob IDs before publishing
-const PROD_BANNER_ANDROID = 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX';
-const PROD_BANNER_IOS = 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX';
-const PROD_INTERSTITIAL_ANDROID = 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX';
-const PROD_INTERSTITIAL_IOS = 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX';
+// Real AdMob production IDs
+const PROD_BANNER_ANDROID = 'ca-app-pub-7768131514876444/1687889981';
+const PROD_BANNER_IOS = 'ca-app-pub-7768131514876444/6731508696';
+const PROD_INTERSTITIAL_ANDROID = 'ca-app-pub-7768131514876444/3731599399';
+const PROD_INTERSTITIAL_IOS = 'ca-app-pub-7768131514876444/5838488603';
 
 const IS_DEV = __DEV__;
 
@@ -42,10 +42,9 @@ export const AD_UNIT_IDS = {
 
 // AdMob App IDs (set in app.json plugins)
 export const ADMOB_APP_ID = Platform.select({
-  // TODO: Replace with real AdMob App IDs
-  ios: 'ca-app-pub-3940256099942544~1458002511',
-  android: 'ca-app-pub-3940256099942544~3347511713',
-  default: 'ca-app-pub-3940256099942544~3347511713',
+  ios: 'ca-app-pub-7768131514876444~2821443026',
+  android: 'ca-app-pub-7768131514876444~1368760553',
+  default: 'ca-app-pub-7768131514876444~1368760553',
 });
 
 /**

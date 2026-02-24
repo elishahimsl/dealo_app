@@ -100,13 +100,22 @@ const detectObject = async (photo: { uri: string; base64: string }): Promise<Det
       ],
     };
 
+    console.log('[DeaLo] Vision API: sending request...');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
+      signal: controller.signal as any,
     });
+    clearTimeout(timeout);
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn('[DeaLo] Vision API error:', res.status);
+      return null;
+    }
     const json: any = await res.json();
     const first = json?.responses?.[0];
 
@@ -155,6 +164,7 @@ const detectObject = async (photo: { uri: string; base64: string }): Promise<Det
     const maxX = xs.length ? Math.max(...xs) : 0.82;
     const maxY = ys.length ? Math.max(...ys) : 0.78;
 
+    console.log('[DeaLo] Vision API: detected =>', bestGuess || 'Unknown');
     return {
       name: bestGuess || 'Unknown Product',
       category: category || 'Unknown',
@@ -165,7 +175,8 @@ const detectObject = async (photo: { uri: string; base64: string }): Promise<Det
       priceRange: '',
       alternatives: [],
     };
-  } catch (_e) {
+  } catch (e: any) {
+    console.warn('[DeaLo] Vision API failed:', e?.message || e);
     return null;
   }
 };
@@ -243,7 +254,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 1,
+                quality: 0.4,
                 base64: true,
               });
               
@@ -261,7 +272,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 1,
+                quality: 0.4,
                 base64: true,
               });
               
@@ -288,7 +299,7 @@ export default function CameraScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.4,
       base64: true,
     });
 
@@ -416,6 +427,21 @@ export default function CameraScreen() {
             }
           });
         }, 1600);
+      } else {
+        // Detection failed — still navigate to results with a generic name
+        console.warn('[DeaLo] Detection returned null, navigating with fallback');
+        scanDoneTimeoutRef.current = setTimeout(() => {
+          if (!alive) return;
+          router.push({
+            pathname: '/camera/results',
+            params: {
+              objectName: 'Product',
+              category: 'General',
+              confidence: '0.5',
+              imageUri: capturedUri,
+            }
+          });
+        }, 800);
       }
     })();
 
@@ -511,7 +537,7 @@ export default function CameraScreen() {
     if (!cameraRef.current) return;
 
     try {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 1 });
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.4, exif: false });
       if (!photo?.uri) return;
       setCapturedUri(photo.uri);
       setCapturedBase64(photo.base64 ?? null);

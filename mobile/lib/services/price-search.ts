@@ -46,14 +46,22 @@ export async function searchProductPrices(productName: string): Promise<PriceRes
   const query = `${productName.trim()} price buy`;
 
   try {
+    console.log('[DeaLo] CSE: searching for', query);
     const url = `https://www.googleapis.com/customsearch/v1?key=${CSE_API_KEY}&cx=${CSE_ID}&q=${encodeURIComponent(query)}&num=10`;
-    const res = await fetch(url);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+
+    const res = await fetch(url, { signal: controller.signal as any });
+    clearTimeout(timeout);
+
     if (!res.ok) {
-      console.warn('CSE search failed:', res.status);
+      console.warn('[DeaLo] CSE search failed:', res.status, await res.text().catch(() => ''));
       return [];
     }
 
     const json: any = await res.json();
+    console.log('[DeaLo] CSE: got', json.items?.length ?? 0, 'results');
     const items: any[] = json.items || [];
 
     const results: PriceResult[] = [];

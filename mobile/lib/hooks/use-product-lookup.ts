@@ -28,7 +28,18 @@ export function useProductLookup(productName: string, category: string, imageUri
 
     setResult({ status: 'loading', data: null, dloScore: null, error: null });
 
+    // Global timeout: never let the whole lookup hang for more than 30s
+    const timeoutId = setTimeout(() => {
+      setResult((prev) =>
+        prev.status === 'loading'
+          ? { status: 'error', data: null, dloScore: null, error: 'Search timed out. Please try again.' }
+          : prev
+      );
+    }, 30000);
+
     try {
+      console.log('[DeaLo] lookup: starting for', productName);
+
       // 1. Ingest product (search prices + store in DB)
       const productData = await ingestProduct({
         name: productName,
@@ -36,6 +47,7 @@ export function useProductLookup(productName: string, category: string, imageUri
         imageUri,
         upc,
       });
+      console.log('[DeaLo] lookup: ingest done, calculating DLO score...');
 
       // 2. Calculate DLO score from real data
       const dloScore = await calculateDloScore({
@@ -46,7 +58,9 @@ export function useProductLookup(productName: string, category: string, imageUri
         highestPrice: productData.highestPrice,
         productName,
       });
+      console.log('[DeaLo] lookup: done! Score =', dloScore.overallScore);
 
+      clearTimeout(timeoutId);
       setResult({
         status: 'done',
         data: productData,
@@ -54,7 +68,8 @@ export function useProductLookup(productName: string, category: string, imageUri
         error: null,
       });
     } catch (err: any) {
-      console.warn('Product lookup failed:', err);
+      clearTimeout(timeoutId);
+      console.warn('[DeaLo] lookup failed:', err);
       setResult({
         status: 'error',
         data: null,

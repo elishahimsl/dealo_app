@@ -44,7 +44,9 @@ export async function ingestProduct(params: {
   const { name, category, imageUri, upc } = params;
 
   // 1. Search for real prices via Google CSE
+  console.log('[DeaLo] ingest: searching prices for', name);
   const priceResults = await searchProductPrices(name);
+  console.log('[DeaLo] ingest: got', priceResults.length, 'price results');
 
   // 2. Extract brand from product name (first word if multi-word)
   const words = name.trim().split(/\s+/);

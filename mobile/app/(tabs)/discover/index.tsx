@@ -319,6 +319,9 @@ export default function Discover() {
     <View style={styles.trendingWrapper}>
       <TouchableOpacity style={styles.trendingCard} activeOpacity={0.9}>
         <Image source={{ uri: item.image }} style={styles.trendingImage} />
+        <TouchableOpacity activeOpacity={0.9} style={styles.tileHeartBtn}>
+          <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
+        </TouchableOpacity>
       </TouchableOpacity>
 
       <View style={styles.tileMetaRow}>
@@ -348,7 +351,7 @@ export default function Discover() {
           <Text style={styles.discoverTitle}>Discover</Text>
         </View>
 
-        <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/search' as Href)}>
+        <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/(tabs)/search' as Href)}>
           <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
           <Text style={styles.searchInput}>Search</Text>
           <TouchableOpacity style={styles.searchCameraButton} onPress={() => router.push('/(tabs)/camera' as Href)}>
@@ -443,6 +446,7 @@ export default function Discover() {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.trendingSeparator} />}
             contentContainerStyle={styles.trendingList}
           />
         </View>
@@ -463,6 +467,7 @@ export default function Discover() {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.trendingSeparator} />}
             contentContainerStyle={styles.trendingList}
           />
         </View>
@@ -483,6 +488,7 @@ export default function Discover() {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.trendingSeparator} />}
             contentContainerStyle={styles.trendingList}
           />
         </View>
@@ -503,6 +509,7 @@ export default function Discover() {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={styles.trendingSeparator} />}
             contentContainerStyle={styles.trendingList}
           />
         </View>
@@ -742,8 +749,11 @@ const styles = StyleSheet.create({
     paddingRight: 14,
     paddingBottom: 10,
   },
+  trendingSeparator: {
+    width: 14,
+  },
   trendingWrapper: {
-    marginRight: 14,
+    marginRight: 0,
   },
   trendingCard: {
     width: 150,
@@ -756,6 +766,17 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 4,
     marginBottom: 8,
+  },
+  tileHeartBtn: {
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: 'rgba(17,24,39,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   trendingImage: {
     width: '100%',

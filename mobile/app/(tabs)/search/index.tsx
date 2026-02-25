@@ -1,186 +1,280 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, FlatList, Dimensions, Image } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { Platform } from 'react-native';
+import Svg, { Defs, LinearGradient, RadialGradient, Rect, Stop } from 'react-native-svg';
 
+const BRAND_GREEN = '#0E9F6E';
 const { width } = Dimensions.get('window');
 
-const stores = [
-  { id: '1', name: 'Nike', domain: 'nike.com', color: '#111827' },
-  { id: '2', name: 'Amazon', domain: 'amazon.com', color: '#FF9900' },
-  { id: '3', name: 'Apple', domain: 'apple.com', color: '#111827' },
-  { id: '4', name: 'Target', domain: 'target.com', color: '#CC0000' },
-  { id: '5', name: 'Walmart', domain: 'walmart.com', color: '#0071CE' },
-  { id: '6', name: 'Best Buy', domain: 'bestbuy.com', color: '#0046BE' },
+const categoryPills = ['Electronics', 'Groceries', 'Home', 'Beauty', 'Clothing'];
+
+const popularStores = [
+  { id: 'amazon', domain: 'amazon.com' },
+  { id: 'target', domain: 'target.com' },
+  { id: 'bestbuy', domain: 'bestbuy.com' },
+  { id: 'walmart', domain: 'walmart.com' },
+  { id: 'costco', domain: 'costco.com' },
 ];
 
-const categories = [
-  { id: '1', name: 'Electronics', icon: 'laptop-outline' as const },
-  { id: '2', name: 'Clothing', icon: 'shirt-outline' as const },
-  { id: '3', name: 'Home', icon: 'home-outline' as const },
-  { id: '4', name: 'Beauty', icon: 'sparkles-outline' as const },
-  { id: '5', name: 'Toys', icon: 'game-controller-outline' as const },
-  { id: '6', name: 'Sports', icon: 'basketball-outline' as const },
+const topBrands = [
+  { id: 'apple', domain: 'apple.com' },
+  { id: 'sony', domain: 'sony.com' },
+  { id: 'nike', domain: 'nike.com' },
+  { id: 'adidas', domain: 'adidas.com' },
+  { id: 'samsung', domain: 'samsung.com' },
+];
+
+const recentSearchesSeed = [
+  {
+    id: 'r1',
+    title: 'Sony WH-1000XM5',
+    subtitle: 'Sony',
+    image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=200&q=80',
+  },
+  {
+    id: 'r2',
+    title: 'Stanley Quencher',
+    subtitle: 'Stanley',
+    image: 'https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=200&q=80',
+  },
+  {
+    id: 'r3',
+    title: 'Apple AirPods Pro',
+    subtitle: 'Apple',
+    image: 'https://images.unsplash.com/photo-1603351154351-5e2d0600bb77?auto=format&fit=crop&w=200&q=80',
+  },
+];
+
+const trendingSeed = [
+  {
+    id: 't1',
+    title: 'Best Noise-Cancelling Headphones',
+    subtitle: 'Most searched today',
+    image: 'https://images.unsplash.com/photo-1518441315630-3cb2f5223d82?auto=format&fit=crop&w=200&q=80',
+  },
+  {
+    id: 't2',
+    title: 'Trending Running Shoes',
+    subtitle: 'Price recently dropped',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=200&q=80',
+  },
+  {
+    id: 't3',
+    title: 'Top Protein Powders',
+    subtitle: 'High demand this week',
+    image: 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=200&q=80',
+  },
+  {
+    id: 't4',
+    title: 'Most-Wanted Kitchen Gadgets',
+    subtitle: 'Top searched appliances',
+    image: 'https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=200&q=80',
+  },
 ];
 
 export default function Search() {
-  const router = useRouter();
   const inputRef = useRef<TextInput>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const blinkAnim = useRef(new Animated.Value(1)).current;
 
-  const handleSearch = (query: string) => {
-    if (query.trim()) {
-      const updatedSearches = [query, ...recentSearches.filter(item => item !== query)].slice(0, 10);
-      setRecentSearches(updatedSearches);
-      // TODO: Navigate to search results when results page is created
-      console.log('Searching for:', query);
-    }
-  };
+  const [query, setQuery] = useState('');
+  const [activePill, setActivePill] = useState('Electronics');
+  const [isFocused, setIsFocused] = useState(true);
+  const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
+  const [recentSearches, setRecentSearches] = useState(recentSearchesSeed);
 
-  const deleteRecentSearch = (item: string) => {
-    const updatedSearches = recentSearches.filter(search => search !== item);
-    setRecentSearches(updatedSearches);
-  };
+  useEffect(() => {
+    const t = setTimeout(() => inputRef.current?.focus(), 120);
+    return () => clearTimeout(t);
+  }, []);
 
-  const clearAllRecentSearches = () => {
-    setRecentSearches([]);
-  };
-
-  const renderStoreItem = ({ item }: { item: typeof stores[0] }) => (
-    <TouchableOpacity style={styles.storeItem} activeOpacity={0.85}>
-      <View style={[styles.storeLogoTile, { borderColor: `${item.color}22` }]}>
-        <Image
-          source={{ uri: `https://logo.clearbit.com/${item.domain}` }}
-          style={styles.storeLogo}
-        />
-      </View>
-    </TouchableOpacity>
-  );
-
-  const renderCategoryItem = ({ item }: { item: typeof categories[0] }) => {
-    const isSelected = selectedCategory === item.name;
-    return (
-      <TouchableOpacity
-        style={styles.categoryItem}
-        activeOpacity={0.7}
-        onPress={() => {
-          setSelectedCategory(item.name);
-          inputRef.current?.focus();
-        }}
-      >
-        <View style={[styles.categoryIconContainer, isSelected && styles.categoryIconContainerSelected]}>
-          <Ionicons name={item.icon} size={20} color={isSelected ? '#0E9F6E' : '#6B7280'} />
-        </View>
-      </TouchableOpacity>
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(blinkAnim, { toValue: 0, duration: 380, useNativeDriver: true }),
+        Animated.timing(blinkAnim, { toValue: 1, duration: 480, useNativeDriver: true }),
+      ])
     );
-  };
-
-  const renderRecentSearchItem = ({ item }: { item: string }) => (
-    <View style={styles.recentSearchItem}>
-      <TouchableOpacity 
-        style={styles.recentSearchContent}
-        onPress={() => handleSearch(item)}
-      >
-        <Ionicons name="time-outline" size={16} color="#9CA3AF" />
-        <Text style={styles.recentSearchText}>{item}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity 
-        style={styles.deleteButton}
-        onPress={() => deleteRecentSearch(item)}
-      >
-        <Ionicons name="close-outline" size={16} color="#9CA3AF" />
-      </TouchableOpacity>
-    </View>
-  );
+    loop.start();
+    return () => loop.stop();
+  }, [blinkAnim]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar} onTouchStart={() => inputRef.current?.focus()}>
-            <Ionicons name="search-outline" size={20} color="#9CA3AF" style={styles.searchIcon} />
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <View pointerEvents="none" style={[StyleSheet.absoluteFillObject, { zIndex: -1 }]}> 
+        <Svg height="100%" width="100%" style={StyleSheet.absoluteFillObject}>
+          <Defs>
+            <RadialGradient id="sun" cx="-8%" cy="-12%" rx="95%" ry="95%" fx="-8%" fy="-12%">
+              <Stop offset="0" stopColor="#B9F6D2" stopOpacity={0.9} />
+              <Stop offset="0.22" stopColor="#34D399" stopOpacity={0.55} />
+              <Stop offset="0.52" stopColor={BRAND_GREEN} stopOpacity={0.18} />
+              <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
+            </RadialGradient>
+            <LinearGradient id="sunRay" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0" stopColor="#34D399" stopOpacity={0.12} />
+              <Stop offset="0.35" stopColor="#34D399" stopOpacity={0.05} />
+              <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
+            </LinearGradient>
+          </Defs>
+          <Rect x="0" y="0" width="100%" height="100%" fill="#FFFFFF" />
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#sun)" />
+          <Rect x="0" y="0" width="100%" height="100%" fill="url(#sunRay)" />
+        </Svg>
+      </View>
 
-            {selectedCategory ? (
-              <View style={styles.categoryPill}>
-                <Text style={styles.categoryPillText}>{selectedCategory}</Text>
-                <TouchableOpacity
-                  style={styles.categoryPillClose}
-                  onPress={() => {
-                    setSelectedCategory(null);
-                    inputRef.current?.focus();
-                  }}
-                >
-                  <Ionicons name="close" size={14} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-            ) : null}
-
-            <TextInput
-              ref={inputRef}
-              style={styles.searchInput}
-              placeholder="Search for products, stores, deals..."
-              placeholderTextColor="#9CA3AF"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={() => handleSearch(searchQuery)}
-              returnKeyType="search"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle-outline" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {/* Recent Searches */}
-        {recentSearches.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Searches</Text>
-              <TouchableOpacity onPress={clearAllRecentSearches}>
-                <Text style={styles.clearAllText}>Clear all</Text>
-              </TouchableOpacity>
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.searchRow}>
+          <View style={styles.searchInputWrap}>
+            <Ionicons name="search-outline" size={20} color="#6B7280" style={styles.searchLeadingIcon} />
+            <View style={styles.searchInputInner}>
+              {isFocused && query.length === 0 ? (
+                <Animated.View style={[styles.blinkCursor, { opacity: blinkAnim }]} />
+              ) : null}
+              <TextInput
+                ref={inputRef}
+                style={styles.searchInput}
+                value={query}
+                onChangeText={setQuery}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="Search"
+                placeholderTextColor="#9CA3AF"
+                returnKeyType="search"
+              />
             </View>
-            <FlatList
-              data={recentSearches}
-              renderItem={renderRecentSearchItem}
-              keyExtractor={(item, index) => `recent-${index}`}
-              scrollEnabled={false}
-            />
+            <View style={styles.searchCameraButton}>
+              <Ionicons name="camera-outline" size={18} color={BRAND_GREEN} />
+            </View>
           </View>
-        )}
-
-        {/* Featured Stores */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, styles.sectionTitleSpacing]}>Featured</Text>
-          <FlatList
-            data={stores}
-            renderItem={renderStoreItem}
-            keyExtractor={(item) => item.id}
-            numColumns={3}
-            scrollEnabled={false}
-            columnWrapperStyle={styles.storeRow}
-            contentContainerStyle={styles.storesGrid}
-          />
         </View>
 
-        {/* Categories */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, styles.sectionTitleSpacing]}>Categories</Text>
-          <FlatList
-            data={categories}
-            renderItem={renderCategoryItem}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.categoriesList}
-          />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pillsRow}>
+          {categoryPills.map((pill) => {
+            const active = pill === activePill;
+            return (
+              <TouchableOpacity
+                key={pill}
+                activeOpacity={0.88}
+                style={[styles.pill, active && styles.pillActive]}
+                onPress={() => {
+                  setActivePill(pill);
+                  inputRef.current?.focus();
+                }}
+              >
+                <Text style={[styles.pillText, active && styles.pillTextActive]}>{pill}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleWrap}>
+              <Ionicons name="time-outline" size={16} color="#6B7280" />
+              <Text style={styles.sectionTitle}>Popular Stores</Text>
+            </View>
+            <TouchableOpacity activeOpacity={0.8}>
+              <Text style={styles.sectionAction}>Clear ›</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
+            {popularStores.map((store) => (
+              <View key={store.id} style={styles.logoTile}>
+                {!logoErrors[store.id] ? (
+                  <Image
+                    source={{ uri: `https://logo.clearbit.com/${store.domain}` }}
+                    style={styles.logoImage}
+                    onError={() => setLogoErrors((prev) => ({ ...prev, [store.id]: true }))}
+                  />
+                ) : (
+                  <View style={styles.logoBlank} />
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleWrap}>
+              <Ionicons name="logo-apple" size={16} color="#6B7280" />
+              <Text style={styles.sectionTitle}>Top Brands</Text>
+            </View>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
+            {topBrands.map((brand) => (
+              <View key={brand.id} style={styles.logoTile}>
+                {!logoErrors[brand.id] ? (
+                  <Image
+                    source={{ uri: `https://logo.clearbit.com/${brand.domain}` }}
+                    style={styles.logoImage}
+                    onError={() => setLogoErrors((prev) => ({ ...prev, [brand.id]: true }))}
+                  />
+                ) : (
+                  <View style={styles.logoBlank} />
+                )}
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleWrap}>
+              <Ionicons name="time-outline" size={16} color="#6B7280" />
+              <Text style={styles.sectionTitle}>Recent Searches</Text>
+            </View>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => setRecentSearches([])}>
+              <Text style={styles.sectionAction}>Clear ›</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.listCard}>
+            {recentSearches.map((item, idx) => (
+              <TouchableOpacity key={item.id} style={[styles.listRow, idx !== recentSearches.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
+                <Ionicons name="time-outline" size={16} color="#9CA3AF" style={styles.listLeadingIcon} />
+                <View style={styles.listTextWrap}>
+                  <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
+                  <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={[styles.sectionCard, { marginBottom: 24 }]}> 
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleWrap}>
+              <Ionicons name="trending-up-outline" size={16} color="#6B7280" />
+              <Text style={styles.sectionTitle}>Trending Now</Text>
+            </View>
+          </View>
+
+          <View style={styles.listCard}>
+            {trendingSeed.map((item, idx) => (
+              <TouchableOpacity key={item.id} style={[styles.listRow, idx !== trendingSeed.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
+                <Ionicons name="trending-up-outline" size={16} color="#9CA3AF" style={styles.listLeadingIcon} />
+                <View style={styles.listTextWrap}>
+                  <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
+                  <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -192,157 +286,197 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  scrollView: {
+  scroll: {
     flex: 1,
   },
-  searchContainer: {
-    paddingHorizontal: 16,
+  scrollContent: {
+    paddingHorizontal: 12,
     paddingTop: 8,
-    paddingBottom: 16,
+    paddingBottom: 92,
   },
-  searchBar: {
+  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
   },
-  searchIcon: {
-    marginRight: 12,
+  searchInputWrap: {
+    flex: 1,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  searchLeadingIcon: {
+    marginRight: 10,
+  },
+  searchInputInner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchCameraButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  blinkCursor: {
+    width: 2,
+    height: 18,
+    borderRadius: 2,
+    backgroundColor: BRAND_GREEN,
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    height: '100%',
+    fontSize: 17,
     color: '#111827',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
+    paddingVertical: 0,
   },
-  section: {
-    paddingHorizontal: 16,
-    marginBottom: 24,
+  pillsRow: {
+    paddingTop: 12,
+    paddingBottom: 10,
+    gap: 8,
+  },
+  pill: {
+    height: 34,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+  },
+  pillActive: {
+    backgroundColor: '#3A6C57',
+    borderColor: '#2E5A4A',
+  },
+  pillText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4B5563',
+    fontFamily: 'Manrope-Regular',
+  },
+  pillTextActive: {
+    color: '#FFFFFF',
+  },
+  sectionCard: {
+    marginTop: 6,
+    marginBottom: 10,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.82)',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
   },
   sectionHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  sectionTitleWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: '#111827',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Display' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
-  sectionTitleSpacing: {
-    marginBottom: 14,
-  },
-  clearAllText: {
-    fontSize: 12,
+  sectionAction: {
+    fontSize: 16,
+    fontWeight: '500',
     color: '#6B7280',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    fontFamily: 'Manrope-Regular',
   },
-  recentSearchItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
+  logoRow: {
+    paddingHorizontal: 2,
+    gap: 8,
   },
-  recentSearchContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  recentSearchText: {
-    fontSize: 14,
-    color: '#4B5563',
-    marginLeft: 12,
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  storesGrid: {
-    paddingTop: 2,
-  },
-  storeRow: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 0,
-  },
-  storeItem: {
-    width: (width - 32 - 16) / 3,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  storeLogoTile: {
-    width: 58,
-    height: 58,
-    borderRadius: 999,
-    backgroundColor: '#F3F4F6',
+  logoTile: {
+    width: (width - 24 - 20 - 32) / 5,
+    minWidth: 60,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    justifyContent: 'center',
+    borderColor: 'rgba(17,24,39,0.06)',
     alignItems: 'center',
-    marginBottom: 0,
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  storeLogo: {
-    width: 54,
-    height: 22,
+  logoImage: {
+    width: '78%',
+    height: '54%',
     resizeMode: 'contain',
   },
-  storeName: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#374151',
-    textAlign: 'center',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
-  },
-  categoriesList: {
-    paddingRight: 16,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  categoryIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  logoBlank: {
+    width: '78%',
+    height: '54%',
+    borderRadius: 6,
     backgroundColor: '#F3F4F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 0,
   },
-  categoryIconContainerSelected: {
-    backgroundColor: '#ECFDF5',
+  listCard: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    backgroundColor: '#FFFFFF',
   },
-  categoryPill: {
+  listRow: {
+    height: 74,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    height: 28,
-    borderRadius: 999,
-    backgroundColor: '#111827',
-    borderWidth: 1,
-    borderColor: '#0E9F6E',
+  },
+  listLeadingIcon: {
     marginRight: 10,
-    shadowColor: '#0E9F6E',
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 6,
   },
-  categoryPillText: {
-    fontSize: 12,
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  listTextWrap: {
+    flex: 1,
+    minWidth: 0,
+  },
+  listTitle: {
+    fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
-    fontFamily: Platform.OS === 'ios' ? 'SF Pro Text' : 'Roboto',
+    color: '#111827',
+    fontFamily: 'Manrope-Regular',
   },
-  categoryPillClose: {
-    marginLeft: 8,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  listSubtitle: {
+    marginTop: 2,
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#6B7280',
+    fontFamily: 'Manrope-Regular',
   },
 });

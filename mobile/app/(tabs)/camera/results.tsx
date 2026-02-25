@@ -168,8 +168,25 @@ export default function CameraResults() {
       const longestSnippet = [...pricedResults].sort((a, b) => (b.snippet?.length || 0) - (a.snippet?.length || 0))[0];
       return longestSnippet?.snippet || `${displayName} found across ${pricedResults.length} retailers.`;
     }
-    return `Searching for the best deals on ${displayName}...`;
-  }, [pricedResults, displayName]);
+    return `${displayName} is currently being analyzed in the ${categoryParam} category. We are generating a product overview using available scan context while live retailer pricing finishes loading.`;
+  }, [pricedResults, displayName, categoryParam]);
+
+  const fallbackBreakdown = useMemo(() => {
+    const baseline = 65;
+    return [
+      { key: 'price', label: 'Price', value: baseline, weight: 0.3 },
+      { key: 'features', label: 'Features', value: baseline + 3, weight: 0.25 },
+      { key: 'value', label: 'Value', value: baseline - 2, weight: 0.2 },
+      { key: 'durability', label: 'Durability', value: baseline + 1, weight: 0.25 },
+    ];
+  }, []);
+
+  const breakdownForUi = dloScore?.breakdown?.length ? dloScore.breakdown : fallbackBreakdown;
+  const scoreForUi = dloScore?.overallScore ?? 65;
+  const labelForUi = dloScore?.label ?? (status === 'loading' ? 'Analyzing...' : 'Fair Deal');
+  const rundownForUi =
+    dloScore?.rundown ||
+    `${displayName} has a preliminary score based on category and scan context. Live pricing and retailer comparisons are currently unavailable, so this is an early estimate.`;
 
   // For backward compat with identifyOnly view
   const detectedProduct = {
@@ -215,49 +232,6 @@ export default function CameraResults() {
     );
   }
 
-  // Loading state
-  if (status === 'loading') {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.headerRowMock}>
-          <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={24} color="#111827" />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-        </View>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16 }}>
-          <ActivityIndicator size="large" color={BRAND_GREEN} />
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>Finding best deals...</Text>
-          <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center', paddingHorizontal: 40 }}>
-            Searching retailers for {displayName}
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Error state
-  if (status === 'error') {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.headerRowMock}>
-          <TouchableOpacity style={styles.headerBtn} onPress={() => router.back()}>
-            <Ionicons name="chevron-back" size={24} color="#111827" />
-          </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-        </View>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, paddingHorizontal: 32 }}>
-          <Ionicons name="alert-circle-outline" size={48} color="#F59E0B" />
-          <Text style={{ fontSize: 16, fontWeight: '600', color: '#111827' }}>Search Failed</Text>
-          <Text style={{ fontSize: 13, color: '#6B7280', textAlign: 'center' }}>{error || 'Could not find price data'}</Text>
-          <TouchableOpacity onPress={retry} style={{ height: 44, borderRadius: 999, backgroundColor: BRAND_GREEN, paddingHorizontal: 24, justifyContent: 'center' }}>
-            <Text style={{ color: '#fff', fontWeight: '600', fontSize: 14 }}>Try Again</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   // Derive chart data from real prices
   const chartPrices = pricedResults.map((r) => r.price!);
   const chartMax = chartPrices.length > 0 ? Math.max(...chartPrices) : 200;
@@ -265,7 +239,7 @@ export default function CameraResults() {
   const chartMid = Math.round((chartMax + chartMin) / 2);
 
   // Build review rows from DLO breakdown
-  const reviewRows = (dloScore?.breakdown || []).map((b) => ({
+  const reviewRows = breakdownForUi.map((b) => ({
     k: b.label,
     v: b.value >= 85 ? 'Very Positive' : b.value >= 75 ? 'Positive' : b.value >= 65 ? 'Fair' : 'Mixed',
     tone: (b.value >= 70 ? 'good' : 'warn') as 'good' | 'warn',
@@ -297,7 +271,7 @@ export default function CameraResults() {
             <View style={styles.heroRight}>
               <Text style={styles.heroTitleMock}>{displayName}</Text>
               <View style={styles.goodDealPill}>
-                <Text style={styles.goodDealText}>{dealLabel}</Text>
+                <Text style={styles.goodDealText}>{labelForUi}</Text>
               </View>
 
               <Text style={styles.productMatchLabel}>Product Match</Text>
@@ -328,55 +302,59 @@ export default function CameraResults() {
             </View>
           )}
 
-          {dloScore && dloScore.breakdown.length > 0 && (
-            <>
-              <View style={styles.strengthCard}>
-                <View pointerEvents="none" style={styles.strengthTint} />
-                <Text style={styles.cardHeader}>Strengths</Text>
+          <>
+            <View style={styles.strengthCard}>
+              <View pointerEvents="none" style={styles.strengthTint} />
+              <Text style={styles.cardHeader}>Strengths</Text>
+              <View style={styles.bulletList}>
+                {breakdownForUi.filter((b) => b.value >= 75).slice(0, 3).map((b, i) => (
+                  <View key={i} style={styles.bulletRowMock}>
+                    <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
+                    <Text style={styles.bulletTextMock}>{`Strong ${b.label.toLowerCase()} score of ${b.value} — above average for this category`}</Text>
+                  </View>
+                ))}
+                {breakdownForUi.filter((b) => b.value >= 75).length === 0 && (
+                  <View style={styles.bulletRowMock}>
+                    <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
+                    <Text style={styles.bulletTextMock}>Core quality signals look stable for this product category.</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.weakCardWrap}>
+              <View pointerEvents="none" style={styles.weakUnderlay} />
+              <View style={styles.weakCard}>
+                <View pointerEvents="none" style={styles.weakTint} />
+                <Text style={styles.cardHeader}>Areas to Watch</Text>
                 <View style={styles.bulletList}>
-                  {dloScore.breakdown.filter((b) => b.value >= 75).slice(0, 3).map((b, i) => (
+                  {breakdownForUi.filter((b) => b.value < 75).slice(0, 3).map((b, i) => (
                     <View key={i} style={styles.bulletRowMock}>
-                      <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
-                      <Text style={styles.bulletTextMock}>{`Strong ${b.label.toLowerCase()} score of ${b.value} — above average for this category`}</Text>
+                      <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
+                      <Text style={styles.bulletTextMock}>{`${b.label} scored ${b.value} — consider comparing alternatives`}</Text>
                     </View>
                   ))}
+                  {breakdownForUi.filter((b) => b.value < 75).length === 0 && (
+                    <View style={styles.bulletRowMock}>
+                      <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
+                      <Text style={styles.bulletTextMock}>No major concerns detected for this product</Text>
+                    </View>
+                  )}
                 </View>
               </View>
-
-              <View style={styles.weakCardWrap}>
-                <View pointerEvents="none" style={styles.weakUnderlay} />
-                <View style={styles.weakCard}>
-                  <View pointerEvents="none" style={styles.weakTint} />
-                  <Text style={styles.cardHeader}>Areas to Watch</Text>
-                  <View style={styles.bulletList}>
-                    {dloScore.breakdown.filter((b) => b.value < 75).slice(0, 3).map((b, i) => (
-                      <View key={i} style={styles.bulletRowMock}>
-                        <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
-                        <Text style={styles.bulletTextMock}>{`${b.label} scored ${b.value} — consider comparing alternatives`}</Text>
-                      </View>
-                    ))}
-                    {dloScore.breakdown.filter((b) => b.value < 75).length === 0 && (
-                      <View style={styles.bulletRowMock}>
-                        <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
-                        <Text style={styles.bulletTextMock}>No major concerns detected for this product</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </View>
-            </>
-          )}
+            </View>
+          </>
 
           <Text style={styles.sectionTitleMock}>Deal Overview</Text>
           <View style={styles.aiScoreWrap}>
             <Text style={styles.aiScoreTitle}>
-              AI Score <Text style={styles.aiScoreValue}>{dloScore?.overallScore || '--'}</Text> {dealLabel}
+              AI Score <Text style={styles.aiScoreValue}>{scoreForUi}</Text> {labelForUi}
             </Text>
             <View style={styles.aiTrack}>
-              <View style={[styles.aiFill, { width: `${dloScore?.overallScore || 0}%` }]} />
+              <View style={[styles.aiFill, { width: `${scoreForUi}%` }]} />
             </View>
             <View style={styles.aiBreakRow}>
-              {(dloScore?.breakdown || []).map((b) => (
+              {breakdownForUi.map((b) => (
                 <View key={b.key} style={styles.aiBreakItem}>
                   <View style={styles.aiDot} />
                   <Text style={styles.aiBreakText}>
@@ -387,10 +365,32 @@ export default function CameraResults() {
             </View>
             <Text style={styles.aiRundownTitle}>AI Rundown</Text>
             <View style={styles.aiRundownRow}>
-              <Text style={styles.aiRundownText}>{dloScore?.rundown || 'Analyzing product data...'}</Text>
+              <Text style={styles.aiRundownText}>{rundownForUi}</Text>
               <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} />
             </View>
           </View>
+
+          {(status === 'loading' || status === 'error') && (
+            <View style={styles.lookupStatusCard}>
+              <View style={styles.lookupStatusRow}>
+                {status === 'loading' ? (
+                  <ActivityIndicator size="small" color={BRAND_GREEN} />
+                ) : (
+                  <Ionicons name="alert-circle-outline" size={18} color="#F59E0B" />
+                )}
+                <Text style={styles.lookupStatusText}>
+                  {status === 'loading'
+                    ? `Searching retailers for ${displayName}...`
+                    : error || 'Live retailer search is unavailable right now. Showing fallback analysis.'}
+                </Text>
+              </View>
+              {status === 'error' && (
+                <TouchableOpacity activeOpacity={0.9} onPress={retry} style={styles.lookupRetryBtn}>
+                  <Text style={styles.lookupRetryText}>Try Again</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
           {bestPrice && (
             <View style={styles.bestPriceGlass}>
@@ -483,11 +483,11 @@ export default function CameraResults() {
             </View>
           )}
 
-          {dloScore?.rundown && (
+          {rundownForUi && (
             <View style={styles.reviewOverviewSection}>
               <Text style={styles.reviewOverviewHeader}>AI Analysis</Text>
               <TouchableOpacity activeOpacity={0.85} style={styles.reviewOverviewRow}>
-                <Text style={styles.reviewOverviewTextInline}>{dloScore.rundown}</Text>
+                <Text style={styles.reviewOverviewTextInline}>{rundownForUi}</Text>
                 <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={styles.reviewOverviewChevron} />
               </TouchableOpacity>
             </View>
@@ -684,6 +684,41 @@ const styles = StyleSheet.create({
   aiRundownTitle: { marginTop: 12, fontSize: 14, fontWeight: '600', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
   aiRundownRow: { flexDirection: 'row', gap: 10, marginTop: 8, alignItems: 'flex-start' },
   aiRundownText: { flex: 1, fontSize: 13, lineHeight: 18, color: '#6B7280', fontWeight: '400', fontFamily: DEALO_FONT_FAMILY },
+  lookupStatusCard: {
+    marginHorizontal: 16,
+    marginTop: 14,
+    borderRadius: 14,
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#EEF2F7',
+  },
+  lookupStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  lookupStatusText: {
+    flex: 1,
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: DEALO_FONT_FAMILY,
+  },
+  lookupRetryBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 10,
+    height: 30,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    backgroundColor: BRAND_GREEN,
+  },
+  lookupRetryText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+    fontFamily: DEALO_FONT_FAMILY,
+  },
 
   bestPriceGlass: {
     marginHorizontal: 16,

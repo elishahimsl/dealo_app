@@ -416,7 +416,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="products"
+          name="products/index"
           options={{
             href: null,
           }}
@@ -428,7 +428,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="deals"
+          name="deals/index"
           options={{
             title: 'Deals',
           }}
@@ -449,6 +449,12 @@ export default function TabLayout() {
           name="account"
           options={{
             title: 'Account',
+          }}
+        />
+        <Tabs.Screen
+          name="filter"
+          options={{
+            href: null,
           }}
         />
       </Tabs>

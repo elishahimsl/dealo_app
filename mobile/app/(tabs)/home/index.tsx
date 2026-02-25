@@ -1,6 +1,5 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { 
-  Animated,
   View, 
   Text, 
   StyleSheet, 
@@ -19,7 +18,6 @@ import DealoWordmarkGreenBlack from '../../../assets/images/logos/dealo-wordmark
 import DealoMarkGreen from '../../../assets/images/logos/dealo-mark-green';
 import { useRecentScans } from '../../../lib/hooks/use-recent-scans';
 import { useSavedProducts } from '../../../lib/hooks/use-saved-products';
-import AdBanner from '../../../components/AdBanner';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -46,6 +44,30 @@ const trendingProducts = [
     store: 'Target',
     price: '$149.99',
     image: 'https://images.unsplash.com/photo-1518441315630-3cb2f5223d82?auto=format&fit=crop&w=800&q=80',
+  },
+];
+
+const dealsForYouSponsoredCards = [
+  {
+    id: 'deal-sponsored-1',
+    brand: 'Adidas',
+    deal: '20% off all shoes',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
+    logo: 'A',
+  },
+  {
+    id: 'deal-sponsored-2',
+    brand: 'Nike',
+    deal: '30% off running gear',
+    image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80',
+    logo: 'N',
+  },
+  {
+    id: 'deal-sponsored-3',
+    brand: 'Samsung',
+    deal: '18% off Galaxy Buds',
+    image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=900&q=80',
+    logo: 'S',
   },
 ];
 
@@ -186,6 +208,23 @@ const navItems = [
   { label: 'Saved', icon: 'bookmark-outline' as const },
 ];
 
+const sponsoredHomeCards = [
+  {
+    id: 'sponsored-home-1',
+    brand: 'Adidas',
+    deal: '20% off all shoes',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
+    logo: 'A',
+  },
+  {
+    id: 'sponsored-home-2',
+    brand: 'Nike',
+    deal: '30% off running gear',
+    image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80',
+    logo: 'N',
+  },
+];
+
 const followChips = [
   { id: 'follow-nike', label: 'Nike', logo: 'N' },
   { id: 'follow-walmart', label: 'Walmart', logo: 'W' },
@@ -215,7 +254,7 @@ export default function Home() {
   const [activeNav, setActiveNav] = useState<string>('Categories');
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const [following, setFollowing] = useState<Record<string, boolean>>({});
-  const dealScrollX = useRef(new Animated.Value(0)).current;
+  const snapCardWidth = width - 32;
 
   // Real data hooks
   const { scans, refresh: refreshScans } = useRecentScans(6);
@@ -248,21 +287,7 @@ export default function Home() {
     image: string;
   }
 
-  const dealsForYou = [
-    { id: 'deal-1', title: '50% Off all Electronics' },
-    { id: 'deal-2', title: 'Buy 1 Get 1 on Shoes' },
-    { id: 'deal-3', title: 'Extra 20% Off Clearance' },
-    { id: 'deal-4', title: 'Weekend Flash Sale' },
-  ];
-
-  const dealCardWidth = width - 64;
-  const dotStep = 14;
-  const dotsWrapWidth = 18 + (dealsForYou.length - 1) * dotStep;
-  const activeDotTranslateX = dealScrollX.interpolate({
-    inputRange: dealsForYou.map((_, i) => i * dealCardWidth),
-    outputRange: dealsForYou.map((_, i) => i * dotStep),
-    extrapolate: 'clamp',
-  });
+  const dealCardWidth = width - 88;
 
   const renderProductCard = ({ item }: { item: Product }) => (
     <TouchableOpacity activeOpacity={0.9} onPress={() => router.push('/(tabs)/products' as Href)} style={styles.productCard}>
@@ -306,7 +331,7 @@ export default function Home() {
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Search Bar */}
-        <TouchableOpacity style={styles.searchContainer} onPress={() => router.push('/search' as Href)}>
+        <TouchableOpacity style={styles.searchContainer} onPress={() => router.push('/(tabs)/search' as Href)}>
           <Ionicons name="search" size={18} color="#6B7280" style={styles.searchIcon} />
           <TextInput 
             style={styles.searchInput} 
@@ -345,28 +370,67 @@ export default function Home() {
           ))}
         </ScrollView>
 
-        {/* Snap to Search Card */}
-        <TouchableOpacity style={styles.snapCard} activeOpacity={0.9} onPress={() => router.replace('/(tabs)/camera' as Href)}>
-          <View style={styles.snapTop}>
-            <View style={styles.snapIllustration}>
-              <View style={[styles.starDot, { top: 18, left: 24, opacity: 0.35 }]} />
-              <View style={[styles.starDot, { top: 42, right: 38, opacity: 0.25 }]} />
-              <View style={[styles.starDot, { bottom: 28, left: 56, opacity: 0.2 }]} />
-              <View style={styles.illusCameraWrapper}>
-                <Ionicons name="camera" size={60} color="rgba(255,255,255,0.28)" />
-              </View>
-              <View style={styles.illusTagWrapper}>
-                <Ionicons name="pricetag" size={44} color={BRAND_GREEN} />
+        {/* Snap + Sponsored Carousel */}
+        <ScrollView
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={snapCardWidth + 12}
+          disableIntervalMomentum
+          bounces={false}
+          contentContainerStyle={styles.snapCarousel}
+        >
+          <TouchableOpacity
+            style={[styles.snapCard, styles.snapCardSlide, { width: snapCardWidth }]}
+            activeOpacity={0.9}
+            onPress={() => router.replace('/(tabs)/camera' as Href)}
+          >
+            <View style={styles.snapTop}>
+              <View style={styles.snapIllustration}>
+                <View style={[styles.starDot, { top: 18, left: 24, opacity: 0.35 }]} />
+                <View style={[styles.starDot, { top: 42, right: 38, opacity: 0.25 }]} />
+                <View style={[styles.starDot, { bottom: 28, left: 56, opacity: 0.2 }]} />
+                <View style={styles.illusCameraWrapper}>
+                  <Ionicons name="camera" size={60} color="rgba(255,255,255,0.28)" />
+                </View>
+                <View style={styles.illusTagWrapper}>
+                  <Ionicons name="pricetag" size={44} color={BRAND_GREEN} />
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles.snapBottom}>
-            <View style={styles.snapBottomIcon}>
-              <Ionicons name="camera" size={18} color="#fff" />
+            <View style={styles.snapBottom}>
+              <View style={styles.snapBottomIcon}>
+                <Ionicons name="camera" size={18} color="#fff" />
+              </View>
+              <Text style={styles.snapBottomText}>Snap a picture to get started</Text>
             </View>
-            <Text style={styles.snapBottomText}>Snap a picture to get started</Text>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+
+          {sponsoredHomeCards.map((card) => (
+            <TouchableOpacity
+              key={card.id}
+              style={[styles.snapCard, styles.snapCardSlide, styles.sponsoredSnapCard, { width: snapCardWidth }]}
+              activeOpacity={0.9}
+              onPress={() => router.push('/(tabs)/deals' as Href)}
+            >
+              <View style={styles.sponsoredImageWrap}>
+                <Text style={styles.sponsoredLabel}>Sponsored</Text>
+                <Image source={{ uri: card.image }} style={styles.sponsoredImage} />
+              </View>
+
+              <View style={styles.sponsoredBottom}>
+                <View style={styles.sponsoredLogoCircle}>
+                  <Text style={styles.sponsoredLogoText}>{card.logo}</Text>
+                </View>
+                <View style={styles.sponsoredTextCol}>
+                  <Text style={styles.sponsoredBrand}>{card.brand}</Text>
+                  <Text style={styles.sponsoredDeal}>{card.deal}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
         {/* Try Scanning These */}
         <View style={styles.section}>
@@ -437,7 +501,32 @@ export default function Home() {
           </ScrollView>
         </View>
 
-        <AdBanner style={{ marginHorizontal: 16, marginVertical: 4 }} />
+        <View style={[styles.section, { marginTop: 24 }]}> 
+          <View style={[styles.homeMockHeaderRowTight, { marginHorizontal: 16, marginTop: 0 }]}> 
+            <Text style={styles.homeMockSubTitle}>Stores and Brands</Text>
+            <TouchableOpacity activeOpacity={0.85} onPress={() => router.replace('/discover' as Href)}>
+              <Ionicons name="chevron-forward" size={18} color="#111827" />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.homeMockFollowRow, { paddingLeft: 16 }]}> 
+            {followChips.map((c) => (
+              <View key={c.id} style={styles.homeMockFollowTile}>
+                <View style={styles.homeMockFollowTileRow}>
+                  <View style={styles.homeMockFollowLogoCircle}>
+                    <Text style={styles.homeMockFollowLogoText}>{c.logo}</Text>
+                  </View>
+                  <View style={styles.homeMockFollowInfo}>
+                    <Text style={styles.homeMockFollowLabel}>{c.label}</Text>
+                    <TouchableOpacity activeOpacity={0.85} style={[styles.homeMockFollowBtnGreen, following[c.id] && { backgroundColor: '#E5E7EB' }]} onPress={() => setFollowing((prev) => ({ ...prev, [c.id]: !prev[c.id] }))}>
+                      <Text style={[styles.homeMockFollowBtnGreenText, following[c.id] && { color: '#6B7280' }]}>{following[c.id] ? 'Following' : 'Follow'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* Smart Suggestions */}
         <View style={styles.section}>
@@ -501,28 +590,35 @@ export default function Home() {
             </View>
           </View>
 
-          <Animated.FlatList
-            data={dealsForYou}
-            keyExtractor={(d) => d.id}
+          <ScrollView
             horizontal
-            showsHorizontalScrollIndicator={false}
             pagingEnabled
+            showsHorizontalScrollIndicator={false}
             decelerationRate="fast"
-            snapToInterval={dealCardWidth}
+            snapToInterval={dealCardWidth + 12}
             disableIntervalMomentum
             bounces={false}
-            onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: dealScrollX } } }], { useNativeDriver: true })}
-            scrollEventThrottle={16}
-            contentContainerStyle={styles.homeMockDealCarousel}
-            renderItem={({ item }) => (
-              <View style={[styles.homeMockDealCard, { width: dealCardWidth }]}>
-                <View style={styles.homeMockDealPin}>
-                  <Ionicons name="pricetag" size={14} color="#111827" />
+            contentContainerStyle={styles.homeMockSponsoredCarousel}
+          >
+            {dealsForYouSponsoredCards.map((card) => (
+              <TouchableOpacity key={card.id} activeOpacity={0.9} style={[styles.homeMockSponsoredCard, { width: dealCardWidth }]}>
+                <View style={styles.homeMockSponsoredImageWrap}>
+                  <Text style={styles.homeMockSponsoredLabel}>Sponsored</Text>
+                  <Image source={{ uri: card.image }} style={styles.homeMockSponsoredImage} />
                 </View>
-                <Text style={styles.homeMockDealText}>{item.title}</Text>
-              </View>
-            )}
-          />
+
+                <View style={styles.homeMockSponsoredBottom}>
+                  <View style={styles.homeMockSponsoredLogoCircle}>
+                    <Text style={styles.homeMockSponsoredLogoText}>{card.logo}</Text>
+                  </View>
+                  <View style={styles.homeMockSponsoredTextCol}>
+                    <Text style={styles.homeMockSponsoredBrand}>{card.brand}</Text>
+                    <Text style={styles.homeMockSponsoredDeal}>{card.deal}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
 
           {/* Deal Product Tiles - 2 rows of 2 */}
           <View style={styles.dealProductsGrid}>
@@ -552,30 +648,6 @@ export default function Home() {
             ))}
           </View>
 
-          <View style={styles.homeMockHeaderRowTight}>
-            <Text style={styles.homeMockSubTitle}>Stores and Brands</Text>
-            <TouchableOpacity activeOpacity={0.85} onPress={() => router.replace('/discover' as Href)}>
-              <Ionicons name="chevron-forward" size={18} color="#111827" />
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.homeMockFollowRow}>
-            {followChips.map((c) => (
-              <View key={c.id} style={styles.homeMockFollowTile}>
-                <View style={styles.homeMockFollowTileRow}>
-                  <View style={styles.homeMockFollowLogoCircle}>
-                    <Text style={styles.homeMockFollowLogoText}>{c.logo}</Text>
-                  </View>
-                  <View style={styles.homeMockFollowInfo}>
-                    <Text style={styles.homeMockFollowLabel}>{c.label}</Text>
-                    <TouchableOpacity activeOpacity={0.85} style={[styles.homeMockFollowBtnGreen, following[c.id] && { backgroundColor: '#E5E7EB' }]} onPress={() => setFollowing((prev) => ({ ...prev, [c.id]: !prev[c.id] }))}>
-                      <Text style={[styles.homeMockFollowBtnGreenText, following[c.id] && { color: '#6B7280' }]}>{following[c.id] ? 'Following' : 'Follow'}</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
         </View>
 
         <View style={styles.footer}>
@@ -709,6 +781,15 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
   },
+  snapCarousel: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
+  snapCardSlide: {
+    marginHorizontal: 0,
+    marginTop: 0,
+    marginRight: 12,
+  },
   snapTop: {
     height: 170,
     justifyContent: 'center',
@@ -760,6 +841,68 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: 'white',
+  },
+  sponsoredSnapCard: {
+    backgroundColor: '#111827',
+  },
+  sponsoredImageWrap: {
+    height: 170,
+    backgroundColor: '#0F172A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  sponsoredLabel: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    zIndex: 2,
+  },
+  sponsoredImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    opacity: 0.88,
+  },
+  sponsoredBottom: {
+    height: 72,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    gap: 12,
+  },
+  sponsoredLogoCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sponsoredLogoText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  sponsoredTextCol: {
+    flex: 1,
+  },
+  sponsoredBrand: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  sponsoredDeal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
   },
   section: {
     marginTop: 24,
@@ -956,39 +1099,80 @@ const styles = StyleSheet.create({
     left: 34,
     top: 0,
   },
-  homeMockDealCard: {
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    padding: 18,
+  homeMockSponsoredCarousel: {
+    paddingRight: 16,
+  },
+  homeMockSponsoredCard: {
     marginRight: 12,
-    height: 120,
+    borderRadius: 18,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
     borderWidth: 1,
     borderColor: 'rgba(17,24,39,0.06)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.06,
-    shadowRadius: 14,
+    shadowRadius: 12,
     elevation: 3,
   },
-  homeMockDealCarousel: {
-    paddingRight: 16,
+  homeMockSponsoredImageWrap: {
+    height: 112,
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
-  homeMockDealPin: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  homeMockSponsoredLabel: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    zIndex: 2,
+  },
+  homeMockSponsoredImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    opacity: 0.88,
+  },
+  homeMockSponsoredBottom: {
+    height: 58,
     backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    gap: 10,
+  },
+  homeMockSponsoredLogoCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#F3F4F6',
     borderWidth: 1,
     borderColor: 'rgba(17,24,39,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
   },
-  homeMockDealText: {
-    fontSize: 17,
+  homeMockSponsoredLogoText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  homeMockSponsoredTextCol: {
+    flex: 1,
+  },
+  homeMockSponsoredBrand: {
+    fontSize: 12,
     fontWeight: '700',
     color: '#111827',
-    marginBottom: 12,
+    marginBottom: 1,
+  },
+  homeMockSponsoredDeal: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#374151',
   },
   dealProductsGrid: {
     flexDirection: 'row',

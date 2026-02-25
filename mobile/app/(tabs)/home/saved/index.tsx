@@ -46,6 +46,14 @@ const SAVED_COMPARISONS: SavedComparison[] = [
   { id: 'cmp-3', title: 'Adidas v. Nike', brand: 'Nike', scoreA: 81, scoreB: 78 },
 ];
 
+const SAMPLE_COLLECTION_IMAGES = [
+  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1588156979435-379b9d802b0a?auto=format&fit=crop&w=600&q=80',
+  'https://images.unsplash.com/photo-1520975869017-a7f1f8fefe7b?auto=format&fit=crop&w=600&q=80',
+];
+
+const SAMPLE_COLLECTIONS: { id: string; name: string }[] = [];
+
 type SavedFilter = 'all' | 'favorites' | 'scans' | 'comparisons';
 
 function FilterGlyph() {
@@ -164,14 +172,22 @@ export default function Saved() {
     }));
   }, [recentScans]);
 
-  const collectionThumbs = useMemo(() => favoritesData.slice(0, 3), [favoritesData]);
+  const collectionThumbs = useMemo(() => {
+    if (favoritesData.length > 0) return favoritesData.slice(0, 3);
+    return SAMPLE_COLLECTION_IMAGES.map((image, idx) => ({
+      id: `sample-thumb-${idx}`,
+      brand: 'Sample',
+      title: 'Sample Item',
+      image,
+    }));
+  }, [favoritesData]);
 
   const [activeFilter, setActiveFilter] = useState<SavedFilter>('all');
   const [filterOpen, setFilterOpen] = useState(false);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState('');
-  const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
+  const [collections, setCollections] = useState<{ id: string; name: string }[]>(SAMPLE_COLLECTIONS);
 
   const renderItem = ({ item }: ListRenderItemInfo<SavedItem>) => {
     return (
@@ -213,14 +229,14 @@ export default function Saved() {
               <View style={styles.headerRightSpacer} />
             </View>
 
-            <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/search' as Href)}>
+            <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/(tabs)/search' as Href)}>
               <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
               <Text style={styles.searchInput}>Search</Text>
             </TouchableOpacity>
 
             <Text style={styles.sectionTitle}>Collections</Text>
             <TouchableOpacity activeOpacity={0.9} style={styles.collectionCardFull} onPress={() => setCreateOpen(true)}>
-                <Text style={styles.createText}>+ Create collection</Text>
+                <Text style={styles.createText}>+ Create collections</Text>
 
                 <View style={styles.booksStack}>
                   {collectionThumbs.map((t: SavedItem, idx: number) => (
@@ -623,7 +639,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 14,
     backgroundColor: '#F3F4F6',
-    padding: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    minHeight: 150,
     alignItems: 'center',
     overflow: 'hidden',
   },

@@ -117,7 +117,8 @@ export default function Compare() {
     return () => clearTimeout(t);
   }, []);
 
-  const onPressSearch = () => router.push('/search' as Href);
+  const onPressSearch = () => router.push('/(tabs)/search' as Href);
+
   const onPressSaveForLater = () => onPressQuickTile('saved');
   const onPressViewOffer = () => router.push('/compare/results' as Href);
 

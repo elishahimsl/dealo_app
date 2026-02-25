@@ -4,8 +4,8 @@ import {
   Text,
   StyleSheet,
   FlatList,
+  ScrollView,
   Image,
-  TextInput,
   TouchableOpacity,
   ListRenderItemInfo,
   Dimensions,
@@ -80,17 +80,64 @@ const MOCK_DEALS: Deal[] = [
   },
 ];
 
+type DealOfDayCard = {
+  id: string;
+  brand: string;
+  product: string;
+  discount: string;
+  price: string;
+  oldPrice: string;
+  image: string;
+};
+
+const DEAL_OF_DAY_FEATURED: DealOfDayCard = {
+  id: 'day-1',
+  brand: 'Sony',
+  product: 'Black Headphones',
+  discount: '25% off',
+  price: '$75.00',
+  oldPrice: '$99.00',
+  image: 'https://images.unsplash.com/photo-1518441315630-3cb2f5223d82?auto=format&fit=crop&w=900&q=80',
+};
+
+type DealSponsoredCard = {
+  id: string;
+  brand: string;
+  deal: string;
+  image: string;
+  logo: string;
+};
+
+const DEAL_DAY_SPONSORED_CARDS: DealSponsoredCard[] = [
+  {
+    id: 's-day-1',
+    brand: 'Adidas',
+    deal: '20% off all shoes',
+    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
+    logo: 'A',
+  },
+  {
+    id: 's-day-2',
+    brand: 'Nike',
+    deal: '30% off running gear',
+    image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&w=1200&q=80',
+    logo: 'N',
+  },
+  {
+    id: 's-day-3',
+    brand: 'Samsung',
+    deal: '18% off Galaxy Buds',
+    image: 'https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?auto=format&fit=crop&w=900&q=80',
+    logo: 'S',
+  },
+];
+
 export default function Deals() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<(typeof FILTERS)[number]>('For You');
-  const [query, setQuery] = useState('');
+  const dealDayCardWidth = width - 34;
 
-  const data = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const base = MOCK_DEALS;
-    if (!q) return base;
-    return base.filter((d) => `${d.brand} ${d.product}`.toLowerCase().includes(q));
-  }, [query]);
+  const data = MOCK_DEALS;
 
   const sectionTitle = useMemo(() => {
     if (activeFilter === 'Hot Deals') return 'Best Deals Right Now';
@@ -180,17 +227,13 @@ export default function Deals() {
               <Text style={styles.headerTitle}>Deals</Text>
             </View>
 
-            <View style={styles.searchRow}>
+            <TouchableOpacity style={styles.searchRow} activeOpacity={0.9} onPress={() => router.push('/(tabs)/search')}>
               <Ionicons name="search" size={18} color="#6B7280" style={styles.searchIcon} />
-              <TextInput
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search"
-                placeholderTextColor="#6B7280"
-                style={styles.searchInput}
-                returnKeyType="search"
-              />
-            </View>
+              <Text style={styles.searchInput}>Search</Text>
+              <View style={styles.searchCameraButton}>
+                <Ionicons name="camera-outline" size={18} color={BRAND_GREEN} />
+              </View>
+            </TouchableOpacity>
 
             <View style={styles.filterRow}>
               {FILTERS.map((f) => {
@@ -208,12 +251,70 @@ export default function Deals() {
               })}
             </View>
 
-            <View style={styles.featuredDeal}>
-              <View style={styles.featuredDealPin}>
-                <Ionicons name="pricetag" size={14} color="#111827" />
-              </View>
-              <Text style={styles.featuredDealText}>50% Off all Electronics</Text>
+            <View style={styles.dealOfDayHead}>
+              <Text style={styles.dealOfDayTitle}>Deal of the Day</Text>
             </View>
+
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={dealDayCardWidth + 12}
+              disableIntervalMomentum
+              bounces={false}
+              contentContainerStyle={styles.dealDayCarousel}
+            >
+              <View style={[styles.dealDayCard, { width: dealDayCardWidth }]}> 
+                <View style={styles.dealDayRow}>
+                  <View style={styles.dealDayLeft}>
+                    <View style={styles.dealDayPill}>
+                      <Ionicons name="pricetag-outline" size={12} color="#111827" />
+                      <Text style={styles.dealDayPillText}>{DEAL_OF_DAY_FEATURED.discount}</Text>
+                    </View>
+
+                    <Text style={styles.dealDayBrand}>{DEAL_OF_DAY_FEATURED.brand}</Text>
+                    <Text style={styles.dealDayProduct}>{DEAL_OF_DAY_FEATURED.product}</Text>
+
+                    <View style={styles.dealDayPriceRow}>
+                      <Text style={styles.dealDayPrice}>{DEAL_OF_DAY_FEATURED.price}</Text>
+                      <Text style={styles.dealDayOldPrice}>{DEAL_OF_DAY_FEATURED.oldPrice}</Text>
+                    </View>
+
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      style={styles.dealDayBtn}
+                      onPress={() => router.push('/(tabs)/products')}
+                    >
+                      <Text style={styles.dealDayBtnText}>Get Deal</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.dealDayImageWrap}>
+                    <Image source={{ uri: DEAL_OF_DAY_FEATURED.image }} style={styles.dealDayImage} />
+                  </View>
+                </View>
+              </View>
+
+              {DEAL_DAY_SPONSORED_CARDS.map((card) => (
+                <View key={card.id} style={[styles.dealDaySponsoredCard, { width: dealDayCardWidth }]}> 
+                  <View style={styles.dealDaySponsoredImageWrap}>
+                    <Text style={styles.dealDaySponsoredLabel}>Sponsored</Text>
+                    <Image source={{ uri: card.image }} style={styles.dealDaySponsoredImage} />
+                  </View>
+
+                  <View style={styles.dealDaySponsoredBottom}>
+                    <View style={styles.dealDaySponsoredLogoCircle}>
+                      <Text style={styles.dealDaySponsoredLogoText}>{card.logo}</Text>
+                    </View>
+                    <View style={styles.dealDaySponsoredTextCol}>
+                      <Text style={styles.dealDaySponsoredBrand}>{card.brand}</Text>
+                      <Text style={styles.dealDaySponsoredDeal}>{card.deal}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
 
             <View style={styles.sectionHead}>
               <Text style={styles.sectionTitle}>{sectionTitle}</Text>
@@ -311,9 +412,16 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: '100%',
-    fontSize: 14,
+    fontSize: 13,
     color: '#111827',
+    fontWeight: '500',
+  },
+  searchCameraButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   filterRow: {
@@ -321,8 +429,193 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingTop: 6,
-    paddingBottom: 22,
+    paddingBottom: 14,
     gap: 8,
+  },
+  dealOfDayHead: {
+    paddingHorizontal: 18,
+    paddingTop: 6,
+    paddingBottom: 10,
+  },
+  dealOfDayTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#111827',
+    letterSpacing: -0.1,
+  },
+  dealDayCarousel: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  dealDayCard: {
+    marginRight: 12,
+    borderRadius: 22,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    padding: 14,
+    minHeight: 166,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  dealDayRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 12,
+    flex: 1,
+  },
+  dealDayLeft: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: 2,
+  },
+  dealDayPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.12)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 12,
+    gap: 5,
+  },
+  dealDayPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  dealDayBrand: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+    lineHeight: 18,
+  },
+  dealDayProduct: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  dealDayPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 8,
+    marginBottom: 8,
+  },
+  dealDayPrice: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#111827',
+    letterSpacing: -0.4,
+  },
+  dealDayOldPrice: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    textDecorationLine: 'line-through',
+  },
+  dealDayBtn: {
+    alignSelf: 'flex-start',
+    minHeight: 30,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    backgroundColor: '#111827',
+  },
+  dealDayBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  dealDayImageWrap: {
+    width: 108,
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: '#E5E7EB',
+  },
+  dealDayImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  dealDaySponsoredCard: {
+    marginRight: 12,
+    borderRadius: 22,
+    backgroundColor: '#111827',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    elevation: 4,
+  },
+  dealDaySponsoredImageWrap: {
+    height: 154,
+    backgroundColor: '#0F172A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  dealDaySponsoredLabel: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    zIndex: 2,
+  },
+  dealDaySponsoredImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    opacity: 0.88,
+  },
+  dealDaySponsoredBottom: {
+    height: 72,
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    gap: 12,
+  },
+  dealDaySponsoredLogoCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dealDaySponsoredLogoText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  dealDaySponsoredTextCol: {
+    flex: 1,
+  },
+  dealDaySponsoredBrand: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  dealDaySponsoredDeal: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
   },
   filterPill: {
     flexDirection: 'row',
@@ -354,7 +647,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
-    paddingTop: 18,
+    paddingTop: 12,
     paddingBottom: 10,
   },
   sectionTitle: {

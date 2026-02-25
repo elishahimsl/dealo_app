@@ -393,7 +393,7 @@ export default function DiscoverProducts() {
           <View style={styles.headerRightSpacer} />
         </View>
 
-        <TouchableOpacity style={styles.searchContainer} onPress={() => router.push('/search' as Href)}>
+        <TouchableOpacity style={styles.searchContainer} onPress={() => router.push('/(tabs)/search' as Href)}>
           <Ionicons name="search" size={18} color="#6B7280" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}

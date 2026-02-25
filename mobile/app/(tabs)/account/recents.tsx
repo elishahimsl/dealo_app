@@ -331,7 +331,7 @@ export default function RecentsScreen() {
         <View style={styles.headerBtn} />
       </View>
 
-      <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/search' as Href)}>
+      <TouchableOpacity style={styles.searchContainer} activeOpacity={0.9} onPress={() => router.push('/(tabs)/search' as Href)}>
         <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
         <Text style={styles.searchInput}>Search</Text>
       </TouchableOpacity>

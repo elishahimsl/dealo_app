@@ -28,14 +28,14 @@ export function useProductLookup(productName: string, category: string, imageUri
 
     setResult({ status: 'loading', data: null, dloScore: null, error: null });
 
-    // Global timeout: never let the whole lookup hang for more than 30s
+    // Global timeout: never let the whole lookup hang for more than 45s
     const timeoutId = setTimeout(() => {
       setResult((prev) =>
         prev.status === 'loading'
           ? { status: 'error', data: null, dloScore: null, error: 'Search timed out. Please try again.' }
           : prev
       );
-    }, 30000);
+    }, 45000);
 
     try {
       console.log('[DeaLo] lookup: starting for', productName);

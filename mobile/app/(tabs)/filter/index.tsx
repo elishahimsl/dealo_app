@@ -1,5 +1,17 @@
-import React, { useMemo, useState } from 'react';
-import { Dimensions, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  Image,
+  PanResponder,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,14 +24,6 @@ type Range = {
   max: number;
 };
 
-type TopicKey = 'recents' | 'trending' | 'mens' | 'womens' | 'sports' | 'tech' | 'home' | 'health' | 'fashion';
-
-type Topic = {
-  key: TopicKey;
-  title: string;
-  options: string[];
-};
-
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
@@ -28,18 +32,21 @@ function formatMoney(n: number) {
   return `$${n.toLocaleString()}`;
 }
 
-function Pill({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+function FilterChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.pill, active ? styles.pillActive : null]}>
-      <Text style={[styles.pillText, active ? styles.pillTextActive : null]}>{label}</Text>
+    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={[styles.chip, active ? styles.chipActive : null]}>
+      <Text style={[styles.chipText, active ? styles.chipTextActive : null]}>{label}</Text>
     </TouchableOpacity>
   );
 }
 
-function CheckboxBox({ checked, onToggle }: { checked: boolean; onToggle: () => void }) {
+function OptionRow({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return (
-    <TouchableOpacity activeOpacity={0.9} onPress={onToggle} style={[styles.checkBox, checked ? styles.checkBoxChecked : null]}>
-      {checked ? <Ionicons name="checkmark" size={16} color="#FFFFFF" /> : null}
+    <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={styles.sortRow}>
+      <View style={[styles.radioOuter, active ? styles.radioOuterActive : null]}>
+        {active ? <View style={styles.radioInner} /> : null}
+      </View>
+      <Text style={styles.sortText}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -107,124 +114,205 @@ export default function FilterScreen() {
   const params = useLocalSearchParams<{ returnTo?: string }>();
   const returnTo = (params.returnTo ?? '').toString().trim();
 
-  const [price, setPrice] = useState<Range>({ min: 50, max: 1000 });
-  const [activeStores, setActiveStores] = useState<Record<string, boolean>>({});
-  const [activeTopics, setActiveTopics] = useState<Record<string, boolean>>({});
+  const translateY = useRef(new Animated.Value(540)).current;
+  const dragYStart = useRef(0);
 
-  const stores = useMemo(() => ['Amazon', 'Nike', 'Target', 'Walmart', 'Best Buy'], []);
+  const dismiss = () => {
+    Animated.timing(translateY, {
+      toValue: 560,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      if (returnTo) router.replace(returnTo as Href);
+      else router.back();
+    });
+  };
 
-  const topics = useMemo<Topic[]>(
+  useEffect(() => {
+    Animated.spring(translateY, {
+      toValue: 0,
+      useNativeDriver: true,
+      damping: 20,
+      stiffness: 190,
+      mass: 0.95,
+    }).start();
+  }, [translateY]);
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onMoveShouldSetPanResponder: (_evt, gesture) => Math.abs(gesture.dy) > 6 && Math.abs(gesture.dx) < 18,
+        onPanResponderGrant: () => {
+          translateY.stopAnimation((v) => {
+            dragYStart.current = v;
+          });
+        },
+        onPanResponderMove: (_evt, gesture) => {
+          const next = Math.max(0, dragYStart.current + gesture.dy);
+          translateY.setValue(next);
+        },
+        onPanResponderRelease: (_evt, gesture) => {
+          if (gesture.dy > 120 || gesture.vy > 1.1) {
+            dismiss();
+            return;
+          }
+          Animated.spring(translateY, {
+            toValue: 0,
+            useNativeDriver: true,
+            damping: 20,
+            stiffness: 220,
+            mass: 0.95,
+          }).start();
+        },
+      }),
+    [translateY]
+  );
+
+  const [sortBy, setSortBy] = useState('Best Match');
+  const [price, setPrice] = useState<Range>({ min: 50, max: 250 });
+  const [activeQuickPrice, setActiveQuickPrice] = useState('Under $200');
+  const [activeStores, setActiveStores] = useState<Record<string, boolean>>({ Target: true, 'Best Buy': true });
+  const [activeBrands, setActiveBrands] = useState<Record<string, boolean>>({ Apple: true });
+
+  const sortOptions = useMemo(() => ['Best Match', 'Lowest Price', 'Highest Rating', 'Biggest Discount'], []);
+  const quickPriceOptions = useMemo(() => ['Any', 'Under $50', 'Under $100', 'Under $200'], []);
+
+  const stores = useMemo(
     () => [
-      { key: 'recents', title: 'Recents', options: ['Recently scanned', 'Recently compared', 'Recently saved'] },
-      { key: 'trending', title: 'Trending', options: ['Popular now', 'Top deals', 'Best value'] },
-      { key: 'mens', title: 'Mens', options: ['Shoes', 'Hoodies', 'Accessories'] },
-      { key: 'womens', title: 'Womens', options: ['Bags', 'Sweaters', 'Beauty'] },
-      { key: 'sports', title: 'Sports', options: ['Running', 'Training', 'Yoga'] },
-      { key: 'tech', title: 'Tech', options: ['Headphones', 'Watches', 'TVs'] },
-      { key: 'home', title: 'Home', options: ['Furniture', 'Kitchen', 'Lighting'] },
-      { key: 'health', title: 'Health', options: ['Recovery', 'Supplements', 'Fitness'] },
-      { key: 'fashion', title: 'Fashion', options: ['Jackets', 'Tees', 'Hats'] },
+      { id: 'amazon', label: 'Amazon', domain: 'amazon.com' },
+      { id: 'target', label: 'Target', domain: 'target.com' },
+      { id: 'bestbuy', label: 'Best Buy', domain: 'bestbuy.com' },
+      { id: 'walmart', label: 'Walmart', domain: 'walmart.com' },
+      { id: 'costco', label: 'Costco', domain: 'costco.com' },
     ],
     []
   );
 
+  const brands = useMemo(
+    () => [
+      { id: 'apple', label: 'Apple', domain: 'apple.com' },
+      { id: 'sony', label: 'Sony', domain: 'sony.com' },
+      { id: 'nike', label: 'Nike', domain: 'nike.com' },
+      { id: 'adidas', label: 'Adidas', domain: 'adidas.com' },
+    ],
+    []
+  );
+
+  const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
+
   const reset = () => {
-    setPrice({ min: 50, max: 1000 });
+    setSortBy('Best Match');
+    setPrice({ min: 50, max: 250 });
+    setActiveQuickPrice('Any');
     setActiveStores({});
-    setActiveTopics({});
+    setActiveBrands({});
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Filters</Text>
-        <TouchableOpacity
-          activeOpacity={0.85}
-          style={styles.closeBtn}
-          onPress={() => {
-            if (returnTo) router.replace(returnTo as Href);
-            else router.back();
-          }}
-        >
-          <Ionicons name="close" size={22} color="#111827" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+      <Pressable style={styles.backdrop} onPress={dismiss} />
 
-      <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Price Range</Text>
-        <View style={styles.priceRow}>
-          <Text style={styles.priceValue}>{formatMoney(price.min)}</Text>
-          <Text style={styles.priceValue}>{formatMoney(price.max)}</Text>
+      <Animated.View style={[styles.sheetWrap, { transform: [{ translateY }] }]}>
+        <View style={styles.handleArea} {...panResponder.panHandlers}>
+          <View style={styles.handle} />
+          <Text style={styles.headerTitle}>Filter</Text>
         </View>
-        <DualThumbRange min={0} max={1500} value={price} onChange={setPrice} />
-      </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionLabel}>Stores</Text>
-        <View style={styles.pillsRow}>
-          <Pill label="All" active={Object.keys(activeStores).length === 0} onPress={() => setActiveStores({})} />
-          {stores.map((s) => (
-            <Pill
-              key={s}
-              label={s}
-              active={!!activeStores[s]}
-              onPress={() => setActiveStores((prev) => ({ ...prev, [s]: !prev[s] }))}
-            />
-          ))}
-        </View>
-      </View>
-
-      <View style={[styles.section, styles.topicsSection]}>
-        <Text style={styles.sectionLabel}>Categories</Text>
-
-        {topics.map((t) => (
-          <View key={t.key} style={styles.topicBlock}>
-            <View style={styles.topicHeaderRow}>
-              <Text style={styles.topicTitle}>{t.title}</Text>
-              <TouchableOpacity
-                activeOpacity={0.85}
-                onPress={() => {
-                  const allKey = `${t.key}:__all__`;
-                  const nextOn = !activeTopics[allKey];
-                  const next: Record<string, boolean> = { ...activeTopics, [allKey]: nextOn };
-                  t.options.forEach((o) => {
-                    next[`${t.key}:${o}`] = nextOn;
-                  });
-                  setActiveTopics(next);
-                }}
-              >
-                <Text style={styles.selectAllText}>Select all</Text>
-              </TouchableOpacity>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
+          <View style={styles.card}>
+            <Text style={styles.sectionLabel}>SORT BY</Text>
+            <View style={styles.sortCard}>
+              {sortOptions.map((option, idx) => (
+                <View key={option} style={idx !== 0 ? styles.rowTopDivider : undefined}>
+                  <OptionRow label={option} active={sortBy === option} onPress={() => setSortBy(option)} />
+                </View>
+              ))}
             </View>
 
-            {t.options.map((o) => {
-              const k = `${t.key}:${o}`;
-              return (
-                <View key={k} style={styles.optionRow}>
-                  <Text style={styles.optionText}>{o}</Text>
-                  <CheckboxBox checked={!!activeTopics[k]} onToggle={() => setActiveTopics((p) => ({ ...p, [k]: !p[k] }))} />
-                </View>
-              );
-            })}
-          </View>
-        ))}
-      </View>
+            <Text style={[styles.sectionLabel, styles.sectionGap]}>PRICE RANGE</Text>
+            <Text style={styles.priceHeadline}>{formatMoney(price.min)} - {formatMoney(price.max)}</Text>
+            <View style={styles.sliderWrap}>
+              <DualThumbRange min={0} max={250} value={price} onChange={setPrice} />
+            </View>
+            <View style={styles.priceBoundsRow}>
+              <Text style={styles.boundText}>$50</Text>
+              <Text style={styles.boundText}>$250</Text>
+            </View>
 
-      <View style={styles.footer}>
-        <TouchableOpacity activeOpacity={0.9} style={styles.footerBtnSecondary} onPress={reset}>
-          <Text style={styles.footerBtnSecondaryText}>Clear</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          style={styles.footerBtnPrimary}
-          onPress={() => {
-            if (returnTo) router.replace(returnTo as Href);
-            else router.back();
-          }}
-        >
-          <Text style={styles.footerBtnPrimaryText}>Apply</Text>
-        </TouchableOpacity>
-      </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickPriceRow}>
+              {quickPriceOptions.map((option) => (
+                <FilterChip key={option} label={option} active={activeQuickPrice === option} onPress={() => setActiveQuickPrice(option)} />
+              ))}
+              <TouchableOpacity activeOpacity={0.85} style={styles.chipArrowBtn}>
+                <Ionicons name="chevron-forward" size={18} color="#6B7280" />
+              </TouchableOpacity>
+            </ScrollView>
+
+            <Text style={[styles.sectionLabel, styles.sectionGap]}>STORES</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
+              {stores.map((store) => {
+                const active = !!activeStores[store.label];
+                return (
+                  <TouchableOpacity
+                    key={store.id}
+                    activeOpacity={0.9}
+                    style={[styles.logoChip, active && styles.logoChipActive]}
+                    onPress={() => setActiveStores((prev) => ({ ...prev, [store.label]: !prev[store.label] }))}
+                  >
+                    {!logoErrors[store.id] ? (
+                      <Image
+                        source={{ uri: `https://logo.clearbit.com/${store.domain}` }}
+                        style={styles.logoImage}
+                        onError={() => setLogoErrors((prev) => ({ ...prev, [store.id]: true }))}
+                      />
+                    ) : (
+                      <Text style={styles.logoFallback}>{store.label}</Text>
+                    )}
+                    {active ? (
+                      <View style={styles.checkPill}>
+                        <Ionicons name="checkmark" size={12} color="#FFFFFF" />
+                      </View>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <Text style={[styles.sectionLabel, styles.sectionGap]}>BRANDS</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.brandRow}>
+              {brands.map((brand) => (
+                <FilterChip
+                  key={`b1-${brand.id}`}
+                  label={brand.label}
+                  active={!!activeBrands[brand.label]}
+                  onPress={() => setActiveBrands((prev) => ({ ...prev, [brand.label]: !prev[brand.label] }))}
+                />
+              ))}
+            </ScrollView>
+
+            <Text style={[styles.sectionLabel, styles.sectionGapTight]}>BRANDS</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.brandRow}>
+              {brands.map((brand) => (
+                <FilterChip
+                  key={`b2-${brand.id}`}
+                  label={brand.label}
+                  active={!!activeBrands[brand.label]}
+                  onPress={() => setActiveBrands((prev) => ({ ...prev, [brand.label]: !prev[brand.label] }))}
+                />
+              ))}
+            </ScrollView>
+
+            <View style={styles.footerRow}>
+              <TouchableOpacity activeOpacity={0.9} style={styles.footerBtnSecondary} onPress={reset}>
+                <Text style={styles.footerBtnSecondaryText}>Clear</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={0.9} style={styles.footerBtnPrimary} onPress={dismiss}>
+                <Text style={styles.footerBtnPrimaryText}>Apply</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -232,63 +320,154 @@ export default function FilterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F2ED',
+    backgroundColor: 'transparent',
+    justifyContent: 'flex-end',
   },
-  header: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 12,
-    flexDirection: 'row',
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(17,24,39,0.3)',
+  },
+  sheetWrap: {
+    maxHeight: '88%',
+    backgroundColor: '#F8F9FA',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  handleArea: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingBottom: 8,
+  },
+  handle: {
+    width: 60,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#D1D5DB',
+    marginBottom: 10,
+  },
+  sheetContent: {
+    paddingHorizontal: 12,
+    paddingBottom: Platform.select({ ios: 26, android: 20, default: 20 }),
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '800',
+    fontSize: 40 / 2,
+    fontWeight: '700',
     color: '#111827',
   },
-  closeBtn: {
-    width: 40,
-    height: 40,
+  card: {
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  section: {
-    paddingHorizontal: 18,
+    backgroundColor: '#F2F3F5',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    paddingHorizontal: 12,
     paddingTop: 14,
+    paddingBottom: 14,
   },
   sectionLabel: {
     fontSize: 13,
     fontWeight: '700',
     color: '#111827',
-    opacity: 0.75,
+    opacity: 0.72,
+    letterSpacing: 0.4,
+    marginBottom: 8,
+  },
+  sectionGap: {
+    marginTop: 12,
+  },
+  sectionGapTight: {
+    marginTop: 10,
+  },
+  sortCard: {
+    borderRadius: 14,
+    backgroundColor: '#F7F8FA',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.06)',
+    overflow: 'hidden',
+  },
+  rowTopDivider: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(17,24,39,0.06)',
+  },
+  sortRow: {
+    minHeight: 48,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  sortText: {
+    fontSize: 32 / 2,
+    color: '#1F2937',
+    fontWeight: '500',
+  },
+  radioOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 1.6,
+    borderColor: '#D1D5DB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  radioOuterActive: {
+    borderColor: '#D3A977',
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D3A977',
+  },
+  priceHeadline: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
     marginBottom: 10,
   },
-
-  priceRow: {
+  sliderWrap: {
+    alignItems: 'center',
+  },
+  priceBoundsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
+    marginTop: 6,
   },
-  priceValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
+  boundText: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  quickPriceRow: {
+    paddingTop: 10,
+    gap: 8,
+    alignItems: 'center',
+  },
+  chipArrowBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   sliderTrack: {
-    height: 4,
+    height: 6,
     borderRadius: 999,
-    backgroundColor: 'rgba(17,24,39,0.18)',
+    backgroundColor: 'rgba(14,159,110,0.24)',
   },
   sliderActive: {
     position: 'absolute',
     top: 0,
-    height: 4,
+    height: 6,
     borderRadius: 999,
-    backgroundColor: '#111827',
+    backgroundColor: BRAND_GREEN,
   },
   sliderThumbLayer: {
     position: 'absolute',
@@ -303,143 +482,126 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sliderThumb: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    borderColor: '#111827',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-
-  pillsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  pill: {
-    paddingHorizontal: 14,
-    height: 34,
-    borderRadius: 999,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: 'rgba(17,24,39,0.12)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.14,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingTop: 2,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  logoChip: {
+    minWidth: 98,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: '#F9FAFB',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.07)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    position: 'relative',
+  },
+  logoChipActive: {
+    borderColor: 'rgba(14,159,110,0.5)',
+    backgroundColor: 'rgba(14,159,110,0.08)',
+  },
+  logoImage: {
+    width: '85%',
+    height: '58%',
+    resizeMode: 'contain',
+  },
+  logoFallback: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  checkPill: {
+    position: 'absolute',
+    right: 8,
+    top: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: BRAND_GREEN,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  pillActive: {
-    backgroundColor: '#111827',
-    borderColor: '#111827',
+  chip: {
+    paddingHorizontal: 14,
+    height: 34,
+    borderRadius: 999,
+    backgroundColor: '#F7F8FA',
+    borderWidth: 1,
+    borderColor: 'rgba(17,24,39,0.09)',
+    justifyContent: 'center',
   },
-  pillText: {
-    fontSize: 12,
-    fontWeight: '700',
+  chipActive: {
+    backgroundColor: 'rgba(14,159,110,0.62)',
+    borderColor: 'rgba(14,159,110,0.75)',
+  },
+  chipText: {
+    fontSize: 26 / 2,
+    fontWeight: '600',
     color: '#111827',
   },
-  pillTextActive: {
+  chipTextActive: {
     color: '#FFFFFF',
   },
-
-  topicsSection: {
-    paddingBottom: 110,
-  },
-  topicBlock: {
-    marginTop: 12,
-    backgroundColor: 'rgba(255,255,255,0.75)',
-    borderRadius: 16,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(17,24,39,0.06)',
-  },
-  topicHeaderRow: {
+  footerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  topicTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  selectAllText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#6B7280',
-  },
-  optionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(17,24,39,0.06)',
-  },
-  optionText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#111827',
-    opacity: 0.82,
-  },
-  checkBox: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: 'rgba(17,24,39,0.18)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkBoxChecked: {
-    backgroundColor: BRAND_GREEN,
-    borderColor: BRAND_GREEN,
-  },
-
-  footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 18,
-    paddingTop: 12,
-    paddingBottom: Platform.select({ ios: 22, android: 18, default: 18 }),
-    flexDirection: 'row',
+    marginTop: 14,
     gap: 12,
-    backgroundColor: '#F5F2ED',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(17,24,39,0.06)',
   },
   footerBtnSecondary: {
     flex: 1,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: '#F7F8FA',
     borderWidth: 1,
-    borderColor: 'rgba(17,24,39,0.18)',
+    borderColor: 'rgba(17,24,39,0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   footerBtnSecondaryText: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#111827',
   },
   footerBtnPrimary: {
     flex: 1,
-    height: 52,
-    borderRadius: 18,
-    backgroundColor: '#111827',
+    height: 50,
+    borderRadius: 20,
+    backgroundColor: 'rgba(14,159,110,0.58)',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: BRAND_GREEN,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.22,
+    shadowRadius: 12,
+    elevation: 4,
   },
   footerBtnPrimaryText: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 16,
+    fontWeight: '700',
     color: '#FFFFFF',
   },
 });

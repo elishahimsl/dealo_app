@@ -105,34 +105,38 @@ export async function ingestProduct(params: {
     product = data as Product;
   }
 
-  // 5. Store offers in DB (best effort)
-  const offers: Offer[] = [];
-  for (const pr of priceResults) {
-    if (pr.price === null) continue;
+  // 5. Store offers in DB (best effort, parallelized)
+  const pricedForDB = priceResults.filter((pr) => pr.price !== null);
+  console.log('[DeaLo] ingest: storing', pricedForDB.length, 'offers in parallel');
+  const offerPromises = pricedForDB.map(async (pr) => {
+    try {
+      const { data: merchant } = await supabase
+        .from('merchants')
+        .select('id')
+        .eq('domain', pr.domain)
+        .single();
 
-    // Look up merchant
-    const { data: merchant } = await supabase
-      .from('merchants')
-      .select('id')
-      .eq('domain', pr.domain)
-      .single();
+      const { data: offer } = await supabase
+        .from('offers')
+        .upsert({
+          product_id: product.id,
+          merchant_id: merchant?.id || null,
+          price: pr.price!,
+          currency: pr.currency,
+          availability: 'in_stock',
+          url: pr.url,
+          affiliate_url: pr.affiliateUrl,
+        }, { onConflict: 'id' })
+        .select()
+        .single();
 
-    const { data: offer, error } = await supabase
-      .from('offers')
-      .upsert({
-        product_id: product.id,
-        merchant_id: merchant?.id || null,
-        price: pr.price,
-        currency: pr.currency,
-        availability: 'in_stock',
-        url: pr.url,
-        affiliate_url: pr.affiliateUrl,
-      }, { onConflict: 'id' })
-      .select()
-      .single();
-
-    if (offer) offers.push(offer as Offer);
-  }
+      return offer as Offer | null;
+    } catch {
+      return null;
+    }
+  });
+  const offerResults = await Promise.all(offerPromises);
+  const offers: Offer[] = offerResults.filter((o): o is Offer => o !== null);
 
   // 6. Calculate price stats
   const pricedResults = priceResults.filter((r) => r.price !== null);

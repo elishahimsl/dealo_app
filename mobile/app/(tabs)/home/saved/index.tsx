@@ -139,6 +139,7 @@ function ComparisonTile({ item }: { item: SavedComparison }) {
 
 export default function Saved() {
   const router = useRouter();
+  const selfHref = '/(tabs)/home/saved';
 
   // Real data hooks
   const { items: savedItems, loading: savedLoading, refresh: refreshSaved } = useSavedProducts();
@@ -338,7 +339,7 @@ export default function Saved() {
                   <TouchableOpacity
                     activeOpacity={0.85}
                     style={styles.iconOnlyBtn}
-                    onPress={() => setFilterOpen((v) => !v)}
+                    onPress={() => router.push(`/filter?returnTo=${encodeURIComponent(selfHref)}` as unknown as Href)}
                   >
                     <FilterGlyph />
                   </TouchableOpacity>
@@ -367,7 +368,11 @@ export default function Saved() {
               <>
                 <View style={styles.subheaderRow}>
                   <Text style={styles.subheader}>Scans ({scansData.length})</Text>
-                  <TouchableOpacity activeOpacity={0.85} style={styles.iconOnlyBtn}>
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    style={styles.iconOnlyBtn}
+                    onPress={() => router.push(`/filter?returnTo=${encodeURIComponent(selfHref)}` as unknown as Href)}
+                  >
                     <FilterGlyph />
                   </TouchableOpacity>
                 </View>
@@ -398,7 +403,7 @@ export default function Saved() {
                   <TouchableOpacity
                     activeOpacity={0.85}
                     style={styles.iconOnlyBtn}
-                    onPress={() => router.push('/compare/savedComparisons?returnTo=/home/saved' as Href)}
+                    onPress={() => router.push(`/filter?returnTo=${encodeURIComponent(selfHref)}` as unknown as Href)}
                   >
                     <FilterGlyph />
                   </TouchableOpacity>

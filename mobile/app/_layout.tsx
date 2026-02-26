@@ -113,6 +113,14 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: 'none' }} />
+          <Stack.Screen
+            name="(tabs)/filter"
+            options={{
+              headerShown: false,
+              presentation: 'transparentModal',
+              animation: 'slide_from_bottom',
+            }}
+          />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />

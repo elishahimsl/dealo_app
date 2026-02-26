@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Animated,
   Dimensions,
   Image,
   ScrollView,
@@ -85,11 +84,9 @@ const trendingSeed = [
 
 export default function Search() {
   const inputRef = useRef<TextInput>(null);
-  const blinkAnim = useRef(new Animated.Value(1)).current;
 
   const [query, setQuery] = useState('');
   const [activePill, setActivePill] = useState('Electronics');
-  const [isFocused, setIsFocused] = useState(true);
   const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
   const [recentSearches, setRecentSearches] = useState(recentSearchesSeed);
 
@@ -97,17 +94,6 @@ export default function Search() {
     const t = setTimeout(() => inputRef.current?.focus(), 120);
     return () => clearTimeout(t);
   }, []);
-
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(blinkAnim, { toValue: 0, duration: 380, useNativeDriver: true }),
-        Animated.timing(blinkAnim, { toValue: 1, duration: 480, useNativeDriver: true }),
-      ])
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [blinkAnim]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -135,25 +121,18 @@ export default function Search() {
       <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrap}>
-            <Ionicons name="search-outline" size={20} color="#6B7280" style={styles.searchLeadingIcon} />
-            <View style={styles.searchInputInner}>
-              {isFocused && query.length === 0 ? (
-                <Animated.View style={[styles.blinkCursor, { opacity: blinkAnim }]} />
-              ) : null}
-              <TextInput
-                ref={inputRef}
-                style={styles.searchInput}
-                value={query}
-                onChangeText={setQuery}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Search"
-                placeholderTextColor="#9CA3AF"
-                returnKeyType="search"
-              />
-            </View>
+            <Ionicons name="search" size={18} color="#6B7280" style={styles.searchLeadingIcon} />
+            <TextInput
+              ref={inputRef}
+              style={styles.searchInput}
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search"
+              placeholderTextColor="#6B7280"
+              returnKeyType="search"
+            />
             <View style={styles.searchCameraButton}>
-              <Ionicons name="camera-outline" size={18} color={BRAND_GREEN} />
+              <Ionicons name="camera-outline" size={20} color="#6B7280" />
             </View>
           </View>
         </View>
@@ -177,103 +156,104 @@ export default function Search() {
           })}
         </ScrollView>
 
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleWrap}>
-              <Ionicons name="time-outline" size={16} color="#6B7280" />
-              <Text style={styles.sectionTitle}>Popular Stores</Text>
-            </View>
-            <TouchableOpacity activeOpacity={0.8}>
-              <Text style={styles.sectionAction}>Clear ›</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
-            {popularStores.map((store) => (
-              <View key={store.id} style={styles.logoTile}>
-                {!logoErrors[store.id] ? (
-                  <Image
-                    source={{ uri: `https://logo.clearbit.com/${store.domain}` }}
-                    style={styles.logoImage}
-                    onError={() => setLogoErrors((prev) => ({ ...prev, [store.id]: true }))}
-                  />
-                ) : (
-                  <View style={styles.logoBlank} />
-                )}
+        <View style={styles.sheet}>
+          <View style={styles.sectionBlock}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleWrap}>
+                <Ionicons name="time-outline" size={17} color="#6B7280" />
+                <Text style={styles.sectionTitle}>Popular Stores</Text>
               </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleWrap}>
-              <Ionicons name="logo-apple" size={16} color="#6B7280" />
-              <Text style={styles.sectionTitle}>Top Brands</Text>
             </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
+              {popularStores.map((store) => (
+                <View key={store.id} style={styles.logoTile}>
+                  {!logoErrors[store.id] ? (
+                    <Image
+                      source={{ uri: `https://logo.clearbit.com/${store.domain}` }}
+                      style={styles.logoImage}
+                      onError={() => setLogoErrors((prev) => ({ ...prev, [store.id]: true }))}
+                    />
+                  ) : (
+                    <View style={styles.logoBlank} />
+                  )}
+                </View>
+              ))}
+            </ScrollView>
           </View>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
-            {topBrands.map((brand) => (
-              <View key={brand.id} style={styles.logoTile}>
-                {!logoErrors[brand.id] ? (
-                  <Image
-                    source={{ uri: `https://logo.clearbit.com/${brand.domain}` }}
-                    style={styles.logoImage}
-                    onError={() => setLogoErrors((prev) => ({ ...prev, [brand.id]: true }))}
-                  />
-                ) : (
-                  <View style={styles.logoBlank} />
-                )}
+          <View style={styles.sectionBlock}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleWrap}>
+                <Ionicons name="logo-apple" size={17} color="#6B7280" />
+                <Text style={styles.sectionTitle}>Top Brands</Text>
               </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleWrap}>
-              <Ionicons name="time-outline" size={16} color="#6B7280" />
-              <Text style={styles.sectionTitle}>Recent Searches</Text>
             </View>
-            <TouchableOpacity activeOpacity={0.8} onPress={() => setRecentSearches([])}>
-              <Text style={styles.sectionAction}>Clear ›</Text>
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.listCard}>
-            {recentSearches.map((item, idx) => (
-              <TouchableOpacity key={item.id} style={[styles.listRow, idx !== recentSearches.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
-                <Ionicons name="time-outline" size={16} color="#9CA3AF" style={styles.listLeadingIcon} />
-                <View style={styles.listTextWrap}>
-                  <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
-                  <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoRow}>
+              {topBrands.map((brand) => (
+                <View key={brand.id} style={styles.logoTile}>
+                  {!logoErrors[brand.id] ? (
+                    <Image
+                      source={{ uri: `https://logo.clearbit.com/${brand.domain}` }}
+                      style={styles.logoImage}
+                      onError={() => setLogoErrors((prev) => ({ ...prev, [brand.id]: true }))}
+                    />
+                  ) : (
+                    <View style={styles.logoBlank} />
+                  )}
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-              </TouchableOpacity>
-            ))}
+              ))}
+            </ScrollView>
           </View>
-        </View>
 
-        <View style={[styles.sectionCard, { marginBottom: 24 }]}> 
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleWrap}>
-              <Ionicons name="trending-up-outline" size={16} color="#6B7280" />
-              <Text style={styles.sectionTitle}>Trending Now</Text>
+          <View style={styles.sectionBlock}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleWrap}>
+                <Ionicons name="time-outline" size={17} color="#6B7280" />
+                <Text style={styles.sectionTitle}>Recent Searches</Text>
+              </View>
+            </View>
+
+            <View style={styles.flatListGroup}>
+              {recentSearches.map((item, idx) => (
+                <TouchableOpacity key={item.id} style={[styles.listRow, idx !== recentSearches.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
+                  <Image source={{ uri: item.image }} style={styles.rowThumb} />
+                  <View style={styles.listTextWrap}>
+                    <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                  </View>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => setRecentSearches((prev) => prev.filter((s) => s.id !== item.id))}
+                  >
+                    <Ionicons name="close" size={24} color="#111827" />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
             </View>
           </View>
 
-          <View style={styles.listCard}>
-            {trendingSeed.map((item, idx) => (
-              <TouchableOpacity key={item.id} style={[styles.listRow, idx !== trendingSeed.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
-                <Ionicons name="trending-up-outline" size={16} color="#9CA3AF" style={styles.listLeadingIcon} />
-                <View style={styles.listTextWrap}>
-                  <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
-                  <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-              </TouchableOpacity>
-            ))}
+          <View style={[styles.sectionBlock, { marginBottom: 6 }]}> 
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleWrap}>
+                <Text style={styles.trendingEmoji}>🔥</Text>
+                <Text style={styles.sectionTitle}>Trending Now</Text>
+              </View>
+            </View>
+
+            <View style={styles.flatListGroup}>
+              {trendingSeed.map((item, idx) => (
+                <TouchableOpacity key={item.id} style={[styles.listRow, idx !== trendingSeed.length - 1 && styles.rowDivider]} activeOpacity={0.88}>
+                  <Image source={{ uri: item.image }} style={styles.rowThumb} />
+                  <View style={styles.listTextWrap}>
+                    <Text style={styles.listTitle} numberOfLines={1}>{item.title}</Text>
+                    <Text style={styles.listSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={22} color="#9CA3AF" />
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -301,48 +281,35 @@ const styles = StyleSheet.create({
   searchInputWrap: {
     flex: 1,
     height: 48,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
     borderWidth: 1,
-    borderColor: 'rgba(17,24,39,0.06)',
+    borderColor: 'rgba(255,255,255,0.2)',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.08,
-    shadowRadius: 14,
-    elevation: 4,
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 3,
   },
   searchLeadingIcon: {
     marginRight: 10,
   },
-  searchInputInner: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   searchCameraButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  blinkCursor: {
-    width: 2,
-    height: 18,
-    borderRadius: 2,
-    backgroundColor: BRAND_GREEN,
-    marginRight: 8,
   },
   searchInput: {
     flex: 1,
     height: '100%',
-    fontSize: 17,
+    fontSize: 13,
     color: '#111827',
-    fontFamily: 'Manrope-Regular',
-    paddingVertical: 0,
+    fontWeight: '500',
   },
   pillsRow: {
     paddingTop: 12,
@@ -372,27 +339,33 @@ const styles = StyleSheet.create({
   pillTextActive: {
     color: '#FFFFFF',
   },
-  sectionCard: {
-    marginTop: 6,
-    marginBottom: 10,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.82)',
+  sheet: {
+    marginTop: 8,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    backgroundColor: '#F8F8FA',
     borderWidth: 1,
     borderColor: 'rgba(17,24,39,0.06)',
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingTop: 14,
+    paddingBottom: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.08,
-    shadowRadius: 16,
+    shadowRadius: 18,
     elevation: 4,
+  },
+  sectionBlock: {
+    marginBottom: 14,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     marginBottom: 10,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
   },
   sectionTitleWrap: {
     flexDirection: 'row',
@@ -400,16 +373,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 38/2,
+    fontWeight: '600',
     color: '#111827',
     fontFamily: 'Manrope-Regular',
   },
-  sectionAction: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#6B7280',
-    fontFamily: 'Manrope-Regular',
+  trendingEmoji: {
+    fontSize: 17,
   },
   logoRow: {
     paddingHorizontal: 2,
@@ -442,41 +412,43 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#F3F4F6',
   },
-  listCard: {
-    borderRadius: 14,
+  flatListGroup: {
+    borderRadius: 16,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(17,24,39,0.06)',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F8F8FA',
   },
   listRow: {
     height: 74,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
-  listLeadingIcon: {
-    marginRight: 10,
+  rowThumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: '#ECEEF2',
+    marginRight: 12,
   },
   rowDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: '#E5E7EB',
   },
   listTextWrap: {
     flex: 1,
     minWidth: 0,
   },
   listTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '600',
     color: '#111827',
     fontFamily: 'Manrope-Regular',
   },
   listSubtitle: {
     marginTop: 2,
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '500',
-    color: '#6B7280',
+    color: '#4B5563',
     fontFamily: 'Manrope-Regular',
   },
 });

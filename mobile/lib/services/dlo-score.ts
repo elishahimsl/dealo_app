@@ -138,7 +138,7 @@ export async function calculateDloScore(params: {
       score = sentiment.score;
     } else if (key === 'brand') {
       // Brand reputation: known brands get higher scores, boosted by sentiment
-      const knownBrands = ['apple', 'samsung', 'sony', 'nike', 'adidas', 'beats', 'bose', 'lg', 'google', 'microsoft', 'dell', 'hp', 'lenovo'];
+      const knownBrands = ['apple', 'samsung', 'sony', 'nike', 'adidas', 'beats', 'bose', 'lg', 'google', 'microsoft', 'dell', 'hp', 'lenovo', 'jbl', 'harman', 'sennheiser', 'anker', 'skullcandy', 'logitech', 'razer', 'asus', 'acer'];
       const isKnownBrand = knownBrands.some((b) => productName.toLowerCase().includes(b));
       const brandBase = isKnownBrand ? 88 : 70;
       score = Math.round(brandBase * 0.7 + sentiment.score * 0.3);

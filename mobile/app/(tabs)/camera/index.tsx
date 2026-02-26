@@ -68,117 +68,138 @@ const pickTopTextLine = (text: unknown) => {
   return candidate;
 };
 
-const detectObject = async (photo: { uri: string; base64: string }): Promise<DetectedObject | null> => {
+const DEFAULT_BOUNDS: NormalizedBox = { x: 0.12, y: 0.15, width: 0.76, height: 0.70 };
+
+const callVisionAPI = async (base64: string, apiKey: string): Promise<any> => {
+  const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
+  const body = {
+    requests: [
+      {
+        image: { content: base64 },
+        features: [
+          { type: 'WEB_DETECTION', maxResults: 20 },
+          { type: 'LOGO_DETECTION', maxResults: 10 },
+          { type: 'TEXT_DETECTION', maxResults: 5 },
+          { type: 'OBJECT_LOCALIZATION', maxResults: 10 },
+          { type: 'LABEL_DETECTION', maxResults: 12 },
+        ],
+      },
+    ],
+  };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: controller.signal as any,
+  });
+  clearTimeout(timeout);
+
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '');
+    throw new Error(`Vision API ${res.status}: ${errBody.slice(0, 200)}`);
+  }
+  return res.json();
+};
+
+const parseVisionResponse = (json: any): DetectedObject => {
+  const first = json?.responses?.[0];
+
+  const bestGuessLabel = pickFirstString([
+    first?.webDetection?.bestGuessLabels?.[0]?.label,
+    first?.webDetection?.bestGuessLabels?.[1]?.label,
+  ]);
+
+  const topWebEntity = first?.webDetection?.webEntities?.find((e: any) => e?.description && (e?.score ?? 0) >= 0.2);
+  const webEntityDesc = (topWebEntity?.description ?? '') as string;
+
+  const topLogo = first?.logoAnnotations?.find((l: any) => l?.description)?.description as string | undefined;
+  const topText = pickTopTextLine(first?.fullTextAnnotation?.text);
+
+  // Also check all web entities for a longer/more specific name
+  const allWebEntities: string[] = (first?.webDetection?.webEntities ?? [])
+    .filter((e: any) => e?.description && (e?.score ?? 0) >= 0.15)
+    .map((e: any) => e.description as string);
+  // Prefer longer web entity names (e.g. "JBL Clip 5" over "JBL")
+  const longestWebEntity = allWebEntities
+    .filter((d) => d.split(/\s+/).length >= 2)
+    .sort((a, b) => b.length - a.length)[0] ?? '';
+
+  const bestGuess = pickFirstString([
+    joinBrandModel(topLogo ?? '', bestGuessLabel),
+    joinBrandModel(topLogo ?? '', webEntityDesc),
+    bestGuessLabel,
+    longestWebEntity,
+    webEntityDesc,
+    topText,
+    first?.labelAnnotations?.[0]?.description,
+  ]);
+
+  const category = pickFirstString([
+    first?.labelAnnotations?.[0]?.description,
+    first?.webDetection?.webEntities?.[0]?.description,
+    topLogo,
+    'Unknown',
+  ]);
+
+  const obj = first?.localizedObjectAnnotations?.[0];
+  const score =
+    typeof obj?.score === 'number'
+      ? obj.score
+      : typeof topWebEntity?.score === 'number'
+        ? topWebEntity.score
+        : typeof first?.labelAnnotations?.[0]?.score === 'number'
+          ? first.labelAnnotations[0].score
+          : 0.7;
+
+  const verts: VisionNormalizedVertex[] = obj?.boundingPoly?.normalizedVertices ?? [];
+  const xs = verts.map((v: VisionVertex) => (typeof v.x === 'number' ? v.x : 0));
+  const ys = verts.map((v: VisionVertex) => (typeof v.y === 'number' ? v.y : 0));
+  const minX = xs.length ? Math.min(...xs) : DEFAULT_BOUNDS.x;
+  const minY = ys.length ? Math.min(...ys) : DEFAULT_BOUNDS.y;
+  const maxX = xs.length ? Math.max(...xs) : DEFAULT_BOUNDS.x + DEFAULT_BOUNDS.width;
+  const maxY = ys.length ? Math.max(...ys) : DEFAULT_BOUNDS.y + DEFAULT_BOUNDS.height;
+
+  console.log('[DeaLo] Vision API: detected =>', bestGuess || 'Unknown', '| logo:', topLogo, '| webEntity:', webEntityDesc, '| bestGuess:', bestGuessLabel);
+  return {
+    name: bestGuess || 'Unknown Product',
+    category: category || 'Unknown',
+    confidence: clamp01(score),
+    bounds: normalizeBox({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }),
+    description: '',
+    features: [],
+    priceRange: '',
+    alternatives: [],
+  };
+};
+
+const detectObject = async (photo: { uri: string; base64: string }): Promise<DetectedObject> => {
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY;
   if (!apiKey) {
-    return {
-      name: 'Unknown Product',
-      category: 'Unknown',
-      confidence: 0.5,
-      bounds: normalizeBox({ x: 0.22, y: 0.22, width: 0.56, height: 0.56 }),
-      description: '',
-      features: [],
-      priceRange: '',
-      alternatives: [],
-    };
+    console.warn('[DeaLo] No EXPO_PUBLIC_GOOGLE_VISION_API_KEY set');
+    return { name: 'Unknown Product', category: 'Unknown', confidence: 0.5, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [] };
   }
 
-  try {
-    const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
-    const body = {
-      requests: [
-        {
-          image: { content: photo.base64 },
-          features: [
-            { type: 'WEB_DETECTION', maxResults: 20 },
-            { type: 'LOGO_DETECTION', maxResults: 10 },
-            { type: 'TEXT_DETECTION', maxResults: 5 },
-            { type: 'OBJECT_LOCALIZATION', maxResults: 10 },
-            { type: 'LABEL_DETECTION', maxResults: 12 },
-          ],
-        },
-      ],
-    };
-
-    console.log('[DeaLo] Vision API: sending request...');
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: controller.signal as any,
-    });
-    clearTimeout(timeout);
-
-    if (!res.ok) {
-      console.warn('[DeaLo] Vision API error:', res.status);
-      return null;
+  // Try up to 2 attempts
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      console.log(`[DeaLo] Vision API: attempt ${attempt}, base64 length = ${photo.base64?.length ?? 0}`);
+      const json = await callVisionAPI(photo.base64, apiKey);
+      return parseVisionResponse(json);
+    } catch (e: any) {
+      console.warn(`[DeaLo] Vision API attempt ${attempt} failed:`, e?.message || e);
+      if (attempt < 2) {
+        await new Promise((r) => setTimeout(r, 1000)); // wait 1s before retry
+      }
     }
-    const json: any = await res.json();
-    const first = json?.responses?.[0];
-
-    const bestGuessLabel = pickFirstString([
-      first?.webDetection?.bestGuessLabels?.[0]?.label,
-      first?.webDetection?.bestGuessLabels?.[1]?.label,
-    ]);
-
-    const topWebEntity = first?.webDetection?.webEntities?.find((e: any) => e?.description && (e?.score ?? 0) >= 0.2);
-    const webEntityDesc = (topWebEntity?.description ?? '') as string;
-
-    const topLogo = first?.logoAnnotations?.find((l: any) => l?.description)?.description as string | undefined;
-    const topText = pickTopTextLine(first?.fullTextAnnotation?.text);
-
-    const bestGuess = pickFirstString([
-      joinBrandModel(topLogo ?? '', bestGuessLabel),
-      joinBrandModel(topLogo ?? '', webEntityDesc),
-      bestGuessLabel,
-      webEntityDesc,
-      topText,
-      first?.labelAnnotations?.[0]?.description,
-    ]);
-
-    const category = pickFirstString([
-      first?.labelAnnotations?.[0]?.description,
-      first?.webDetection?.webEntities?.[0]?.description,
-      topLogo,
-      'Unknown',
-    ]);
-
-    const obj = first?.localizedObjectAnnotations?.[0];
-    const score =
-      typeof obj?.score === 'number'
-        ? obj.score
-        : typeof topWebEntity?.score === 'number'
-          ? topWebEntity.score
-          : typeof first?.labelAnnotations?.[0]?.score === 'number'
-            ? first.labelAnnotations[0].score
-            : 0.7;
-
-    const verts: VisionNormalizedVertex[] = obj?.boundingPoly?.normalizedVertices ?? [];
-    const xs = verts.map((v: VisionVertex) => (typeof v.x === 'number' ? v.x : 0));
-    const ys = verts.map((v: VisionVertex) => (typeof v.y === 'number' ? v.y : 0));
-    const minX = xs.length ? Math.min(...xs) : 0.18;
-    const minY = ys.length ? Math.min(...ys) : 0.22;
-    const maxX = xs.length ? Math.max(...xs) : 0.82;
-    const maxY = ys.length ? Math.max(...ys) : 0.78;
-
-    console.log('[DeaLo] Vision API: detected =>', bestGuess || 'Unknown');
-    return {
-      name: bestGuess || 'Unknown Product',
-      category: category || 'Unknown',
-      confidence: clamp01(score),
-      bounds: normalizeBox({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }),
-      description: '',
-      features: [],
-      priceRange: '',
-      alternatives: [],
-    };
-  } catch (e: any) {
-    console.warn('[DeaLo] Vision API failed:', e?.message || e);
-    return null;
   }
+
+  // All attempts failed — return fallback with default bounds so scanner still animates
+  console.warn('[DeaLo] Vision API: all attempts failed, using fallback');
+  return { name: 'Unknown Product', category: 'Unknown', confidence: 0.3, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [] };
 };
 
 export default function CameraScreen() {
@@ -254,7 +275,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 0.4,
+                quality: 0.7,
                 base64: true,
               });
               
@@ -272,7 +293,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 0.4,
+                quality: 0.7,
                 base64: true,
               });
               
@@ -299,7 +320,7 @@ export default function CameraScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.4,
+      quality: 0.7,
       base64: true,
     });
 
@@ -380,69 +401,51 @@ export default function CameraScreen() {
       boxWidth.setValue(initialBoxPx.width);
       boxHeight.setValue(initialBoxPx.height);
 
-      // Use AI detection instead of mock bounds
+      // Use AI detection — always returns a result (never null)
       const detected = await detectObject({ uri: capturedUri, base64: capturedBase64 });
       if (!alive) return;
-      
-      if (detected) {
-        setDetectedObject(detected);
-        
-        const targetPx = {
-          left: detected.bounds.x * previewSize.width,
-          top: detected.bounds.y * previewSize.height,
-          width: detected.bounds.width * previewSize.width,
-          height: detected.bounds.height * previewSize.height,
-        };
 
-        const pad = 10;
-        const clamped = {
-          left: Math.max(pad, Math.min(previewSize.width - pad, targetPx.left)),
-          top: Math.max(pad, Math.min(previewSize.height - pad, targetPx.top)),
-          width: Math.max(90, Math.min(previewSize.width - pad * 2, targetPx.width)),
-          height: Math.max(90, Math.min(previewSize.height - pad * 2, targetPx.height)),
-        };
+      setDetectedObject(detected);
 
-        await animateBoxToPx(clamped);
+      const targetPx = {
+        left: detected.bounds.x * previewSize.width,
+        top: detected.bounds.y * previewSize.height,
+        width: detected.bounds.width * previewSize.width,
+        height: detected.bounds.height * previewSize.height,
+      };
+
+      const pad = 10;
+      const clamped = {
+        left: Math.max(pad, Math.min(previewSize.width - pad, targetPx.left)),
+        top: Math.max(pad, Math.min(previewSize.height - pad, targetPx.top)),
+        width: Math.max(90, Math.min(previewSize.width - pad * 2, targetPx.width)),
+        height: Math.max(90, Math.min(previewSize.height - pad * 2, targetPx.height)),
+      };
+
+      await animateBoxToPx(clamped);
+      if (!alive) return;
+
+      const lineHeight = 4;
+      const innerPad = 12;
+      const travel = Math.max(0, clamped.height - innerPad * 2 - lineHeight);
+      startScanLine(travel);
+
+      scanDoneTimeoutRef.current = setTimeout(() => {
         if (!alive) return;
-
-        const lineHeight = 4;
-        const innerPad = 12;
-        const travel = Math.max(0, clamped.height - innerPad * 2 - lineHeight);
-        startScanLine(travel);
-
-        scanDoneTimeoutRef.current = setTimeout(() => {
-          if (!alive) return;
-          // Pass detected object data to results page
-          router.push({
-            pathname: '/camera/results',
-            params: {
-              objectName: detected.name,
-              category: detected.category,
-              confidence: detected.confidence.toString(),
-              description: detected.description,
-              features: JSON.stringify(detected.features),
-              priceRange: detected.priceRange,
-              alternatives: JSON.stringify(detected.alternatives),
-              imageUri: capturedUri,
-            }
-          });
-        }, 1600);
-      } else {
-        // Detection failed — still navigate to results with a generic name
-        console.warn('[DeaLo] Detection returned null, navigating with fallback');
-        scanDoneTimeoutRef.current = setTimeout(() => {
-          if (!alive) return;
-          router.push({
-            pathname: '/camera/results',
-            params: {
-              objectName: 'Product',
-              category: 'General',
-              confidence: '0.5',
-              imageUri: capturedUri,
-            }
-          });
-        }, 800);
-      }
+        router.push({
+          pathname: '/camera/results',
+          params: {
+            objectName: detected.name,
+            category: detected.category,
+            confidence: detected.confidence.toString(),
+            description: detected.description,
+            features: JSON.stringify(detected.features),
+            priceRange: detected.priceRange,
+            alternatives: JSON.stringify(detected.alternatives),
+            imageUri: capturedUri,
+          }
+        });
+      }, 1600);
     })();
 
     return () => {
@@ -537,7 +540,7 @@ export default function CameraScreen() {
     if (!cameraRef.current) return;
 
     try {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.4, exif: false });
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.7, exif: false });
       if (!photo?.uri) return;
       setCapturedUri(photo.uri);
       setCapturedBase64(photo.base64 ?? null);

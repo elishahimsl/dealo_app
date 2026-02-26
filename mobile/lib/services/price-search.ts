@@ -38,90 +38,137 @@ function buildAffiliateUrl(url: string, domain: string): string | null {
 }
 
 /**
- * Search Google CSE for product prices across retailers
+ * Fetch CSE results for a given query string
+ */
+async function fetchCSE(query: string): Promise<any[]> {
+  const url = `https://www.googleapis.com/customsearch/v1?key=${CSE_API_KEY}&cx=${CSE_ID}&q=${encodeURIComponent(query)}&num=10`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  const res = await fetch(url, { signal: controller.signal as any });
+  clearTimeout(timeout);
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '');
+    console.warn('[DeaLo] CSE search failed:', res.status, errText.slice(0, 200));
+    return [];
+  }
+
+  const json: any = await res.json();
+  return json.items || [];
+}
+
+/**
+ * Parse CSE items into PriceResult[]
+ */
+function parseCSEItems(items: any[]): PriceResult[] {
+  const results: PriceResult[] = [];
+
+  for (const item of items) {
+    const link: string = item.link || '';
+    const title: string = item.title || '';
+    const snippet: string = item.snippet || '';
+
+    // Extract domain
+    let domain = '';
+    try {
+      domain = new URL(link).hostname.replace('www.', '');
+    } catch {
+      continue;
+    }
+
+    // Try to extract price from multiple structured-data sources
+    const priceFromMeta =
+      item.pagemap?.offer?.[0]?.price
+      || item.pagemap?.product?.[0]?.price
+      || item.pagemap?.metatags?.[0]?.['product:price:amount']
+      || item.pagemap?.metatags?.[0]?.['og:price:amount']
+      || null;
+
+    const price = priceFromMeta
+      ? extractPrice(String(priceFromMeta))
+      : extractPrice(snippet) || extractPrice(title);
+
+    // Determine store name from domain
+    const storeName = domainToStore(domain);
+    const affiliateUrl = buildAffiliateUrl(link, domain);
+
+    // Get image from multiple sources
+    const imageUrl =
+      item.pagemap?.cse_image?.[0]?.src
+      || item.pagemap?.product?.[0]?.image
+      || item.pagemap?.metatags?.[0]?.['og:image']
+      || item.pagemap?.cse_thumbnail?.[0]?.src
+      || null;
+
+    results.push({
+      title: title.replace(/ - .*$/, '').replace(/\|.*$/, '').trim(),
+      price,
+      currency: 'USD',
+      store: storeName,
+      domain,
+      url: link,
+      affiliateUrl,
+      snippet,
+      imageUrl,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Search Google CSE for product prices across retailers.
+ * Runs two queries in parallel: a shopping-focused query and a review/comparison query.
  */
 export async function searchProductPrices(productName: string): Promise<PriceResult[]> {
   if (!CSE_API_KEY || !CSE_ID || !productName.trim()) return [];
 
-  const query = `${productName.trim()} price buy`;
+  const name = productName.trim();
+  // Skip overly generic names that produce useless results
+  if (name.length < 3 || ['product', 'unknown product', 'unknown'].includes(name.toLowerCase())) {
+    console.warn('[DeaLo] CSE: skipping generic product name:', name);
+    return [];
+  }
 
   try {
-    console.log('[DeaLo] CSE: searching for', query);
-    const url = `https://www.googleapis.com/customsearch/v1?key=${CSE_API_KEY}&cx=${CSE_ID}&q=${encodeURIComponent(query)}&num=10`;
+    // Run two search queries in parallel for broader coverage
+    const shoppingQuery = `${name} buy price`;
+    const compareQuery = `${name} best price comparison`;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 12000);
+    console.log('[DeaLo] CSE: searching for', shoppingQuery);
+    const [shoppingItems, compareItems] = await Promise.all([
+      fetchCSE(shoppingQuery),
+      fetchCSE(compareQuery).catch(() => [] as any[]),
+    ]);
 
-    const res = await fetch(url, { signal: controller.signal as any });
-    clearTimeout(timeout);
+    console.log('[DeaLo] CSE: got', shoppingItems.length, '+', compareItems.length, 'results');
 
-    if (!res.ok) {
-      console.warn('[DeaLo] CSE search failed:', res.status, await res.text().catch(() => ''));
-      return [];
-    }
+    const shoppingResults = parseCSEItems(shoppingItems);
+    const compareResults = parseCSEItems(compareItems);
 
-    const json: any = await res.json();
-    console.log('[DeaLo] CSE: got', json.items?.length ?? 0, 'results');
-    const items: any[] = json.items || [];
-
-    const results: PriceResult[] = [];
-
-    for (const item of items) {
-      const link: string = item.link || '';
-      const title: string = item.title || '';
-      const snippet: string = item.snippet || '';
-
-      // Extract domain
-      let domain = '';
-      try {
-        domain = new URL(link).hostname.replace('www.', '');
-      } catch {
-        continue;
-      }
-
-      // Try to extract price from multiple sources
-      const priceFromMeta = item.pagemap?.offer?.[0]?.price
-        || item.pagemap?.product?.[0]?.price
-        || null;
-
-      const price = priceFromMeta
-        ? extractPrice(String(priceFromMeta))
-        : extractPrice(snippet) || extractPrice(title);
-
-      // Determine store name from domain
-      const storeName = domainToStore(domain);
-
-      const affiliateUrl = buildAffiliateUrl(link, domain);
-
-      // Get image
-      const imageUrl = item.pagemap?.cse_image?.[0]?.src
-        || item.pagemap?.product?.[0]?.image
-        || null;
-
-      results.push({
-        title: title.replace(/ - .*$/, '').trim(), // Clean title
-        price,
-        currency: 'USD',
-        store: storeName,
-        domain,
-        url: link,
-        affiliateUrl,
-        snippet,
-        imageUrl,
-      });
+    // Merge & deduplicate by domain+price
+    const seen = new Set<string>();
+    const merged: PriceResult[] = [];
+    for (const r of [...shoppingResults, ...compareResults]) {
+      const key = `${r.domain}|${r.price}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      merged.push(r);
     }
 
     // Sort: items with prices first, then by price ascending
-    results.sort((a, b) => {
+    merged.sort((a, b) => {
       if (a.price !== null && b.price === null) return -1;
       if (a.price === null && b.price !== null) return 1;
       if (a.price !== null && b.price !== null) return a.price - b.price;
       return 0;
     });
 
-    return results;
-  } catch (err) {
-    console.warn('Price search error:', err);
+    return merged;
+  } catch (err: any) {
+    console.warn('[DeaLo] Price search error:', err?.message || err);
     return [];
   }
 }
@@ -144,6 +191,20 @@ function domainToStore(domain: string): string {
     'lowes.com': "Lowe's",
     'bhphotovideo.com': 'B&H Photo',
     'adorama.com': 'Adorama',
+    'jbl.com': 'JBL',
+    'crutchfield.com': 'Crutchfield',
+    'samsung.com': 'Samsung',
+    'dell.com': 'Dell',
+    'hp.com': 'HP',
+    'lenovo.com': 'Lenovo',
+    'samsclub.com': "Sam's Club",
+    'staples.com': 'Staples',
+    'officedepot.com': 'Office Depot',
+    'microcenter.com': 'Micro Center',
+    'harmankardon.com': 'Harman Kardon',
+    'bose.com': 'Bose',
+    'sony.com': 'Sony',
+    'skullcandy.com': 'Skullcandy',
   };
 
   for (const [key, val] of Object.entries(map)) {

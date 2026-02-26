@@ -120,9 +120,15 @@ export default function CameraResults() {
     imageUri
   );
 
-  // Save toggle for this product
+  // Save toggle for this product (use temp ID if DB insert failed)
   const productId = productData?.product?.id;
-  const { saved, toggling, toggle: toggleSave } = useSaveToggle(productId);
+  const saveMeta = useMemo(() => ({
+    title: objectName,
+    brand: productData?.product?.brand || null,
+    category: categoryParam,
+    image_urls: productData?.product?.image_urls || (imageUri ? [imageUri] : null),
+  }), [objectName, productData, categoryParam, imageUri]);
+  const { saved, toggling, toggle: toggleSave } = useSaveToggle(productId, saveMeta);
 
   // Track scan interaction and maybe show interstitial when product data loads
   useEffect(() => {
@@ -541,15 +547,19 @@ export default function CameraResults() {
           <AdBanner style={{ marginHorizontal: 16, marginVertical: 8 }} />
 
           <View style={styles.bottomActionsInFlow}>
-            <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary} onPress={toggleSave} disabled={toggling || !productId}>
+            <TouchableOpacity activeOpacity={0.9} style={styles.bottomBtnSecondary} onPress={toggleSave} disabled={toggling}>
               <Text style={styles.bottomBtnSecondaryText}>{saved ? '♥ Saved' : 'Save for Later'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.9}
               style={styles.bottomBtnPrimary}
               onPress={() => {
-                const url = bestPrice?.affiliateUrl || bestPrice?.url;
-                if (url) Linking.openURL(url);
+                if (bestPrice) {
+                  const url = bestPrice.affiliateUrl || bestPrice.url;
+                  if (url) Linking.openURL(url);
+                } else {
+                  router.replace('/(tabs)/camera');
+                }
               }}
             >
               <Text style={styles.bottomBtnPrimaryText}>{bestPrice ? 'View Offer' : 'Scan Again'}</Text>

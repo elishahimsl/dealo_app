@@ -19,25 +19,30 @@ export interface InteractionRow {
 
 /**
  * Record a user interaction (scan, view, save, compare, purchase).
+ * Silently skips if user is not authenticated.
  */
 export async function trackInteraction(params: {
   productId: string;
   type: InteractionType;
   metadata?: Record<string, any>;
 }): Promise<boolean> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return false;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
 
-  const { error } = await supabase
-    .from('user_interactions')
-    .insert({
-      user_id: user.id,
-      product_id: params.productId,
-      interaction_type: params.type,
-      metadata: params.metadata || null,
-    });
+    const { error } = await supabase
+      .from('user_interactions')
+      .insert({
+        user_id: user.id,
+        product_id: params.productId,
+        interaction_type: params.type,
+        metadata: params.metadata || null,
+      });
 
-  return !error;
+    return !error;
+  } catch {
+    return false;
+  }
 }
 
 /**

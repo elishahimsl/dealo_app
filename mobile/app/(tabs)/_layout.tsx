@@ -452,7 +452,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="filter"
+          name="filter/index"
           options={{
             href: null,
           }}

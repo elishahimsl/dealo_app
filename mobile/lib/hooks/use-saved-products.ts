@@ -29,8 +29,9 @@ export function useSavedProducts() {
 
 /**
  * Hook for a single product's save state — used on the results screen.
+ * Pass optional meta so local saves include product details.
  */
-export function useSaveToggle(productId: string | undefined) {
+export function useSaveToggle(productId: string | undefined, meta?: { title?: string; brand?: string | null; category?: string | null; image_urls?: string[] | null }) {
   const [saved, setSaved] = useState(false);
   const [toggling, setToggling] = useState(false);
 
@@ -43,13 +44,13 @@ export function useSaveToggle(productId: string | undefined) {
     if (!productId || toggling) return;
     setToggling(true);
     try {
-      const newState = await toggleSaveProduct(productId);
+      const newState = await toggleSaveProduct(productId, meta);
       setSaved(newState);
     } catch {
       // silent fail
     }
     setToggling(false);
-  }, [productId, toggling]);
+  }, [productId, toggling, meta]);
 
   return { saved, toggling, toggle };
 }

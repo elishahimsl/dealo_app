@@ -119,15 +119,35 @@ const GENERIC_BLOCKLIST = new Set([
   'close-up', 'macro', 'still life', 'automotive', 'vehicle',
   'electric blue', 'audio equipment', 'electronic device', 'multimedia',
   'communication device', 'personal computer', 'output device',
+  // Colors — never a product name
+  'tan', 'black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple',
+  'pink', 'brown', 'grey', 'gray', 'silver', 'gold', 'teal', 'navy', 'beige',
+  'ivory', 'maroon', 'magenta', 'cyan', 'turquoise', 'coral', 'crimson',
+  // Common nouns / measurement words
+  'meter', 'metre', 'wire', 'cable', 'cord', 'charger', 'adapter', 'plug',
+  'box', 'bag', 'case', 'cover', 'holder', 'stand', 'mount', 'bracket',
+  'button', 'switch', 'knob', 'dial', 'handle', 'grip', 'strap', 'band',
+  'light', 'lamp', 'bulb', 'led', 'screen', 'panel', 'board', 'surface',
+  'top', 'bottom', 'side', 'front', 'back', 'left', 'right', 'center',
+  'small', 'large', 'medium', 'big', 'tiny', 'mini', 'compact', 'portable',
+  'new', 'old', 'modern', 'vintage', 'classic', 'original', 'premium',
+  'photo', 'video', 'audio', 'sound', 'music', 'noise', 'speaker',
+  'power', 'energy', 'electric', 'battery', 'charge', 'usb', 'bluetooth',
+  'home', 'office', 'kitchen', 'bathroom', 'bedroom', 'garage', 'garden',
+  'hand', 'finger', 'person', 'people', 'man', 'woman', 'child', 'face',
 ]);
 
 const isGenericTerm = (s: string): boolean => {
   const lower = s.toLowerCase().trim();
   if (!lower || lower.length < 2) return true;
   if (GENERIC_BLOCKLIST.has(lower)) return true;
-  // Single common word that's not a brand
-  if (lower.split(/\s+/).length === 1 && lower.length <= 12) {
-    if (GENERIC_BLOCKLIST.has(lower)) return true;
+  // Single word under 4 chars is almost never a real product name
+  const words = lower.split(/\s+/);
+  if (words.length === 1 && lower.length <= 3) return true;
+  // Single lowercase word that's not in known brands — likely generic
+  if (words.length === 1 && !containsKnownBrand(lower) && lower.length <= 8) {
+    // Allow it only if it contains a digit (model numbers like "x5", "s24")
+    if (!/\d/.test(lower)) return true;
   }
   return false;
 };
@@ -394,7 +414,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 0.7,
+                quality: 0.95,
                 base64: true,
               });
               
@@ -412,7 +432,7 @@ export default function CameraScreen() {
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
-                quality: 0.7,
+                quality: 0.95,
                 base64: true,
               });
               
@@ -439,7 +459,7 @@ export default function CameraScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.7,
+      quality: 0.95,
       base64: true,
     });
 
@@ -659,7 +679,7 @@ export default function CameraScreen() {
     if (!cameraRef.current) return;
 
     try {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.7, exif: false });
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.95, exif: false });
       if (!photo?.uri) return;
       setCapturedUri(photo.uri);
       setCapturedBase64(photo.base64 ?? null);

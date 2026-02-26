@@ -421,7 +421,7 @@ export default function CameraResults() {
             </View>
           )}
 
-          {bestPrice && (
+          {bestPrice ? (
             <View style={styles.bestPriceGlass}>
               <View style={styles.bestPriceHeaderRow}>
                 <Text style={styles.bestPriceTitle}>Best Price</Text>
@@ -456,110 +456,155 @@ export default function CameraResults() {
                 </View>
               </View>
             </View>
+          ) : (
+            <View style={styles.bestPriceGlass}>
+              <View style={styles.bestPriceHeaderRow}>
+                <Text style={styles.bestPriceTitle}>Best Price</Text>
+                <Ionicons name="bookmark-outline" size={20} color="#111827" />
+              </View>
+              <View style={styles.bestPriceBody}>
+                <View style={styles.bestPriceThumbWrap}>
+                  <Image source={{ uri: displayImage }} style={styles.bestPriceThumb} />
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 16 }}>
+                  {status === 'loading' ? (
+                    <>
+                      <ActivityIndicator size="small" color={BRAND_GREEN} />
+                      <Text style={[styles.bestSubtitle, { marginTop: 8, textAlign: 'center' }]}>Searching retailers...</Text>
+                    </>
+                  ) : (
+                    <>
+                      <Ionicons name="search-outline" size={28} color="#9CA3AF" />
+                      <Text style={[styles.bestSubtitle, { marginTop: 8, textAlign: 'center', color: '#6B7280' }]}>
+                        Price data unavailable right now. Enable the Custom Search API in Google Cloud Console to get live prices.
+                      </Text>
+                    </>
+                  )}
+                </View>
+              </View>
+            </View>
           )}
 
-          {pricedResults.length > 0 && (
-            <>
-              <Text style={styles.sectionTitleMock}>Market Price</Text>
-              <View style={styles.marketRow}>
-                <View style={styles.marketLeftCard}>
-                  <View style={styles.chartWrapMock}>
-                    <View style={styles.chartWithYAxis}>
-                      <View style={styles.chartYAxis}>
-                        <Text style={styles.chartYAxisText}>{`$${chartMax}`}</Text>
-                        <Text style={styles.chartYAxisText}>{`$${chartMid}`}</Text>
-                        <Text style={styles.chartYAxisText}>{`$${chartMin}`}</Text>
+          <Text style={styles.sectionTitleMock}>Market Price</Text>
+          <View style={styles.marketRow}>
+            <View style={styles.marketLeftCard}>
+              <View style={styles.chartWrapMock}>
+                <View style={styles.chartWithYAxis}>
+                  <View style={styles.chartYAxis}>
+                    <Text style={styles.chartYAxisText}>{pricedResults.length > 0 ? `$${chartMax}` : '--'}</Text>
+                    <Text style={styles.chartYAxisText}>{pricedResults.length > 0 ? `$${chartMid}` : '--'}</Text>
+                    <Text style={styles.chartYAxisText}>{pricedResults.length > 0 ? `$${chartMin}` : '--'}</Text>
+                  </View>
+                  <View style={styles.chartSvgWrap}>
+                    {pricedResults.length >= 2 ? (
+                      <MarketChart points={chartPrices} />
+                    ) : status === 'loading' ? (
+                      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator size="small" color={BRAND_GREEN} />
                       </View>
-                      <View style={styles.chartSvgWrap}>
-                        <MarketChart points={chartPrices.length >= 2 ? chartPrices : [chartMax, chartMid, chartMin]} />
+                    ) : (
+                      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <Ionicons name="analytics-outline" size={28} color="#D1D5DB" />
                       </View>
+                    )}
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.marketDivider} />
+            <View style={styles.marketRightCard}>
+              <Text style={styles.priceOverviewTitle}>Price Overview</Text>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{avgPrice ? `$${avgPrice.toFixed(2)}` : '--'}</Text>
+                <Text style={styles.priceOverviewRight}>Avg</Text>
+              </View>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{lowestPrice ? `$${lowestPrice.toFixed(2)}` : '--'}</Text>
+                <View style={styles.todayDot} />
+                <Text style={styles.priceOverviewRight}>Best</Text>
+              </View>
+              <View style={styles.priceOverviewRow}>
+                <Text style={styles.priceOverviewLeft}>{highestPrice ? `$${highestPrice.toFixed(2)}` : '--'}</Text>
+                <Text style={styles.priceOverviewRight}>High</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.reviewsGlass}>
+            <View style={styles.reviewsHeader}>
+              <Text style={styles.reviewsTitle}>Score Breakdown</Text>
+            </View>
+            {reviewRows.map((r, i) => (
+              <View key={r.k} style={[styles.reviewRow, i !== reviewRows.length - 1 && styles.reviewRowBorder]}>
+                <Text style={[styles.reviewKey, i === 0 && styles.reviewKeyBold]}>{r.k}</Text>
+                <Text style={[styles.reviewVal, r.tone === 'warn' ? styles.reviewValWarn : styles.reviewValGood]}>{r.v}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.reviewOverviewSection}>
+            <Text style={styles.reviewOverviewHeader}>AI Analysis</Text>
+            <TouchableOpacity activeOpacity={0.85} style={styles.reviewOverviewRow}>
+              <Text style={styles.reviewOverviewTextInline}>{rundownForUi}</Text>
+              <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={styles.reviewOverviewChevron} />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.sectionHeaderRowMock}>
+            <Text style={styles.sectionTitleMockNoTop}>
+              {otherStores.length > 0 ? `All Retailers (${otherStores.length})` : 'Retailers'}
+            </Text>
+            <Ionicons name="chevron-forward" size={18} color="#111827" />
+          </View>
+          {otherStores.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
+              {otherStores.map((item) => (
+                <TouchableOpacity key={item.id} style={styles.hItem} onPress={() => Linking.openURL(item.url)} activeOpacity={0.85}>
+                  <View style={styles.gridCard}>
+                    {item.imageUrl ? (
+                      <Image source={{ uri: item.imageUrl }} style={[styles.gridImgPlaceholder, { resizeMode: 'contain' }]} />
+                    ) : (
+                      <View style={styles.gridImgPlaceholder} />
+                    )}
+                    {item.save && (
+                      <View style={styles.savePill}>
+                        <Text style={styles.savePillText}>{item.save}</Text>
+                      </View>
+                    )}
+                    <TouchableOpacity style={styles.heartBtn}>
+                      <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.gridMetaRow}>
+                    <View style={[styles.storeLogoCircle, { backgroundColor: BRAND_GREEN, width: 34, height: 34, borderRadius: 17 }]}>
+                      <Text style={[styles.storeLogoText, { fontSize: 14 }]}>{item.store.charAt(0)}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.gridStore}>{item.store}</Text>
+                      <Text style={styles.gridName} numberOfLines={1}>{item.name}</Text>
+                      <Text style={styles.gridPrice}>{item.price}</Text>
                     </View>
                   </View>
-                </View>
-
-                <View style={styles.marketDivider} />
-                <View style={styles.marketRightCard}>
-                  <Text style={styles.priceOverviewTitle}>Price Overview</Text>
-                  <View style={styles.priceOverviewRow}>
-                    <Text style={styles.priceOverviewLeft}>${avgPrice?.toFixed(2) || '--'}</Text>
-                    <Text style={styles.priceOverviewRight}>Avg</Text>
-                  </View>
-                  <View style={styles.priceOverviewRow}>
-                    <Text style={styles.priceOverviewLeft}>${lowestPrice?.toFixed(2) || '--'}</Text>
-                    <View style={styles.todayDot} />
-                    <Text style={styles.priceOverviewRight}>Best</Text>
-                  </View>
-                  <View style={styles.priceOverviewRow}>
-                    <Text style={styles.priceOverviewLeft}>${highestPrice?.toFixed(2) || '--'}</Text>
-                    <Text style={styles.priceOverviewRight}>High</Text>
-                  </View>
-                </View>
-              </View>
-            </>
-          )}
-
-          {reviewRows.length > 0 && (
-            <View style={styles.reviewsGlass}>
-              <View style={styles.reviewsHeader}>
-                <Text style={styles.reviewsTitle}>Score Breakdown</Text>
-              </View>
-              {reviewRows.map((r, i) => (
-                <View key={r.k} style={[styles.reviewRow, i !== reviewRows.length - 1 && styles.reviewRowBorder]}>
-                  <Text style={[styles.reviewKey, i === 0 && styles.reviewKeyBold]}>{r.k}</Text>
-                  <Text style={[styles.reviewVal, r.tone === 'warn' ? styles.reviewValWarn : styles.reviewValGood]}>{r.v}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
+            </ScrollView>
+          ) : (
+            <View style={{ paddingHorizontal: 16, paddingVertical: 20, alignItems: 'center' }}>
+              {status === 'loading' ? (
+                <>
+                  <ActivityIndicator size="small" color={BRAND_GREEN} />
+                  <Text style={{ marginTop: 8, fontSize: 13, color: '#6B7280' }}>Loading retailer listings...</Text>
+                </>
+              ) : (
+                <>
+                  <Ionicons name="storefront-outline" size={32} color="#D1D5DB" />
+                  <Text style={{ marginTop: 8, fontSize: 13, color: '#6B7280', textAlign: 'center' }}>
+                    No retailer listings found. Enable the Custom Search API in your Google Cloud project for live pricing.
+                  </Text>
+                </>
+              )}
             </View>
-          )}
-
-          {rundownForUi && (
-            <View style={styles.reviewOverviewSection}>
-              <Text style={styles.reviewOverviewHeader}>AI Analysis</Text>
-              <TouchableOpacity activeOpacity={0.85} style={styles.reviewOverviewRow}>
-                <Text style={styles.reviewOverviewTextInline}>{rundownForUi}</Text>
-                <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={styles.reviewOverviewChevron} />
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {otherStores.length > 0 && (
-            <>
-              <View style={styles.sectionHeaderRowMock}>
-                <Text style={styles.sectionTitleMockNoTop}>All Retailers ({otherStores.length})</Text>
-                <Ionicons name="chevron-forward" size={18} color="#111827" />
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.hScrollContent} style={styles.hScroll}>
-                {otherStores.map((item) => (
-                  <TouchableOpacity key={item.id} style={styles.hItem} onPress={() => Linking.openURL(item.url)} activeOpacity={0.85}>
-                    <View style={styles.gridCard}>
-                      {item.imageUrl ? (
-                        <Image source={{ uri: item.imageUrl }} style={[styles.gridImgPlaceholder, { resizeMode: 'contain' }]} />
-                      ) : (
-                        <View style={styles.gridImgPlaceholder} />
-                      )}
-                      {item.save && (
-                        <View style={styles.savePill}>
-                          <Text style={styles.savePillText}>{item.save}</Text>
-                        </View>
-                      )}
-                      <TouchableOpacity style={styles.heartBtn}>
-                        <Ionicons name="heart-outline" size={14} color="#FFFFFF" />
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.gridMetaRow}>
-                      <View style={[styles.storeLogoCircle, { backgroundColor: BRAND_GREEN, width: 34, height: 34, borderRadius: 17 }]}>
-                        <Text style={[styles.storeLogoText, { fontSize: 14 }]}>{item.store.charAt(0)}</Text>
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.gridStore}>{item.store}</Text>
-                        <Text style={styles.gridName} numberOfLines={1}>{item.name}</Text>
-                        <Text style={styles.gridPrice}>{item.price}</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </>
           )}
 
           <View style={styles.offRow}>

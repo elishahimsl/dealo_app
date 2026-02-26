@@ -9,6 +9,7 @@ import { useSaveToggle } from '../../../lib/hooks/use-saved-products';
 import { trackInteraction } from '../../../lib/services/user-interactions';
 import AdBanner from '../../../components/AdBanner';
 import { maybeShowInterstitial } from '../../../lib/services/ad-service';
+import { generateProductAnalysis } from '../../../lib/services/product-analysis';
 
 const { width } = Dimensions.get('window');
 
@@ -168,14 +169,27 @@ export default function CameraResults() {
     }));
   }, [pricedResults, bestPrice, avgPrice]);
 
-  // Overview description from snippets
+  // AI-generated product analysis — available immediately from product name
+  const analysis = useMemo(() => generateProductAnalysis(
+    displayName,
+    categoryParam,
+    {
+      avgPrice: productData?.avgPrice ?? null,
+      lowestPrice: productData?.lowestPrice ?? null,
+      highestPrice: productData?.highestPrice ?? null,
+      storeCount: pricedResults.length,
+    }
+  ), [displayName, categoryParam, productData, pricedResults.length]);
+
+  // Overview description: prefer AI analysis, fall back to snippet
   const overviewDescription = useMemo(() => {
+    if (analysis.overview) return analysis.overview;
     if (pricedResults.length > 0) {
       const longestSnippet = [...pricedResults].sort((a, b) => (b.snippet?.length || 0) - (a.snippet?.length || 0))[0];
       return longestSnippet?.snippet || `${displayName} found across ${pricedResults.length} retailers.`;
     }
-    return `${displayName} is currently being analyzed in the ${categoryParam} category. We are generating a product overview using available scan context while live retailer pricing finishes loading.`;
-  }, [pricedResults, displayName, categoryParam]);
+    return `${displayName} is currently being analyzed in the ${categoryParam} category.`;
+  }, [analysis, pricedResults, displayName, categoryParam]);
 
   const fallbackBreakdown = useMemo(() => {
     const baseline = 65;
@@ -192,6 +206,7 @@ export default function CameraResults() {
   const labelForUi = dloScore?.label ?? (status === 'loading' ? 'Analyzing...' : 'Fair Deal');
   const rundownForUi =
     dloScore?.rundown ||
+    analysis.verdict ||
     `${displayName} has a preliminary score based on category and scan context. Live pricing and retailer comparisons are currently unavailable, so this is an early estimate.`;
 
   // For backward compat with identifyOnly view
@@ -296,35 +311,27 @@ export default function CameraResults() {
             <Text style={styles.overviewText}>{overviewDescription}</Text>
             <Ionicons name="chevron-down" size={18} color={BRAND_GREEN} style={{ marginTop: 2 }} />
           </View>
-          {pricedResults.length > 0 && (
-            <View style={styles.overviewTagsRow}>
-              <Text style={styles.overviewTagsText}>
-                {[
-                  categoryParam,
-                  pricedResults.length > 0 ? `${pricedResults.length} Stores` : null,
-                  bestPrice?.price ? `From $${bestPrice.price.toFixed(2)}` : null,
-                ].filter(Boolean).join('   •   ')}
-              </Text>
-            </View>
-          )}
+          <View style={styles.overviewTagsRow}>
+            <Text style={styles.overviewTagsText}>
+              {[
+                categoryParam,
+                pricedResults.length > 0 ? `${pricedResults.length} Stores` : (status === 'loading' ? 'Searching stores...' : null),
+                bestPrice?.price ? `From $${bestPrice.price.toFixed(2)}` : null,
+              ].filter(Boolean).join('   •   ')}
+            </Text>
+          </View>
 
           <>
             <View style={styles.strengthCard}>
               <View pointerEvents="none" style={styles.strengthTint} />
               <Text style={styles.cardHeader}>Strengths</Text>
               <View style={styles.bulletList}>
-                {breakdownForUi.filter((b) => b.value >= 75).slice(0, 3).map((b, i) => (
+                {analysis.strengths.slice(0, 4).map((s, i) => (
                   <View key={i} style={styles.bulletRowMock}>
                     <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
-                    <Text style={styles.bulletTextMock}>{`Strong ${b.label.toLowerCase()} score of ${b.value} — above average for this category`}</Text>
+                    <Text style={styles.bulletTextMock}>{s}</Text>
                   </View>
                 ))}
-                {breakdownForUi.filter((b) => b.value >= 75).length === 0 && (
-                  <View style={styles.bulletRowMock}>
-                    <View style={[styles.bulletDotMock, { backgroundColor: BRAND_GREEN }]} />
-                    <Text style={styles.bulletTextMock}>Core quality signals look stable for this product category.</Text>
-                  </View>
-                )}
               </View>
             </View>
 
@@ -334,22 +341,38 @@ export default function CameraResults() {
                 <View pointerEvents="none" style={styles.weakTint} />
                 <Text style={styles.cardHeader}>Areas to Watch</Text>
                 <View style={styles.bulletList}>
-                  {breakdownForUi.filter((b) => b.value < 75).slice(0, 3).map((b, i) => (
+                  {analysis.weaknesses.slice(0, 3).map((w, i) => (
                     <View key={i} style={styles.bulletRowMock}>
                       <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
-                      <Text style={styles.bulletTextMock}>{`${b.label} scored ${b.value} — consider comparing alternatives`}</Text>
+                      <Text style={styles.bulletTextMock}>{w}</Text>
                     </View>
                   ))}
-                  {breakdownForUi.filter((b) => b.value < 75).length === 0 && (
-                    <View style={styles.bulletRowMock}>
-                      <View style={[styles.bulletDotMock, { backgroundColor: '#F59E0B' }]} />
-                      <Text style={styles.bulletTextMock}>No major concerns detected for this product</Text>
-                    </View>
-                  )}
                 </View>
               </View>
             </View>
           </>
+
+          {analysis.specs.length > 0 && (
+            <View style={styles.specsCard}>
+              <Text style={styles.cardHeader}>Key Specs</Text>
+              {analysis.specs.map((spec, i) => (
+                <View key={i} style={[styles.specRow, i !== analysis.specs.length - 1 && styles.specRowBorder]}>
+                  <Text style={styles.specLabel}>{spec.label}</Text>
+                  <Text style={styles.specValue}>{spec.value}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {analysis.verdict && (
+            <View style={styles.verdictCard}>
+              <View style={styles.verdictIconRow}>
+                <Ionicons name="sparkles" size={18} color={BRAND_GREEN} />
+                <Text style={styles.verdictTitle}>AI Verdict</Text>
+              </View>
+              <Text style={styles.verdictText}>{analysis.verdict}</Text>
+            </View>
+          )}
 
           <Text style={styles.sectionTitleMock}>Deal Overview</Text>
           <View style={styles.aiScoreWrap}>
@@ -675,6 +698,36 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(245,158,11,0.28)',
   },
+  specsCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 14,
+    padding: 14,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#EEF2F7',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 4,
+  },
+  specRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 10 },
+  specRowBorder: { borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  specLabel: { fontSize: 13, fontWeight: '500', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY },
+  specValue: { fontSize: 13, fontWeight: '600', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  verdictCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 14,
+    padding: 16,
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  verdictIconRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  verdictTitle: { fontSize: 15, fontWeight: '700', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  verdictText: { fontSize: 13, lineHeight: 20, color: '#374151', fontWeight: '400', fontFamily: DEALO_FONT_FAMILY },
   cardHeader: { fontSize: 14, fontWeight: '600', color: '#000000', marginBottom: 10, fontFamily: 'Manrope-SemiBold' },
   bulletList: { gap: 10 },
   bulletRowMock: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },

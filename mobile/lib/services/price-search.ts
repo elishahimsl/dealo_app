@@ -127,7 +127,12 @@ export async function searchProductPrices(productName: string): Promise<PriceRes
 
   const name = productName.trim();
   // Skip overly generic names that produce useless results
-  if (name.length < 3 || ['product', 'unknown product', 'unknown'].includes(name.toLowerCase())) {
+  const SKIP_NAMES = new Set([
+    'product', 'unknown product', 'unknown', 'signage', 'sign', 'electronics',
+    'technology', 'gadget', 'device', 'label', 'packaging', 'brand', 'display',
+    'audio equipment', 'electronic device', 'multimedia', 'object', 'item',
+  ]);
+  if (name.length < 3 || SKIP_NAMES.has(name.toLowerCase())) {
     console.warn('[DeaLo] CSE: skipping generic product name:', name);
     return [];
   }

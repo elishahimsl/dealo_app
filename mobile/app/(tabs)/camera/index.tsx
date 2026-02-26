@@ -105,55 +105,174 @@ const callVisionAPI = async (base64: string, apiKey: string): Promise<any> => {
   return res.json();
 };
 
+// Terms that are NOT product names — filter these out aggressively
+const GENERIC_BLOCKLIST = new Set([
+  'product', 'signage', 'sign', 'electronics', 'technology', 'gadget', 'device',
+  'brand', 'design', 'font', 'text', 'logo', 'label', 'packaging', 'advertising',
+  'graphic design', 'banner', 'poster', 'display', 'photograph', 'image', 'picture',
+  'computer', 'mobile phone', 'smartphone', 'tablet', 'laptop', 'camera', 'monitor',
+  'hardware', 'software', 'accessory', 'equipment', 'tool', 'material', 'object',
+  'item', 'thing', 'stuff', 'goods', 'merchandise', 'commodity', 'article',
+  'plastic', 'metal', 'rubber', 'fabric', 'textile', 'glass', 'wood', 'paper',
+  'rectangle', 'circle', 'square', 'shape', 'pattern', 'color', 'colour',
+  'indoor', 'outdoor', 'room', 'table', 'desk', 'shelf', 'floor', 'wall',
+  'close-up', 'macro', 'still life', 'automotive', 'vehicle',
+  'electric blue', 'audio equipment', 'electronic device', 'multimedia',
+  'communication device', 'personal computer', 'output device',
+]);
+
+const isGenericTerm = (s: string): boolean => {
+  const lower = s.toLowerCase().trim();
+  if (!lower || lower.length < 2) return true;
+  if (GENERIC_BLOCKLIST.has(lower)) return true;
+  // Single common word that's not a brand
+  if (lower.split(/\s+/).length === 1 && lower.length <= 12) {
+    if (GENERIC_BLOCKLIST.has(lower)) return true;
+  }
+  return false;
+};
+
+// Known major brands — if we see these in any signal, boost them
+const KNOWN_BRANDS = new Set([
+  'jbl', 'sony', 'bose', 'apple', 'samsung', 'nike', 'adidas', 'beats', 'lg',
+  'google', 'microsoft', 'dell', 'hp', 'lenovo', 'asus', 'acer', 'razer',
+  'logitech', 'anker', 'skullcandy', 'sennheiser', 'harman', 'marshall',
+  'bang & olufsen', 'b&o', 'ultimate ears', 'ue', 'jabra', 'audio-technica',
+  'shure', 'beyerdynamic', 'plantronics', 'corsair', 'steelseries', 'hyperx',
+  'nintendo', 'playstation', 'xbox', 'gopro', 'dji', 'canon', 'nikon', 'fujifilm',
+  'dyson', 'kitchenaid', 'instant pot', 'ninja', 'breville', 'cuisinart',
+  'north face', 'patagonia', 'under armour', 'new balance', 'puma', 'reebok',
+  'columbia', 'lululemon', 'ray-ban', 'oakley', 'yeti', 'hydro flask',
+  'crocs', 'birkenstock', 'vans', 'converse', 'dr. martens',
+]);
+
+const containsKnownBrand = (s: string): boolean => {
+  const lower = s.toLowerCase();
+  for (const brand of KNOWN_BRANDS) {
+    if (lower.includes(brand)) return true;
+  }
+  return false;
+};
+
 const parseVisionResponse = (json: any): DetectedObject => {
   const first = json?.responses?.[0];
 
-  const bestGuessLabel = pickFirstString([
-    first?.webDetection?.bestGuessLabels?.[0]?.label,
-    first?.webDetection?.bestGuessLabels?.[1]?.label,
-  ]);
+  // --- Collect ALL signals ---
+  const bestGuessLabels: string[] = (first?.webDetection?.bestGuessLabels ?? [])
+    .map((l: any) => (l?.label ?? '').trim())
+    .filter(Boolean);
 
-  const topWebEntity = first?.webDetection?.webEntities?.find((e: any) => e?.description && (e?.score ?? 0) >= 0.2);
-  const webEntityDesc = (topWebEntity?.description ?? '') as string;
+  const webEntities: { desc: string; score: number }[] = (first?.webDetection?.webEntities ?? [])
+    .filter((e: any) => e?.description && (e?.score ?? 0) >= 0.1)
+    .map((e: any) => ({ desc: (e.description as string).trim(), score: e.score as number }));
 
-  const topLogo = first?.logoAnnotations?.find((l: any) => l?.description)?.description as string | undefined;
+  const logoAnnotations: string[] = (first?.logoAnnotations ?? [])
+    .filter((l: any) => l?.description)
+    .map((l: any) => (l.description as string).trim());
+
   const topText = pickTopTextLine(first?.fullTextAnnotation?.text);
 
-  // Also check all web entities for a longer/more specific name
-  const allWebEntities: string[] = (first?.webDetection?.webEntities ?? [])
-    .filter((e: any) => e?.description && (e?.score ?? 0) >= 0.15)
-    .map((e: any) => e.description as string);
-  // Prefer longer web entity names (e.g. "JBL Clip 5" over "JBL")
-  const longestWebEntity = allWebEntities
-    .filter((d) => d.split(/\s+/).length >= 2)
-    .sort((a, b) => b.length - a.length)[0] ?? '';
+  const labelAnnotations: string[] = (first?.labelAnnotations ?? [])
+    .map((l: any) => (l?.description ?? '').trim())
+    .filter(Boolean);
 
-  const bestGuess = pickFirstString([
-    joinBrandModel(topLogo ?? '', bestGuessLabel),
-    joinBrandModel(topLogo ?? '', webEntityDesc),
-    bestGuessLabel,
-    longestWebEntity,
-    webEntityDesc,
-    topText,
-    first?.labelAnnotations?.[0]?.description,
-  ]);
+  // Extract product names from pages with matching images
+  const pagesWithMatchingImages: string[] = (first?.webDetection?.pagesWithMatchingImages ?? [])
+    .map((p: any) => (p?.pageTitle ?? '').trim())
+    .filter((t: string) => t.length > 3 && t.length < 120);
 
-  const category = pickFirstString([
-    first?.labelAnnotations?.[0]?.description,
-    first?.webDetection?.webEntities?.[0]?.description,
-    topLogo,
-    'Unknown',
-  ]);
+  // Extract names from visually similar image page titles
+  const visuallySimilarTitles: string[] = (first?.webDetection?.visuallySimilarImages ?? [])
+    .map((p: any) => (p?.url ?? ''))
+    .filter(Boolean);
 
+  // --- Build candidate product names, scored ---
+  const candidates: { name: string; score: number; source: string }[] = [];
+
+  // 1. Web entities (highest priority — Google's knowledge graph)
+  for (const we of webEntities) {
+    if (isGenericTerm(we.desc)) continue;
+    const wordCount = we.desc.split(/\s+/).length;
+    // Multi-word entities with brand names are gold
+    let bonus = 0;
+    if (wordCount >= 2) bonus += 20;
+    if (wordCount >= 3) bonus += 10;
+    if (containsKnownBrand(we.desc)) bonus += 30;
+    candidates.push({ name: we.desc, score: we.score * 100 + bonus, source: 'webEntity' });
+  }
+
+  // 2. Best guess labels from web detection
+  for (const label of bestGuessLabels) {
+    if (isGenericTerm(label)) continue;
+    let bonus = 0;
+    if (label.split(/\s+/).length >= 2) bonus += 15;
+    if (containsKnownBrand(label)) bonus += 25;
+    candidates.push({ name: label, score: 60 + bonus, source: 'bestGuess' });
+  }
+
+  // 3. Page titles from matching images (often contain exact product name)
+  for (const title of pagesWithMatchingImages) {
+    // Clean page titles: remove " - Store Name", "| Store", "Buy ...", etc.
+    let cleaned = title
+      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')     // Remove trailing " - Store Name"
+      .replace(/^Buy\s+/i, '')                      // Remove "Buy " prefix
+      .replace(/\s*\(.*?\)\s*/g, ' ')               // Remove parentheticals
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (cleaned.length < 3 || cleaned.length > 80 || isGenericTerm(cleaned)) continue;
+    let bonus = 0;
+    if (containsKnownBrand(cleaned)) bonus += 25;
+    if (cleaned.split(/\s+/).length >= 2 && cleaned.split(/\s+/).length <= 6) bonus += 15;
+    candidates.push({ name: cleaned, score: 50 + bonus, source: 'pageTitle' });
+  }
+
+  // 4. Logo + text combination (e.g., "JBL" logo + "Clip 5" text = "JBL Clip 5")
+  const topLogo = logoAnnotations[0] ?? '';
+  if (topLogo) {
+    candidates.push({ name: topLogo, score: 40, source: 'logo' });
+    // Try combining logo with text lines that might be model names
+    if (topText && !isGenericTerm(topText)) {
+      const combined = joinBrandModel(topLogo, topText);
+      if (combined && combined !== topLogo) {
+        let bonus = containsKnownBrand(combined) ? 25 : 0;
+        candidates.push({ name: combined, score: 75 + bonus, source: 'logo+text' });
+      }
+    }
+    // Also combine logo with each best guess label
+    for (const label of bestGuessLabels) {
+      if (isGenericTerm(label)) continue;
+      const combined = joinBrandModel(topLogo, label);
+      if (combined && combined !== topLogo && combined !== label) {
+        candidates.push({ name: combined, score: 70, source: 'logo+bestGuess' });
+      }
+    }
+  }
+
+  // 5. Text detection (lowest priority, only if nothing else works)
+  if (topText && !isGenericTerm(topText)) {
+    candidates.push({ name: topText, score: 20, source: 'text' });
+  }
+
+  // --- Pick the best candidate ---
+  candidates.sort((a, b) => b.score - a.score);
+
+  // Log all candidates for debugging
+  console.log('[DeaLo] Vision candidates:', candidates.slice(0, 8).map((c) => `${c.name} (${c.score.toFixed(0)}, ${c.source})`));
+
+  const bestCandidate = candidates[0];
+  const bestName = bestCandidate?.name || 'Unknown Product';
+
+  // --- Category: use label annotations but skip generic ones ---
+  const categoryLabel = labelAnnotations.find((l) => !isGenericTerm(l)) || labelAnnotations[0] || 'General';
+
+  // --- Bounding box from object localization ---
   const obj = first?.localizedObjectAnnotations?.[0];
-  const score =
-    typeof obj?.score === 'number'
-      ? obj.score
-      : typeof topWebEntity?.score === 'number'
-        ? topWebEntity.score
-        : typeof first?.labelAnnotations?.[0]?.score === 'number'
-          ? first.labelAnnotations[0].score
-          : 0.7;
+  const confidence =
+    bestCandidate?.score
+      ? clamp01(Math.min(1, bestCandidate.score / 100))
+      : typeof obj?.score === 'number'
+        ? obj.score
+        : 0.7;
 
   const verts: VisionNormalizedVertex[] = obj?.boundingPoly?.normalizedVertices ?? [];
   const xs = verts.map((v: VisionVertex) => (typeof v.x === 'number' ? v.x : 0));
@@ -163,11 +282,11 @@ const parseVisionResponse = (json: any): DetectedObject => {
   const maxX = xs.length ? Math.max(...xs) : DEFAULT_BOUNDS.x + DEFAULT_BOUNDS.width;
   const maxY = ys.length ? Math.max(...ys) : DEFAULT_BOUNDS.y + DEFAULT_BOUNDS.height;
 
-  console.log('[DeaLo] Vision API: detected =>', bestGuess || 'Unknown', '| logo:', topLogo, '| webEntity:', webEntityDesc, '| bestGuess:', bestGuessLabel);
+  console.log('[DeaLo] Vision API: detected =>', bestName, '| confidence:', confidence.toFixed(2), '| logo:', topLogo, '| source:', bestCandidate?.source);
   return {
-    name: bestGuess || 'Unknown Product',
-    category: category || 'Unknown',
-    confidence: clamp01(score),
+    name: bestName,
+    category: categoryLabel || 'Unknown',
+    confidence: clamp01(confidence),
     bounds: normalizeBox({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }),
     description: '',
     features: [],

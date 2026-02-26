@@ -40,12 +40,13 @@ export async function ingestProduct(params: {
   category: string;
   imageUri?: string;
   upc?: string;
+  visionWebPages?: { url: string; title: string }[];
 }): Promise<ProductWithOffers> {
-  const { name, category, imageUri, upc } = params;
+  const { name, category, imageUri, upc, visionWebPages } = params;
 
-  // 1. Search for real prices via Google CSE
+  // 1. Search for real prices via Google CSE (with Vision webPages fallback)
   console.log('[DeaLo] ingest: searching prices for', name);
-  const priceResults = await searchProductPrices(name);
+  const priceResults = await searchProductPrices(name, visionWebPages);
   console.log('[DeaLo] ingest: got', priceResults.length, 'price results');
 
   // 2. Extract brand from product name (first word if multi-word)

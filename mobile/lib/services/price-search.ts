@@ -1,8 +1,9 @@
 import { supabase } from '../supabase';
 
-const CSE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY!;
-const CSE_ID = process.env.EXPO_PUBLIC_GOOGLE_CSE_ID!;
-const AMAZON_TAG = process.env.EXPO_PUBLIC_AMAZON_ASSOCIATE_TAG!;
+// Prefer dedicated CSE key; fall back to Vision key
+const CSE_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_CSE_KEY || process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY || '';
+const CSE_ID = process.env.EXPO_PUBLIC_GOOGLE_CSE_ID || '';
+const AMAZON_TAG = process.env.EXPO_PUBLIC_AMAZON_ASSOCIATE_TAG || '';
 
 export interface PriceResult {
   title: string;
@@ -40,23 +41,90 @@ function buildAffiliateUrl(url: string, domain: string): string | null {
 /**
  * Fetch CSE results for a given query string
  */
-async function fetchCSE(query: string): Promise<any[]> {
+async function fetchCSE(query: string): Promise<{ items: any[]; failed: boolean }> {
   const url = `https://www.googleapis.com/customsearch/v1?key=${CSE_API_KEY}&cx=${CSE_ID}&q=${encodeURIComponent(query)}&num=10`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
 
-  const res = await fetch(url, { signal: controller.signal as any });
-  clearTimeout(timeout);
+  try {
+    const res = await fetch(url, { signal: controller.signal as any });
+    clearTimeout(timeout);
 
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '');
-    console.warn('[DeaLo] CSE search failed:', res.status, errText.slice(0, 200));
-    return [];
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      console.warn(`[DeaLo] CSE ${res.status} for "${query}":`, errText.slice(0, 300));
+      // 403 = API key restriction or API not enabled
+      if (res.status === 403) {
+        console.warn('[DeaLo] CSE 403 — likely API key restriction. Go to Google Cloud Console > APIs & Services > Credentials > click your API key > under "API restrictions" add "Custom Search JSON API" or set to "Don\'t restrict key"');
+      }
+      return { items: [], failed: true };
+    }
+
+    const json: any = await res.json();
+    return { items: json.items || [], failed: false };
+  } catch (e: any) {
+    clearTimeout(timeout);
+    console.warn('[DeaLo] CSE fetch error:', e?.message || e);
+    return { items: [], failed: true };
+  }
+}
+
+/**
+ * Parse Vision API pagesWithMatchingImages into PriceResults.
+ * This is a fallback when CSE fails — extracts retailer URLs and prices from page titles.
+ */
+export function parseVisionWebPages(webPages: { url: string; title: string }[]): PriceResult[] {
+  const results: PriceResult[] = [];
+
+  for (const page of webPages) {
+    let domain = '';
+    try {
+      domain = new URL(page.url).hostname.replace('www.', '');
+    } catch {
+      continue;
+    }
+
+    const storeName = domainToStore(domain);
+    const title = page.title
+      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim();
+
+    if (!title || title.length < 3) continue;
+
+    // Try to extract price from title
+    const price = extractPrice(page.title);
+    const affiliateUrl = buildAffiliateUrl(page.url, domain);
+
+    results.push({
+      title: title.slice(0, 100),
+      price,
+      currency: 'USD',
+      store: storeName,
+      domain,
+      url: page.url,
+      affiliateUrl,
+      snippet: page.title,
+      imageUrl: null,
+    });
   }
 
-  const json: any = await res.json();
-  return json.items || [];
+  // Deduplicate by domain
+  const seen = new Set<string>();
+  const deduped: PriceResult[] = [];
+  for (const r of results) {
+    if (seen.has(r.domain)) continue;
+    seen.add(r.domain);
+    deduped.push(r);
+  }
+
+  return deduped;
 }
 
 /**
@@ -122,9 +190,10 @@ function parseCSEItems(items: any[]): PriceResult[] {
  * Search Google CSE for product prices across retailers.
  * Runs two queries in parallel: a shopping-focused query and a review/comparison query.
  */
-export async function searchProductPrices(productName: string): Promise<PriceResult[]> {
-  if (!CSE_API_KEY || !CSE_ID || !productName.trim()) return [];
-
+export async function searchProductPrices(
+  productName: string,
+  visionWebPages?: { url: string; title: string }[]
+): Promise<PriceResult[]> {
   const name = productName.trim();
   // Skip overly generic names that produce useless results
   const SKIP_NAMES = new Set([
@@ -132,50 +201,77 @@ export async function searchProductPrices(productName: string): Promise<PriceRes
     'technology', 'gadget', 'device', 'label', 'packaging', 'brand', 'display',
     'audio equipment', 'electronic device', 'multimedia', 'object', 'item',
   ]);
-  if (name.length < 3 || SKIP_NAMES.has(name.toLowerCase())) {
+  if (!name || name.length < 3 || SKIP_NAMES.has(name.toLowerCase())) {
     console.warn('[DeaLo] CSE: skipping generic product name:', name);
-    return [];
-  }
-
-  try {
-    // Run two search queries in parallel for broader coverage
-    const shoppingQuery = `${name} buy price`;
-    const compareQuery = `${name} best price comparison`;
-
-    console.log('[DeaLo] CSE: searching for', shoppingQuery);
-    const [shoppingItems, compareItems] = await Promise.all([
-      fetchCSE(shoppingQuery),
-      fetchCSE(compareQuery).catch(() => [] as any[]),
-    ]);
-
-    console.log('[DeaLo] CSE: got', shoppingItems.length, '+', compareItems.length, 'results');
-
-    const shoppingResults = parseCSEItems(shoppingItems);
-    const compareResults = parseCSEItems(compareItems);
-
-    // Merge & deduplicate by domain+price
-    const seen = new Set<string>();
-    const merged: PriceResult[] = [];
-    for (const r of [...shoppingResults, ...compareResults]) {
-      const key = `${r.domain}|${r.price}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      merged.push(r);
+    // Even for generic names, try vision web pages
+    if (visionWebPages?.length) {
+      console.log('[DeaLo] Using Vision webPages fallback for generic name');
+      return parseVisionWebPages(visionWebPages);
     }
-
-    // Sort: items with prices first, then by price ascending
-    merged.sort((a, b) => {
-      if (a.price !== null && b.price === null) return -1;
-      if (a.price === null && b.price !== null) return 1;
-      if (a.price !== null && b.price !== null) return a.price - b.price;
-      return 0;
-    });
-
-    return merged;
-  } catch (err: any) {
-    console.warn('[DeaLo] Price search error:', err?.message || err);
     return [];
   }
+
+  let cseFailed = false;
+  let merged: PriceResult[] = [];
+
+  // Try CSE first if keys are available
+  if (CSE_API_KEY && CSE_ID) {
+    try {
+      const shoppingQuery = `${name} buy price`;
+      const compareQuery = `${name} best price comparison`;
+
+      console.log('[DeaLo] CSE: searching for', shoppingQuery);
+      const [shoppingResult, compareResult] = await Promise.all([
+        fetchCSE(shoppingQuery),
+        fetchCSE(compareQuery),
+      ]);
+
+      cseFailed = shoppingResult.failed && compareResult.failed;
+
+      console.log('[DeaLo] CSE: got', shoppingResult.items.length, '+', compareResult.items.length, 'results', cseFailed ? '(both failed)' : '');
+
+      const shoppingResults = parseCSEItems(shoppingResult.items);
+      const compareResults = parseCSEItems(compareResult.items);
+
+      const seen = new Set<string>();
+      for (const r of [...shoppingResults, ...compareResults]) {
+        const key = `${r.domain}|${r.price}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        merged.push(r);
+      }
+    } catch (err: any) {
+      console.warn('[DeaLo] CSE error:', err?.message || err);
+      cseFailed = true;
+    }
+  } else {
+    console.warn('[DeaLo] CSE: no API key or CSE ID configured');
+    cseFailed = true;
+  }
+
+  // Fallback: use Vision API's pagesWithMatchingImages when CSE fails or returns nothing
+  if ((cseFailed || merged.length === 0) && visionWebPages?.length) {
+    console.log('[DeaLo] CSE failed/empty, falling back to Vision webPages (' + visionWebPages.length + ' pages)');
+    const visionResults = parseVisionWebPages(visionWebPages);
+    // Merge with any CSE results, dedup by domain
+    const seenDomains = new Set(merged.map((r) => r.domain));
+    for (const r of visionResults) {
+      if (!seenDomains.has(r.domain)) {
+        seenDomains.add(r.domain);
+        merged.push(r);
+      }
+    }
+  }
+
+  // Sort: items with prices first, then by price ascending
+  merged.sort((a, b) => {
+    if (a.price !== null && b.price === null) return -1;
+    if (a.price === null && b.price !== null) return 1;
+    if (a.price !== null && b.price !== null) return a.price - b.price;
+    return 0;
+  });
+
+  return merged;
 }
 
 function domainToStore(domain: string): string {

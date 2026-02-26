@@ -15,7 +15,7 @@ export interface ProductLookupResult {
  * Hook to look up a product: search prices, store in DB, calculate DLO score.
  * Triggered when productName changes.
  */
-export function useProductLookup(productName: string, category: string, imageUri?: string, upc?: string) {
+export function useProductLookup(productName: string, category: string, imageUri?: string, upc?: string, visionWebPages?: { url: string; title: string }[]) {
   const [result, setResult] = useState<ProductLookupResult>({
     status: 'idle',
     data: null,
@@ -46,6 +46,7 @@ export function useProductLookup(productName: string, category: string, imageUri
         category,
         imageUri,
         upc,
+        visionWebPages,
       });
       console.log('[DeaLo] lookup: ingest done, calculating DLO score...');
 
@@ -77,7 +78,7 @@ export function useProductLookup(productName: string, category: string, imageUri
         error: err?.message || 'Failed to look up product',
       });
     }
-  }, [productName, category, imageUri, upc]);
+  }, [productName, category, imageUri, upc, visionWebPages]);
 
   useEffect(() => {
     lookup();

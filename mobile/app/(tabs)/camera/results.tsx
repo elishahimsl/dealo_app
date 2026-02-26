@@ -114,11 +114,22 @@ export default function CameraResults() {
   const categoryParam = typeof params.category === 'string' ? params.category : 'General';
   const imageUri = (params.imageUri as string) || '';
 
+  // Parse Vision API webPages for fallback price extraction
+  const visionWebPages = useMemo(() => {
+    try {
+      const raw = params.webPages as string;
+      if (raw) return JSON.parse(raw) as { url: string; title: string }[];
+    } catch {}
+    return undefined;
+  }, [params.webPages]);
+
   // Real data lookup: searches prices, stores in DB, calculates DLO score
   const { status, data: productData, dloScore, error, retry } = useProductLookup(
     objectName,
     categoryParam,
-    imageUri
+    imageUri,
+    undefined, // upc
+    visionWebPages
   );
 
   // Save toggle for this product (use temp ID if DB insert failed)

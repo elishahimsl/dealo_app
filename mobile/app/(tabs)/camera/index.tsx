@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { extractVisionSignals, VisionSignals } from '../../../lib/services/scan-pipeline';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -19,6 +20,7 @@ type DetectedObject = {
   priceRange: string;
   alternatives: string[];
   webPages: { url: string; title: string }[];
+  visionSignals: VisionSignals | null;
 };
 
 type BarcodeLookupState = {
@@ -411,7 +413,10 @@ const parseVisionResponse = (json: any): DetectedObject => {
     .map((p: any) => ({ url: p.url as string, title: (p.pageTitle as string).trim() }))
     .slice(0, 20);
 
-  console.log('[DeaLo] Vision API: detected =>', bestName, '| confidence:', confidence.toFixed(2), '| logo:', topLogo, '| source:', bestCandidate?.source, '| webPages:', webPages.length);
+  // Extract VisionSignals for the scan pipeline
+  const visionSignals = extractVisionSignals(json);
+
+  console.log('[DeaLo] Vision API: detected =>', bestName, '| confidence:', confidence.toFixed(2), '| logo:', topLogo, '| source:', bestCandidate?.source, '| webPages:', webPages.length, '| ocrTokens:', visionSignals.ocrTokens.length);
   return {
     name: bestName,
     category: categoryLabel || 'Unknown',
@@ -422,6 +427,7 @@ const parseVisionResponse = (json: any): DetectedObject => {
     priceRange: '',
     alternatives: [],
     webPages,
+    visionSignals,
   };
 };
 
@@ -429,7 +435,7 @@ const detectObject = async (photo: { uri: string; base64: string }): Promise<Det
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY;
   if (!apiKey) {
     console.warn('[DeaLo] No EXPO_PUBLIC_GOOGLE_VISION_API_KEY set');
-    return { name: 'Unknown Product', category: 'Unknown', confidence: 0.5, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [] };
+    return { name: 'Unknown Product', category: 'Unknown', confidence: 0.5, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [], visionSignals: null };
   }
 
   // Try up to 2 attempts
@@ -448,7 +454,7 @@ const detectObject = async (photo: { uri: string; base64: string }): Promise<Det
 
   // All attempts failed — return fallback with default bounds so scanner still animates
   console.warn('[DeaLo] Vision API: all attempts failed, using fallback');
-  return { name: 'Unknown Product', category: 'Unknown', confidence: 0.3, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [] };
+  return { name: 'Unknown Product', category: 'Unknown', confidence: 0.3, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [], visionSignals: null };
 };
 
 export default function CameraScreen() {
@@ -707,6 +713,7 @@ export default function CameraScreen() {
             alternatives: JSON.stringify(detected.alternatives),
             imageUri: capturedUri,
             webPages: JSON.stringify(detected.webPages),
+            visionSignals: detected.visionSignals ? JSON.stringify(detected.visionSignals) : '',
           }
         });
       }, 1600);

@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { fullProductSearch, PriceResult, ReviewResult, ProductImage } from './price-search';
 import { serpFullProductSearch, isSerpApiConfigured, ShoppingResult, ProductReview } from './serp-search';
 import { geminiAnalyzeProduct, GeminiProductAnalysis } from './gemini-ai';
+import { VisionSignals, runScanPipeline, RankedCandidate } from './scan-pipeline';
 
 export interface Product {
   id: string;
@@ -77,8 +78,64 @@ function serpReviewsToReviews(items: ProductReview[]): ReviewResult[] {
 }
 
 /**
+ * Convert pipeline RankedCandidates into PriceResults + images + reviews.
+ */
+function pipelineCandidatesToResults(candidates: RankedCandidate[]): {
+  priceResults: PriceResult[];
+  productImages: ProductImage[];
+  reviews: ReviewResult[];
+} {
+  const priceResults: PriceResult[] = [];
+  const productImages: ProductImage[] = [];
+  const reviews: ReviewResult[] = [];
+  const seenImages = new Set<string>();
+  const seenReviewSources = new Set<string>();
+
+  for (const c of candidates) {
+    let domain = '';
+    try { domain = new URL(c.url).hostname.replace('www.', ''); } catch { domain = c.merchant.toLowerCase().replace(/\s+/g, '') + '.com'; }
+
+    priceResults.push({
+      title: c.title,
+      price: c.price,
+      currency: 'USD',
+      store: c.merchant,
+      domain,
+      url: c.url,
+      affiliateUrl: null,
+      snippet: c.priceRaw || '',
+      imageUrl: c.image,
+    });
+
+    if (c.image && !seenImages.has(c.image)) {
+      seenImages.add(c.image);
+      productImages.push({ url: c.image, source: c.merchant });
+    }
+
+    if (c.rating && !seenReviewSources.has(c.merchant)) {
+      seenReviewSources.add(c.merchant);
+      reviews.push({
+        source: c.merchant,
+        domain,
+        url: c.url,
+        rating: c.rating,
+        maxRating: 5,
+        reviewCount: c.reviewCount,
+        snippet: `${c.title} — ${c.priceRaw}`,
+      });
+    }
+  }
+
+  return { priceResults, productImages, reviews };
+}
+
+/**
  * Ingest a detected product: save to DB, search for prices, store offers.
- * Uses SerpApi (if configured) as primary, falls back to CSE/DDG.
+ * 
+ * Pipeline priority:
+ * 1. Scan Pipeline (VisionSignals + SerpApi multi-query) — best accuracy
+ * 2. SerpApi direct search (single query) — good structured data
+ * 3. CSE + DDG fallback — works without paid APIs
  */
 export async function ingestProduct(params: {
   name: string;
@@ -86,8 +143,9 @@ export async function ingestProduct(params: {
   imageUri?: string;
   upc?: string;
   visionWebPages?: { url: string; title: string }[];
+  visionSignals?: VisionSignals;
 }): Promise<ProductWithOffers> {
-  const { name, category, imageUri, upc, visionWebPages } = params;
+  const { name, category, imageUri, upc, visionWebPages, visionSignals } = params;
 
   let priceResults: PriceResult[] = [];
   let reviews: ReviewResult[] = [];
@@ -95,13 +153,34 @@ export async function ingestProduct(params: {
   let refinedName: string | null = null;
   let geminiAnalysis: GeminiProductAnalysis | null = null;
 
-  // ─── TIER 1: SerpApi (structured Google Shopping data) ───────────
-  if (isSerpApiConfigured()) {
-    console.log('[DeaLo] ingest: using SerpApi for', name);
+  // ─── TIER 0: Scan Pipeline (multi-query, reranked candidates) ──────
+  if (visionSignals && isSerpApiConfigured()) {
+    console.log('[DeaLo] ingest: running scan pipeline for', name);
+    try {
+      const decision = await runScanPipeline(visionSignals);
+
+      if (decision.best && decision.allCandidates.length > 0) {
+        refinedName = decision.bestName || null;
+        console.log('[DeaLo] Pipeline result:', decision.mode, '| name:', refinedName, '| confidence:', decision.confidence.toFixed(2));
+
+        const pipelineData = pipelineCandidatesToResults(decision.allCandidates);
+        priceResults = pipelineData.priceResults;
+        productImages = pipelineData.productImages;
+        reviews = pipelineData.reviews;
+
+        console.log('[DeaLo] Pipeline data:', priceResults.length, 'prices,', productImages.length, 'images,', reviews.length, 'reviews');
+      }
+    } catch (err: any) {
+      console.warn('[DeaLo] Scan pipeline error, falling back:', err?.message || err);
+    }
+  }
+
+  // ─── TIER 1: SerpApi direct search (if pipeline didn't run or returned nothing) ───
+  if (priceResults.length === 0 && isSerpApiConfigured()) {
+    console.log('[DeaLo] ingest: using SerpApi direct for', name);
     try {
       const serpData = await serpFullProductSearch(name);
 
-      // Use canonical name from shopping results if more specific
       if (serpData.canonicalName && serpData.canonicalName.length > name.length) {
         refinedName = serpData.canonicalName;
         console.log('[DeaLo] ingest: refined name:', name, '→', refinedName);
@@ -110,7 +189,6 @@ export async function ingestProduct(params: {
       priceResults = shoppingToPriceResults(serpData.shopping);
       reviews = serpReviewsToReviews(serpData.reviews);
 
-      // Collect images
       for (const img of serpData.images) {
         productImages.push({ url: img, source: 'Google' });
       }
@@ -119,17 +197,11 @@ export async function ingestProduct(params: {
           productImages.push({ url: s.imageUrl, source: s.store });
         }
       }
-
-      // Also include review ratings from shopping results
       for (const s of serpData.shopping) {
         if (s.rating && !reviews.find((r) => r.source === s.store)) {
           reviews.push({
-            source: s.store,
-            domain: '',
-            url: s.link,
-            rating: s.rating,
-            maxRating: 5,
-            reviewCount: s.reviewCount,
+            source: s.store, domain: '', url: s.link,
+            rating: s.rating, maxRating: 5, reviewCount: s.reviewCount,
             snippet: `${s.title} — ${s.priceRaw}`,
           });
         }
@@ -141,15 +213,13 @@ export async function ingestProduct(params: {
     }
   }
 
-  // ─── TIER 2: CSE + DDG fallback (if SerpApi not available or returned nothing) ─────
+  // ─── TIER 2: CSE + DDG fallback ─────
   if (priceResults.length === 0) {
     console.log('[DeaLo] ingest: using CSE/DDG fallback for', name);
     const fallbackData = await fullProductSearch(name, visionWebPages);
     priceResults = fallbackData.priceResults;
     if (reviews.length === 0) reviews = fallbackData.reviews;
-    if (productImages.length === 0) {
-      productImages = fallbackData.images;
-    }
+    if (productImages.length === 0) productImages = fallbackData.images;
   }
 
   // ─── TIER 3: Gemini AI analysis (always, runs in parallel with DB ops) ─────

@@ -123,13 +123,23 @@ export default function CameraResults() {
     return undefined;
   }, [params.webPages]);
 
+  // Parse VisionSignals for the scan pipeline
+  const visionSignals = useMemo(() => {
+    try {
+      const raw = params.visionSignals as string;
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return undefined;
+  }, [params.visionSignals]);
+
   // Real data lookup: searches prices, stores in DB, calculates DLO score
   const { status, data: productData, dloScore, error, retry } = useProductLookup(
     objectName,
     categoryParam,
     imageUri,
     undefined, // upc
-    visionWebPages
+    visionWebPages,
+    visionSignals,
   );
 
   // Save toggle for this product (use temp ID if DB insert failed)

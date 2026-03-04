@@ -151,9 +151,11 @@ export default function CameraResults() {
   }, [productId, status]);
 
   // Derive display data from real results
-  const displayName = objectName.trim() || 'Unknown Product';
+  // Use refined name from SerpApi/Gemini if more specific than Vision detection
+  const displayName = productData?.refinedName || objectName.trim() || 'Unknown Product';
   const onlineImage = productData?.productImages?.[0]?.url || productData?.priceResults?.[0]?.imageUrl || null;
   const displayImage = onlineImage || imageUri || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80';
+  const gemini = productData?.geminiAnalysis;
   const dealLabel = dloScore?.label || 'Analyzing...';
   const confidence = (params.confidence as string) || '0.85';
   const matchDots = Math.min(5, Math.max(1, Math.round(parseFloat(confidence) * 5)));
@@ -199,8 +201,8 @@ export default function CameraResults() {
     }));
   }, [pricedResults, bestPrice, avgPrice]);
 
-  // AI-generated product analysis — available immediately from product name
-  const analysis = useMemo(() => generateProductAnalysis(
+  // AI analysis: prefer Gemini (real AI), fall back to hardcoded
+  const localAnalysis = useMemo(() => generateProductAnalysis(
     displayName,
     categoryParam,
     {
@@ -211,15 +213,25 @@ export default function CameraResults() {
     }
   ), [displayName, categoryParam, productData, pricedResults.length]);
 
-  // Overview description: prefer AI analysis, fall back to snippet
+  // Merge: Gemini overrides local analysis when available
+  const analysis = useMemo(() => ({
+    overview: gemini?.overview || localAnalysis.overview,
+    strengths: gemini?.strengths?.length ? gemini.strengths : localAnalysis.strengths,
+    weaknesses: gemini?.weaknesses?.length ? gemini.weaknesses : localAnalysis.weaknesses,
+    specs: gemini?.specs?.length ? gemini.specs : localAnalysis.specs,
+    verdict: gemini?.verdict || localAnalysis.verdict,
+  }), [gemini, localAnalysis]);
+
+  // Overview description: prefer Gemini, fall back to snippet
   const overviewDescription = useMemo(() => {
+    if (gemini?.overview) return gemini.overview;
     if (analysis.overview) return analysis.overview;
     if (pricedResults.length > 0) {
       const longestSnippet = [...pricedResults].sort((a, b) => (b.snippet?.length || 0) - (a.snippet?.length || 0))[0];
       return longestSnippet?.snippet || `${displayName} found across ${pricedResults.length} retailers.`;
     }
-    return `${displayName} is currently being analyzed in the ${categoryParam} category.`;
-  }, [analysis, pricedResults, displayName, categoryParam]);
+    return `${displayName} is currently being analyzed...`;
+  }, [gemini, analysis, pricedResults, displayName]);
 
   const fallbackBreakdown = useMemo(() => {
     const baseline = 65;

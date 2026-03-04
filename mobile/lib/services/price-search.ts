@@ -165,82 +165,125 @@ const RETAILER_DOMAINS = [
  * React Native fetch has no CORS, so this works on mobile.
  */
 async function fetchWebSearchFallback(query: string): Promise<{ results: { url: string; title: string; snippet: string }[] }> {
-  const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
   console.log('[DeaLo] Fallback web search:', query);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  // Try DuckDuckGo lite (simplest HTML, easiest to parse)
+  const endpoints = [
+    `https://lite.duckduckgo.com/lite/?q=${encodeURIComponent(query)}`,
+    `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`,
+  ];
 
-  try {
-    const res = await fetch(searchUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (compatible; DeaLo/1.0)',
-      },
-      body: `q=${encodeURIComponent(query)}`,
-      signal: controller.signal as any,
-    });
-    clearTimeout(timeout);
+  for (const searchUrl of endpoints) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
 
-    if (!res.ok) {
-      console.warn('[DeaLo] Fallback search HTTP', res.status);
-      return { results: [] };
+    try {
+      const res = await fetch(searchUrl, {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+          'Accept': 'text/html',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+        signal: controller.signal as any,
+      });
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        console.warn('[DeaLo] Fallback search HTTP', res.status, 'from', searchUrl);
+        continue;
+      }
+
+      const html = await res.text();
+      console.log('[DeaLo] Fallback: got HTML response, length:', html.length);
+      const parsed = parseDDGHtml(html);
+      if (parsed.length > 0) return { results: parsed };
+      console.log('[DeaLo] Fallback: 0 results from this endpoint, trying next...');
+    } catch (e: any) {
+      clearTimeout(timeout);
+      console.warn('[DeaLo] Fallback search error:', e?.message || e);
     }
-
-    const html = await res.text();
-    return { results: parseDDGHtml(html) };
-  } catch (e: any) {
-    clearTimeout(timeout);
-    console.warn('[DeaLo] Fallback search error:', e?.message || e);
-    return { results: [] };
   }
+
+  return { results: [] };
 }
 
 /**
  * Parse DuckDuckGo HTML results into structured data.
+ * Handles both lite.duckduckgo.com and html.duckduckgo.com formats.
  */
 function parseDDGHtml(html: string): { url: string; title: string; snippet: string }[] {
   const results: { url: string; title: string; snippet: string }[] = [];
 
-  // DuckDuckGo HTML results have links in <a class="result__a" href="...">title</a>
-  // and snippets in <a class="result__snippet">...</a>
-  // We use regex since we can't use DOM parser in React Native
-  const resultBlocks = html.split(/class="result__body"|class="result "/g);
-
-  for (const block of resultBlocks) {
-    // Extract URL from uddg= redirect parameter or direct href
-    const urlMatch = block.match(/href="[^"]*uddg=([^&"]+)/)
-      || block.match(/href="(https?:\/\/[^"]+)"[^>]*class="result__a"/);
-    if (!urlMatch) continue;
-
+  // Strategy 1: Parse DDG lite format (table rows with links)
+  // DDG lite uses <a href="//duckduckgo.com/l/?uddg=ENCODED_URL">title</a> in table rows
+  const uddgPattern = /href="[^"]*uddg=([^&"]+)[^"]*"[^>]*>([^<]*)</g;
+  let match;
+  while ((match = uddgPattern.exec(html)) !== null) {
     let url = '';
-    try {
-      url = decodeURIComponent(urlMatch[1]);
-    } catch {
-      url = urlMatch[1];
-    }
+    try { url = decodeURIComponent(match[1]); } catch { url = match[1]; }
     if (!url.startsWith('http')) continue;
 
-    // Extract title — text between result__a tags
-    const titleMatch = block.match(/class="result__a"[^>]*>([^<]+)</);
-    const title = titleMatch
-      ? titleMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim()
-      : '';
+    const title = match[2]
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
 
-    // Extract snippet
-    const snippetMatch = block.match(/class="result__snippet"[^>]*>(.*?)<\/a>/s);
-    const snippet = snippetMatch
-      ? snippetMatch[1].replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim()
-      : '';
-
-    if (title || snippet) {
-      results.push({ url, title, snippet });
+    if (title && title.length > 3) {
+      results.push({ url, title, snippet: '' });
     }
   }
 
-  console.log('[DeaLo] Fallback: parsed', results.length, 'results from DDG HTML');
-  return results;
+  // Strategy 2: Parse DDG HTML format (result blocks)
+  if (results.length === 0) {
+    const resultBlocks = html.split(/class="result[\s"]/g);
+    for (const block of resultBlocks) {
+      // Look for any URL in href attributes
+      const urlMatch = block.match(/href="(https?:\/\/[^"]+)"/)
+        || block.match(/uddg=([^&"]+)/);
+      if (!urlMatch) continue;
+
+      let url = '';
+      try { url = decodeURIComponent(urlMatch[1]); } catch { url = urlMatch[1]; }
+      if (!url.startsWith('http')) continue;
+
+      // Extract any text that looks like a title
+      const titleMatch = block.match(/>([^<]{5,100})</);
+      const title = titleMatch ? titleMatch[1].replace(/&amp;/g, '&').replace(/&quot;/g, '"').trim() : '';
+
+      // Extract snippet text
+      const snippetMatch = block.match(/snippet[^>]*>([^<]*(?:<b>[^<]*<\/b>[^<]*)*)/);
+      const snippet = snippetMatch ? snippetMatch[1].replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').trim() : '';
+
+      if (title || snippet) {
+        results.push({ url, title, snippet });
+      }
+    }
+  }
+
+  // Strategy 3: Brute force — extract all links with known retailer domains
+  if (results.length === 0) {
+    const allLinks = html.match(/https?:\/\/[^"'\s<>]+/g) || [];
+    for (const link of allLinks) {
+      if (RETAILER_DOMAINS.some((d) => link.includes(d))) {
+        let domain = '';
+        try { domain = new URL(link).hostname.replace('www.', ''); } catch { continue; }
+        results.push({ url: link, title: domainToStore(domain), snippet: '' });
+      }
+    }
+  }
+
+  // Deduplicate by domain
+  const seen = new Set<string>();
+  const deduped = results.filter((r) => {
+    let domain = '';
+    try { domain = new URL(r.url).hostname; } catch { return true; }
+    if (seen.has(domain)) return false;
+    seen.add(domain);
+    return true;
+  });
+
+  console.log('[DeaLo] Fallback: parsed', deduped.length, 'results from DDG HTML');
+  return deduped;
 }
 
 /**

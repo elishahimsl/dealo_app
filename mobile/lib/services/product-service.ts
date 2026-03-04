@@ -1,5 +1,5 @@
 import { supabase } from '../supabase';
-import { searchProductPrices, PriceResult } from './price-search';
+import { fullProductSearch, PriceResult, ReviewResult, ProductImage } from './price-search';
 
 export interface Product {
   id: string;
@@ -30,6 +30,8 @@ export interface ProductWithOffers {
   avgPrice: number | null;
   lowestPrice: number | null;
   highestPrice: number | null;
+  reviews: ReviewResult[];
+  productImages: ProductImage[];
 }
 
 /**
@@ -44,10 +46,10 @@ export async function ingestProduct(params: {
 }): Promise<ProductWithOffers> {
   const { name, category, imageUri, upc, visionWebPages } = params;
 
-  // 1. Search for real prices via Google CSE (with Vision webPages fallback)
-  console.log('[DeaLo] ingest: searching prices for', name);
-  const priceResults = await searchProductPrices(name, visionWebPages);
-  console.log('[DeaLo] ingest: got', priceResults.length, 'price results');
+  // 1. Full search: prices + reviews + images in parallel
+  console.log('[DeaLo] ingest: full search for', name);
+  const { priceResults, reviews, images } = await fullProductSearch(name, visionWebPages);
+  console.log('[DeaLo] ingest: got', priceResults.length, 'prices,', reviews.length, 'reviews,', images.length, 'images');
 
   // 2. Extract brand from product name (first word if multi-word)
   const words = name.trim().split(/\s+/);
@@ -101,7 +103,7 @@ export async function ingestProduct(params: {
     if (error) {
       console.warn('Failed to insert product:', error.message);
       // Return results without DB persistence
-      return buildResultWithoutDB(name, category, priceResults);
+      return buildResultWithoutDB(name, category, priceResults, reviews, images);
     }
     product = data as Product;
   }
@@ -155,13 +157,17 @@ export async function ingestProduct(params: {
     avgPrice,
     lowestPrice,
     highestPrice,
+    reviews,
+    productImages: images,
   };
 }
 
 function buildResultWithoutDB(
   name: string,
   category: string,
-  priceResults: PriceResult[]
+  priceResults: PriceResult[],
+  reviews: ReviewResult[] = [],
+  productImages: ProductImage[] = []
 ): ProductWithOffers {
   const pricedResults = priceResults.filter((r) => r.price !== null);
   const prices = pricedResults.map((r) => r.price!);
@@ -182,5 +188,7 @@ function buildResultWithoutDB(
     avgPrice: prices.length > 0 ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : null,
     lowestPrice: prices.length > 0 ? Math.min(...prices) : null,
     highestPrice: prices.length > 0 ? Math.max(...prices) : null,
+    reviews,
+    productImages,
   };
 }

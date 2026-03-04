@@ -152,7 +152,8 @@ export default function CameraResults() {
 
   // Derive display data from real results
   const displayName = objectName.trim() || 'Unknown Product';
-  const displayImage = imageUri || productData?.priceResults?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80';
+  const onlineImage = productData?.productImages?.[0]?.url || productData?.priceResults?.[0]?.imageUrl || null;
+  const displayImage = onlineImage || imageUri || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80';
   const dealLabel = dloScore?.label || 'Analyzing...';
   const confidence = (params.confidence as string) || '0.85';
   const matchDots = Math.min(5, Math.max(1, Math.round(parseFloat(confidence) * 5)));
@@ -163,6 +164,24 @@ export default function CameraResults() {
   const lowestPrice = productData?.lowestPrice;
   const highestPrice = productData?.highestPrice;
   const pricedResults = (productData?.priceResults || []).filter((r) => r.price !== null);
+
+  // Reviews and product images from online
+  const reviews = productData?.reviews || [];
+  const productImages = useMemo(() => {
+    const imgs: string[] = [];
+    const seen = new Set<string>();
+    // Add online product images first
+    for (const pi of productData?.productImages || []) {
+      if (pi.url && !seen.has(pi.url)) { seen.add(pi.url); imgs.push(pi.url); }
+    }
+    // Add images from price results
+    for (const pr of productData?.priceResults || []) {
+      if (pr.imageUrl && !seen.has(pr.imageUrl)) { seen.add(pr.imageUrl); imgs.push(pr.imageUrl); }
+    }
+    // Add captured photo last
+    if (imageUri && !seen.has(imageUri)) imgs.push(imageUri);
+    return imgs.slice(0, 8);
+  }, [productData, imageUri]);
 
   // Build "Other Stores" from real price results
   const otherStores = useMemo(() => {
@@ -315,6 +334,20 @@ export default function CameraResults() {
             </View>
           </View>
 
+          {productImages.length > 1 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 10, paddingVertical: 8 }}>
+              {productImages.map((img, i) => (
+                <TouchableOpacity key={i} activeOpacity={0.9}>
+                  <Image
+                    source={{ uri: img }}
+                    style={{ width: 80, height: 80, borderRadius: 12, backgroundColor: '#F3F4F6' }}
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+
           <View style={styles.hrMock} />
 
           <Text style={styles.sectionTitleMock}>Product Overview</Text>
@@ -383,6 +416,38 @@ export default function CameraResults() {
               </View>
               <Text style={styles.verdictText}>{analysis.verdict}</Text>
             </View>
+          )}
+
+          {reviews.length > 0 && (
+            <>
+              <Text style={styles.sectionTitleMock}>Online Reviews</Text>
+              <View style={styles.onlineReviewsCard}>
+                {reviews.slice(0, 5).map((rev, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[styles.onlineReviewRow, i !== Math.min(reviews.length, 5) - 1 && styles.onlineReviewRowBorder]}
+                    activeOpacity={0.85}
+                    onPress={() => Linking.openURL(rev.url)}
+                  >
+                    <View style={styles.onlineReviewLeft}>
+                      <Text style={styles.onlineReviewSource}>{rev.source}</Text>
+                      {rev.rating && (
+                        <View style={styles.onlineReviewRatingRow}>
+                          <Ionicons name="star" size={13} color="#F59E0B" />
+                          <Text style={styles.onlineReviewRating}>
+                            {rev.rating.toFixed(1)}/{rev.maxRating}
+                          </Text>
+                          {rev.reviewCount && (
+                            <Text style={styles.onlineReviewCount}>({rev.reviewCount.toLocaleString()})</Text>
+                          )}
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.onlineReviewSnippet} numberOfLines={2}>{rev.snippet}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
           )}
 
           <Text style={styles.sectionTitleMock}>Deal Overview</Text>
@@ -1070,6 +1135,16 @@ const styles = StyleSheet.create({
   altPrice: { fontSize: 16, fontWeight: '900', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
   tagPill: { height: 28, borderRadius: 8, backgroundColor: '#D1FAE5', paddingHorizontal: 12, justifyContent: 'center' },
   tagText: { fontSize: 12, fontWeight: '900', color: BRAND_GREEN, fontFamily: DEALO_FONT_FAMILY },
+
+  onlineReviewsCard: { marginHorizontal: 16, marginTop: 8, backgroundColor: '#fff', borderRadius: 16, borderWidth: 1, borderColor: '#EEF2F7', overflow: 'hidden' },
+  onlineReviewRow: { paddingHorizontal: 14, paddingVertical: 12 },
+  onlineReviewRowBorder: { borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
+  onlineReviewLeft: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, gap: 10 },
+  onlineReviewSource: { fontSize: 14, fontWeight: '800', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  onlineReviewRatingRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  onlineReviewRating: { fontSize: 13, fontWeight: '700', color: '#111827', fontFamily: DEALO_FONT_FAMILY },
+  onlineReviewCount: { fontSize: 12, fontWeight: '600', color: '#6B7280', fontFamily: DEALO_FONT_FAMILY },
+  onlineReviewSnippet: { fontSize: 12, fontWeight: '600', color: '#6B7280', lineHeight: 18, fontFamily: DEALO_FONT_FAMILY },
 
   bottomRow: { paddingHorizontal: 16, marginTop: 18, flexDirection: 'row', gap: 12 },
   primaryBtn: { flex: 1, height: 52, borderRadius: 999, backgroundColor: BRAND_GREEN, justifyContent: 'center', alignItems: 'center' },

@@ -223,94 +223,156 @@ const parseVisionResponse = (json: any): DetectedObject => {
     .map((p: any) => (p?.url ?? ''))
     .filter(Boolean);
 
+  // --- Helper: clean a page title into a potential product name ---
+  const cleanPageTitle = (raw: string): string => {
+    return raw
+      .replace(/<[^>]*>/g, '')                         // Remove HTML tags
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')           // Remove trailing " - Store Name"
+      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')           // Second pass for double separators
+      .replace(/^Buy\s+/i, '')                          // Remove "Buy " prefix
+      .replace(/^Shop\s+/i, '')                         // Remove "Shop " prefix
+      .replace(/\s*\(.*?\)\s*/g, ' ')                   // Remove parentheticals
+      .replace(/,\s*\d+\s*pack\b/i, '')                 // Remove ", 2 pack" etc
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  // --- Helper: score a candidate based on specificity ---
+  const specificityScore = (name: string): number => {
+    const words = name.split(/\s+/);
+    let score = 0;
+    // Multi-word is more specific
+    if (words.length >= 2) score += 30;
+    if (words.length >= 3) score += 20;
+    if (words.length >= 4) score += 10;
+    // Contains a known brand
+    if (containsKnownBrand(name)) score += 40;
+    // Contains a number (model numbers like "Clip 5", "S24", "AirPods Pro 2")
+    if (/\d/.test(name)) score += 25;
+    // Contains known model patterns (Pro, Max, Plus, Ultra, Mini, Gen, Series)
+    if (/\b(pro|max|plus|ultra|mini|gen|series|edition|lite|air)\b/i.test(name)) score += 15;
+    // Penalty for very long names (likely full page titles, not product names)
+    if (words.length > 8) score -= 20;
+    if (words.length > 12) score -= 30;
+    return score;
+  };
+
   // --- Build candidate product names, scored ---
   const candidates: { name: string; score: number; source: string }[] = [];
 
-  // 1. Web entities (highest priority — Google's knowledge graph)
-  for (const we of webEntities) {
-    if (isGenericTerm(we.desc)) continue;
-    const wordCount = we.desc.split(/\s+/).length;
-    // Multi-word entities with brand names are gold
-    let bonus = 0;
-    if (wordCount >= 2) bonus += 20;
-    if (wordCount >= 3) bonus += 10;
-    if (containsKnownBrand(we.desc)) bonus += 30;
-    candidates.push({ name: we.desc, score: we.score * 100 + bonus, source: 'webEntity' });
-  }
-
-  // 2. Best guess labels from web detection
+  // 1. Best guess labels — often the most accurate single signal
   for (const label of bestGuessLabels) {
     if (isGenericTerm(label)) continue;
-    let bonus = 0;
-    if (label.split(/\s+/).length >= 2) bonus += 15;
-    if (containsKnownBrand(label)) bonus += 25;
-    candidates.push({ name: label, score: 60 + bonus, source: 'bestGuess' });
+    candidates.push({ name: label, score: 80 + specificityScore(label), source: 'bestGuess' });
   }
 
-  // 3. Page titles from matching images (often contain exact product name)
+  // 2. Web entities (Google's knowledge graph)
+  for (const we of webEntities) {
+    if (isGenericTerm(we.desc)) continue;
+    candidates.push({ name: we.desc, score: we.score * 80 + specificityScore(we.desc), source: 'webEntity' });
+  }
+
+  // 3. Page titles — use consensus: find the most common product name across retailer pages
+  const cleanedTitles: string[] = [];
   for (const title of pagesWithMatchingImages) {
-    // Clean page titles: remove " - Store Name", "| Store", "Buy ...", etc.
-    let cleaned = title
-      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')     // Remove trailing " - Store Name"
-      .replace(/^Buy\s+/i, '')                      // Remove "Buy " prefix
-      .replace(/\s*\(.*?\)\s*/g, ' ')               // Remove parentheticals
-      .replace(/\s+/g, ' ')
-      .trim();
-    if (cleaned.length < 3 || cleaned.length > 80 || isGenericTerm(cleaned)) continue;
-    let bonus = 0;
-    if (containsKnownBrand(cleaned)) bonus += 25;
-    if (cleaned.split(/\s+/).length >= 2 && cleaned.split(/\s+/).length <= 6) bonus += 15;
-    candidates.push({ name: cleaned, score: 50 + bonus, source: 'pageTitle' });
+    const cleaned = cleanPageTitle(title);
+    if (cleaned.length >= 3 && cleaned.length <= 80 && !isGenericTerm(cleaned)) {
+      cleanedTitles.push(cleaned);
+    }
   }
 
-  // 4. Logo + text combination (e.g., "JBL" logo + "Clip 5" text = "JBL Clip 5")
-  const topLogo = logoAnnotations[0] ?? '';
-  if (topLogo) {
-    candidates.push({ name: topLogo, score: 40, source: 'logo' });
-    // Try combining logo with text lines that might be model names
-    if (topText && !isGenericTerm(topText)) {
-      const combined = joinBrandModel(topLogo, topText);
-      if (combined && combined !== topLogo) {
-        let bonus = containsKnownBrand(combined) ? 25 : 0;
-        candidates.push({ name: combined, score: 75 + bonus, source: 'logo+text' });
+  // Find common substrings across page titles (consensus = exact model name)
+  if (cleanedTitles.length >= 2) {
+    const wordFreq = new Map<string, number>();
+    for (const title of cleanedTitles) {
+      const words = title.split(/\s+/);
+      // Generate all 2-5 word phrases
+      for (let len = 2; len <= Math.min(5, words.length); len++) {
+        for (let start = 0; start <= words.length - len; start++) {
+          const phrase = words.slice(start, start + len).join(' ');
+          if (!isGenericTerm(phrase)) {
+            wordFreq.set(phrase, (wordFreq.get(phrase) || 0) + 1);
+          }
+        }
       }
     }
-    // Also combine logo with each best guess label
+    // Phrases appearing in multiple titles are likely the actual product name
+    const sortedPhrases = [...wordFreq.entries()]
+      .filter(([, count]) => count >= 2)
+      .sort((a, b) => {
+        // Sort by: count * specificity
+        const scoreA = a[1] * 10 + specificityScore(a[0]);
+        const scoreB = b[1] * 10 + specificityScore(b[0]);
+        return scoreB - scoreA;
+      });
+
+    for (const [phrase, count] of sortedPhrases.slice(0, 5)) {
+      const consensusBoost = count * 15;
+      candidates.push({ name: phrase, score: 90 + consensusBoost + specificityScore(phrase), source: `consensus(${count})` });
+    }
+  }
+
+  // Also add individual cleaned page titles
+  for (const cleaned of cleanedTitles) {
+    candidates.push({ name: cleaned, score: 50 + specificityScore(cleaned), source: 'pageTitle' });
+  }
+
+  // 4. Logo + text/OCR combination
+  const topLogo = logoAnnotations[0] ?? '';
+  if (topLogo) {
+    // Logo alone (brand only, low priority)
+    if (!isGenericTerm(topLogo)) {
+      candidates.push({ name: topLogo, score: 30 + specificityScore(topLogo), source: 'logo' });
+    }
+
+    // Extract ALL text lines for model number detection
+    const allTextLines = (first?.fullTextAnnotation?.text ?? '').split(/\r?\n/).map((l: string) => l.trim()).filter(Boolean);
+    const modelPattern = /^[A-Za-z0-9][A-Za-z0-9 .\-/]{1,30}$/;
+    for (const line of allTextLines) {
+      if (line.length < 2 || line.length > 35) continue;
+      if (!modelPattern.test(line)) continue;
+      if (isGenericTerm(line) && !containsKnownBrand(line)) continue;
+      const combined = joinBrandModel(topLogo, line);
+      if (combined && combined !== topLogo && combined.split(/\s+/).length >= 2) {
+        candidates.push({ name: combined, score: 85 + specificityScore(combined), source: 'logo+ocr' });
+      }
+    }
+
+    // Combine logo with best guess labels
     for (const label of bestGuessLabels) {
       if (isGenericTerm(label)) continue;
       const combined = joinBrandModel(topLogo, label);
       if (combined && combined !== topLogo && combined !== label) {
-        candidates.push({ name: combined, score: 70, source: 'logo+bestGuess' });
+        candidates.push({ name: combined, score: 75 + specificityScore(combined), source: 'logo+bestGuess' });
       }
     }
   }
 
-  // 5. Text detection
+  // 5. Text detection standalone (low priority)
   if (topText && !isGenericTerm(topText)) {
-    candidates.push({ name: topText, score: 20, source: 'text' });
+    candidates.push({ name: topText, score: 20 + specificityScore(topText), source: 'text' });
   }
 
-  // 6. Object localization names (e.g. "Loudspeaker", "Headphones")
+  // 6. Object localization + logo
   const objectNames: string[] = (first?.localizedObjectAnnotations ?? [])
     .map((o: any) => (o?.name ?? '').trim())
     .filter(Boolean);
   for (const objName of objectNames) {
     if (isGenericTerm(objName)) continue;
-    candidates.push({ name: objName, score: 15, source: 'objectLocalization' });
-    // Combine object name with logo for better identification
     if (topLogo && !isGenericTerm(topLogo)) {
       const combined = joinBrandModel(topLogo, objName);
       if (combined && combined !== topLogo && combined !== objName) {
-        candidates.push({ name: combined, score: 65, source: 'logo+object' });
+        candidates.push({ name: combined, score: 60 + specificityScore(combined), source: 'logo+object' });
       }
     }
   }
 
-  // 7. If still no candidates, use non-blocklisted label annotations as last resort
+  // 7. Label annotations as last resort
   if (candidates.length === 0) {
     for (const label of labelAnnotations) {
       if (isGenericTerm(label)) continue;
-      candidates.push({ name: label, score: 10, source: 'label' });
+      candidates.push({ name: label, score: 10 + specificityScore(label), source: 'label' });
     }
   }
 

@@ -17,6 +17,27 @@ export interface PriceResult {
   imageUrl: string | null;
 }
 
+export interface ReviewResult {
+  source: string;
+  domain: string;
+  url: string;
+  rating: number | null;      // e.g. 4.7
+  maxRating: number;           // e.g. 5
+  reviewCount: number | null;  // e.g. 1234
+  snippet: string;             // short review excerpt
+}
+
+export interface ProductImage {
+  url: string;
+  source: string;  // store name or 'vision'
+}
+
+export interface FullSearchResult {
+  priceResults: PriceResult[];
+  reviews: ReviewResult[];
+  images: ProductImage[];
+}
+
 /**
  * Extract price from a string like "$149.99" or "149.99 USD"
  */
@@ -272,6 +293,111 @@ export async function searchProductPrices(
   });
 
   return merged;
+}
+
+/**
+ * Search for product reviews via CSE. Parses aggregate ratings from pagemap.
+ */
+export async function searchProductReviews(
+  productName: string
+): Promise<ReviewResult[]> {
+  if (!CSE_API_KEY || !CSE_ID || !productName.trim()) return [];
+  const name = productName.trim();
+  if (name.length < 3) return [];
+
+  try {
+    const reviewQuery = `${name} review rating`;
+    console.log('[DeaLo] CSE reviews: searching for', reviewQuery);
+    const result = await fetchCSE(reviewQuery);
+    if (result.failed || result.items.length === 0) return [];
+
+    const reviews: ReviewResult[] = [];
+    for (const item of result.items) {
+      let domain = '';
+      try { domain = new URL(item.link || '').hostname.replace('www.', ''); } catch { continue; }
+
+      // Extract aggregate rating from pagemap
+      const aggRating = item.pagemap?.aggregaterating?.[0]
+        || item.pagemap?.review?.[0];
+      const ratingVal = parseFloat(aggRating?.ratingvalue || aggRating?.rating || '0');
+      const maxVal = parseFloat(aggRating?.bestrating || '5') || 5;
+      const reviewCount = parseInt(aggRating?.reviewcount || aggRating?.ratingcount || '0', 10) || null;
+
+      // Also try metatags
+      const metaRating = parseFloat(item.pagemap?.metatags?.[0]?.['rating'] || '0');
+
+      const rating = ratingVal > 0 ? ratingVal : (metaRating > 0 ? metaRating : null);
+
+      // Extract a review snippet
+      const snippet = (item.snippet || '').trim();
+
+      if (rating || snippet.length > 20) {
+        reviews.push({
+          source: domainToStore(domain),
+          domain,
+          url: item.link || '',
+          rating: rating ? Math.min(rating, maxVal) : null,
+          maxRating: maxVal,
+          reviewCount,
+          snippet: snippet.slice(0, 200),
+        });
+      }
+    }
+
+    // Deduplicate by domain, keep highest rated
+    const byDomain = new Map<string, ReviewResult>();
+    for (const r of reviews) {
+      const existing = byDomain.get(r.domain);
+      if (!existing || (r.rating || 0) > (existing.rating || 0)) {
+        byDomain.set(r.domain, r);
+      }
+    }
+
+    console.log('[DeaLo] CSE reviews: found', byDomain.size, 'reviews');
+    return [...byDomain.values()].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  } catch (err: any) {
+    console.warn('[DeaLo] Review search error:', err?.message || err);
+    return [];
+  }
+}
+
+/**
+ * Collect product images from CSE results and Vision API data.
+ */
+export function collectProductImages(
+  priceResults: PriceResult[],
+  visionWebPages?: { url: string; title: string }[]
+): ProductImage[] {
+  const seen = new Set<string>();
+  const images: ProductImage[] = [];
+
+  // From price/CSE results
+  for (const r of priceResults) {
+    if (r.imageUrl && !seen.has(r.imageUrl)) {
+      seen.add(r.imageUrl);
+      images.push({ url: r.imageUrl, source: r.store });
+    }
+  }
+
+  return images.slice(0, 10); // Cap at 10 images
+}
+
+/**
+ * Full product search: prices + reviews + images in parallel
+ */
+export async function fullProductSearch(
+  productName: string,
+  visionWebPages?: { url: string; title: string }[]
+): Promise<FullSearchResult> {
+  const [priceResults, reviews] = await Promise.all([
+    searchProductPrices(productName, visionWebPages),
+    searchProductReviews(productName).catch(() => [] as ReviewResult[]),
+  ]);
+
+  const images = collectProductImages(priceResults, visionWebPages);
+
+  console.log('[DeaLo] Full search:', priceResults.length, 'prices,', reviews.length, 'reviews,', images.length, 'images');
+  return { priceResults, reviews, images };
 }
 
 function domainToStore(domain: string): string {

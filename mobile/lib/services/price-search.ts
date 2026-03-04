@@ -148,6 +148,187 @@ export function parseVisionWebPages(webPages: { url: string; title: string }[]):
   return deduped;
 }
 
+// ─── WEB SEARCH FALLBACK (no API key needed) ────────────────────────────────
+
+const RETAILER_DOMAINS = [
+  'amazon.com', 'walmart.com', 'target.com', 'bestbuy.com', 'ebay.com',
+  'newegg.com', 'costco.com', 'bhphotovideo.com', 'adorama.com', 'kohls.com',
+  'macys.com', 'nordstrom.com', 'homedepot.com', 'lowes.com', 'samsclub.com',
+  'staples.com', 'officedepot.com', 'microcenter.com', 'jbl.com', 'bose.com',
+  'sony.com', 'samsung.com', 'dell.com', 'hp.com', 'lenovo.com', 'apple.com',
+  'nike.com', 'adidas.com', 'crutchfield.com', 'harmankardon.com',
+  'skullcandy.com', 'rei.com', 'zappos.com', 'overstock.com',
+];
+
+/**
+ * Fallback web search using DuckDuckGo HTML (no API key needed).
+ * React Native fetch has no CORS, so this works on mobile.
+ */
+async function fetchWebSearchFallback(query: string): Promise<{ results: { url: string; title: string; snippet: string }[] }> {
+  const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+  console.log('[DeaLo] Fallback web search:', query);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(searchUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (compatible; DeaLo/1.0)',
+      },
+      body: `q=${encodeURIComponent(query)}`,
+      signal: controller.signal as any,
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      console.warn('[DeaLo] Fallback search HTTP', res.status);
+      return { results: [] };
+    }
+
+    const html = await res.text();
+    return { results: parseDDGHtml(html) };
+  } catch (e: any) {
+    clearTimeout(timeout);
+    console.warn('[DeaLo] Fallback search error:', e?.message || e);
+    return { results: [] };
+  }
+}
+
+/**
+ * Parse DuckDuckGo HTML results into structured data.
+ */
+function parseDDGHtml(html: string): { url: string; title: string; snippet: string }[] {
+  const results: { url: string; title: string; snippet: string }[] = [];
+
+  // DuckDuckGo HTML results have links in <a class="result__a" href="...">title</a>
+  // and snippets in <a class="result__snippet">...</a>
+  // We use regex since we can't use DOM parser in React Native
+  const resultBlocks = html.split(/class="result__body"|class="result "/g);
+
+  for (const block of resultBlocks) {
+    // Extract URL from uddg= redirect parameter or direct href
+    const urlMatch = block.match(/href="[^"]*uddg=([^&"]+)/)
+      || block.match(/href="(https?:\/\/[^"]+)"[^>]*class="result__a"/);
+    if (!urlMatch) continue;
+
+    let url = '';
+    try {
+      url = decodeURIComponent(urlMatch[1]);
+    } catch {
+      url = urlMatch[1];
+    }
+    if (!url.startsWith('http')) continue;
+
+    // Extract title — text between result__a tags
+    const titleMatch = block.match(/class="result__a"[^>]*>([^<]+)</);
+    const title = titleMatch
+      ? titleMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim()
+      : '';
+
+    // Extract snippet
+    const snippetMatch = block.match(/class="result__snippet"[^>]*>(.*?)<\/a>/s);
+    const snippet = snippetMatch
+      ? snippetMatch[1].replace(/<[^>]*>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim()
+      : '';
+
+    if (title || snippet) {
+      results.push({ url, title, snippet });
+    }
+  }
+
+  console.log('[DeaLo] Fallback: parsed', results.length, 'results from DDG HTML');
+  return results;
+}
+
+/**
+ * Convert DuckDuckGo web search results into PriceResults.
+ */
+function parseFallbackResults(results: { url: string; title: string; snippet: string }[]): PriceResult[] {
+  const priceResults: PriceResult[] = [];
+
+  for (const r of results) {
+    let domain = '';
+    try {
+      domain = new URL(r.url).hostname.replace('www.', '');
+    } catch {
+      continue;
+    }
+
+    // Try to extract price from snippet or title
+    const price = extractPrice(r.snippet) || extractPrice(r.title);
+    const storeName = domainToStore(domain);
+    const affiliateUrl = buildAffiliateUrl(r.url, domain);
+
+    priceResults.push({
+      title: r.title.replace(/ - .*$/, '').replace(/\|.*$/, '').trim() || storeName,
+      price,
+      currency: 'USD',
+      store: storeName,
+      domain,
+      url: r.url,
+      affiliateUrl,
+      snippet: r.snippet,
+      imageUrl: null,
+    });
+  }
+
+  return priceResults;
+}
+
+/**
+ * Extract review data from DuckDuckGo search results.
+ */
+function parseReviewsFromFallback(results: { url: string; title: string; snippet: string }[]): ReviewResult[] {
+  const reviews: ReviewResult[] = [];
+
+  for (const r of results) {
+    let domain = '';
+    try {
+      domain = new URL(r.url).hostname.replace('www.', '');
+    } catch {
+      continue;
+    }
+
+    // Try to extract rating from snippet (e.g., "4.7 out of 5", "Rating: 4.5/5", "4.7 stars")
+    const ratingMatch = r.snippet.match(/(\d\.\d)\s*(?:out of|\/)\s*(\d)/)
+      || r.snippet.match(/(?:rating|rated|stars?)\s*:?\s*(\d\.\d)/i)
+      || r.title.match(/(\d\.\d)\s*(?:out of|\/)\s*(\d)/);
+
+    const rating = ratingMatch ? parseFloat(ratingMatch[1]) : null;
+    const maxRating = ratingMatch?.[2] ? parseFloat(ratingMatch[2]) : 5;
+
+    // Try to extract review count
+    const countMatch = r.snippet.match(/(\d[\d,]*)\s*(?:reviews?|ratings?)/i);
+    const reviewCount = countMatch ? parseInt(countMatch[1].replace(/,/g, ''), 10) : null;
+
+    if (rating || r.snippet.length > 30) {
+      reviews.push({
+        source: domainToStore(domain),
+        domain,
+        url: r.url,
+        rating,
+        maxRating,
+        reviewCount,
+        snippet: r.snippet.slice(0, 200),
+      });
+    }
+  }
+
+  // Deduplicate by domain
+  const byDomain = new Map<string, ReviewResult>();
+  for (const r of reviews) {
+    const existing = byDomain.get(r.domain);
+    if (!existing || (r.rating || 0) > (existing.rating || 0)) {
+      byDomain.set(r.domain, r);
+    }
+  }
+
+  return [...byDomain.values()].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+}
+
 /**
  * Parse CSE items into PriceResult[]
  */
@@ -270,17 +451,35 @@ export async function searchProductPrices(
     cseFailed = true;
   }
 
-  // Fallback: use Vision API's pagesWithMatchingImages when CSE fails or returns nothing
+  // Fallback 1: Vision API's pagesWithMatchingImages
   if ((cseFailed || merged.length === 0) && visionWebPages?.length) {
-    console.log('[DeaLo] CSE failed/empty, falling back to Vision webPages (' + visionWebPages.length + ' pages)');
+    console.log('[DeaLo] Trying Vision webPages fallback (' + visionWebPages.length + ' pages)');
     const visionResults = parseVisionWebPages(visionWebPages);
-    // Merge with any CSE results, dedup by domain
     const seenDomains = new Set(merged.map((r) => r.domain));
     for (const r of visionResults) {
       if (!seenDomains.has(r.domain)) {
         seenDomains.add(r.domain);
         merged.push(r);
       }
+    }
+  }
+
+  // Fallback 2: DuckDuckGo web search (free, no API key)
+  if (cseFailed || merged.length === 0) {
+    console.log('[DeaLo] CSE unavailable, using web search fallback for prices');
+    try {
+      const ddgPriceSearch = await fetchWebSearchFallback(`${name} buy price USD`);
+      const ddgResults = parseFallbackResults(ddgPriceSearch.results);
+      const seenDomains = new Set(merged.map((r) => r.domain));
+      for (const r of ddgResults) {
+        if (!seenDomains.has(r.domain)) {
+          seenDomains.add(r.domain);
+          merged.push(r);
+        }
+      }
+      console.log('[DeaLo] Fallback: added', ddgResults.length, 'results from web search');
+    } catch (err: any) {
+      console.warn('[DeaLo] Web search fallback error:', err?.message || err);
     }
   }
 
@@ -301,62 +500,63 @@ export async function searchProductPrices(
 export async function searchProductReviews(
   productName: string
 ): Promise<ReviewResult[]> {
-  if (!CSE_API_KEY || !CSE_ID || !productName.trim()) return [];
   const name = productName.trim();
   if (name.length < 3) return [];
 
+  // Try CSE first
+  if (CSE_API_KEY && CSE_ID) {
+    try {
+      const reviewQuery = `${name} review rating`;
+      console.log('[DeaLo] CSE reviews: searching for', reviewQuery);
+      const result = await fetchCSE(reviewQuery);
+      if (!result.failed && result.items.length > 0) {
+        const reviews: ReviewResult[] = [];
+        for (const item of result.items) {
+          let domain = '';
+          try { domain = new URL(item.link || '').hostname.replace('www.', ''); } catch { continue; }
+
+          const aggRating = item.pagemap?.aggregaterating?.[0]
+            || item.pagemap?.review?.[0];
+          const ratingVal = parseFloat(aggRating?.ratingvalue || aggRating?.rating || '0');
+          const maxVal = parseFloat(aggRating?.bestrating || '5') || 5;
+          const reviewCount = parseInt(aggRating?.reviewcount || aggRating?.ratingcount || '0', 10) || null;
+          const metaRating = parseFloat(item.pagemap?.metatags?.[0]?.['rating'] || '0');
+          const rating = ratingVal > 0 ? ratingVal : (metaRating > 0 ? metaRating : null);
+          const snippet = (item.snippet || '').trim();
+
+          if (rating || snippet.length > 20) {
+            reviews.push({
+              source: domainToStore(domain), domain, url: item.link || '',
+              rating: rating ? Math.min(rating, maxVal) : null,
+              maxRating: maxVal, reviewCount, snippet: snippet.slice(0, 200),
+            });
+          }
+        }
+
+        const byDomain = new Map<string, ReviewResult>();
+        for (const r of reviews) {
+          const existing = byDomain.get(r.domain);
+          if (!existing || (r.rating || 0) > (existing.rating || 0)) byDomain.set(r.domain, r);
+        }
+        if (byDomain.size > 0) {
+          console.log('[DeaLo] CSE reviews: found', byDomain.size);
+          return [...byDomain.values()].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        }
+      }
+    } catch (err: any) {
+      console.warn('[DeaLo] CSE review search error:', err?.message || err);
+    }
+  }
+
+  // Fallback: DuckDuckGo web search for reviews
+  console.log('[DeaLo] Using web search fallback for reviews');
   try {
-    const reviewQuery = `${name} review rating`;
-    console.log('[DeaLo] CSE reviews: searching for', reviewQuery);
-    const result = await fetchCSE(reviewQuery);
-    if (result.failed || result.items.length === 0) return [];
-
-    const reviews: ReviewResult[] = [];
-    for (const item of result.items) {
-      let domain = '';
-      try { domain = new URL(item.link || '').hostname.replace('www.', ''); } catch { continue; }
-
-      // Extract aggregate rating from pagemap
-      const aggRating = item.pagemap?.aggregaterating?.[0]
-        || item.pagemap?.review?.[0];
-      const ratingVal = parseFloat(aggRating?.ratingvalue || aggRating?.rating || '0');
-      const maxVal = parseFloat(aggRating?.bestrating || '5') || 5;
-      const reviewCount = parseInt(aggRating?.reviewcount || aggRating?.ratingcount || '0', 10) || null;
-
-      // Also try metatags
-      const metaRating = parseFloat(item.pagemap?.metatags?.[0]?.['rating'] || '0');
-
-      const rating = ratingVal > 0 ? ratingVal : (metaRating > 0 ? metaRating : null);
-
-      // Extract a review snippet
-      const snippet = (item.snippet || '').trim();
-
-      if (rating || snippet.length > 20) {
-        reviews.push({
-          source: domainToStore(domain),
-          domain,
-          url: item.link || '',
-          rating: rating ? Math.min(rating, maxVal) : null,
-          maxRating: maxVal,
-          reviewCount,
-          snippet: snippet.slice(0, 200),
-        });
-      }
-    }
-
-    // Deduplicate by domain, keep highest rated
-    const byDomain = new Map<string, ReviewResult>();
-    for (const r of reviews) {
-      const existing = byDomain.get(r.domain);
-      if (!existing || (r.rating || 0) > (existing.rating || 0)) {
-        byDomain.set(r.domain, r);
-      }
-    }
-
-    console.log('[DeaLo] CSE reviews: found', byDomain.size, 'reviews');
-    return [...byDomain.values()].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    const ddg = await fetchWebSearchFallback(`${name} review rating stars`);
+    const reviews = parseReviewsFromFallback(ddg.results);
+    console.log('[DeaLo] Fallback reviews: found', reviews.length);
+    return reviews;
   } catch (err: any) {
-    console.warn('[DeaLo] Review search error:', err?.message || err);
+    console.warn('[DeaLo] Fallback review search error:', err?.message || err);
     return [];
   }
 }

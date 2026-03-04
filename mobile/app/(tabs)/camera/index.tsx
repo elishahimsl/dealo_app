@@ -138,21 +138,6 @@ const GENERIC_BLOCKLIST = new Set([
   'hand', 'finger', 'person', 'people', 'man', 'woman', 'child', 'face',
 ]);
 
-const isGenericTerm = (s: string): boolean => {
-  const lower = s.toLowerCase().trim();
-  if (!lower || lower.length < 2) return true;
-  if (GENERIC_BLOCKLIST.has(lower)) return true;
-  // Single word under 4 chars is almost never a real product name
-  const words = lower.split(/\s+/);
-  if (words.length === 1 && lower.length <= 3) return true;
-  // Single lowercase word that's not in known brands — likely generic
-  if (words.length === 1 && !containsKnownBrand(lower) && lower.length <= 8) {
-    // Allow it only if it contains a digit (model numbers like "x5", "s24")
-    if (!/\d/.test(lower)) return true;
-  }
-  return false;
-};
-
 // Known major brands — if we see these in any signal, boost them
 const KNOWN_BRANDS = new Set([
   'jbl', 'sony', 'bose', 'apple', 'samsung', 'nike', 'adidas', 'beats', 'lg',
@@ -175,8 +160,39 @@ const containsKnownBrand = (s: string): boolean => {
   return false;
 };
 
+const isGenericTerm = (s: string): boolean => {
+  const lower = s.toLowerCase().trim();
+  if (!lower || lower.length < 2) return true;
+  if (GENERIC_BLOCKLIST.has(lower)) return true;
+  // ALWAYS allow known brands, regardless of length (JBL=3, LG=2, HP=2, DJI=3)
+  if (containsKnownBrand(lower)) return false;
+  // Single word checks — only apply to non-brand terms
+  const words = lower.split(/\s+/);
+  if (words.length === 1 && lower.length <= 3) return true;
+  if (words.length === 1 && lower.length <= 6 && !/\d/.test(lower)) return true;
+  return false;
+};
+
 const parseVisionResponse = (json: any): DetectedObject => {
   const first = json?.responses?.[0];
+
+  // Log raw response keys for debugging empty-candidate issues
+  const rawWebEntities = first?.webDetection?.webEntities ?? [];
+  const rawBestGuess = first?.webDetection?.bestGuessLabels ?? [];
+  const rawLogos = first?.logoAnnotations ?? [];
+  const rawLabels = first?.labelAnnotations ?? [];
+  const rawObjects = first?.localizedObjectAnnotations ?? [];
+  const rawPages = first?.webDetection?.pagesWithMatchingImages ?? [];
+  console.log('[DeaLo] Vision RAW:', {
+    webEntities: rawWebEntities.length,
+    bestGuess: rawBestGuess.map((l: any) => l?.label),
+    logos: rawLogos.map((l: any) => l?.description),
+    labels: rawLabels.slice(0, 5).map((l: any) => l?.description),
+    objects: rawObjects.map((o: any) => o?.name),
+    pages: rawPages.length,
+    hasError: !!first?.error,
+    errorMsg: first?.error?.message,
+  });
 
   // --- Collect ALL signals ---
   const bestGuessLabels: string[] = (first?.webDetection?.bestGuessLabels ?? [])
@@ -184,8 +200,8 @@ const parseVisionResponse = (json: any): DetectedObject => {
     .filter(Boolean);
 
   const webEntities: { desc: string; score: number }[] = (first?.webDetection?.webEntities ?? [])
-    .filter((e: any) => e?.description && (e?.score ?? 0) >= 0.1)
-    .map((e: any) => ({ desc: (e.description as string).trim(), score: e.score as number }));
+    .filter((e: any) => e?.description)
+    .map((e: any) => ({ desc: (e.description as string).trim(), score: (e.score as number) || 0.5 }));
 
   const logoAnnotations: string[] = (first?.logoAnnotations ?? [])
     .filter((l: any) => l?.description)
@@ -269,9 +285,33 @@ const parseVisionResponse = (json: any): DetectedObject => {
     }
   }
 
-  // 5. Text detection (lowest priority, only if nothing else works)
+  // 5. Text detection
   if (topText && !isGenericTerm(topText)) {
     candidates.push({ name: topText, score: 20, source: 'text' });
+  }
+
+  // 6. Object localization names (e.g. "Loudspeaker", "Headphones")
+  const objectNames: string[] = (first?.localizedObjectAnnotations ?? [])
+    .map((o: any) => (o?.name ?? '').trim())
+    .filter(Boolean);
+  for (const objName of objectNames) {
+    if (isGenericTerm(objName)) continue;
+    candidates.push({ name: objName, score: 15, source: 'objectLocalization' });
+    // Combine object name with logo for better identification
+    if (topLogo && !isGenericTerm(topLogo)) {
+      const combined = joinBrandModel(topLogo, objName);
+      if (combined && combined !== topLogo && combined !== objName) {
+        candidates.push({ name: combined, score: 65, source: 'logo+object' });
+      }
+    }
+  }
+
+  // 7. If still no candidates, use non-blocklisted label annotations as last resort
+  if (candidates.length === 0) {
+    for (const label of labelAnnotations) {
+      if (isGenericTerm(label)) continue;
+      candidates.push({ name: label, score: 10, source: 'label' });
+    }
   }
 
   // --- Pick the best candidate ---
@@ -365,6 +405,8 @@ export default function CameraScreen() {
   const [detectedObject, setDetectedObject] = useState<DetectedObject | null>(null);
   const [showHelp, setShowHelp] = useState(false);
   const [showARComingSoon, setShowARComingSoon] = useState(false);
+  const [detectionFailed, setDetectionFailed] = useState(false);
+  const isTakingPicture = useRef(false);
   const [scannedBarcode, setScannedBarcode] = useState<{ type: string; data: string } | null>(null);
   const [showBarcodeModal, setShowBarcodeModal] = useState(false);
   const [barcodeLookup, setBarcodeLookup] = useState<BarcodeLookupState>({ status: 'idle', name: '', imageUri: '' });
@@ -406,6 +448,8 @@ export default function CameraScreen() {
     setIsScanning(false);
     setCapturedUri(null);
     setCapturedBase64(null);
+    setDetectionFailed(false);
+    isTakingPicture.current = false;
   };
 
   const handleGalleryPress = async () => {
@@ -554,6 +598,16 @@ export default function CameraScreen() {
 
       setDetectedObject(detected);
 
+      // Check if detection actually found a product
+      const isUnknown = detected.name === 'Unknown Product' || detected.confidence < 0.15;
+
+      if (isUnknown) {
+        // Detection failed — show "not found" overlay instead of navigating
+        console.warn('[DeaLo] Detection failed, showing not-found overlay');
+        setDetectionFailed(true);
+        return;
+      }
+
       const targetPx = {
         left: detected.bounds.x * previewSize.width,
         top: detected.bounds.y * previewSize.height,
@@ -685,16 +739,22 @@ export default function CameraScreen() {
   }
 
   const takePicture = async () => {
-    if (!cameraRef.current) return;
+    if (!cameraRef.current || isTakingPicture.current) return;
+    isTakingPicture.current = true;
 
     try {
-      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.95, exif: false });
-      if (!photo?.uri) return;
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.85, exif: false });
+      if (!photo?.uri) {
+        isTakingPicture.current = false;
+        return;
+      }
       setCapturedUri(photo.uri);
       setCapturedBase64(photo.base64 ?? null);
+      setDetectionFailed(false);
       setIsScanning(true);
     } catch (err) {
       console.warn('Failed to take picture', err);
+      isTakingPicture.current = false;
     }
   };
 
@@ -717,42 +777,66 @@ export default function CameraScreen() {
             </View>
           </View>
 
-          <View style={styles.scanOverlay} pointerEvents="none">
-            <Animated.View
-              style={[
-                styles.scanBox,
-                {
-                  left: boxLeft,
-                  top: boxTop,
-                  width: boxWidth,
-                  height: boxHeight,
-                },
-              ]}
-            >
-              <View style={[styles.scanCorner, styles.scanCornerTL]} />
-              <View style={[styles.scanCorner, styles.scanCornerTR]} />
-              <View style={[styles.scanCorner, styles.scanCornerBL]} />
-              <View style={[styles.scanCorner, styles.scanCornerBR]} />
+          {!detectionFailed && (
+            <View style={styles.scanOverlay} pointerEvents="none">
+              <Animated.View
+                style={[
+                  styles.scanBox,
+                  {
+                    left: boxLeft,
+                    top: boxTop,
+                    width: boxWidth,
+                    height: boxHeight,
+                  },
+                ]}
+              >
+                <View style={[styles.scanCorner, styles.scanCornerTL]} />
+                <View style={[styles.scanCorner, styles.scanCornerTR]} />
+                <View style={[styles.scanCorner, styles.scanCornerBL]} />
+                <View style={[styles.scanCorner, styles.scanCornerBR]} />
 
-              <Animated.View
-                style={[
-                  styles.scanLineGlow,
-                  {
-                    transform: [{ translateY: scanLineY }, { scaleY: scanPulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] }) }],
-                    opacity: scanPulse.interpolate({ inputRange: [0, 1], outputRange: [0.38, 0.65] }),
-                  },
-                ]}
-              />
-              <Animated.View
-                style={[
-                  styles.scanLine,
-                  {
-                    transform: [{ translateY: scanLineY }],
-                  },
-                ]}
-              />
-            </Animated.View>
-          </View>
+                <Animated.View
+                  style={[
+                    styles.scanLineGlow,
+                    {
+                      transform: [{ translateY: scanLineY }, { scaleY: scanPulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] }) }],
+                      opacity: scanPulse.interpolate({ inputRange: [0, 1], outputRange: [0.38, 0.65] }),
+                    },
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.scanLine,
+                    {
+                      transform: [{ translateY: scanLineY }],
+                    },
+                  ]}
+                />
+              </Animated.View>
+            </View>
+          )}
+
+          {detectionFailed && (
+            <View style={styles.notFoundOverlay}>
+              <View style={styles.notFoundCard}>
+                <Ionicons name="search-outline" size={48} color="#9CA3AF" />
+                <Text style={styles.notFoundTitle}>Product Not Recognized</Text>
+                <Text style={styles.notFoundSubtitle}>
+                  We couldn't identify this product. Try the following:
+                </Text>
+                <View style={styles.notFoundTips}>
+                  <Text style={styles.notFoundTip}>- Make sure the product label or logo is visible</Text>
+                  <Text style={styles.notFoundTip}>- Get closer to the product</Text>
+                  <Text style={styles.notFoundTip}>- Ensure good lighting</Text>
+                  <Text style={styles.notFoundTip}>- Try a different angle</Text>
+                </View>
+                <TouchableOpacity style={styles.notFoundRetryBtn} onPress={resetToCamera} activeOpacity={0.9}>
+                  <Ionicons name="camera-outline" size={20} color="#FFFFFF" />
+                  <Text style={styles.notFoundRetryText}>Try Again</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
         </View>
       </SafeAreaView>
     );
@@ -1427,5 +1511,63 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 25,
+  },
+  notFoundOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  notFoundCard: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 24,
+    padding: 32,
+    alignItems: 'center',
+    width: '100%',
+    maxWidth: 360,
+  },
+  notFoundTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  notFoundSubtitle: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  notFoundTips: {
+    alignSelf: 'stretch',
+    marginBottom: 24,
+  },
+  notFoundTip: {
+    fontSize: 13,
+    color: '#D1D5DB',
+    lineHeight: 22,
+    paddingLeft: 4,
+  },
+  notFoundRetryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: BRAND_GREEN,
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 28,
+    gap: 8,
+  },
+  notFoundRetryText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

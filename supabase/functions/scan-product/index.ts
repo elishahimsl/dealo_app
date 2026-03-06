@@ -1,21 +1,23 @@
 /**
  * scan-product — DeaLo Edge Function
  *
+ * Main backend entry point for the camera scan flow.
+ *
  * Accepts a base64-encoded product image, runs multi-signal detection
  * via Google Vision, builds smart search queries, calls search-offers
- * for structured price data, reranks candidates, and returns the best
- * match with offers.
+ * for structured price data, reranks candidates with weighted scoring,
+ * applies a confidence gate (AUTO vs PICK), and optionally runs Gemini
+ * for AI product analysis.
  *
- * This is the main backend entry point for the camera scan flow.
- * The mobile app sends the photo here instead of calling Vision/SerpApi
- * directly — no paid API keys on the client.
+ * The mobile app sends the photo here — no paid API keys on the client.
  *
  * Secrets required (set via `supabase secrets set`):
- *   GOOGLE_VISION_KEY — Google Cloud API key with Vision API enabled
- *   SERPAPI_KEY        — serpapi.com API key (used by search-offers)
+ *   GOOGLE_VISION_KEY  — Google Cloud API key with Vision API enabled
+ *   SERPAPI_KEY         — serpapi.com API key (used by search-offers)
+ *   GEMINI_API_KEY      — (optional) Google AI Studio or Vertex AI key
  *
  * POST /scan-product
- * Body: { "image": "<base64 string>" }
+ * Body: { "imageBase64": "<base64 string>" }
  * Response: ScanProductResponse (see _shared/types.ts)
  */
 
@@ -23,7 +25,15 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { jsonResponse, preflightResponse } from '../_shared/cors.ts'
 import { callVisionApi, extractVisionSignals } from '../_shared/vision.ts'
 import { buildQueries, rankCandidateTitles } from '../_shared/query-builder.ts'
-import type { Offer, ScanProductResponse } from '../_shared/types.ts'
+import type { RankedTitle } from '../_shared/query-builder.ts'
+import { analyzeProduct } from '../_shared/gemini.ts'
+import type {
+  Offer,
+  ScoredCandidate,
+  ScoreBreakdown,
+  ScanProductResponse,
+  VisionSignals,
+} from '../_shared/types.ts'
 
 // ─── Internal: call search-offers ────────────────────────────────────
 
@@ -78,76 +88,110 @@ async function callSearchOffers(
 
 // ─── Confidence gate ─────────────────────────────────────────────────
 
-interface ConfidenceResult {
+/**
+ * Confidence thresholds:
+ *
+ * AUTO — high confidence, we can show the best match directly
+ *   top score ≥ 75 AND gap to #2 ≥ 8
+ *
+ * PICK — low/medium confidence, show top candidates for user to choose
+ *   top score < 75 OR gap to #2 < 8
+ *
+ * This is intentionally conservative: accuracy > false certainty.
+ */
+const AUTO_SCORE_THRESHOLD = 75
+const AUTO_GAP_THRESHOLD = 8
+
+interface GateResult {
+  decision: 'AUTO' | 'PICK'
   bestTitle: string | null
   bestImage: string | null
   confidence: number
-  offers: Offer[]
-  alternatives: string[]
+  candidates: ScoredCandidate[]
+  scoreBreakdowns: ScoreBreakdown[]
+}
+
+function cleanTitle(title: string): string {
+  return title
+    .replace(/\s*[-,]\s*(Black|White|Blue|Red|Green|Pink|Gray|Grey|Silver|Gold|Purple|Orange|Yellow)\b.*$/i, '')
+    .replace(/\s*\(.*?\)/g, '')
+    .trim()
 }
 
 /**
- * Given offers from one or more queries, rank them against vision signals
- * and determine confidence level.
- *
- * High confidence  → top score ≥ 75 and gap to #2 ≥ 8
- * Medium           → top score ≥ 60
- * Low              → below 60, return alternatives for user to pick
+ * Rank offers against vision signals and apply the confidence gate.
  */
 function evaluateConfidence(
   allOffers: Offer[],
-  // deno-lint-ignore no-explicit-any
-  signals: any,
-): ConfidenceResult {
-  if (allOffers.length === 0) {
-    return { bestTitle: null, bestImage: null, confidence: 0, offers: [], alternatives: [] }
+  signals: VisionSignals,
+): GateResult {
+  const empty: GateResult = {
+    decision: 'PICK',
+    bestTitle: null,
+    bestImage: null,
+    confidence: 0,
+    candidates: [],
+    scoreBreakdowns: [],
   }
+
+  if (allOffers.length === 0) return empty
 
   // Rank candidate titles against vision signals
   const titles = allOffers.map((o) => o.title)
-  const ranked = rankCandidateTitles(titles, signals)
+  const ranked: RankedTitle[] = rankCandidateTitles(titles, signals)
 
-  if (ranked.length === 0) {
-    return { bestTitle: null, bestImage: null, confidence: 0, offers: allOffers, alternatives: [] }
-  }
+  if (ranked.length === 0) return { ...empty, candidates: [] }
 
   const top = ranked[0]
   const gap = ranked.length > 1 ? top.score - ranked[1].score : 100
 
+  // Determine confidence and decision
   let confidence: number
-  if (top.score >= 75 && gap >= 8) {
+  let decision: 'AUTO' | 'PICK'
+
+  if (top.score >= AUTO_SCORE_THRESHOLD && gap >= AUTO_GAP_THRESHOLD) {
     confidence = Math.min(0.98, top.score / 100)
+    decision = 'AUTO'
   } else if (top.score >= 60) {
     confidence = Math.min(0.85, top.score / 100)
+    decision = 'PICK' // medium confidence — let user confirm
   } else {
     confidence = Math.min(0.6, top.score / 100)
+    decision = 'PICK' // low confidence — user must pick
   }
 
-  // Clean the best title: strip color suffixes for the canonical name
-  const bestTitle = top.title
-    .replace(/\s*[-,]\s*(Black|White|Blue|Red|Green|Pink|Gray|Grey|Silver|Gold|Purple|Orange|Yellow)\b.*$/i, '')
-    .replace(/\s*\(.*?\)/g, '')
-    .trim()
-
+  const bestTitle = cleanTitle(top.title)
   const bestOffer = allOffers[top.index]
   const bestImage = bestOffer?.image ?? null
 
-  // Collect unique alternative names (top 5 excluding the best)
-  const altSet = new Set<string>()
-  for (const r of ranked.slice(1, 8)) {
-    const clean = r.title
-      .replace(/\s*[-,]\s*(Black|White|Blue|Red|Green|Pink|Gray|Grey|Silver|Gold|Purple|Orange|Yellow)\b.*$/i, '')
-      .replace(/\s*\(.*?\)/g, '')
-      .trim()
-    if (clean && clean !== bestTitle) altSet.add(clean)
+  // Build candidates list (unique titles, top 8)
+  const seenTitles = new Set<string>()
+  const candidates: ScoredCandidate[] = []
+  for (const r of ranked.slice(0, 15)) {
+    const clean = cleanTitle(r.title)
+    if (seenTitles.has(clean)) continue
+    seenTitles.add(clean)
+    const offer = allOffers[r.index]
+    candidates.push({
+      title: clean,
+      image: offer?.image ?? null,
+      price: offer?.price ?? null,
+      merchant: offer?.merchant ?? null,
+      confidence: Math.min(0.98, r.score / 100),
+    })
+    if (candidates.length >= 8) break
   }
 
+  // Collect all score breakdowns for debug
+  const scoreBreakdowns = ranked.slice(0, 20).map((r) => r.breakdown)
+
   return {
+    decision,
     bestTitle,
     bestImage,
     confidence,
-    offers: allOffers,
-    alternatives: [...altSet].slice(0, 5),
+    candidates,
+    scoreBreakdowns,
   }
 }
 
@@ -171,13 +215,18 @@ serve(async (req: Request) => {
       return jsonResponse({ error: 'Invalid JSON body.' }, 400)
     }
 
-    const base64Image = typeof body.image === 'string' ? body.image.trim() : ''
+    const base64Image = typeof body.imageBase64 === 'string' ? body.imageBase64.trim() : ''
     if (!base64Image) {
       return jsonResponse(
-        { error: 'Missing required field: "image" (base64 string).' },
+        { error: 'Missing required field: "imageBase64" (base64 string).' },
         400,
       )
     }
+
+    // NOTE: Image preprocessing (resize/compress) should happen on the
+    // mobile client before sending. Supabase Edge Functions have a 2MB
+    // body limit so large images should be resized client-side.
+    // A future improvement could add a resize step here using sharp/wasm.
 
     // ── Read secrets ──────────────────────────────────────────────
     const visionKey = Deno.env.get('GOOGLE_VISION_KEY')
@@ -211,17 +260,19 @@ serve(async (req: Request) => {
 
     if (queries.length === 0) {
       const response: ScanProductResponse = {
+        decision: 'PICK',
         bestMatch: null,
         offers: [],
-        alternatives: [],
+        candidates: [],
         queriesUsed: [],
+        analysis: null,
       }
       return jsonResponse(response)
     }
 
     // ── Step 3: Search with progressive queries ──────────────────
-    // Try the best query first. If we get enough high-scoring results,
-    // stop early to save API credits. Otherwise try the next query.
+    // Try the best query first. If we get high confidence early, stop
+    // to save API credits. Otherwise try the next query for more data.
     const allOffers: Offer[] = []
     const seenUrls = new Set<string>()
     const queriesUsed: string[] = []
@@ -240,11 +291,11 @@ serve(async (req: Request) => {
         }
       }
 
-      // Early stop: if we already have 15+ offers, evaluate confidence
+      // Early stop: if we have 15+ offers with high confidence, done
       if (allOffers.length >= 15) {
         const check = evaluateConfidence(allOffers, signals)
-        if (check.confidence >= 0.75) {
-          console.log(`[scan-product] high confidence after ${queriesUsed.length} queries, stopping early`)
+        if (check.decision === 'AUTO') {
+          console.log(`[scan-product] AUTO confidence after ${queriesUsed.length} queries, stopping early`)
           break
         }
       }
@@ -256,26 +307,52 @@ serve(async (req: Request) => {
     console.log(`[scan-product] total offers: ${allOffers.length} from ${queriesUsed.length} queries`)
 
     // ── Step 4: Final ranking + confidence gate ──────────────────
-    const result = evaluateConfidence(allOffers, signals)
+    const gate = evaluateConfidence(allOffers, signals)
 
+    console.log(`[scan-product] decision: ${gate.decision} | best: "${gate.bestTitle}" | confidence: ${gate.confidence}`)
+
+    // ── Step 5: Optional Gemini analysis (non-blocking if key missing) ─
+    // Only run analysis for AUTO decisions where we're confident in the match.
+    // For PICK mode, wait until the user confirms a choice.
+    let analysis = null
+    if (gate.decision === 'AUTO' && gate.bestTitle) {
+      // Run Gemini in parallel — if it fails or times out, we still return
+      analysis = await analyzeProduct(gate.bestTitle)
+    }
+
+    // ── Build response ───────────────────────────────────────────
     const response: ScanProductResponse = {
-      bestMatch: result.bestTitle
+      decision: gate.decision,
+      bestMatch: gate.bestTitle
         ? {
-            title: result.bestTitle,
-            image: result.bestImage,
-            confidence: result.confidence,
+            title: gate.bestTitle,
+            image: gate.bestImage,
+            confidence: gate.confidence,
           }
         : null,
-      offers: result.offers,
-      alternatives: result.alternatives,
+      offers: allOffers,
+      candidates: gate.candidates,
       queriesUsed,
+      analysis,
+      _debug: {
+        signals: {
+          ocrTokenCount: signals.ocrTokens.length,
+          webEntityCount: signals.webEntities.length,
+          logos: signals.logos,
+          bestGuessLabels: signals.bestGuessLabels,
+          pageTitleCount: signals.pageTitles.length,
+        },
+        scoreBreakdown: gate.scoreBreakdowns,
+      },
     }
 
     console.log('[scan-product] done:', {
+      decision: response.decision,
       bestMatch: response.bestMatch?.title,
       confidence: response.bestMatch?.confidence,
       offerCount: response.offers.length,
-      alternatives: response.alternatives.length,
+      candidateCount: response.candidates.length,
+      hasAnalysis: response.analysis !== null,
     })
 
     return jsonResponse(response)

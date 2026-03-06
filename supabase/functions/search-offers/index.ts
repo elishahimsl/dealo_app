@@ -18,7 +18,14 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { jsonResponse, preflightResponse } from '../_shared/cors.ts'
-import { parsePrice, parseCurrency } from '../_shared/parse-price.ts'
+import {
+  parsePrice,
+  parseCurrency,
+  parseRating,
+  parseReviewCount,
+  safeString,
+  safeUrl,
+} from '../_shared/parse-price.ts'
 import type { Offer, SearchOffersResponse } from '../_shared/types.ts'
 
 // ─── Provider: SerpApi ───────────────────────────────────────────────
@@ -71,34 +78,88 @@ async function fetchSerpApiShopping(
 
 /**
  * Normalize raw SerpApi shopping_results into our internal Offer shape.
+ *
+ * Defensive rules:
+ * - Never assume any field exists on a result item
+ * - Skip items that are null, undefined, or not objects
+ * - Skip items with no usable title (the one required field)
+ * - Every optional field falls back to null, never throws
+ * - Log skipped items count for debugging
  */
 function normalizeSerpApiOffers(raw: Record<string, unknown>): Offer[] {
+  // SerpApi returns shopping_results as the main array.
+  // If it's missing or not an array, return empty — this is valid
+  // (e.g. a query with no shopping results).
   // deno-lint-ignore no-explicit-any
-  const items = (raw as any).shopping_results as any[] | undefined
-  if (!Array.isArray(items)) return []
+  const items = (raw as any)?.shopping_results
+  if (!Array.isArray(items)) {
+    console.log('[search-offers] no shopping_results array in response')
+    return []
+  }
 
-  return items.map((item): Offer => {
-    const extractedPrice = parsePrice(item.extracted_price ?? item.price)
-    const currency = parseCurrency(item.currency ?? item.price)
+  const offers: Offer[] = []
+  let skipped = 0
 
-    return {
-      merchant: typeof item.source === 'string' ? item.source : null,
-      title: typeof item.title === 'string' ? item.title : 'Unknown',
-      price: extractedPrice,
-      currency,
-      url: typeof item.link === 'string' ? item.link : null,
-      image: typeof item.thumbnail === 'string' ? item.thumbnail : null,
-      rating:
-        typeof item.rating === 'number' && isFinite(item.rating)
-          ? item.rating
-          : null,
-      reviewCount:
-        typeof item.reviews === 'number' && isFinite(item.reviews)
-          ? item.reviews
-          : null,
-      source: 'serpapi',
+  for (let i = 0; i < items.length; i++) {
+    try {
+      const item = items[i]
+
+      // Skip null/undefined/non-object entries
+      if (item == null || typeof item !== 'object') {
+        skipped++
+        continue
+      }
+
+      // Title is the only required field — skip if missing
+      const title = safeString(item.title)
+      if (!title) {
+        skipped++
+        continue
+      }
+
+      // Price: prefer extracted_price (numeric), fall back to price (string)
+      const price = parsePrice(item.extracted_price) ?? parsePrice(item.price)
+
+      // Currency: prefer explicit currency field, infer from price string, default USD
+      const currency = parseCurrency(item.currency) !== 'USD'
+        ? parseCurrency(item.currency)
+        : parseCurrency(item.price)
+
+      // Merchant: SerpApi uses "source" for merchant name
+      const merchant = safeString(item.source)
+
+      // URL: SerpApi uses "link" for the product page, sometimes "product_link"
+      const url = safeUrl(item.link) ?? safeUrl(item.product_link)
+
+      // Image: SerpApi uses "thumbnail", sometimes "image"
+      const image = safeUrl(item.thumbnail) ?? safeUrl(item.image)
+
+      // Rating & review count: may be number or string
+      const rating = parseRating(item.rating)
+      const reviewCount = parseReviewCount(item.reviews)
+
+      offers.push({
+        merchant,
+        title,
+        price,
+        currency,
+        url,
+        image,
+        rating,
+        reviewCount,
+        source: 'serpapi',
+      })
+    } catch {
+      // If any single item throws unexpectedly, skip it — don't fail the batch
+      skipped++
     }
-  })
+  }
+
+  if (skipped > 0) {
+    console.log(`[search-offers] skipped ${skipped} malformed items out of ${items.length}`)
+  }
+
+  return offers
 }
 
 // ─── Main handler ────────────────────────────────────────────────────

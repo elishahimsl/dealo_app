@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { extractVisionSignals, VisionSignals } from '../../../lib/services/scan-pipeline';
+import { setCachedImageBase64 } from '../../../lib/services/scan-image-cache';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -20,7 +20,6 @@ type DetectedObject = {
   priceRange: string;
   alternatives: string[];
   webPages: { url: string; title: string }[];
-  visionSignals: VisionSignals | null;
 };
 
 type BarcodeLookupState = {
@@ -39,422 +38,32 @@ const normalizeBox = (b: NormalizedBox): NormalizedBox => ({
   height: clamp01(b.height),
 });
 
-type VisionVertex = { x?: number; y?: number };
-type VisionNormalizedVertex = { x?: number; y?: number };
-
-const pickFirstString = (candidates: Array<string | undefined | null>) => {
-  for (const c of candidates) {
-    const v = (c ?? '').trim();
-    if (v) return v;
-  }
-  return '';
-};
-
-const joinBrandModel = (brand: string, model: string) => {
-  const b = brand.trim();
-  const m = model.trim();
-  if (!b && !m) return '';
-  if (!b) return m;
-  if (!m) return b;
-  if (m.toLowerCase().startsWith(b.toLowerCase())) return m;
-  return `${b} ${m}`;
-};
-
-const pickTopTextLine = (text: unknown) => {
-  if (typeof text !== 'string') return '';
-  const lines = text
-    .split(/\r?\n/g)
-    .map((l) => l.trim())
-    .filter(Boolean);
-  // Prefer short-ish lines that look like a product/brand, not paragraphs
-  const candidate = lines.find((l) => l.length >= 3 && l.length <= 40) ?? lines[0] ?? '';
-  return candidate;
-};
-
 const DEFAULT_BOUNDS: NormalizedBox = { x: 0.12, y: 0.15, width: 0.76, height: 0.70 };
 
-const callVisionAPI = async (base64: string, apiKey: string): Promise<any> => {
-  const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`;
-  const body = {
-    requests: [
-      {
-        image: { content: base64 },
-        features: [
-          { type: 'WEB_DETECTION', maxResults: 20 },
-          { type: 'LOGO_DETECTION', maxResults: 10 },
-          { type: 'TEXT_DETECTION', maxResults: 5 },
-          { type: 'OBJECT_LOCALIZATION', maxResults: 10 },
-          { type: 'LABEL_DETECTION', maxResults: 12 },
-        ],
-      },
-    ],
-  };
+/**
+ * Prepare a captured image for scanning.
+ *
+ * All product detection (Vision API, query building, SerpApi search,
+ * reranking, Gemini analysis) now happens server-side in the
+ * scan-product edge function. The camera just caches the base64
+ * and shows a scan animation with default bounds.
+ */
+const prepareForScan = (base64: string): DetectedObject => {
+  // Cache the base64 so the results screen can send it to the edge function
+  setCachedImageBase64(base64);
+  console.log('[DeaLo] Cached image for edge scan, size:', base64.length);
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
-
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: controller.signal as any,
-  });
-  clearTimeout(timeout);
-
-  if (!res.ok) {
-    const errBody = await res.text().catch(() => '');
-    throw new Error(`Vision API ${res.status}: ${errBody.slice(0, 200)}`);
-  }
-  return res.json();
-};
-
-// Terms that are NOT product names — filter these out aggressively
-const GENERIC_BLOCKLIST = new Set([
-  'product', 'signage', 'sign', 'electronics', 'technology', 'gadget', 'device',
-  'brand', 'design', 'font', 'text', 'logo', 'label', 'packaging', 'advertising',
-  'graphic design', 'banner', 'poster', 'display', 'photograph', 'image', 'picture',
-  'computer', 'mobile phone', 'smartphone', 'tablet', 'laptop', 'camera', 'monitor',
-  'hardware', 'software', 'accessory', 'equipment', 'tool', 'material', 'object',
-  'item', 'thing', 'stuff', 'goods', 'merchandise', 'commodity', 'article',
-  'plastic', 'metal', 'rubber', 'fabric', 'textile', 'glass', 'wood', 'paper',
-  'rectangle', 'circle', 'square', 'shape', 'pattern', 'color', 'colour',
-  'indoor', 'outdoor', 'room', 'table', 'desk', 'shelf', 'floor', 'wall',
-  'close-up', 'macro', 'still life', 'automotive', 'vehicle',
-  'electric blue', 'audio equipment', 'electronic device', 'multimedia',
-  'communication device', 'personal computer', 'output device',
-  // Colors — never a product name
-  'tan', 'black', 'white', 'red', 'blue', 'green', 'yellow', 'orange', 'purple',
-  'pink', 'brown', 'grey', 'gray', 'silver', 'gold', 'teal', 'navy', 'beige',
-  'ivory', 'maroon', 'magenta', 'cyan', 'turquoise', 'coral', 'crimson',
-  // Common nouns / measurement words
-  'meter', 'metre', 'wire', 'cable', 'cord', 'charger', 'adapter', 'plug',
-  'box', 'bag', 'case', 'cover', 'holder', 'stand', 'mount', 'bracket',
-  'button', 'switch', 'knob', 'dial', 'handle', 'grip', 'strap', 'band',
-  'light', 'lamp', 'bulb', 'led', 'screen', 'panel', 'board', 'surface',
-  'top', 'bottom', 'side', 'front', 'back', 'left', 'right', 'center',
-  'small', 'large', 'medium', 'big', 'tiny', 'mini', 'compact', 'portable',
-  'new', 'old', 'modern', 'vintage', 'classic', 'original', 'premium',
-  'photo', 'video', 'audio', 'sound', 'music', 'noise', 'speaker',
-  'power', 'energy', 'electric', 'battery', 'charge', 'usb', 'bluetooth',
-  'home', 'office', 'kitchen', 'bathroom', 'bedroom', 'garage', 'garden',
-  'hand', 'finger', 'person', 'people', 'man', 'woman', 'child', 'face',
-]);
-
-// Known major brands — if we see these in any signal, boost them
-const KNOWN_BRANDS = new Set([
-  'jbl', 'sony', 'bose', 'apple', 'samsung', 'nike', 'adidas', 'beats', 'lg',
-  'google', 'microsoft', 'dell', 'hp', 'lenovo', 'asus', 'acer', 'razer',
-  'logitech', 'anker', 'skullcandy', 'sennheiser', 'harman', 'marshall',
-  'bang & olufsen', 'b&o', 'ultimate ears', 'ue', 'jabra', 'audio-technica',
-  'shure', 'beyerdynamic', 'plantronics', 'corsair', 'steelseries', 'hyperx',
-  'nintendo', 'playstation', 'xbox', 'gopro', 'dji', 'canon', 'nikon', 'fujifilm',
-  'dyson', 'kitchenaid', 'instant pot', 'ninja', 'breville', 'cuisinart',
-  'north face', 'patagonia', 'under armour', 'new balance', 'puma', 'reebok',
-  'columbia', 'lululemon', 'ray-ban', 'oakley', 'yeti', 'hydro flask',
-  'crocs', 'birkenstock', 'vans', 'converse', 'dr. martens',
-]);
-
-const containsKnownBrand = (s: string): boolean => {
-  const lower = s.toLowerCase();
-  for (const brand of KNOWN_BRANDS) {
-    if (lower.includes(brand)) return true;
-  }
-  return false;
-};
-
-const isGenericTerm = (s: string): boolean => {
-  const lower = s.toLowerCase().trim();
-  if (!lower || lower.length < 2) return true;
-  if (GENERIC_BLOCKLIST.has(lower)) return true;
-  // ALWAYS allow known brands, regardless of length (JBL=3, LG=2, HP=2, DJI=3)
-  if (containsKnownBrand(lower)) return false;
-  // Single word checks — only apply to non-brand terms
-  const words = lower.split(/\s+/);
-  if (words.length === 1 && lower.length <= 3) return true;
-  if (words.length === 1 && lower.length <= 6 && !/\d/.test(lower)) return true;
-  return false;
-};
-
-const parseVisionResponse = (json: any): DetectedObject => {
-  const first = json?.responses?.[0];
-
-  // Log raw response keys for debugging empty-candidate issues
-  const rawWebEntities = first?.webDetection?.webEntities ?? [];
-  const rawBestGuess = first?.webDetection?.bestGuessLabels ?? [];
-  const rawLogos = first?.logoAnnotations ?? [];
-  const rawLabels = first?.labelAnnotations ?? [];
-  const rawObjects = first?.localizedObjectAnnotations ?? [];
-  const rawPages = first?.webDetection?.pagesWithMatchingImages ?? [];
-  console.log('[DeaLo] Vision RAW:', {
-    webEntities: rawWebEntities.length,
-    bestGuess: rawBestGuess.map((l: any) => l?.label),
-    logos: rawLogos.map((l: any) => l?.description),
-    labels: rawLabels.slice(0, 5).map((l: any) => l?.description),
-    objects: rawObjects.map((o: any) => o?.name),
-    pages: rawPages.length,
-    hasError: !!first?.error,
-    errorMsg: first?.error?.message,
-  });
-
-  // --- Collect ALL signals ---
-  const bestGuessLabels: string[] = (first?.webDetection?.bestGuessLabels ?? [])
-    .map((l: any) => (l?.label ?? '').trim())
-    .filter(Boolean);
-
-  const webEntities: { desc: string; score: number }[] = (first?.webDetection?.webEntities ?? [])
-    .filter((e: any) => e?.description)
-    .map((e: any) => ({ desc: (e.description as string).trim(), score: (e.score as number) || 0.5 }));
-
-  const logoAnnotations: string[] = (first?.logoAnnotations ?? [])
-    .filter((l: any) => l?.description)
-    .map((l: any) => (l.description as string).trim());
-
-  const topText = pickTopTextLine(first?.fullTextAnnotation?.text);
-
-  const labelAnnotations: string[] = (first?.labelAnnotations ?? [])
-    .map((l: any) => (l?.description ?? '').trim())
-    .filter(Boolean);
-
-  // Extract product names from pages with matching images
-  const pagesWithMatchingImages: string[] = (first?.webDetection?.pagesWithMatchingImages ?? [])
-    .map((p: any) => (p?.pageTitle ?? '').trim())
-    .filter((t: string) => t.length > 3 && t.length < 120);
-
-  // Extract names from visually similar image page titles
-  const visuallySimilarTitles: string[] = (first?.webDetection?.visuallySimilarImages ?? [])
-    .map((p: any) => (p?.url ?? ''))
-    .filter(Boolean);
-
-  // --- Helper: clean a page title into a potential product name ---
-  const cleanPageTitle = (raw: string): string => {
-    return raw
-      .replace(/<[^>]*>/g, '')                         // Remove HTML tags
-      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')           // Remove trailing " - Store Name"
-      .replace(/\s*[-|–—]\s*[^-|–—]*$/g, '')           // Second pass for double separators
-      .replace(/^Buy\s+/i, '')                          // Remove "Buy " prefix
-      .replace(/^Shop\s+/i, '')                         // Remove "Shop " prefix
-      .replace(/\s*\(.*?\)\s*/g, ' ')                   // Remove parentheticals
-      .replace(/,\s*\d+\s*pack\b/i, '')                 // Remove ", 2 pack" etc
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
-
-  // --- Helper: score a candidate based on specificity ---
-  const specificityScore = (name: string): number => {
-    const words = name.split(/\s+/);
-    let score = 0;
-    // Multi-word is more specific
-    if (words.length >= 2) score += 30;
-    if (words.length >= 3) score += 20;
-    if (words.length >= 4) score += 10;
-    // Contains a known brand
-    if (containsKnownBrand(name)) score += 40;
-    // Contains a number (model numbers like "Clip 5", "S24", "AirPods Pro 2")
-    if (/\d/.test(name)) score += 25;
-    // Contains known model patterns (Pro, Max, Plus, Ultra, Mini, Gen, Series)
-    if (/\b(pro|max|plus|ultra|mini|gen|series|edition|lite|air)\b/i.test(name)) score += 15;
-    // Penalty for very long names (likely full page titles, not product names)
-    if (words.length > 8) score -= 20;
-    if (words.length > 12) score -= 30;
-    return score;
-  };
-
-  // --- Build candidate product names, scored ---
-  const candidates: { name: string; score: number; source: string }[] = [];
-
-  // 1. Best guess labels — often the most accurate single signal
-  for (const label of bestGuessLabels) {
-    if (isGenericTerm(label)) continue;
-    candidates.push({ name: label, score: 80 + specificityScore(label), source: 'bestGuess' });
-  }
-
-  // 2. Web entities (Google's knowledge graph)
-  for (const we of webEntities) {
-    if (isGenericTerm(we.desc)) continue;
-    candidates.push({ name: we.desc, score: we.score * 80 + specificityScore(we.desc), source: 'webEntity' });
-  }
-
-  // 3. Page titles — use consensus: find the most common product name across retailer pages
-  const cleanedTitles: string[] = [];
-  for (const title of pagesWithMatchingImages) {
-    const cleaned = cleanPageTitle(title);
-    if (cleaned.length >= 3 && cleaned.length <= 80 && !isGenericTerm(cleaned)) {
-      cleanedTitles.push(cleaned);
-    }
-  }
-
-  // Find common substrings across page titles (consensus = exact model name)
-  if (cleanedTitles.length >= 2) {
-    const wordFreq = new Map<string, number>();
-    for (const title of cleanedTitles) {
-      const words = title.split(/\s+/);
-      // Generate all 2-5 word phrases
-      for (let len = 2; len <= Math.min(5, words.length); len++) {
-        for (let start = 0; start <= words.length - len; start++) {
-          const phrase = words.slice(start, start + len).join(' ');
-          if (!isGenericTerm(phrase)) {
-            wordFreq.set(phrase, (wordFreq.get(phrase) || 0) + 1);
-          }
-        }
-      }
-    }
-    // Phrases appearing in multiple titles are likely the actual product name
-    const sortedPhrases = [...wordFreq.entries()]
-      .filter(([, count]) => count >= 2)
-      .sort((a, b) => {
-        // Sort by: count * specificity
-        const scoreA = a[1] * 10 + specificityScore(a[0]);
-        const scoreB = b[1] * 10 + specificityScore(b[0]);
-        return scoreB - scoreA;
-      });
-
-    for (const [phrase, count] of sortedPhrases.slice(0, 5)) {
-      const consensusBoost = count * 15;
-      candidates.push({ name: phrase, score: 90 + consensusBoost + specificityScore(phrase), source: `consensus(${count})` });
-    }
-  }
-
-  // Also add individual cleaned page titles
-  for (const cleaned of cleanedTitles) {
-    candidates.push({ name: cleaned, score: 50 + specificityScore(cleaned), source: 'pageTitle' });
-  }
-
-  // 4. Logo + text/OCR combination
-  const topLogo = logoAnnotations[0] ?? '';
-  if (topLogo) {
-    // Logo alone (brand only, low priority)
-    if (!isGenericTerm(topLogo)) {
-      candidates.push({ name: topLogo, score: 30 + specificityScore(topLogo), source: 'logo' });
-    }
-
-    // Extract ALL text lines for model number detection
-    const allTextLines = (first?.fullTextAnnotation?.text ?? '').split(/\r?\n/).map((l: string) => l.trim()).filter(Boolean);
-    const modelPattern = /^[A-Za-z0-9][A-Za-z0-9 .\-/]{1,30}$/;
-    for (const line of allTextLines) {
-      if (line.length < 2 || line.length > 35) continue;
-      if (!modelPattern.test(line)) continue;
-      if (isGenericTerm(line) && !containsKnownBrand(line)) continue;
-      const combined = joinBrandModel(topLogo, line);
-      if (combined && combined !== topLogo && combined.split(/\s+/).length >= 2) {
-        candidates.push({ name: combined, score: 85 + specificityScore(combined), source: 'logo+ocr' });
-      }
-    }
-
-    // Combine logo with best guess labels
-    for (const label of bestGuessLabels) {
-      if (isGenericTerm(label)) continue;
-      const combined = joinBrandModel(topLogo, label);
-      if (combined && combined !== topLogo && combined !== label) {
-        candidates.push({ name: combined, score: 75 + specificityScore(combined), source: 'logo+bestGuess' });
-      }
-    }
-  }
-
-  // 5. Text detection standalone (low priority)
-  if (topText && !isGenericTerm(topText)) {
-    candidates.push({ name: topText, score: 20 + specificityScore(topText), source: 'text' });
-  }
-
-  // 6. Object localization + logo
-  const objectNames: string[] = (first?.localizedObjectAnnotations ?? [])
-    .map((o: any) => (o?.name ?? '').trim())
-    .filter(Boolean);
-  for (const objName of objectNames) {
-    if (isGenericTerm(objName)) continue;
-    if (topLogo && !isGenericTerm(topLogo)) {
-      const combined = joinBrandModel(topLogo, objName);
-      if (combined && combined !== topLogo && combined !== objName) {
-        candidates.push({ name: combined, score: 60 + specificityScore(combined), source: 'logo+object' });
-      }
-    }
-  }
-
-  // 7. Label annotations as last resort
-  if (candidates.length === 0) {
-    for (const label of labelAnnotations) {
-      if (isGenericTerm(label)) continue;
-      candidates.push({ name: label, score: 10 + specificityScore(label), source: 'label' });
-    }
-  }
-
-  // --- Pick the best candidate ---
-  candidates.sort((a, b) => b.score - a.score);
-
-  // Log all candidates for debugging
-  console.log('[DeaLo] Vision candidates:', candidates.slice(0, 8).map((c) => `${c.name} (${c.score.toFixed(0)}, ${c.source})`));
-
-  const bestCandidate = candidates[0];
-  const bestName = bestCandidate?.name || 'Unknown Product';
-
-  // --- Category: use label annotations but skip generic ones ---
-  const categoryLabel = labelAnnotations.find((l) => !isGenericTerm(l)) || labelAnnotations[0] || 'General';
-
-  // --- Bounding box from object localization ---
-  const obj = first?.localizedObjectAnnotations?.[0];
-  const confidence =
-    bestCandidate?.score
-      ? clamp01(Math.min(1, bestCandidate.score / 100))
-      : typeof obj?.score === 'number'
-        ? obj.score
-        : 0.7;
-
-  const verts: VisionNormalizedVertex[] = obj?.boundingPoly?.normalizedVertices ?? [];
-  const xs = verts.map((v: VisionVertex) => (typeof v.x === 'number' ? v.x : 0));
-  const ys = verts.map((v: VisionVertex) => (typeof v.y === 'number' ? v.y : 0));
-  const minX = xs.length ? Math.min(...xs) : DEFAULT_BOUNDS.x;
-  const minY = ys.length ? Math.min(...ys) : DEFAULT_BOUNDS.y;
-  const maxX = xs.length ? Math.max(...xs) : DEFAULT_BOUNDS.x + DEFAULT_BOUNDS.width;
-  const maxY = ys.length ? Math.max(...ys) : DEFAULT_BOUNDS.y + DEFAULT_BOUNDS.height;
-
-  // Extract web pages with matching images — these are often retailer pages with prices
-  const webPages: { url: string; title: string }[] = (first?.webDetection?.pagesWithMatchingImages ?? [])
-    .filter((p: any) => p?.url && p?.pageTitle)
-    .map((p: any) => ({ url: p.url as string, title: (p.pageTitle as string).trim() }))
-    .slice(0, 20);
-
-  // Extract VisionSignals for the scan pipeline
-  const visionSignals = extractVisionSignals(json);
-
-  console.log('[DeaLo] Vision API: detected =>', bestName, '| confidence:', confidence.toFixed(2), '| logo:', topLogo, '| source:', bestCandidate?.source, '| webPages:', webPages.length, '| ocrTokens:', visionSignals.ocrTokens.length);
   return {
-    name: bestName,
-    category: categoryLabel || 'Unknown',
-    confidence: clamp01(confidence),
-    bounds: normalizeBox({ x: minX, y: minY, width: maxX - minX, height: maxY - minY }),
+    name: 'Scanning...',
+    category: 'General',
+    confidence: 0.9,
+    bounds: normalizeBox(DEFAULT_BOUNDS),
     description: '',
     features: [],
     priceRange: '',
     alternatives: [],
-    webPages,
-    visionSignals,
+    webPages: [],
   };
-};
-
-const detectObject = async (photo: { uri: string; base64: string }): Promise<DetectedObject> => {
-  const apiKey = process.env.EXPO_PUBLIC_GOOGLE_VISION_API_KEY;
-  if (!apiKey) {
-    console.warn('[DeaLo] No EXPO_PUBLIC_GOOGLE_VISION_API_KEY set');
-    return { name: 'Unknown Product', category: 'Unknown', confidence: 0.5, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [], visionSignals: null };
-  }
-
-  // Try up to 2 attempts
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    try {
-      console.log(`[DeaLo] Vision API: attempt ${attempt}, base64 length = ${photo.base64?.length ?? 0}`);
-      const json = await callVisionAPI(photo.base64, apiKey);
-      return parseVisionResponse(json);
-    } catch (e: any) {
-      console.warn(`[DeaLo] Vision API attempt ${attempt} failed:`, e?.message || e);
-      if (attempt < 2) {
-        await new Promise((r) => setTimeout(r, 1000)); // wait 1s before retry
-      }
-    }
-  }
-
-  // All attempts failed — return fallback with default bounds so scanner still animates
-  console.warn('[DeaLo] Vision API: all attempts failed, using fallback');
-  return { name: 'Unknown Product', category: 'Unknown', confidence: 0.3, bounds: normalizeBox(DEFAULT_BOUNDS), description: '', features: [], priceRange: '', alternatives: [], webPages: [], visionSignals: null };
 };
 
 export default function CameraScreen() {
@@ -660,21 +269,11 @@ export default function CameraScreen() {
       boxWidth.setValue(initialBoxPx.width);
       boxHeight.setValue(initialBoxPx.height);
 
-      // Use AI detection — always returns a result (never null)
-      const detected = await detectObject({ uri: capturedUri, base64: capturedBase64 });
+      // Prepare for edge function scan — caches base64, returns default bounds
+      const detected = prepareForScan(capturedBase64);
       if (!alive) return;
 
       setDetectedObject(detected);
-
-      // Check if detection actually found a product
-      const isUnknown = detected.name === 'Unknown Product' || detected.confidence < 0.15;
-
-      if (isUnknown) {
-        // Detection failed — show "not found" overlay instead of navigating
-        console.warn('[DeaLo] Detection failed, showing not-found overlay');
-        setDetectionFailed(true);
-        return;
-      }
 
       const targetPx = {
         left: detected.bounds.x * previewSize.width,
@@ -707,13 +306,8 @@ export default function CameraScreen() {
             objectName: detected.name,
             category: detected.category,
             confidence: detected.confidence.toString(),
-            description: detected.description,
-            features: JSON.stringify(detected.features),
-            priceRange: detected.priceRange,
-            alternatives: JSON.stringify(detected.alternatives),
             imageUri: capturedUri,
-            webPages: JSON.stringify(detected.webPages),
-            visionSignals: detected.visionSignals ? JSON.stringify(detected.visionSignals) : '',
+            useEdgeScan: '1',
           }
         });
       }, 1600);

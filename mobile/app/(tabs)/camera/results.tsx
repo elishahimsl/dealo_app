@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Dimensions, Platform, ActivityIndicator, Linking, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -10,6 +10,7 @@ import { trackInteraction } from '../../../lib/services/user-interactions';
 import AdBanner from '../../../components/AdBanner';
 import { maybeShowInterstitial } from '../../../lib/services/ad-service';
 import { generateProductAnalysis } from '../../../lib/services/product-analysis';
+import { getCachedImageBase64, clearCachedImageBase64 } from '../../../lib/services/scan-image-cache';
 
 const { width } = Dimensions.get('window');
 
@@ -108,66 +109,79 @@ export default function CameraResults() {
   const [aiSummaryExpanded, setAiSummaryExpanded] = useState(false);
   const [range, setRange] = useState<RangeKey>('90D');
   const half = useMemo(() => (width - 16 * 2 - 12) / 2, []);
+  const [showPickModal, setShowPickModal] = useState(false);
+  const [pickDismissed, setPickDismissed] = useState(false);
 
   // Parse params
   const objectName = typeof params.objectName === 'string' ? params.objectName : '';
   const categoryParam = typeof params.category === 'string' ? params.category : 'General';
   const imageUri = (params.imageUri as string) || '';
+  const useEdgeScan = params.useEdgeScan === '1';
 
-  // Parse Vision API webPages for fallback price extraction
-  const visionWebPages = useMemo(() => {
-    try {
-      const raw = params.webPages as string;
-      if (raw) return JSON.parse(raw) as { url: string; title: string }[];
-    } catch {}
-    return undefined;
-  }, [params.webPages]);
+  // Read cached base64 for edge function scan (set by camera screen)
+  const imageBase64 = useMemo(() => {
+    if (!useEdgeScan) return null;
+    const b64 = getCachedImageBase64();
+    if (!b64) {
+      console.warn('[DeaLo] useEdgeScan=1 but no cached base64 found');
+    }
+    return b64;
+  }, [useEdgeScan]);
 
-  // Parse VisionSignals for the scan pipeline
-  const visionSignals = useMemo(() => {
-    try {
-      const raw = params.visionSignals as string;
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return undefined;
-  }, [params.visionSignals]);
+  // Clear cached base64 on unmount to free memory
+  useEffect(() => {
+    return () => { clearCachedImageBase64(); };
+  }, []);
 
-  // Real data lookup: searches prices, stores in DB, calculates DLO score
-  const { status, data: productData, dloScore, error, retry } = useProductLookup(
+  // Real data lookup: edge function (camera scan) or client-side (barcode)
+  const { status, data: productData, dloScore, scanResponse, error, retry } = useProductLookup(
     objectName,
     categoryParam,
     imageUri,
-    undefined, // upc
-    visionWebPages,
-    visionSignals,
+    imageBase64,
   );
+
+  // Show candidate picker when edge function returns PICK decision
+  useEffect(() => {
+    if (
+      scanResponse?.decision === 'PICK' &&
+      scanResponse.candidates.length > 1 &&
+      !pickDismissed &&
+      status === 'done'
+    ) {
+      setShowPickModal(true);
+    }
+  }, [scanResponse, status, pickDismissed]);
+
+  // Derive display data from real results
+  // Use refined name from edge function / SerpApi if more specific than "Scanning..."
+  const displayName = productData?.refinedName || (objectName !== 'Scanning...' ? objectName.trim() : '') || 'Unknown Product';
 
   // Save toggle for this product (use temp ID if DB insert failed)
   const productId = productData?.product?.id;
   const saveMeta = useMemo(() => ({
-    title: objectName,
+    title: displayName,
     brand: productData?.product?.brand || null,
     category: categoryParam,
     image_urls: productData?.product?.image_urls || (imageUri ? [imageUri] : null),
-  }), [objectName, productData, categoryParam, imageUri]);
+  }), [displayName, productData, categoryParam, imageUri]);
   const { saved, toggling, toggle: toggleSave } = useSaveToggle(productId, saveMeta);
 
   // Track scan interaction and maybe show interstitial when product data loads
   useEffect(() => {
     if (productId && status === 'done') {
-      trackInteraction({ productId, type: 'scan', metadata: { source: 'camera', name: objectName } });
+      trackInteraction({ productId, type: 'scan', metadata: { source: useEdgeScan ? 'edge-scan' : 'camera', name: displayName } });
       maybeShowInterstitial();
     }
   }, [productId, status]);
-
-  // Derive display data from real results
-  // Use refined name from SerpApi/Gemini if more specific than Vision detection
-  const displayName = productData?.refinedName || objectName.trim() || 'Unknown Product';
   const onlineImage = productData?.productImages?.[0]?.url || productData?.priceResults?.[0]?.imageUrl || null;
   const displayImage = onlineImage || imageUri || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80';
   const gemini = productData?.geminiAnalysis;
   const dealLabel = dloScore?.label || 'Analyzing...';
-  const confidence = (params.confidence as string) || '0.85';
+  // Use edge function confidence when available, otherwise route param
+  const confidence = scanResponse?.bestMatch?.confidence?.toString()
+    || (params.confidence as string)
+    || '0.85';
   const matchDots = Math.min(5, Math.max(1, Math.round(parseFloat(confidence) * 5)));
 
   // Price data
@@ -733,9 +747,81 @@ export default function CameraResults() {
           </View>
         </ScrollView>
       </View>
+
+      {/* PICK mode candidate picker modal */}
+      <Modal
+        visible={showPickModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => { setShowPickModal(false); setPickDismissed(true); }}
+      >
+        <View style={pickStyles.overlay}>
+          <View style={pickStyles.sheet}>
+            <Text style={pickStyles.title}>Which product is this?</Text>
+            <Text style={pickStyles.subtitle}>We found several possible matches.</Text>
+            <ScrollView style={pickStyles.list} showsVerticalScrollIndicator={false}>
+              {(scanResponse?.candidates || []).slice(0, 5).map((c, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[pickStyles.candidateRow, i === 0 && pickStyles.candidateRowTop]}
+                  activeOpacity={0.85}
+                  onPress={() => {
+                    setShowPickModal(false);
+                    setPickDismissed(true);
+                    // Top candidate is already shown — no action needed for index 0
+                  }}
+                >
+                  {c.image ? (
+                    <Image source={{ uri: c.image }} style={pickStyles.candidateImg} />
+                  ) : (
+                    <View style={[pickStyles.candidateImg, { backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' }]}>
+                      <Ionicons name="cube-outline" size={20} color="#9CA3AF" />
+                    </View>
+                  )}
+                  <View style={{ flex: 1 }}>
+                    <Text style={pickStyles.candidateTitle} numberOfLines={2}>{c.title}</Text>
+                    <Text style={pickStyles.candidateMeta}>
+                      {c.merchant ? `${c.merchant}` : ''}
+                      {c.price != null ? ` · $${c.price.toFixed(2)}` : ''}
+                    </Text>
+                  </View>
+                  {i === 0 && (
+                    <View style={pickStyles.topBadge}>
+                      <Text style={pickStyles.topBadgeText}>Best</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={pickStyles.dismissBtn}
+              onPress={() => { setShowPickModal(false); setPickDismissed(true); }}
+            >
+              <Text style={pickStyles.dismissText}>Use Top Match</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
+
+const pickStyles = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 36, maxHeight: '70%' },
+  title: { fontSize: 20, fontWeight: '700', color: '#111827', textAlign: 'center' },
+  subtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 4, marginBottom: 16 },
+  list: { maxHeight: 340 },
+  candidateRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#F3F4F6', gap: 12 },
+  candidateRowTop: { backgroundColor: '#F0FDF9', borderRadius: 12, borderBottomWidth: 0, marginBottom: 4 },
+  candidateImg: { width: 52, height: 52, borderRadius: 10, resizeMode: 'cover' as any },
+  candidateTitle: { fontSize: 14, fontWeight: '600', color: '#111827', lineHeight: 18 },
+  candidateMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
+  topBadge: { backgroundColor: '#0E9F6E', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
+  topBadgeText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+  dismissBtn: { marginTop: 16, backgroundColor: '#0E9F6E', paddingVertical: 14, borderRadius: 14, alignItems: 'center' },
+  dismissText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+});
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB' },

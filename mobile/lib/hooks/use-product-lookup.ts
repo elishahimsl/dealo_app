@@ -10,7 +10,7 @@ export interface ProductLookupResult {
   data: ProductWithOffers | null;
   dloScore: DloScoreResult | null;
   error: string | null;
-  /** Edge function response (available when imageBase64 path is used) */
+  /** Edge function response (available when scanImageUrl path is used) */
   scanResponse: ScanProductResponse | null;
 }
 
@@ -18,14 +18,14 @@ export interface ProductLookupResult {
  * Hook to look up a product.
  *
  * Two paths:
- * 1. imageBase64 provided → call scan-product edge function (camera scan flow)
- * 2. productName provided → call ingestProduct client-side (barcode / manual flow)
+ * 1. scanImageUrl provided → call scan-product edge function (camera scan flow)
+ * 2. productName provided  → call ingestProduct client-side (barcode / manual flow)
  */
 export function useProductLookup(
   productName: string,
   category: string,
   imageUri?: string,
-  imageBase64?: string | null,
+  scanImageUrl?: string | null,
   upc?: string,
   visionWebPages?: { url: string; title: string }[],
 ) {
@@ -38,8 +38,8 @@ export function useProductLookup(
   });
 
   const lookup = useCallback(async () => {
-    // Need either a base64 image or a product name to search
-    if (!imageBase64 && !productName.trim()) return;
+    // Need either a scan image URL or a product name to search
+    if (!scanImageUrl && !productName.trim()) return;
 
     setResult({ status: 'loading', data: null, dloScore: null, error: null, scanResponse: null });
 
@@ -56,10 +56,10 @@ export function useProductLookup(
       let productData: ProductWithOffers;
       let scanResponse: ScanProductResponse | null = null;
 
-      if (imageBase64) {
-        // ─── Path A: Edge function (camera scan) ─────────────────
-        console.log('[DeaLo] lookup: calling scan-product edge function');
-        scanResponse = await callScanProduct(imageBase64);
+      if (scanImageUrl) {
+        // ─── Path A: Edge function via Storage URL (camera scan) ──
+        console.log('[DeaLo] lookup: calling scan-product with imageUrl');
+        scanResponse = await callScanProduct({ imageUrl: scanImageUrl });
         productData = mapScanResponseToProductData(scanResponse, category, imageUri || '');
         console.log('[DeaLo] lookup: edge scan done, decision:', scanResponse.decision, '| product:', productData.refinedName);
       } else {
@@ -107,7 +107,7 @@ export function useProductLookup(
         scanResponse: null,
       });
     }
-  }, [productName, category, imageUri, imageBase64, upc, visionWebPages]);
+  }, [productName, category, imageUri, scanImageUrl, upc, visionWebPages]);
 
   useEffect(() => {
     lookup();

@@ -42,21 +42,48 @@ export function extractTokens(text: string): string[] {
 
 // ─── Vision API call ─────────────────────────────────────────────────
 
+export interface VisionImageInput {
+  /** Base64-encoded image data (legacy / fallback) */
+  base64?: string
+  /** Public URL — Vision API fetches the image directly (preferred) */
+  imageUri?: string
+}
+
 /**
  * Call Google Vision API with WEB_DETECTION and TEXT_DETECTION.
- * Accepts base64-encoded image data.
+ *
+ * Accepts either:
+ *   - base64 content  →  `image.content`
+ *   - public URL      →  `image.source.imageUri`
+ *
+ * The URL path is preferred — avoids sending megabytes through the
+ * Edge Function body and lets Vision fetch directly from storage.
  */
 export async function callVisionApi(
-  base64Image: string,
+  input: VisionImageInput | string,
   apiKey: string,
   // deno-lint-ignore no-explicit-any
 ): Promise<Record<string, any>> {
   const url = `https://vision.googleapis.com/v1/images:annotate?key=${apiKey}`
 
+  // Build the image field based on input type
+  // deno-lint-ignore no-explicit-any
+  let imageField: Record<string, any>
+  if (typeof input === 'string') {
+    // Legacy: bare string = base64
+    imageField = { content: input }
+  } else if (input.imageUri) {
+    imageField = { source: { imageUri: input.imageUri } }
+  } else if (input.base64) {
+    imageField = { content: input.base64 }
+  } else {
+    throw new Error('callVisionApi: must provide either base64 or imageUri')
+  }
+
   const body = {
     requests: [
       {
-        image: { content: base64Image },
+        image: imageField,
         features: [
           { type: 'WEB_DETECTION', maxResults: 20 },
           { type: 'TEXT_DETECTION', maxResults: 5 },

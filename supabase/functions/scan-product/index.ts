@@ -3,27 +3,32 @@
  *
  * Main backend entry point for the camera scan flow.
  *
- * Accepts a base64-encoded product image, runs multi-signal detection
- * via Google Vision, builds smart search queries, calls search-offers
- * for structured price data, reranks candidates with weighted scoring,
- * applies a confidence gate (AUTO vs PICK), and optionally runs Gemini
- * for AI product analysis.
+ * Accepts a product image via one of three inputs (in priority order):
+ *   1. imageUrl     — public URL (preferred, e.g. Supabase Storage public URL)
+ *   2. storagePath  — relative path in Supabase Storage scan-images bucket
+ *   3. imageBase64  — base64-encoded image data (legacy / fallback)
+ *
+ * Runs multi-signal detection via Google Vision, builds smart search
+ * queries, calls search-offers for structured price data, reranks
+ * candidates with weighted scoring, applies a confidence gate
+ * (AUTO vs PICK), and optionally runs Gemini for AI product analysis.
  *
  * The mobile app sends the photo here — no paid API keys on the client.
  *
  * Secrets required (set via `supabase secrets set`):
- *   GOOGLE_VISION_KEY  — Google Cloud API key with Vision API enabled
+ *   VISION_API_KEY      — Google Cloud API key with Vision API enabled
  *   SERPAPI_KEY         — serpapi.com API key (used by search-offers)
  *   GEMINI_API_KEY      — (optional) Google AI Studio or Vertex AI key
  *
  * POST /scan-product
- * Body: { "imageBase64": "<base64 string>" }
+ * Body: { "imageUrl": "..." } | { "storagePath": "..." } | { "imageBase64": "..." }
  * Response: ScanProductResponse (see _shared/types.ts)
  */
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { jsonResponse, preflightResponse } from '../_shared/cors.ts'
 import { callVisionApi, extractVisionSignals } from '../_shared/vision.ts'
+import type { VisionImageInput } from '../_shared/vision.ts'
 import { buildQueries, rankCandidateTitles } from '../_shared/query-builder.ts'
 import type { RankedTitle } from '../_shared/query-builder.ts'
 import { analyzeProduct } from '../_shared/gemini.ts'
@@ -215,35 +220,50 @@ serve(async (req: Request) => {
       return jsonResponse({ error: 'Invalid JSON body.' }, 400)
     }
 
+    // ── Resolve image input (priority: imageUrl > storagePath > imageBase64) ──
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+
+    let visionInput: VisionImageInput
+    let inputLabel: string
+
+    const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl.trim() : ''
+    const storagePath = typeof body.storagePath === 'string' ? body.storagePath.trim() : ''
     const base64Image = typeof body.imageBase64 === 'string' ? body.imageBase64.trim() : ''
-    if (!base64Image) {
+
+    if (imageUrl) {
+      // Preferred: direct public URL
+      visionInput = { imageUri: imageUrl }
+      inputLabel = `url (${imageUrl.slice(0, 80)})`
+    } else if (storagePath) {
+      // Construct public URL from Supabase Storage bucket
+      const publicUrl = `${supabaseUrl}/storage/v1/object/public/scan-images/${storagePath}`
+      visionInput = { imageUri: publicUrl }
+      inputLabel = `storage (${storagePath})`
+    } else if (base64Image) {
+      // Legacy fallback: inline base64
+      visionInput = { base64: base64Image }
+      inputLabel = `base64 (${base64Image.length} chars)`
+    } else {
       return jsonResponse(
-        { error: 'Missing required field: "imageBase64" (base64 string).' },
+        { error: 'Missing image. Provide "imageUrl", "storagePath", or "imageBase64".' },
         400,
       )
     }
 
-    // NOTE: Image preprocessing (resize/compress) should happen on the
-    // mobile client before sending. Supabase Edge Functions have a 2MB
-    // body limit so large images should be resized client-side.
-    // A future improvement could add a resize step here using sharp/wasm.
-
     // ── Read secrets ──────────────────────────────────────────────
-    const visionKey = Deno.env.get('GOOGLE_VISION_KEY')
+    const visionKey = Deno.env.get('VISION_API_KEY')
     if (!visionKey) {
-      console.error('[scan-product] GOOGLE_VISION_KEY secret is not set.')
+      console.error('[scan-product] VISION_API_KEY secret is not set.')
       return jsonResponse(
         { error: 'Vision API is not configured. Contact support.' },
         500,
       )
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-
     // ── Step 1: Call Vision API ───────────────────────────────────
-    console.log(`[scan-product] calling Vision API (image: ${base64Image.length} chars)`)
-    const visionJson = await callVisionApi(base64Image, visionKey)
+    console.log(`[scan-product] calling Vision API (${inputLabel})`)
+    const visionJson = await callVisionApi(visionInput, visionKey)
     const signals = extractVisionSignals(visionJson)
 
     console.log('[scan-product] signals:', {
@@ -316,8 +336,13 @@ serve(async (req: Request) => {
     // For PICK mode, wait until the user confirms a choice.
     let analysis = null
     if (gate.decision === 'AUTO' && gate.bestTitle) {
-      // Run Gemini in parallel — if it fails or times out, we still return
-      analysis = await analyzeProduct(gate.bestTitle)
+      try {
+        analysis = await analyzeProduct(gate.bestTitle)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err)
+        console.error(`[scan-product] Gemini analysis failed: ${msg}`)
+        analysis = null
+      }
     }
 
     // ── Build response ───────────────────────────────────────────

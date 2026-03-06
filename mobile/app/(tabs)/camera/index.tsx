@@ -5,7 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { setCachedImageBase64 } from '../../../lib/services/scan-image-cache';
+import { uploadScanImage } from '../../../lib/services/scan-storage';
 
 const BRAND_GREEN = '#0E9F6E';
 
@@ -41,30 +41,22 @@ const normalizeBox = (b: NormalizedBox): NormalizedBox => ({
 const DEFAULT_BOUNDS: NormalizedBox = { x: 0.12, y: 0.15, width: 0.76, height: 0.70 };
 
 /**
- * Prepare a captured image for scanning.
+ * Build a default DetectedObject for the scan animation.
  *
- * All product detection (Vision API, query building, SerpApi search,
- * reranking, Gemini analysis) now happens server-side in the
- * scan-product edge function. The camera just caches the base64
- * and shows a scan animation with default bounds.
+ * All product detection now happens server-side. The camera shows
+ * a scan animation while uploading the image to Supabase Storage.
  */
-const prepareForScan = (base64: string): DetectedObject => {
-  // Cache the base64 so the results screen can send it to the edge function
-  setCachedImageBase64(base64);
-  console.log('[DeaLo] Cached image for edge scan, size:', base64.length);
-
-  return {
-    name: 'Scanning...',
-    category: 'General',
-    confidence: 0.9,
-    bounds: normalizeBox(DEFAULT_BOUNDS),
-    description: '',
-    features: [],
-    priceRange: '',
-    alternatives: [],
-    webPages: [],
-  };
-};
+const buildScanPlaceholder = (): DetectedObject => ({
+  name: 'Scanning...',
+  category: 'General',
+  confidence: 0.9,
+  bounds: normalizeBox(DEFAULT_BOUNDS),
+  description: '',
+  features: [],
+  priceRange: '',
+  alternatives: [],
+  webPages: [],
+});
 
 export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
@@ -269,8 +261,8 @@ export default function CameraScreen() {
       boxWidth.setValue(initialBoxPx.width);
       boxHeight.setValue(initialBoxPx.height);
 
-      // Prepare for edge function scan — caches base64, returns default bounds
-      const detected = prepareForScan(capturedBase64);
+      // Show scan animation with default bounds
+      const detected = buildScanPlaceholder();
       if (!alive) return;
 
       setDetectedObject(detected);
@@ -298,19 +290,29 @@ export default function CameraScreen() {
       const travel = Math.max(0, clamped.height - innerPad * 2 - lineHeight);
       startScanLine(travel);
 
-      scanDoneTimeoutRef.current = setTimeout(() => {
+      // Upload image to Supabase Storage while scan animation plays
+      let uploadResult: { storagePath: string; publicUrl: string };
+      try {
+        uploadResult = await uploadScanImage(capturedUri, capturedBase64);
+      } catch (err: any) {
         if (!alive) return;
-        router.push({
-          pathname: '/camera/results',
-          params: {
-            objectName: detected.name,
-            category: detected.category,
-            confidence: detected.confidence.toString(),
-            imageUri: capturedUri,
-            useEdgeScan: '1',
-          }
-        });
-      }, 1600);
+        console.warn('[DeaLo] Storage upload failed:', err?.message);
+        setDetectionFailed(true);
+        return;
+      }
+      if (!alive) return;
+
+      console.log('[DeaLo] Upload done, navigating to results with URL');
+      router.push({
+        pathname: '/camera/results',
+        params: {
+          objectName: detected.name,
+          category: detected.category,
+          confidence: detected.confidence.toString(),
+          imageUri: capturedUri,
+          scanImageUrl: uploadResult.publicUrl,
+        }
+      });
     })();
 
     return () => {

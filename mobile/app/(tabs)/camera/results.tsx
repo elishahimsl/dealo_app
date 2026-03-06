@@ -10,7 +10,7 @@ import { trackInteraction } from '../../../lib/services/user-interactions';
 import AdBanner from '../../../components/AdBanner';
 import { maybeShowInterstitial } from '../../../lib/services/ad-service';
 import { generateProductAnalysis } from '../../../lib/services/product-analysis';
-import { getCachedImageBase64, clearCachedImageBase64 } from '../../../lib/services/scan-image-cache';
+// scan-image-cache is no longer needed — scanImageUrl comes via route params
 
 const { width } = Dimensions.get('window');
 
@@ -116,29 +116,15 @@ export default function CameraResults() {
   const objectName = typeof params.objectName === 'string' ? params.objectName : '';
   const categoryParam = typeof params.category === 'string' ? params.category : 'General';
   const imageUri = (params.imageUri as string) || '';
-  const useEdgeScan = params.useEdgeScan === '1';
+  // scanImageUrl is a small string (Supabase Storage public URL) passed via route params
+  const scanImageUrl = (params.scanImageUrl as string) || null;
 
-  // Read cached base64 for edge function scan (set by camera screen)
-  const imageBase64 = useMemo(() => {
-    if (!useEdgeScan) return null;
-    const b64 = getCachedImageBase64();
-    if (!b64) {
-      console.warn('[DeaLo] useEdgeScan=1 but no cached base64 found');
-    }
-    return b64;
-  }, [useEdgeScan]);
-
-  // Clear cached base64 on unmount to free memory
-  useEffect(() => {
-    return () => { clearCachedImageBase64(); };
-  }, []);
-
-  // Real data lookup: edge function (camera scan) or client-side (barcode)
+  // Real data lookup: edge function via URL (camera scan) or client-side (barcode)
   const { status, data: productData, dloScore, scanResponse, error, retry } = useProductLookup(
     objectName,
     categoryParam,
     imageUri,
-    imageBase64,
+    scanImageUrl,
   );
 
   // Show candidate picker when edge function returns PICK decision
@@ -170,7 +156,7 @@ export default function CameraResults() {
   // Track scan interaction and maybe show interstitial when product data loads
   useEffect(() => {
     if (productId && status === 'done') {
-      trackInteraction({ productId, type: 'scan', metadata: { source: useEdgeScan ? 'edge-scan' : 'camera', name: displayName } });
+      trackInteraction({ productId, type: 'scan', metadata: { source: scanImageUrl ? 'edge-scan' : 'camera', name: displayName } });
       maybeShowInterstitial();
     }
   }, [productId, status]);
@@ -748,7 +734,7 @@ export default function CameraResults() {
         </ScrollView>
       </View>
 
-      {/* PICK mode candidate picker modal */}
+      {/* PICK mode — Lens-style bottom-sheet candidate picker */}
       <Modal
         visible={showPickModal}
         transparent
@@ -756,48 +742,69 @@ export default function CameraResults() {
         onRequestClose={() => { setShowPickModal(false); setPickDismissed(true); }}
       >
         <View style={pickStyles.overlay}>
+          {/* Captured image visible behind the scrim */}
+          {imageUri ? (
+            <Image source={{ uri: imageUri }} style={pickStyles.bgImage} blurRadius={Platform.OS === 'ios' ? 6 : 3} />
+          ) : null}
+          <View style={pickStyles.scrim} />
+
+          {/* Bottom sheet */}
           <View style={pickStyles.sheet}>
-            <Text style={pickStyles.title}>Which product is this?</Text>
-            <Text style={pickStyles.subtitle}>We found several possible matches.</Text>
+            {/* Drag handle */}
+            <View style={pickStyles.handle} />
+
+            <Text style={pickStyles.title}>Visual matches</Text>
+            <Text style={pickStyles.subtitle}>Tap the product that matches best</Text>
+
             <ScrollView style={pickStyles.list} showsVerticalScrollIndicator={false}>
-              {(scanResponse?.candidates || []).slice(0, 5).map((c, i) => (
+              {(scanResponse?.candidates || []).slice(0, 6).map((c, i) => (
                 <TouchableOpacity
                   key={i}
-                  style={[pickStyles.candidateRow, i === 0 && pickStyles.candidateRowTop]}
-                  activeOpacity={0.85}
+                  style={[pickStyles.card, i === 0 && pickStyles.cardTop]}
+                  activeOpacity={0.88}
                   onPress={() => {
                     setShowPickModal(false);
                     setPickDismissed(true);
-                    // Top candidate is already shown — no action needed for index 0
                   }}
                 >
+                  {/* Product image */}
                   {c.image ? (
-                    <Image source={{ uri: c.image }} style={pickStyles.candidateImg} />
+                    <Image source={{ uri: c.image }} style={pickStyles.cardImg} />
                   ) : (
-                    <View style={[pickStyles.candidateImg, { backgroundColor: '#F3F4F6', justifyContent: 'center', alignItems: 'center' }]}>
-                      <Ionicons name="cube-outline" size={20} color="#9CA3AF" />
+                    <View style={[pickStyles.cardImg, pickStyles.cardImgPlaceholder]}>
+                      <Ionicons name="cube-outline" size={24} color="#9CA3AF" />
                     </View>
                   )}
-                  <View style={{ flex: 1 }}>
-                    <Text style={pickStyles.candidateTitle} numberOfLines={2}>{c.title}</Text>
-                    <Text style={pickStyles.candidateMeta}>
-                      {c.merchant ? `${c.merchant}` : ''}
-                      {c.price != null ? ` · $${c.price.toFixed(2)}` : ''}
+
+                  {/* Info */}
+                  <View style={pickStyles.cardInfo}>
+                    <Text style={pickStyles.cardTitle} numberOfLines={2}>{c.title}</Text>
+                    <View style={pickStyles.cardMetaRow}>
+                      {c.merchant ? (
+                        <Text style={pickStyles.cardMerchant}>{c.merchant}</Text>
+                      ) : null}
+                      {c.price != null ? (
+                        <Text style={pickStyles.cardPrice}>${c.price.toFixed(2)}</Text>
+                      ) : null}
+                    </View>
+                  </View>
+
+                  {/* Confidence badge */}
+                  <View style={[pickStyles.confBadge, i === 0 && pickStyles.confBadgeTop]}>
+                    <Text style={[pickStyles.confText, i === 0 && pickStyles.confTextTop]}>
+                      {Math.round(c.confidence * 100)}%
                     </Text>
                   </View>
-                  {i === 0 && (
-                    <View style={pickStyles.topBadge}>
-                      <Text style={pickStyles.topBadgeText}>Best</Text>
-                    </View>
-                  )}
                 </TouchableOpacity>
               ))}
             </ScrollView>
+
             <TouchableOpacity
-              style={pickStyles.dismissBtn}
+              style={pickStyles.confirmBtn}
+              activeOpacity={0.9}
               onPress={() => { setShowPickModal(false); setPickDismissed(true); }}
             >
-              <Text style={pickStyles.dismissText}>Use Top Match</Text>
+              <Text style={pickStyles.confirmText}>Use Top Match</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -807,20 +814,48 @@ export default function CameraResults() {
 }
 
 const pickStyles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 36, maxHeight: '70%' },
-  title: { fontSize: 20, fontWeight: '700', color: '#111827', textAlign: 'center' },
-  subtitle: { fontSize: 13, color: '#6B7280', textAlign: 'center', marginTop: 4, marginBottom: 16 },
-  list: { maxHeight: 340 },
-  candidateRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#F3F4F6', gap: 12 },
-  candidateRowTop: { backgroundColor: '#F0FDF9', borderRadius: 12, borderBottomWidth: 0, marginBottom: 4 },
-  candidateImg: { width: 52, height: 52, borderRadius: 10, resizeMode: 'cover' as any },
-  candidateTitle: { fontSize: 14, fontWeight: '600', color: '#111827', lineHeight: 18 },
-  candidateMeta: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  topBadge: { backgroundColor: '#0E9F6E', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  topBadgeText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
-  dismissBtn: { marginTop: 16, backgroundColor: '#0E9F6E', paddingVertical: 14, borderRadius: 14, alignItems: 'center' },
-  dismissText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  overlay: { flex: 1, justifyContent: 'flex-end' },
+  bgImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%', resizeMode: 'cover' as any },
+  scrim: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.55)' },
+  sheet: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 16,
+    paddingBottom: 36,
+    maxHeight: '72%',
+  },
+  handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#D1D5DB', alignSelf: 'center', marginTop: 10, marginBottom: 12 },
+  title: { fontSize: 22, fontWeight: '800', color: '#111827', marginBottom: 2 },
+  subtitle: { fontSize: 13, color: '#6B7280', marginBottom: 14 },
+  list: { maxHeight: 380 },
+
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    marginBottom: 6,
+    borderRadius: 14,
+    backgroundColor: '#F9FAFB',
+    gap: 12,
+  },
+  cardTop: { backgroundColor: '#F0FDF9', borderWidth: 1.5, borderColor: '#0E9F6E' },
+  cardImg: { width: 60, height: 60, borderRadius: 12, resizeMode: 'cover' as any },
+  cardImgPlaceholder: { backgroundColor: '#F3F4F6', justifyContent: 'center' as any, alignItems: 'center' as any },
+  cardInfo: { flex: 1 },
+  cardTitle: { fontSize: 14, fontWeight: '600', color: '#111827', lineHeight: 19 },
+  cardMetaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 3 },
+  cardMerchant: { fontSize: 12, color: '#6B7280' },
+  cardPrice: { fontSize: 12, fontWeight: '700', color: '#111827' },
+
+  confBadge: { backgroundColor: '#F3F4F6', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
+  confBadgeTop: { backgroundColor: '#D1FAE5' },
+  confText: { fontSize: 11, fontWeight: '700', color: '#6B7280' },
+  confTextTop: { color: '#0E9F6E' },
+
+  confirmBtn: { marginTop: 14, backgroundColor: '#0E9F6E', paddingVertical: 15, borderRadius: 16, alignItems: 'center' },
+  confirmText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 });
 
 const styles = StyleSheet.create({

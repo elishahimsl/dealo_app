@@ -56,15 +56,38 @@ export interface ScanProductResponse {
 
 // ─── Call the edge function ─────────────────────────────────────────
 
+export interface ScanProductInput {
+  /** Public URL of image in Supabase Storage (preferred path) */
+  imageUrl?: string;
+  /** Relative path within the scan-images bucket */
+  storagePath?: string;
+  /** Base64-encoded image data (legacy fallback) */
+  imageBase64?: string;
+}
+
 /**
  * Call the scan-product Supabase Edge Function.
- * Sends the raw base64 image, receives structured product data.
+ *
+ * Preferred flow: send imageUrl (public Storage URL) so the backend
+ * can pass it directly to Vision API — no large base64 payloads.
+ *
+ * Falls back to storagePath or imageBase64 for backward compat.
  */
-export async function callScanProduct(imageBase64: string): Promise<ScanProductResponse> {
-  console.log('[DeaLo] edge-scan: calling scan-product, image size:', imageBase64.length);
+export async function callScanProduct(input: ScanProductInput): Promise<ScanProductResponse> {
+  const label = input.imageUrl
+    ? `url (${input.imageUrl.slice(0, 60)})`
+    : input.storagePath
+      ? `storage (${input.storagePath})`
+      : `base64 (${input.imageBase64?.length ?? 0} chars)`;
+
+  console.log('[DeaLo] edge-scan: calling scan-product,', label);
 
   const { data, error } = await supabase.functions.invoke('scan-product', {
-    body: { imageBase64 },
+    body: {
+      ...(input.imageUrl ? { imageUrl: input.imageUrl } : {}),
+      ...(input.storagePath ? { storagePath: input.storagePath } : {}),
+      ...(input.imageBase64 ? { imageBase64: input.imageBase64 } : {}),
+    },
   });
 
   if (error) {
